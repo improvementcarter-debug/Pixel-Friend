@@ -8,201 +8,140 @@
 
 <style>
 :root{
-  --bg:#77b9f5;
-  --card:#fffdf2;
-  --ink:#18202b;
-  --soft:#e8f4ff;
-  --blue:#5d9df6;
-  --green:#77d98d;
-  --yellow:#ffd65a;
-  --pink:#ff89b7;
-  --red:#ff7777;
-  --purple:#a78bfa;
-  --shadow:5px 5px 0 var(--ink);
-  --muted:#627080;
+  --bg:#07111f;
+  --panel:#0d1b2a;
+  --panel2:#13263a;
+  --text:#f5f7ff;
+  --muted:#8fa3ba;
+  --primary:#00e5ff;
+  --yellow:#ffd43b;
+  --danger:#ff5c77;
+  --border:#24435f;
 }
 
-body.dark{
-  --bg:#111827;
-  --card:#202b38;
-  --ink:#f8fafc;
-  --soft:#2b3a4d;
-  --blue:#477fca;
-  --green:#55b86f;
-  --yellow:#d6ad3c;
-  --pink:#c85f8a;
-  --red:#c65c5c;
-  --purple:#8069c4;
-  --muted:#aeb8c5;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
-  font-family:"Courier New",monospace;
-  font-weight:700;
-  color:var(--ink);
-  background-color:var(--bg);
-  background-image:
-    linear-gradient(rgba(255,255,255,.14) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.14) 1px,transparent 1px);
-  background-size:28px 28px;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--text);
 }
 
-button,
-input,
-textarea,
-select{
+.hidden{display:none!important}
+
+button,input,textarea,select{
   font:inherit;
-  font-weight:700;
 }
 
 button{
   cursor:pointer;
-  border:3px solid var(--ink);
-  box-shadow:3px 3px 0 var(--ink);
-  transition:.12s;
-  background:var(--soft);
-  color:var(--ink);
+  border:none;
+  border-radius:10px;
+  padding:11px 15px;
+  font-weight:700;
 }
 
-button:hover{
-  transform:translate(2px,2px);
-  box-shadow:1px 1px 0 var(--ink);
-}
-
-button:active{
-  transform:translate(3px,3px);
-  box-shadow:none;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:2px 2px 0 var(--ink);
-}
-
-input,
-textarea,
-select{
+input,textarea,select{
   width:100%;
-  border:3px solid var(--ink);
+  border:1px solid var(--border);
+  border-radius:10px;
   padding:12px;
-  background:var(--soft);
-  color:var(--ink);
-  outline:none;
+  background:#091725;
+  color:var(--text);
+  margin-bottom:10px;
 }
 
 textarea{
-  min-height:100px;
+  min-height:110px;
   resize:vertical;
 }
 
-.hidden{
-  display:none!important;
-}
-
-.primary{
-  background:var(--green);
-}
-
-.blue{
-  background:var(--blue);
-}
-
-.yellow{
-  background:var(--yellow);
-}
-
-.pink{
-  background:var(--pink);
-}
-
-.danger{
-  background:var(--red);
-}
+.primary{background:var(--primary);color:#001018}
+.blue{background:#4c7dff;color:white}
+.yellow{background:var(--yellow);color:#201900}
+.danger{background:var(--danger)!important;color:white}
 
 .tiny{
-  font-size:11px;
+  font-size:12px;
   color:var(--muted);
 }
 
-/* LOGIN PAGE */
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.wrap{flex-wrap:wrap}
 
 #auth{
   min-height:100vh;
-  display:grid;
-  place-items:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   padding:20px;
 }
 
-.auth-box{
-  width:min(520px,100%);
-  padding:28px;
-  background:var(--card);
-  border:5px solid var(--ink);
-  box-shadow:10px 10px 0 var(--ink);
+.auth-card{
+  width:min(440px,100%);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 20px 70px rgba(0,0,0,.4);
 }
 
 .logo{
   text-align:center;
-  font-size:42px;
+  font-size:30px;
+  font-weight:900;
+  letter-spacing:2px;
 }
 
 .tabs{
   display:flex;
-  gap:10px;
+  gap:8px;
   margin:20px 0;
 }
 
 .tabs button{
   flex:1;
-  padding:12px;
+  background:#10243a;
+  color:var(--text);
 }
 
-.tabs .active{
-  background:var(--green);
+.tabs button.active{
+  background:var(--primary);
+  color:#001018;
 }
-
-/* DEMO TEXT MOVED TO CENTER */
 
 .demo-text{
   text-align:center;
-  margin:18px 0 0;
-  padding:0;
+  margin-top:16px;
 }
-
-/* MAIN APP */
 
 #app{
   min-height:100vh;
 }
 
-.top{
+header{
   position:sticky;
   top:0;
-  z-index:20;
+  z-index:10;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  gap:14px;
+  align-items:center;
+  gap:15px;
   padding:12px 18px;
-  background:var(--card);
-  border-bottom:4px solid var(--ink);
+  background:#081522;
+  border-bottom:1px solid var(--border);
 }
 
 .brand{
-  font-size:21px;
+  font-size:20px;
+  font-weight:900;
   cursor:pointer;
-  white-space:nowrap;
 }
 
 .actions{
@@ -212,518 +151,244 @@ textarea{
 }
 
 .actions input{
-  width:240px;
+  width:220px;
   margin:0;
 }
 
 .icon{
-  width:44px;
-  height:44px;
   position:relative;
+  background:#10243a;
+  color:white;
 }
 
 .badge{
   position:absolute;
-  right:-9px;
-  top:-9px;
-  min-width:22px;
-  height:22px;
+  top:-7px;
+  right:-7px;
+  min-width:20px;
+  height:20px;
   display:grid;
   place-items:center;
-  background:var(--red);
-  border:2px solid var(--ink);
-  font-size:10px;
+  border-radius:50%;
+  background:var(--danger);
+  font-size:11px;
 }
 
 .layout{
-  display:flex;
-  max-width:1500px;
-  margin:auto;
+  display:grid;
+  grid-template-columns:250px 1fr;
+  min-height:calc(100vh - 66px);
 }
 
 .side{
-  width:240px;
-  flex:none;
-  min-height:calc(100vh - 70px);
-  padding:18px;
-  background:var(--card);
-  border-right:4px solid var(--ink);
+  background:#081522;
+  border-right:1px solid var(--border);
+  padding:16px;
 }
 
 .mini{
-  padding:18px;
   text-align:center;
-  background:var(--soft);
-  border:4px solid var(--ink);
-  box-shadow:var(--shadow);
+  background:var(--panel);
+  border:1px solid var(--border);
+  padding:16px;
+  border-radius:16px;
 }
 
 .avatar{
-  display:grid;
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  display:inline-grid;
   place-items:center;
-  background:var(--purple);
-  border:4px solid var(--ink);
+  background:#10243a;
+  font-size:28px;
   position:relative;
 }
 
 .avatar.big{
-  width:84px;
-  height:84px;
-  margin:auto;
-  font-size:42px;
+  width:100px;
+  height:100px;
+  font-size:48px;
 }
 
 .online{
   position:absolute;
-  width:15px;
-  height:15px;
-  right:-6px;
-  bottom:-6px;
-  background:var(--green);
-  border:3px solid var(--ink);
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  right:3px;
+  bottom:3px;
+  background:#4ade80;
+  border:2px solid var(--panel);
 }
 
 .xp{
-  height:14px;
-  background:var(--card);
-  border:2px solid var(--ink);
-  margin-top:8px;
+  height:8px;
+  border-radius:99px;
+  background:#07111f;
+  overflow:hidden;
+  margin-top:10px;
 }
 
-.xp > div{
+#xpBar{
   height:100%;
-  background:var(--green);
-  width:0;
+  width:0%;
+  background:var(--primary);
 }
 
 .menu{
   display:grid;
-  gap:10px;
-  margin-top:20px;
+  gap:7px;
+  margin-top:15px;
 }
 
 .menu button{
-  padding:13px;
   text-align:left;
+  background:transparent;
+  color:var(--text);
+}
+
+.menu button:hover{
+  background:#10243a;
 }
 
 main{
+  padding:24px;
+  max-width:1100px;
   width:100%;
-  max-width:1040px;
   margin:auto;
-  padding:28px;
 }
 
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-  animation:fade .2s ease;
-}
-
-@keyframes fade{
-  from{
-    opacity:0;
-    transform:translateY(6px);
-  }
-
-  to{
-    opacity:1;
-    transform:none;
-  }
-}
-
-.card,
-.post{
-  background:var(--card);
-  border:4px solid var(--ink);
-  box-shadow:var(--shadow);
-  padding:20px;
-  margin-bottom:24px;
-}
+.page{display:none}
+.page.active{display:block}
 
 .hero{
   display:flex;
-  align-items:center;
   justify-content:space-between;
+  align-items:center;
   gap:20px;
-  background:var(--blue);
-  border:4px solid var(--ink);
-  box-shadow:var(--shadow);
-  padding:26px;
-  margin-bottom:24px;
+  padding:25px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#13263a,#0b1d31);
+  margin-bottom:18px;
 }
 
-.hero h1{
-  margin:0 0 10px;
-}
+.hero h1{margin:0 0 8px}
 
 .hero-icon{
-  font-size:58px;
+  font-size:60px;
 }
 
-.row{
-  display:flex;
-  gap:10px;
-  align-items:center;
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:18px;
 }
 
-.wrap{
-  flex-wrap:wrap;
+.post{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:14px;
 }
 
 .post-head{
   display:flex;
-  gap:12px;
   align-items:center;
+  gap:10px;
+  margin-bottom:10px;
 }
 
-.post-avatar{
-  width:48px;
-  height:48px;
-  display:grid;
-  place-items:center;
-  background:var(--purple);
-  border:3px solid var(--ink);
-  font-size:24px;
+.post-head strong{
+  display:block;
 }
 
-.post-body{
-  white-space:pre-wrap;
-  word-break:break-word;
-  line-height:1.6;
-  margin:18px 0;
-}
-
-.post-img{
+.post-image{
   width:100%;
-  max-height:460px;
+  max-height:450px;
   object-fit:cover;
-  border:4px solid var(--ink);
-  margin-bottom:16px;
-}
-
-.post-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.post-actions button{
-  padding:9px 12px;
-}
-
-.liked{
-  background:var(--pink)!important;
-}
-
-.saved{
-  background:var(--yellow)!important;
-}
-
-.comments{
-  border-top:3px dashed var(--ink);
-  margin-top:16px;
-  padding-top:12px;
-}
-
-.comment{
-  padding:10px;
-  margin:8px 0;
-  background:var(--soft);
-  border:3px solid var(--ink);
-  font-size:12px;
+  border-radius:12px;
+  margin-top:12px;
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-  gap:18px;
+  gap:14px;
 }
 
-.user{
+.friend-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
   text-align:center;
-}
-
-.user .avatar{
-  width:76px;
-  height:76px;
-  margin:auto;
-  font-size:38px;
-}
-
-.user p{
-  min-height:34px;
 }
 
 .stat-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-
-.stat{
-  padding:16px;
-  text-align:center;
-  background:var(--soft);
-  border:3px solid var(--ink);
-}
-
-.stat strong{
-  font-size:25px;
-  display:block;
-}
-
-.chat{
-  display:grid;
-  grid-template-columns:260px 1fr;
-  min-height:600px;
-  background:var(--card);
-  border:4px solid var(--ink);
-  box-shadow:var(--shadow);
-}
-
-.chat-side{
-  padding:14px;
-  background:var(--soft);
-  border-right:4px solid var(--ink);
-}
-
-.friend-btn{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  width:100%;
-  padding:10px;
-  margin-bottom:8px;
-  text-align:left;
-}
-
-.chat-main{
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-
-.chat-title{
-  padding:16px;
-  background:var(--blue);
-  border-bottom:4px solid var(--ink);
-}
-
-.messages{
-  flex:1;
-  min-height:460px;
-  max-height:560px;
-  overflow:auto;
-  padding:18px;
-  background:var(--soft);
-  display:flex;
-  flex-direction:column;
   gap:10px;
 }
 
-.msg{
-  max-width:76%;
-  padding:11px;
-  border:3px solid var(--ink);
-  box-shadow:3px 3px 0 var(--ink);
-  word-break:break-word;
-}
-
-.msg.me{
-  align-self:flex-end;
-  background:var(--green);
-}
-
-.msg.other{
-  align-self:flex-start;
-  background:var(--card);
-}
-
-.send{
-  display:flex;
-  gap:8px;
+.stat{
   padding:14px;
-  border-top:4px solid var(--ink);
+  background:#091725;
+  border-radius:12px;
 }
 
-.send input{
-  margin:0;
+.stat strong{
+  display:block;
+  font-size:24px;
 }
 
-.leader{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  padding:12px;
-  margin-bottom:10px;
-  background:var(--soft);
-  border:3px solid var(--ink);
-}
-
-.rank{
-  width:36px;
-  text-align:center;
-  padding:7px;
-  background:var(--yellow);
-  border:2px solid var(--ink);
-}
-
-.notice{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  padding:14px;
-  margin-bottom:12px;
-  background:var(--card);
-  border:3px solid var(--ink);
-  box-shadow:3px 3px 0 var(--ink);
-}
-
-.notice.unread{
-  background:var(--yellow);
-}
-
-.modal{
+.toast{
   position:fixed;
-  inset:0;
-  z-index:50;
-  background:rgba(0,0,0,.65);
-  display:grid;
-  place-items:center;
-  padding:20px;
-}
-
-.modal-box{
-  width:min(620px,100%);
-  max-height:90vh;
-  overflow:auto;
-  background:var(--card);
-  padding:24px;
-  border:5px solid var(--ink);
-  box-shadow:10px 10px 0 var(--ink);
-}
-
-#toast{
-  position:fixed;
+  bottom:20px;
   left:50%;
-  bottom:25px;
-  z-index:80;
-  transform:translate(-50%,130px);
-  padding:14px 18px;
-  background:var(--yellow);
-  color:#18202b;
-  border:4px solid #18202b;
-  box-shadow:5px 5px 0 #18202b;
-  transition:.25s;
+  transform:translateX(-50%);
+  z-index:100;
+  padding:13px 18px;
+  background:#07111f;
+  border:1px solid var(--primary);
+  border-radius:12px;
+  display:none;
 }
 
-#toast.show{
-  transform:translate(-50%,0);
-}
-
-@media(max-width:850px){
-  .layout{
-    flex-direction:column;
-  }
-
-  .side{
-    width:100%;
-    min-height:auto;
-    border-right:0;
-    border-bottom:4px solid var(--ink);
-  }
-
-  .mini{
-    display:none;
-  }
-
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr}
+  .side{border-right:none;border-bottom:1px solid var(--border)}
   .menu{
-    grid-template-columns:repeat(3,1fr);
-    margin-top:0;
-  }
-
-  .menu button{
-    text-align:center;
-  }
-
-  .chat{
-    grid-template-columns:1fr;
-  }
-
-  .chat-side{
-    border-right:0;
-    border-bottom:4px solid var(--ink);
-  }
-
-  #chatFriends{
     display:flex;
-    gap:8px;
     overflow:auto;
   }
-
-  .friend-btn{
-    min-width:155px;
-  }
+  .menu button{white-space:nowrap}
+  .actions input{width:120px}
+  main{padding:14px}
+  .hero-icon{display:none}
 }
 
-@media(max-width:600px){
-  .top{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .brand{
-    text-align:center;
-  }
-
-  .actions input{
-    width:auto;
-    flex:1;
-  }
-
-  main{
-    padding:15px;
-  }
-
-  .hero{
-    flex-direction:column;
-    text-align:center;
-  }
-
-  .menu{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .stat-grid{
-    grid-template-columns:1fr;
-  }
-
-  .row.mobile-stack,
-  .send{
-    flex-direction:column;
-  }
-
-  .post-actions button{
-    flex:1;
-  }
-
-  .messages{
-    min-height:380px;
-  }
+@media(max-width:500px){
+  header{padding:10px}
+  .brand{font-size:15px}
+  .actions input{display:none}
+  .stat-grid{grid-template-columns:1fr}
+  .mobile-stack{flex-direction:column}
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN / REGISTER -->
+<div id="toast" class="toast"></div>
 
+<!-- AUTH -->
 <div id="auth">
-  <div class="auth-box">
+
+  <div class="auth-card">
 
     <div class="logo">
       👾<br>
@@ -746,53 +411,27 @@ main{
 
     <div id="loginPane">
 
-      <input
-        id="loginEmail"
-        type="email"
-        placeholder="EMAIL"
-      >
+      <input id="loginEmail" type="email" placeholder="EMAIL">
 
-      <input
-        id="loginPass"
-        type="password"
-        placeholder="PASSWORD"
-      >
+      <input id="loginPass" type="password" placeholder="PASSWORD">
 
-      <button
-        class="primary"
-        style="width:100%"
-        onclick="login()"
-      >
+      <button class="primary" style="width:100%" onclick="login()">
         ENTER PIXEL WORLD
       </button>
 
-      <!-- MOVED DEMO TEXT -->
-
       <p class="tiny demo-text">
-        Demo app: accounts and content stay in this browser.
+        🌐 REAL PIXEL ACCOUNTS • REGISTER • LOGIN • CONNECT
       </p>
 
     </div>
 
     <div id="registerPane" class="hidden">
 
-      <input
-        id="regName"
-        maxlength="20"
-        placeholder="PIXEL USERNAME"
-      >
+      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">
 
-      <input
-        id="regEmail"
-        type="email"
-        placeholder="EMAIL"
-      >
+      <input id="regEmail" type="email" placeholder="EMAIL">
 
-      <input
-        id="regPass"
-        type="password"
-        placeholder="PASSWORD"
-      >
+      <input id="regPass" type="password" placeholder="PASSWORD">
 
       <select id="regAvatar">
         <option>👾</option>
@@ -807,508 +446,258 @@ main{
         <option>🐲</option>
       </select>
 
-      <button
-        class="primary"
-        style="width:100%"
-        onclick="register()"
-      >
+      <button class="primary" style="width:100%" onclick="register()">
         CREATE ACCOUNT
       </button>
 
     </div>
 
   </div>
+
 </div>
 
-<!-- MAIN APPLICATION -->
-
+<!-- APP -->
 <div id="app" class="hidden">
 
-  <header class="top">
+<header>
 
-    <div class="brand" onclick="page('home')">
-      🎮 PIXEL FRIEND
-    </div>
+  <div class="brand" onclick="page('home')">
+    🎮 PIXEL FRIEND
+  </div>
 
-    <div class="actions">
+  <div class="actions">
 
-      <input
-        id="globalSearch"
-        placeholder="SEARCH FRIENDS..."
-        oninput="searchUsers()"
-      >
+    <input
+      id="globalSearch"
+      placeholder="SEARCH FRIENDS..."
+      oninput="searchUsers()"
+    >
 
-      <button
-        class="icon"
-        onclick="page('notifications')"
-      >
-        🔔
-        <span id="badge" class="badge">0</span>
-      </button>
+    <button class="icon" onclick="page('notifications')">
+      🔔
+      <span id="badge" class="badge">0</span>
+    </button>
 
-      <button
-        class="icon"
-        onclick="theme()"
-      >
-        🌙
-      </button>
+    <button class="icon" onclick="theme()">🌙</button>
 
-      <button
-        id="headAvatar"
-        class="icon"
-        onclick="page('profile')"
-      >
-        👾
-      </button>
-
-    </div>
-
-  </header>
-
-  <div class="layout">
-
-    <aside class="side">
-
-      <div class="mini">
-
-        <div id="sideAvatar" class="avatar big">
-          👾
-          <span class="online"></span>
-        </div>
-
-        <h3 id="sideName">PLAYER</h3>
-
-        <p id="sideBio" class="tiny">
-          PIXEL EXPLORER
-        </p>
-
-        <div>
-          LEVEL
-          <span id="sideLevel">1</span>
-        </div>
-
-        <div class="xp">
-          <div id="xpBar"></div>
-        </div>
-
-        <p id="xpText" class="tiny">
-          0 / 100 XP
-        </p>
-
-      </div>
-
-      <nav class="menu">
-
-        <button onclick="page('home')">
-          🏠 HOME
-        </button>
-
-        <button onclick="page('friends')">
-          👥 FRIENDS
-        </button>
-
-        <button onclick="page('chat')">
-          💬 CHAT
-        </button>
-
-        <button onclick="page('leaderboard')">
-          🏆 RANK
-        </button>
-
-        <button onclick="page('notifications')">
-          🔔 ALERTS
-        </button>
-
-        <button onclick="page('profile')">
-          👤 PROFILE
-        </button>
-
-        <button class="danger" onclick="logout()">
-          🚪 LOGOUT
-        </button>
-
-      </nav>
-
-    </aside>
-
-    <main>
-
-      <!-- HOME -->
-
-      <section id="home" class="page active">
-
-        <div class="hero">
-
-          <div>
-            <h1>WELCOME TO PIXEL WORLD 👾</h1>
-            <div>
-              SHARE POSTS • MAKE FRIENDS • EARN XP
-            </div>
-          </div>
-
-          <div class="hero-icon">
-            🕹️
-          </div>
-
-        </div>
-
-        <div class="card">
-
-          <h2>✍️ CREATE PIXEL POST</h2>
-
-          <textarea
-            id="postText"
-            maxlength="1000"
-            placeholder="WHAT'S ON YOUR PIXEL MIND?"
-          ></textarea>
-
-          <div class="row mobile-stack">
-
-            <input
-              id="postImage"
-              type="file"
-              accept="image/*"
-            >
-
-            <button
-              class="primary"
-              onclick="createPost()"
-            >
-              🚀 PUBLISH +10 XP
-            </button>
-
-          </div>
-
-          <p class="tiny">
-            Tip: Ctrl + Enter publishes your post.
-          </p>
-
-        </div>
-
-        <div id="feed"></div>
-
-      </section>
-
-      <!-- FRIENDS -->
-
-      <section id="friends" class="page">
-
-        <div class="card">
-
-          <h1>👥 PIXEL FRIENDS</h1>
-
-          <input
-            id="friendSearch"
-            placeholder="SEARCH PIXEL FRIENDS..."
-            oninput="searchUsers()"
-          >
-
-        </div>
-
-        <h2>🔎 SEARCH RESULTS</h2>
-
-        <div
-          id="searchResults"
-          class="grid"
-        ></div>
-
-        <h2>⭐ MY FRIENDS</h2>
-
-        <div
-          id="friendsList"
-          class="grid"
-        ></div>
-
-        <h2>🌍 PIXEL COMMUNITY</h2>
-
-        <div
-          id="communityList"
-          class="grid"
-        ></div>
-
-      </section>
-
-      <!-- CHAT -->
-
-      <section id="chat" class="page">
-
-        <div class="chat">
-
-          <div class="chat-side">
-
-            <h2>💬 CHAT</h2>
-
-            <div id="chatFriends"></div>
-
-          </div>
-
-          <div class="chat-main">
-
-            <div
-              id="chatEmpty"
-              style="margin:auto;text-align:center"
-            >
-              💬
-              <h2>SELECT A FRIEND</h2>
-
-              <p class="tiny">
-                START A PIXEL CONVERSATION
-              </p>
-            </div>
-
-            <div
-              id="chatWindow"
-              class="hidden"
-              style="height:100%;display:flex;flex-direction:column"
-            >
-
-              <div class="chat-title">
-                <h3 id="chatName">
-                  PLAYER
-                </h3>
-              </div>
-
-              <div
-                id="messages"
-                class="messages"
-              ></div>
-
-              <div class="send">
-
-                <input
-                  id="messageInput"
-                  maxlength="500"
-                  placeholder="TYPE MESSAGE..."
-                  onkeydown="if(event.key==='Enter')sendMessage()"
-                >
-
-                <button
-                  class="primary"
-                  onclick="sendMessage()"
-                >
-                  SEND
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- LEADERBOARD -->
-
-      <section
-        id="leaderboard"
-        class="page"
-      >
-
-        <div class="card">
-
-          <h1>🏆 PIXEL LEADERBOARD</h1>
-
-          <p class="tiny">
-            TOP PLAYERS IN THE PIXEL WORLD
-          </p>
-
-          <div id="leaders"></div>
-
-        </div>
-
-      </section>
-
-      <!-- NOTIFICATIONS -->
-
-      <section
-        id="notifications"
-        class="page"
-      >
-
-        <div class="card">
-
-          <h1>🔔 NOTIFICATIONS</h1>
-
-          <button
-            class="blue"
-            onclick="readAll()"
-          >
-            ✓ MARK ALL READ
-          </button>
-
-        </div>
-
-        <div id="notices"></div>
-
-      </section>
-
-      <!-- PROFILE -->
-
-      <section
-        id="profile"
-        class="page"
-      >
-
-        <div
-          class="card"
-          style="text-align:center"
-        >
-
-          <div
-            id="profileAvatar"
-            class="avatar big"
-            style="width:140px;height:140px;font-size:68px"
-          >
-            👾
-            <span class="online"></span>
-          </div>
-
-          <h1 id="profileName">
-            PLAYER
-          </h1>
-
-          <p id="profileBio">
-            PIXEL EXPLORER
-          </p>
-
-          <div class="stat-grid">
-
-            <div class="stat">
-              <strong id="statPosts">0</strong>
-              POSTS
-            </div>
-
-            <div class="stat">
-              <strong id="statFriends">0</strong>
-              FRIENDS
-            </div>
-
-            <div class="stat">
-              <strong id="statSaved">0</strong>
-              SAVED
-            </div>
-
-          </div>
-
-          <br>
-
-          <div
-            class="row wrap"
-            style="justify-content:center"
-          >
-
-            <button
-              class="blue"
-              onclick="openProfile()"
-            >
-              ✏️ EDIT PROFILE
-            </button>
-
-            <button
-              class="yellow"
-              onclick="savedView()"
-            >
-              🔖 SAVED POSTS
-            </button>
-
-          </div>
-
-        </div>
-
-        <div
-          id="profileEditor"
-          class="card hidden"
-        >
-
-          <h2>✏️ EDIT PROFILE</h2>
-
-          <input
-            id="editName"
-            maxlength="20"
-          >
-
-          <textarea
-            id="editBio"
-            maxlength="200"
-          ></textarea>
-
-          <select id="editAvatar">
-            <option>👾</option>
-            <option>🤖</option>
-            <option>🦊</option>
-            <option>🐸</option>
-            <option>🐱</option>
-            <option>🐼</option>
-            <option>🧙</option>
-            <option>🦁</option>
-            <option>🐯</option>
-            <option>🐲</option>
-          </select>
-
-          <div class="row wrap">
-
-            <button
-              class="primary"
-              onclick="saveProfile()"
-            >
-              💾 SAVE
-            </button>
-
-            <button onclick="closeProfile()">
-              CANCEL
-            </button>
-
-          </div>
-
-        </div>
-
-        <div
-          id="savedArea"
-          class="hidden"
-        >
-
-          <h2>🔖 SAVED POSTS</h2>
-
-          <div id="savedList"></div>
-
-        </div>
-
-      </section>
-
-    </main>
+    <button id="headAvatar" class="icon" onclick="page('profile')">
+      👾
+    </button>
 
   </div>
 
-</div>
+</header>
 
-<!-- EDIT POST MODAL -->
+<div class="layout">
 
-<div
-  id="editModal"
-  class="modal hidden"
->
+<aside class="side">
 
-  <div class="modal-box">
+  <div class="mini">
 
-    <h2>✏️ EDIT POST</h2>
+    <div id="sideAvatar" class="avatar big">
+      👾
+      <span class="online"></span>
+    </div>
+
+    <h3 id="sideName">PLAYER</h3>
+
+    <p id="sideBio" class="tiny">
+      PIXEL EXPLORER
+    </p>
+
+    <div>
+      LEVEL <span id="sideLevel">1</span>
+    </div>
+
+    <div class="xp">
+      <div id="xpBar"></div>
+    </div>
+
+    <p id="xpText" class="tiny">
+      0 / 100 XP
+    </p>
+
+  </div>
+
+  <nav class="menu">
+
+    <button onclick="page('home')">🏠 HOME</button>
+    <button onclick="page('friends')">👥 FRIENDS</button>
+    <button onclick="page('chat')">💬 CHAT</button>
+    <button onclick="page('leaderboard')">🏆 RANK</button>
+    <button onclick="page('notifications')">🔔 ALERTS</button>
+    <button onclick="page('profile')">👤 PROFILE</button>
+    <button class="danger" onclick="logout()">🚪 LOGOUT</button>
+
+  </nav>
+
+</aside>
+
+<main>
+
+<section id="home" class="page active">
+
+  <div class="hero">
+    <div>
+      <h1>WELCOME TO PIXEL WORLD 👾</h1>
+      <div>SHARE POSTS • MAKE FRIENDS • EARN XP</div>
+    </div>
+
+    <div class="hero-icon">🕹️</div>
+  </div>
+
+  <div class="card">
+
+    <h2>✍️ CREATE PIXEL POST</h2>
 
     <textarea
-      id="editText"
+      id="postText"
       maxlength="1000"
+      placeholder="WHAT'S ON YOUR PIXEL MIND?"
     ></textarea>
+
+    <div class="row mobile-stack">
+
+      <input id="postImage" type="file" accept="image/*">
+
+      <button class="primary" onclick="createPost()">
+        🚀 PUBLISH +10 XP
+      </button>
+
+    </div>
+
+    <p class="tiny">
+      Tip: Ctrl + Enter publishes your post.
+    </p>
+
+  </div>
+
+  <div id="feed"></div>
+
+</section>
+
+<section id="friends" class="page">
+
+  <div class="card">
+    <h1>👥 PIXEL FRIENDS</h1>
+
+    <input
+      id="friendSearch"
+      placeholder="SEARCH PIXEL FRIENDS..."
+      oninput="searchUsers()"
+    >
+  </div>
+
+  <h2>🔎 SEARCH RESULTS</h2>
+  <div id="searchResults" class="grid"></div>
+
+  <h2>🌍 PIXEL COMMUNITY</h2>
+  <div id="communityList" class="grid"></div>
+
+</section>
+
+<section id="chat" class="page">
+
+  <div class="card">
+    <h1>💬 CHAT</h1>
+    <p class="tiny">
+      Real-time chat is the next Supabase upgrade.
+    </p>
+  </div>
+
+</section>
+
+<section id="leaderboard" class="page">
+
+  <div class="card">
+    <h1>🏆 PIXEL LEADERBOARD</h1>
+    <p class="tiny">TOP PLAYERS IN THE PIXEL WORLD</p>
+    <div id="leaders"></div>
+  </div>
+
+</section>
+
+<section id="notifications" class="page">
+
+  <div class="card">
+    <h1>🔔 NOTIFICATIONS</h1>
+    <p class="tiny">Notifications will be connected next.</p>
+  </div>
+
+</section>
+
+<section id="profile" class="page">
+
+  <div class="card" style="text-align:center">
+
+    <div
+      id="profileAvatar"
+      class="avatar big"
+      style="width:140px;height:140px;font-size:68px"
+    >
+      👾
+      <span class="online"></span>
+    </div>
+
+    <h1 id="profileName">PLAYER</h1>
+
+    <p id="profileBio">PIXEL EXPLORER</p>
+
+    <div class="stat-grid">
+
+      <div class="stat">
+        <strong id="statPosts">0</strong>
+        POSTS
+      </div>
+
+      <div class="stat">
+        <strong id="statFriends">0</strong>
+        FRIENDS
+      </div>
+
+      <div class="stat">
+        <strong id="statSaved">0</strong>
+        SAVED
+      </div>
+
+    </div>
+
+    <br>
+
+    <button class="blue" onclick="openProfile()">
+      ✏️ EDIT PROFILE
+    </button>
+
+  </div>
+
+  <div id="profileEditor" class="card hidden">
+
+    <h2>✏️ EDIT PROFILE</h2>
+
+    <input id="editName" maxlength="20">
+
+    <textarea id="editBio" maxlength="200"></textarea>
+
+    <select id="editAvatar">
+      <option>👾</option>
+      <option>🤖</option>
+      <option>🦊</option>
+      <option>🐸</option>
+      <option>🐱</option>
+      <option>🐼</option>
+      <option>🧙</option>
+      <option>🦁</option>
+      <option>🐯</option>
+      <option>🐲</option>
+    </select>
 
     <div class="row wrap">
 
-      <button
-        class="primary"
-        onclick="saveEdit()"
-      >
-        💾 SAVE CHANGES
+      <button class="primary" onclick="saveProfile()">
+        💾 SAVE
       </button>
 
-      <button onclick="closeEdit()">
+      <button onclick="closeProfile()">
         CANCEL
       </button>
 
@@ -1316,1302 +705,691 @@ main{
 
   </div>
 
+</section>
+
+</main>
+
 </div>
 
-<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-const K='pixelFriendV3';
 
-let state=JSON.parse(
-  localStorage.getItem(K)||'{}'
+const SUPABASE_URL =
+  "https://vvfkfpsyxipnypaltixq.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
-if(!state.posts){
-  state={
-    user:null,
-    posts:[],
-    friends:[],
-    saved:[],
-    notifications:[],
-    chats:{},
-    theme:'light'
-  };
+let state = {
+  user: null
+};
+
+function $(id){
+  return document.getElementById(id);
 }
 
-const community=[
-  {
-    id:'nova',
-    name:'PIXEL NOVA',
-    avatar:'🤖',
-    bio:'BUILDING COOL THINGS!',
-    xp:450
-  },
-  {
-    id:'fox',
-    name:'FOX RUNNER',
-    avatar:'🦊',
-    bio:'RUN • PLAY • REPEAT',
-    xp:380
-  },
-  {
-    id:'wizard',
-    name:'WIZARD 404',
-    avatar:'🧙',
-    bio:'MAGIC CODE MASTER',
-    xp:520
-  },
-  {
-    id:'frog',
-    name:'FROG KING',
-    avatar:'🐸',
-    bio:'WELCOME TO MY POND',
-    xp:290
-  },
-  {
-    id:'cat',
-    name:'PIXEL CAT',
-    avatar:'🐱',
-    bio:'MEOW IN 8-BIT',
-    xp:610
-  },
-  {
-    id:'panda',
-    name:'PANDA PIXEL',
-    avatar:'🐼',
-    bio:'EAT • SLEEP • PIXEL',
-    xp:330
-  }
-];
+function toast(message){
 
-let selected=null;
-let editing=null;
+  const box = $("toast");
 
-function save(){
-  localStorage.setItem(
-    K,
-    JSON.stringify(state)
-  );
+  box.textContent = message;
+  box.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    box.style.display = "none";
+  }, 3000);
 }
 
-function esc(v){
-  return String(v??'')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
+function authTab(tab){
+
+  const login = tab === "login";
+
+  $("loginPane").classList.toggle("hidden", !login);
+  $("registerPane").classList.toggle("hidden", login);
+
+  $("loginTab").classList.toggle("active", login);
+  $("regTab").classList.toggle("active", !login);
 }
 
-function toast(t){
+async function register(){
 
-  const e=document.getElementById('toast');
+  const username = $("regName").value.trim();
+  const email = $("regEmail").value.trim();
+  const password = $("regPass").value;
+  const avatar = $("regAvatar").value;
 
-  e.textContent=t;
-
-  e.classList.add('show');
-
-  clearTimeout(window.tt);
-
-  window.tt=setTimeout(()=>{
-    e.classList.remove('show');
-  },2200);
-}
-
-function authTab(t){
-
-  loginPane.classList.toggle(
-    'hidden',
-    t!=='login'
-  );
-
-  registerPane.classList.toggle(
-    'hidden',
-    t!=='register'
-  );
-
-  loginTab.classList.toggle(
-    'active',
-    t==='login'
-  );
-
-  regTab.classList.toggle(
-    'active',
-    t==='register'
-  );
-}
-
-function register(){
-
-  let n=regName.value.trim();
-  let e=regEmail.value.trim();
-  let p=regPass.value;
-
-  if(!n||!e||!p){
-    return toast('⚠️ COMPLETE ALL FIELDS');
+  if(!username || !email || !password){
+    return toast("⚠️ COMPLETE ALL FIELDS");
   }
 
-  if(p.length<4){
-    return toast(
-      '⚠️ PASSWORD MUST HAVE 4+ CHARACTERS'
-    );
+  if(password.length < 6){
+    return toast("⚠️ PASSWORD MUST BE AT LEAST 6 CHARACTERS");
   }
 
-  state.user={
-    id:'u'+Date.now(),
-    name:n.toUpperCase(),
-    email:e,
-    password:p,
-    avatar:regAvatar.value,
-    bio:'PIXEL EXPLORER',
-    xp:0
-  };
+  const { error } = await supabaseClient.auth.signUp({
 
-  notice('👾 WELCOME TO PIXEL FRIEND!');
+    email,
+    password,
 
-  save();
+    options:{
+      data:{
+        username: username.toUpperCase(),
+        avatar: avatar,
+        bio: "PIXEL EXPLORER"
+      }
+    }
+
+  });
+
+  if(error){
+    console.error(error);
+    return toast("❌ " + error.message);
+  }
+
+  $("regName").value = "";
+  $("regEmail").value = "";
+  $("regPass").value = "";
+
+  toast("📧 ACCOUNT CREATED! CHECK YOUR EMAIL.");
+
+  authTab("login");
+}
+
+async function login(){
+
+  const email = $("loginEmail").value.trim();
+  const password = $("loginPass").value;
+
+  if(!email || !password){
+    return toast("⚠️ ENTER EMAIL AND PASSWORD");
+  }
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if(error){
+    return toast("❌ " + error.message);
+  }
+
+  await loadCurrentUser(data.user);
 
   enter();
 }
 
-function login(){
+async function loadCurrentUser(authUser){
 
-  if(!state.user){
-    return toast(
-      '⚠️ CREATE AN ACCOUNT FIRST'
-    );
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("*")
+    .eq("id", authUser.id)
+    .single();
+
+  if(error){
+
+    console.error(error);
+
+    state.user = {
+      id: authUser.id,
+      username: authUser.user_metadata.username || "PLAYER",
+      avatar: authUser.user_metadata.avatar || "👾",
+      bio: "PIXEL EXPLORER",
+      xp: 0
+    };
+
+    return;
   }
 
-  if(
-    loginEmail.value.trim()!==state.user.email ||
-    loginPass.value!==state.user.password
-  ){
-    return toast('❌ INCORRECT LOGIN');
-  }
-
-  enter();
-}
-
-function logout(){
-
-  save();
-
-  state.user=null;
-
-  save();
-
-  app.classList.add('hidden');
-
-  auth.classList.remove('hidden');
-
-  authTab('login');
-
-  toast('👋 LOGGED OUT');
+  state.user = data;
 }
 
 function enter(){
 
-  auth.classList.add('hidden');
+  $("auth").classList.add("hidden");
+  $("app").classList.remove("hidden");
 
-  app.classList.remove('hidden');
+  renderUser();
 
-  document.body.classList.toggle(
-    'dark',
-    state.theme==='dark'
-  );
-
-  refreshAll();
+  loadFeed();
+  loadCommunity();
+  loadLeaderboard();
+  loadProfileStats();
 }
 
-function level(){
-  return Math.floor(
-    state.user.xp/100
-  )+1;
-}
+async function logout(){
 
-function addXP(n){
+  const { error } =
+    await supabaseClient.auth.signOut();
 
-  state.user.xp+=n;
-
-  save();
-
-  refreshUser();
-
-  renderLeaders();
-}
-
-function refreshUser(){
-
-  if(!state.user)return;
-
-  sideAvatar.childNodes[0].textContent=
-    state.user.avatar;
-
-  headAvatar.textContent=
-    state.user.avatar;
-
-  profileAvatar.childNodes[0].textContent=
-    state.user.avatar;
-
-  sideName.textContent=
-    state.user.name;
-
-  profileName.textContent=
-    state.user.name;
-
-  sideBio.textContent=
-    state.user.bio;
-
-  profileBio.textContent=
-    state.user.bio;
-
-  sideLevel.textContent=
-    level();
-
-  let x=state.user.xp%100;
-
-  xpBar.style.width=x+'%';
-
-  xpText.textContent=
-    x+' / 100 XP';
-
-  statPosts.textContent=
-    state.posts.filter(
-      p=>p.userId===state.user.id
-    ).length;
-
-  statFriends.textContent=
-    state.friends.length;
-
-  statSaved.textContent=
-    state.saved.length;
-}
-
-function refreshAll(){
-
-  refreshUser();
-
-  renderFeed();
-
-  renderCommunity();
-
-  renderFriends();
-
-  renderChatFriends();
-
-  renderNotices();
-
-  renderLeaders();
-
-  searchResults.innerHTML=
-    '<div class="card">TYPE A NAME TO SEARCH.</div>';
-}
-
-function page(id){
-
-  document
-    .querySelectorAll('.page')
-    .forEach(x=>{
-      x.classList.remove('active');
-    });
-
-  document
-    .getElementById(id)
-    .classList.add('active');
-
-  if(id==='home'){
-    renderFeed();
+  if(error){
+    return toast("❌ " + error.message);
   }
 
-  if(id==='friends'){
-    renderCommunity();
-    renderFriends();
-    searchUsers();
+  state.user = null;
+
+  $("app").classList.add("hidden");
+  $("auth").classList.remove("hidden");
+
+  $("loginPass").value = "";
+
+  toast("👋 LOGGED OUT");
+}
+
+function renderUser(){
+
+  if(!state.user) return;
+
+  const name =
+    state.user.username ||
+    state.user.name ||
+    "PLAYER";
+
+  const avatar =
+    state.user.avatar || "👾";
+
+  const bio =
+    state.user.bio || "PIXEL EXPLORER";
+
+  const xp =
+    Number(state.user.xp || 0);
+
+  const level =
+    Math.floor(xp / 100) + 1;
+
+  $("sideAvatar").childNodes[0].textContent = avatar;
+  $("headAvatar").textContent = avatar;
+  $("profileAvatar").childNodes[0].textContent = avatar;
+
+  $("sideName").textContent = name;
+  $("profileName").textContent = name;
+
+  $("sideBio").textContent = bio;
+  $("profileBio").textContent = bio;
+
+  $("sideLevel").textContent = level;
+
+  $("xpBar").style.width =
+    (xp % 100) + "%";
+
+  $("xpText").textContent =
+    (xp % 100) + " / 100 XP";
+}
+
+async function createPost(){
+
+  if(!state.user) return;
+
+  const content =
+    $("postText").value.trim();
+
+  if(!content){
+    return toast("⚠️ WRITE SOMETHING FIRST");
   }
 
-  if(id==='chat'){
-    renderChatFriends();
+  const { error } =
+    await supabaseClient
+      .from("posts")
+      .insert({
+        user_id: state.user.id,
+        content: content
+      });
+
+  if(error){
+    console.error(error);
+    return toast("❌ " + error.message);
   }
 
-  if(id==='notifications'){
-    renderNotices();
+  const newXP =
+    Number(state.user.xp || 0) + 10;
+
+  const { error: xpError } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        xp: newXP
+      })
+      .eq("id", state.user.id);
+
+  if(!xpError){
+    state.user.xp = newXP;
   }
 
-  if(id==='leaderboard'){
-    renderLeaders();
-  }
+  $("postText").value = "";
 
-  if(id==='profile'){
-    refreshUser();
-  }
+  renderUser();
 
-  window.scrollTo({
-    top:0,
-    behavior:'smooth'
-  });
+  await loadFeed();
+
+  toast("🚀 POST PUBLISHED +10 XP");
 }
 
-function createPost(){
-
-  let text=postText.value.trim();
-
-  let file=postImage.files[0];
-
-  if(!text&&!file){
-    return toast(
-      '⚠️ WRITE SOMETHING OR ADD AN IMAGE'
-    );
-  }
-
-  const finish=image=>{
-
-    state.posts.unshift({
-      id:Date.now(),
-      userId:state.user.id,
-      name:state.user.name,
-      avatar:state.user.avatar,
-      text,
-      image,
-      time:new Date().toLocaleString(),
-      likes:[],
-      comments:[]
-    });
-
-    postText.value='';
-    postImage.value='';
-
-    addXP(10);
-
-    notice(
-      '🚀 YOUR POST WAS PUBLISHED! +10 XP'
-    );
-
-    save();
-
-    renderFeed();
-
-    toast('🚀 POST PUBLISHED');
-  };
-
-  if(file){
-
-    let r=new FileReader();
-
-    r.onload=e=>{
-      finish(e.target.result);
-    };
-
-    r.readAsDataURL(file);
-
-  }else{
-
-    finish(null);
-
-  }
-}
-
-function renderFeed(){
-
-  if(!state.user)return;
-
-  feed.innerHTML=
-    state.posts.length
-      ?state.posts.map(
-        p=>postHTML(p,true)
-      ).join('')
-      :`
-        <div
-          class="card"
-          style="text-align:center;font-size:18px"
-        >
-          👾
-          <h2>NO POSTS YET!</h2>
-          <p class="tiny">
-            BE THE FIRST TO SHARE SOMETHING.
-          </p>
-        </div>
-      `;
-}
-
-function postHTML(p){
-
-  let liked=
-    p.likes.includes(state.user.id);
-
-  let saved=
-    state.saved.includes(p.id);
-
-  let comments=
-    p.comments.map(c=>`
-      <div class="comment">
-        <strong>${esc(c.name)}</strong>
-        <br>
-        ${esc(c.text)}
-      </div>
-    `).join('');
-
-  return `
-    <article class="post">
-
-      <div class="post-head">
-
-        <div class="post-avatar">
-          ${p.avatar}
-        </div>
-
-        <div>
-
-          <div>
-            ${esc(p.name)}
-          </div>
-
-          <div class="tiny">
-            ${esc(p.time)}
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="post-body">
-        ${esc(p.text)}
-      </div>
-
-      ${
-        p.image
-          ?`
-            <img
-              class="post-img"
-              src="${p.image}"
-              alt="Post image"
-            >
-          `
-          :''
-      }
-
-      <div class="post-actions">
-
-        <button
-          class="${liked?'liked':''}"
-          onclick="likePost(${p.id})"
-        >
-          ❤️ ${p.likes.length}
-        </button>
-
-        <button
-          onclick="
-            document
-              .getElementById('c${p.id}')
-              .classList
-              .toggle('hidden')
-          "
-        >
-          💬 ${p.comments.length}
-        </button>
-
-        <button
-          class="${saved?'saved':''}"
-          onclick="savePost(${p.id})"
-        >
-          🔖
-        </button>
-
-      </div>
-
-      ${
-        p.userId===state.user.id
-          ?`
-            <div
-              class="row wrap"
-              style="margin-top:12px"
-            >
-
-              <button
-                class="yellow"
-                onclick="editPost(${p.id})"
-              >
-                ✏️ EDIT
-              </button>
-
-              <button
-                class="danger"
-                onclick="deletePost(${p.id})"
-              >
-                🗑 DELETE
-              </button>
-
-            </div>
-          `
-          :''
-      }
-
-      <div
-        id="c${p.id}"
-        class="comments hidden"
-      >
-
-        ${comments}
-
-        <div class="row mobile-stack">
-
-          <input
-            id="ci${p.id}"
-            maxlength="300"
-            placeholder="WRITE COMMENT..."
-          >
-
-          <button
-            class="blue"
-            onclick="commentPost(${p.id})"
-          >
-            SEND
-          </button>
-
-        </div>
-
-      </div>
-
-    </article>
-  `;
-}
-
-function likePost(id){
-
-  let p=state.posts.find(
-    x=>x.id===id
-  );
-
-  let i=p.likes.indexOf(
-    state.user.id
-  );
-
-  if(i<0){
-
-    p.likes.push(
-      state.user.id
-    );
-
-    addXP(2);
-
-    toast('❤️ LIKE! +2 XP');
-
-  }else{
-
-    p.likes.splice(i,1);
-
-  }
-
-  save();
-
-  renderFeed();
-}
-
-function savePost(id){
-
-  state.saved=
-    state.saved.includes(id)
-      ?state.saved.filter(
-        x=>x!==id
-      )
-      :[
-        ...state.saved,
-        id
-      ];
-
-  save();
-
-  refreshUser();
-
-  renderFeed();
-
-  toast(
-    state.saved.includes(id)
-      ?'🔖 POST SAVED'
-      :'REMOVED FROM SAVED'
-  );
-}
-
-function commentPost(id){
-
-  let inp=
-    document.getElementById(
-      'ci'+id
-    );
-
-  let text=
-    inp.value.trim();
-
-  if(!text)return;
-
-  state.posts
-    .find(x=>x.id===id)
-    .comments.push({
-      name:state.user.name,
-      text
-    });
-
-  addXP(3);
-
-  save();
-
-  renderFeed();
-
-  document
-    .getElementById('c'+id)
-    ?.classList.remove('hidden');
-}
-
-function editPost(id){
-
-  editing=id;
-
-  editText.value=
-    state.posts.find(
-      x=>x.id===id
-    ).text;
-
-  editModal.classList.remove(
-    'hidden'
-  );
-}
-
-function saveEdit(){
-
-  let p=
-    state.posts.find(
-      x=>x.id===editing
-    );
-
-  p.text=
-    editText.value.trim();
-
-  save();
-
-  closeEdit();
-
-  renderFeed();
-
-  toast('💾 POST UPDATED');
-}
-
-function closeEdit(){
-
-  editModal.classList.add(
-    'hidden'
-  );
-
-  editing=null;
-}
-
-function deletePost(id){
-
-  if(
-    !confirm(
-      'DELETE THIS PIXEL POST?'
-    )
-  ){
+async function loadFeed(){
+
+  const { data, error } =
+    await supabaseClient
+      .from("posts")
+      .select(`
+        id,
+        content,
+        image_url,
+        created_at,
+        user_id,
+        profiles (
+          username,
+          avatar
+        )
+      `)
+      .order("created_at", {
+        ascending:false
+      });
+
+  if(error){
+    console.error(error);
+    $("feed").innerHTML =
+      `<div class="card tiny">Unable to load posts.</div>`;
     return;
   }
 
-  state.posts=
-    state.posts.filter(
-      p=>p.id!==id
-    );
+  if(!data.length){
+    $("feed").innerHTML =
+      `<div class="card tiny">NO POSTS YET. BE THE FIRST PIXEL PLAYER!</div>`;
+    return;
+  }
 
-  state.saved=
-    state.saved.filter(
-      x=>x!==id
-    );
+  $("feed").innerHTML =
+    data.map(post => {
 
-  save();
+      const profile =
+        Array.isArray(post.profiles)
+          ? post.profiles[0]
+          : post.profiles;
 
-  refreshUser();
+      const username =
+        profile?.username || "PLAYER";
 
-  renderFeed();
+      const avatar =
+        profile?.avatar || "👾";
 
-  toast('🗑 POST DELETED');
+      const ownPost =
+        post.user_id === state.user?.id;
+
+      return `
+        <div class="post">
+
+          <div class="post-head">
+
+            <div class="avatar">
+              ${avatar}
+            </div>
+
+            <div>
+              <strong>${escapeHtml(username)}</strong>
+              <span class="tiny">
+                ${new Date(post.created_at).toLocaleString()}
+              </span>
+            </div>
+
+          </div>
+
+          <div>${escapeHtml(post.content)}</div>
+
+          ${
+            post.image_url
+              ? `<img class="post-image" src="${post.image_url}" alt="Post image">`
+              : ""
+          }
+
+          ${
+            ownPost
+              ? `
+                <div style="margin-top:12px">
+                  <button class="danger" onclick="deletePost(${post.id})">
+                    🗑 DELETE
+                  </button>
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+      `;
+
+    }).join("");
 }
 
-function userCard(u,friend=false){
+async function deletePost(id){
 
-  let has=
-    state.friends.some(
-      f=>f.id===u.id
-    );
+  if(!confirm("DELETE THIS POST?")) return;
 
-  return `
-    <div class="card user">
+  const { error } =
+    await supabaseClient
+      .from("posts")
+      .delete()
+      .eq("id", id);
+
+  if(error){
+    return toast("❌ " + error.message);
+  }
+
+  await loadFeed();
+  await loadProfileStats();
+
+  toast("🗑 POST DELETED");
+}
+
+async function loadCommunity(){
+
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .neq("id", state.user?.id)
+      .order("xp", {
+        ascending:false
+      })
+      .limit(30);
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const html = data.map(user => `
+
+    <div class="friend-card">
 
       <div class="avatar big">
-        ${u.avatar}
-        <span class="online"></span>
+        ${user.avatar || "👾"}
       </div>
 
-      <h3>
-        ${esc(u.name)}
-      </h3>
+      <h3>${escapeHtml(user.username)}</h3>
 
       <p class="tiny">
-        ${esc(u.bio)}
+        ${escapeHtml(user.bio || "PIXEL EXPLORER")}
       </p>
 
-      ${
-        friend
-          ?`
-            <div
-              class="row wrap"
-              style="justify-content:center"
-            >
-
-              <button
-                class="blue"
-                onclick="openChat('${u.id}')"
-              >
-                💬 CHAT
-              </button>
-
-              <button
-                class="danger"
-                onclick="removeFriend('${u.id}')"
-              >
-                REMOVE
-              </button>
-
-            </div>
-          `
-          :`
-            <button
-              class="primary"
-              onclick="addFriend('${u.id}')"
-              ${has?'disabled':''}
-            >
-              ${has?'✓ FRIEND':'➕ ADD FRIEND'}
-            </button>
-          `
-      }
+      <strong>
+        ${user.xp || 0} XP
+      </strong>
 
     </div>
-  `;
+
+  `).join("");
+
+  $("communityList").innerHTML =
+    html || `<p class="tiny">NO OTHER PLAYERS YET.</p>`;
 }
 
-function renderCommunity(){
+async function searchUsers(){
 
-  communityList.innerHTML=
-    community.map(
-      u=>userCard(u)
-    ).join('');
-}
+  const query =
+    (
+      $("globalSearch").value ||
+      $("friendSearch").value
+    ).trim();
 
-function renderFriends(){
+  if(!query){
 
-  friendsList.innerHTML=
-    state.friends.length
-      ?state.friends.map(
-        u=>userCard(u,true)
-      ).join('')
-      :'<div class="card">NO FRIENDS YET.</div>';
-}
-
-function addFriend(id){
-
-  let u=
-    community.find(
-      x=>x.id===id
-    );
-
-  if(
-    !u ||
-    state.friends.some(
-      x=>x.id===id
-    )
-  ){
+    $("searchResults").innerHTML = "";
     return;
   }
 
-  state.friends.push(u);
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .ilike("username", `%${query}%`)
+      .neq("id", state.user?.id)
+      .limit(20);
 
-  addXP(5);
-
-  notice(
-    `👥 ${u.name} IS NOW YOUR FRIEND! +5 XP`
-  );
-
-  save();
-
-  refreshUser();
-
-  renderCommunity();
-
-  renderFriends();
-
-  renderChatFriends();
-
-  toast('🎉 NEW FRIEND');
-}
-
-function removeFriend(id){
-
-  state.friends=
-    state.friends.filter(
-      x=>x.id!==id
-    );
-
-  if(selected?.id===id){
-    selected=null;
+  if(error){
+    return;
   }
 
-  save();
+  $("searchResults").innerHTML =
+    data.map(user => `
 
-  refreshUser();
+      <div class="friend-card">
 
-  renderCommunity();
+        <div class="avatar big">
+          ${user.avatar || "👾"}
+        </div>
 
-  renderFriends();
+        <h3>
+          ${escapeHtml(user.username)}
+        </h3>
 
-  renderChatFriends();
+        <p class="tiny">
+          ${escapeHtml(user.bio || "")}
+        </p>
 
-  toast('👋 FRIEND REMOVED');
+        <strong>
+          ${user.xp || 0} XP
+        </strong>
+
+      </div>
+
+    `).join("");
 }
 
-function searchUsers(){
+async function loadLeaderboard(){
 
-  let q=(
-    (globalSearch?.value||'') ||
-    (friendSearch?.value||'')
-  )
-    .trim()
-    .toLowerCase();
+  const { data, error } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .order("xp", {
+        ascending:false
+      })
+      .limit(20);
 
-  let r=q
-    ?community.filter(
-      u=>
-        u.name
-          .toLowerCase()
-          .includes(q) ||
-        u.bio
-          .toLowerCase()
-          .includes(q)
-    )
-    :[];
+  if(error) return;
 
-  searchResults.innerHTML=
-    q
-      ?(
-        r.length
-          ?r.map(
-            u=>userCard(u)
-          ).join('')
-          :'<div class="card">NO USERS FOUND.</div>'
-      )
-      :'<div class="card">TYPE A NAME TO SEARCH.</div>';
+  $("leaders").innerHTML =
+    data.map((user,index) => `
+
+      <div class="post-head"
+        style="padding:10px;border-bottom:1px solid var(--border)">
+
+        <strong>
+          #${index + 1}
+        </strong>
+
+        <div class="avatar">
+          ${user.avatar || "👾"}
+        </div>
+
+        <div style="flex:1">
+          ${escapeHtml(user.username)}
+        </div>
+
+        <strong>
+          ${user.xp || 0} XP
+        </strong>
+
+      </div>
+
+    `).join("");
 }
 
-function renderChatFriends(){
+async function loadProfileStats(){
 
-  chatFriends.innerHTML=
-    state.friends.length
-      ?state.friends.map(
-        f=>`
-          <button
-            class="friend-btn"
-            onclick="openChat('${f.id}')"
-          >
+  if(!state.user) return;
 
-            <span
-              style="font-size:25px"
-            >
-              ${f.avatar}
-            </span>
+  const { count, error } =
+    await supabaseClient
+      .from("posts")
+      .select("*", {
+        count:"exact",
+        head:true
+      })
+      .eq("user_id", state.user.id);
 
-            <span>
-              ${esc(f.name)} 🟢
-            </span>
-
-          </button>
-        `
-      ).join('')
-      :'<p class="tiny">ADD FRIENDS FIRST!</p>';
-}
-
-function openChat(id){
-
-  selected=
-    state.friends.find(
-      x=>x.id===id
-    );
-
-  if(!selected)return;
-
-  page('chat');
-
-  chatEmpty.classList.add(
-    'hidden'
-  );
-
-  chatWindow.classList.remove(
-    'hidden'
-  );
-
-  chatName.textContent=
-    selected.avatar+
-    ' '+
-    selected.name+
-    ' 🟢';
-
-  if(!state.chats[id]){
-    state.chats[id]=[];
+  if(!error){
+    $("statPosts").textContent = count || 0;
   }
 
-  save();
-
-  renderMessages();
-}
-
-function renderMessages(){
-
-  if(!selected)return;
-
-  let a=
-    state.chats[
-      selected.id
-    ]||[];
-
-  messages.innerHTML=
-    a.length
-      ?a.map(
-        m=>`
-          <div class="msg ${m.sender}">
-
-            ${esc(m.text)}
-
-            <div class="tiny">
-              ${esc(m.time)}
-            </div>
-
-          </div>
-        `
-      ).join('')
-      :`
-        <div
-          class="tiny"
-          style="text-align:center"
-        >
-          NO MESSAGES YET. SAY HELLO! 👋
-        </div>
-      `;
-
-  messages.scrollTop=
-    messages.scrollHeight;
-}
-
-function sendMessage(){
-
-  if(!selected)return;
-
-  let t=
-    messageInput.value.trim();
-
-  if(!t)return;
-
-  state.chats[
-    selected.id
-  ]??=[];
-
-  state.chats[
-    selected.id
-  ].push({
-    sender:'me',
-    text:t,
-    time:new Date().toLocaleTimeString()
-  });
-
-  messageInput.value='';
-
-  save();
-
-  renderMessages();
-
-  setTimeout(()=>{
-
-    if(!selected)return;
-
-    state.chats[
-      selected.id
-    ].push({
-
-      sender:'other',
-
-      text:[
-        'HEY PIXEL FRIEND! 👾',
-        'THAT’S AWESOME! 🎮',
-        'LET’S PLAY! 🕹️',
-        'HELLO FROM PIXEL WORLD! ✨'
-      ][
-        Math.floor(
-          Math.random()*4
-        )
-      ],
-
-      time:new Date()
-        .toLocaleTimeString()
-
-    });
-
-    save();
-
-    renderMessages();
-
-  },600);
-}
-
-function renderLeaders(){
-
-  if(!state.user)return;
-
-  let p=[
-    ...community,
-    {
-      id:state.user.id,
-      name:state.user.name,
-      avatar:state.user.avatar,
-      xp:state.user.xp
-    }
-  ].sort(
-    (a,b)=>b.xp-a.xp
-  );
-
-  leaders.innerHTML=
-    p.map(
-      (x,i)=>`
-        <div class="leader">
-
-          <div class="rank">
-            #${i+1}
-          </div>
-
-          <div
-            style="font-size:30px"
-          >
-            ${x.avatar}
-          </div>
-
-          <div style="flex:1">
-            ${esc(x.name)}
-          </div>
-
-          <strong>
-            ${x.xp} XP
-          </strong>
-
-        </div>
-      `
-    ).join('');
-}
-
-function notice(text){
-
-  state.notifications.unshift({
-    id:Date.now()+Math.random(),
-    text,
-    time:new Date().toLocaleString(),
-    read:false
-  });
-
-  save();
-
-  renderNotices();
-}
-
-function renderNotices(){
-
-  let n=
-    state.notifications.filter(
-      x=>!x.read
-    ).length;
-
-  badge.textContent=n;
-
-  notices.innerHTML=
-    state.notifications.length
-      ?state.notifications.map(
-        x=>`
-          <div
-            class="notice ${
-              x.read
-                ?''
-                :'unread'
-            }"
-          >
-
-            <div>
-              🔔
-            </div>
-
-            <div>
-
-              <div>
-                ${esc(x.text)}
-              </div>
-
-              <div class="tiny">
-                ${esc(x.time)}
-              </div>
-
-            </div>
-
-          </div>
-        `
-      ).join('')
-      :'<div class="card">NO NOTIFICATIONS.</div>';
-}
-
-function readAll(){
-
-  state.notifications.forEach(
-    x=>x.read=true
-  );
-
-  save();
-
-  renderNotices();
-
-  toast('✓ ALL READ');
+  $("statFriends").textContent = "0";
+  $("statSaved").textContent = "0";
 }
 
 function openProfile(){
 
-  profileEditor.classList.remove(
-    'hidden'
-  );
+  $("profileEditor").classList.remove("hidden");
 
-  editName.value=
-    state.user.name;
+  $("editName").value =
+    state.user.username || "PLAYER";
 
-  editBio.value=
-    state.user.bio;
+  $("editBio").value =
+    state.user.bio || "";
 
-  editAvatar.value=
-    state.user.avatar;
+  $("editAvatar").value =
+    state.user.avatar || "👾";
 }
 
 function closeProfile(){
 
-  profileEditor.classList.add(
-    'hidden'
-  );
+  $("profileEditor").classList.add("hidden");
 }
 
-function saveProfile(){
+async function saveProfile(){
 
-  let n=
-    editName.value.trim();
+  const username =
+    $("editName").value.trim();
 
-  if(!n){
-    return toast(
-      '⚠️ USERNAME REQUIRED'
-    );
+  const bio =
+    $("editBio").value.trim();
+
+  const avatar =
+    $("editAvatar").value;
+
+  if(!username){
+    return toast("⚠️ USERNAME REQUIRED");
   }
 
-  state.user.name=
-    n.toUpperCase();
+  const { error } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        username,
+        bio,
+        avatar
+      })
+      .eq("id", state.user.id);
 
-  state.user.bio=
-    editBio.value.trim() ||
-    'PIXEL EXPLORER';
+  if(error){
+    return toast("❌ " + error.message);
+  }
 
-  state.user.avatar=
-    editAvatar.value;
+  state.user.username = username;
+  state.user.bio = bio;
+  state.user.avatar = avatar;
 
-  state.posts
-    .filter(
-      p=>p.userId===state.user.id
-    )
-    .forEach(p=>{
-      p.name=state.user.name;
-      p.avatar=state.user.avatar;
-    });
-
-  save();
-
-  refreshUser();
+  renderUser();
 
   closeProfile();
 
-  renderFeed();
+  await loadCommunity();
+  await loadLeaderboard();
 
-  renderLeaders();
-
-  toast('💾 PROFILE SAVED');
+  toast("💾 PROFILE UPDATED");
 }
 
-function savedView(){
+function page(name){
 
-  page('profile');
+  document
+    .querySelectorAll(".page")
+    .forEach(p => p.classList.remove("active"));
 
-  savedArea.classList.remove(
-    'hidden'
-  );
+  const target = $(name);
 
-  let p=
-    state.posts.filter(
-      x=>state.saved.includes(x.id)
-    );
+  if(target){
+    target.classList.add("active");
+  }
 
-  savedList.innerHTML=
-    p.length
-      ?p.map(
-        x=>postHTML(x)
-      ).join('')
-      :'<div class="card">NO SAVED POSTS YET.</div>';
+  if(name === "friends"){
+    loadCommunity();
+  }
+
+  if(name === "leaderboard"){
+    loadLeaderboard();
+  }
+
+  if(name === "profile"){
+    loadProfileStats();
+  }
 }
 
 function theme(){
 
-  state.theme=
-    state.theme==='dark'
-      ?'light'
-      :'dark';
+  document.body.classList.toggle("light");
 
-  document.body.classList.toggle(
-    'dark',
-    state.theme==='dark'
-  );
-
-  save();
+  toast("🌙 THEME SWITCHED");
 }
 
-document.addEventListener(
-  'keydown',
-  e=>{
+function escapeHtml(text){
 
-    if(
-      e.ctrlKey &&
-      e.key==='Enter' &&
-      document
-        .getElementById('home')
-        .classList
-        .contains('active')
-    ){
+  return String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+$("postText").addEventListener(
+  "keydown",
+  event => {
+
+    if(event.ctrlKey && event.key === "Enter"){
       createPost();
-    }
-
-    if(e.key==='Escape'){
-      closeEdit();
-      closeProfile();
     }
 
   }
 );
 
-if(state.theme==='dark'){
-  document.body.classList.add(
-    'dark'
-  );
+async function checkSession(){
+
+  const { data, error } =
+    await supabaseClient.auth.getSession();
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  if(data.session?.user){
+
+    await loadCurrentUser(
+      data.session.user
+    );
+
+    enter();
+  }
 }
 
-if(state.user){
-  enter();
-}
+supabaseClient.auth.onAuthStateChange(
+  (event, session) => {
+
+    if(event === "SIGNED_OUT"){
+      state.user = null;
+    }
+
+  }
+);
+
+checkSession();
+
 </script>
 
 </body>
