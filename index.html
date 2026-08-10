@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Pixel Friend</title>
 
@@ -10,15 +10,15 @@
 
 <style>
 :root{
-  --bg:#eef1f7;
-  --card:#ffffff;
-  --text:#25334a;
-  --muted:#6b778c;
-  --line:#dce2ec;
-  --purple:#6254c7;
-  --purple2:#7568dc;
-  --danger:#b45555;
-  --green:#33b97a;
+  --bg:#e8ebf2;
+  --panel:#ffffff;
+  --text:#26384e;
+  --muted:#718096;
+  --line:#d7deea;
+  --primary:#6356c9;
+  --primary2:#5145b8;
+  --danger:#c65b52;
+  --success:#38a169;
 }
 
 *{
@@ -27,15 +27,12 @@
 
 body{
   margin:0;
-  font-family:Arial,sans-serif;
+  font-family:Arial,Helvetica,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
-button,
-input,
-textarea,
-select{
+button,input,textarea,select{
   font:inherit;
 }
 
@@ -44,10 +41,26 @@ button{
 }
 
 .hidden{
-  display:none!important;
+  display:none !important;
 }
 
-/* AUTH */
+.status{
+  min-height:20px;
+  margin-top:12px;
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.status.error{
+  color:#c0392b;
+}
+
+.status.success{
+  color:var(--success);
+}
+
+/* ================= AUTH ================= */
 
 #authView{
   min-height:100vh;
@@ -59,17 +72,17 @@ button{
 
 .auth-card{
   width:100%;
-  max-width:400px;
-  background:rgba(255,255,255,.95);
-  border:1px solid #d8dfeb;
+  max-width:420px;
+  background:rgba(255,255,255,.85);
+  border:1px solid #ccd5e3;
   border-radius:22px;
   padding:34px;
-  text-align:center;
-  box-shadow:0 15px 45px rgba(50,65,95,.12);
+  box-shadow:0 20px 50px rgba(50,60,90,.12);
 }
 
 .logo{
-  font-size:28px;
+  text-align:center;
+  font-size:26px;
   font-weight:900;
   letter-spacing:4px;
 }
@@ -80,30 +93,32 @@ button{
 }
 
 .tagline{
-  font-size:11px;
-  letter-spacing:1.4px;
+  text-align:center;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:1px;
   color:var(--muted);
-  margin-bottom:25px;
+  margin:12px 0 24px;
 }
 
 .tabs{
-  display:flex;
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:6px;
-  margin-bottom:20px;
+  margin-bottom:18px;
 }
 
 .tabs button{
-  width:50%;
   border:0;
-  padding:13px;
+  padding:12px;
   border-radius:10px;
-  font-weight:bold;
+  background:#e5e9f1;
   color:var(--text);
-  background:#e7ebf3;
+  font-weight:bold;
 }
 
 .tabs button.active{
-  background:var(--purple);
+  background:var(--primary);
   color:white;
 }
 
@@ -111,144 +126,154 @@ input,
 textarea,
 select{
   width:100%;
-  border:1px solid #cfd7e5;
-  background:#f7f9fc;
+  padding:12px;
+  border:1px solid #ccd5e3;
   border-radius:10px;
-  padding:13px;
-  margin-bottom:12px;
+  background:#f7f9fc;
   color:var(--text);
+  margin-bottom:12px;
+  outline:none;
 }
 
 textarea{
-  min-height:110px;
+  min-height:100px;
   resize:vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--primary);
 }
 
 .primary,
 .secondary,
 .blue{
   border:0;
-  padding:12px 18px;
   border-radius:10px;
+  padding:12px 16px;
   font-weight:bold;
 }
 
 .primary{
-  background:var(--purple);
+  background:var(--primary);
   color:white;
 }
 
+.primary:hover{
+  background:var(--primary2);
+}
+
 .secondary{
-  background:#e8edf5;
+  background:#e5e9f1;
   color:var(--text);
 }
 
 .blue{
-  background:#426fc9;
+  background:#4c7cf0;
   color:white;
 }
 
-.status{
-  margin-top:12px;
-  font-size:13px;
-  min-height:20px;
-}
-
-.success{
-  color:#218e5e;
-}
-
-.error{
-  color:#c04f4f;
-}
-
-/* APP */
+/* ================= APP ================= */
 
 #appView{
   min-height:100vh;
 }
 
 .topbar{
-  height:70px;
-  background:white;
+  height:64px;
+  background:var(--panel);
   border-bottom:1px solid var(--line);
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 24px;
+  padding:0 20px;
 }
 
 .brand{
-  font-size:20px;
   font-weight:900;
   letter-spacing:3px;
+  cursor:pointer;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 
 .brand-icon{
-  font-size:25px;
+  font-size:22px;
 }
 
 .actions{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 
 .actions input{
-  width:220px;
   margin:0;
+  width:220px;
 }
 
 .icon{
   border:0;
-  background:#eef1f7;
-  width:42px;
-  height:42px;
+  background:#eef1f6;
   border-radius:10px;
-  font-size:18px;
+  min-width:42px;
+  height:42px;
 }
 
 .layout{
-  display:flex;
-  min-height:calc(100vh - 70px);
+  display:grid;
+  grid-template-columns:240px 1fr;
+  min-height:calc(100vh - 64px);
 }
 
 .side{
-  width:250px;
-  background:white;
+  background:#f9fafc;
   border-right:1px solid var(--line);
-  padding:25px 14px;
+  padding:20px 12px;
 }
 
 .mini{
   text-align:center;
-  padding-bottom:25px;
+  padding:10px 8px 20px;
 }
 
 .avatar,
 .profile-main-avatar,
 .profile-image-preview{
-  width:76px;
-  height:76px;
-  margin:auto;
+  width:70px;
+  height:70px;
   border-radius:50%;
+  margin:auto;
   display:flex;
   align-items:center;
   justify-content:center;
-  overflow:hidden;
-  background:#ece9ff;
   font-size:38px;
-  border:3px solid white;
-  box-shadow:0 3px 12px rgba(0,0,0,.12);
+  background:#dfe5ef;
   position:relative;
+  overflow:hidden;
+  border:3px solid white;
+  box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+.profile-main-avatar{
+  width:110px;
+  height:110px;
+  font-size:58px;
+}
+
+.profile-image-preview{
+  width:100px;
+  height:100px;
+  margin-bottom:15px;
 }
 
 .avatar img,
 .profile-main-avatar img,
-.profile-image-preview img{
+.profile-image-preview img,
+.user-avatar img,
+.chat-avatar img{
   width:100%;
   height:100%;
   object-fit:cover;
@@ -257,41 +282,40 @@ textarea{
 .online{
   width:13px;
   height:13px;
-  background:#35c978;
-  border:2px solid white;
   border-radius:50%;
+  background:#37b76b;
+  border:2px solid white;
   position:absolute;
-  right:2px;
-  bottom:4px;
-}
-
-.mini h3{
-  margin:12px 0 8px;
+  bottom:3px;
+  right:3px;
 }
 
 .badges{
-  min-height:22px;
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  flex-wrap:wrap;
+  margin:8px 0;
 }
 
 .badge{
   display:inline-block;
-  padding:4px 9px;
-  margin:2px;
-  border-radius:20px;
-  font-size:10px;
+  padding:4px 8px;
+  border-radius:999px;
+  font-size:9px;
   font-weight:bold;
-  background:#eeeafd;
-  color:#5b50b7;
+  background:#ecebff;
+  color:#5145b8;
 }
 
 .badge.admin{
-  background:#fff0cf;
-  color:#a66a00;
+  background:#fff0cc;
+  color:#a66b00;
 }
 
 .badge.verified{
-  background:#dff6ec;
-  color:#168454;
+  background:#dff6e8;
+  color:#20864e;
 }
 
 .tiny{
@@ -302,37 +326,39 @@ textarea{
 .xp{
   width:100%;
   height:8px;
-  background:#e6eaf1;
-  border-radius:20px;
+  background:#e0e5ee;
+  border-radius:10px;
   overflow:hidden;
-  margin-top:10px;
+  margin-top:8px;
 }
 
 #xpBar{
   height:100%;
   width:0%;
-  background:var(--purple);
+  background:var(--primary);
+  border-radius:10px;
 }
 
 .menu{
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:7px;
 }
 
 .menu button{
   border:0;
   background:transparent;
-  padding:14px;
   text-align:left;
+  padding:13px;
   border-radius:10px;
   font-weight:bold;
   color:var(--text);
 }
 
+.menu button:hover,
 .menu button.active{
-  background:#ecebfa;
-  color:var(--purple);
+  background:#e9e8f8;
+  color:var(--primary2);
 }
 
 .menu .danger{
@@ -340,30 +366,35 @@ textarea{
 }
 
 main{
-  flex:1;
-  padding:30px;
+  padding:24px;
   overflow:auto;
 }
 
 .page{
   display:none;
-  max-width:1100px;
-  margin:auto;
 }
 
 .page.active{
   display:block;
 }
 
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 8px 24px rgba(40,50,70,.05);
+}
+
 .hero{
-  background:linear-gradient(135deg,#6254c7,#8378e7);
-  color:white;
+  background:linear-gradient(135deg,#ffffff,#edf0f8);
   border-radius:18px;
-  padding:30px;
+  padding:25px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:20px;
+  justify-content:space-between;
+  margin-bottom:18px;
 }
 
 .hero h1{
@@ -372,20 +403,11 @@ main{
 
 .hero p{
   margin:0;
-  opacity:.85;
+  color:var(--muted);
 }
 
 .hero-icon{
-  font-size:55px;
-}
-
-.card{
-  background:white;
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:22px;
-  margin-bottom:20px;
-  box-shadow:0 6px 18px rgba(30,40,60,.04);
+  font-size:60px;
 }
 
 .row{
@@ -395,94 +417,55 @@ main{
 }
 
 .row input{
-  margin-bottom:0;
+  margin:0;
+}
+
+.wrap{
+  flex-wrap:wrap;
 }
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:15px;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:14px;
 }
 
 .user-card{
   background:white;
   border:1px solid var(--line);
-  border-radius:15px;
-  padding:18px;
+  border-radius:14px;
+  padding:16px;
   text-align:center;
 }
 
-.small-avatar{
-  width:54px;
-  height:54px;
+.user-avatar{
+  width:58px;
+  height:58px;
   border-radius:50%;
-  margin:0 auto 10px;
+  background:#e5e9f1;
+  margin:auto;
   display:flex;
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  background:#ece9ff;
   font-size:28px;
 }
 
-.small-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
 .user-card h3{
-  margin:8px 0;
+  margin:10px 0 4px;
 }
 
-.friend-btn{
-  width:100%;
-  margin-top:10px;
+.user-card p{
+  margin:4px 0 12px;
 }
 
-.post{
-  background:white;
-  border:1px solid var(--line);
-  padding:18px;
-  border-radius:15px;
-  margin-bottom:15px;
-}
-
-.post-head{
+.user-actions{
   display:flex;
-  gap:12px;
-  align-items:center;
+  gap:7px;
 }
 
-.post-content{
-  margin-top:15px;
-  white-space:pre-wrap;
-}
-
-.post-image{
-  width:100%;
-  max-height:400px;
-  object-fit:cover;
-  border-radius:12px;
-  margin-top:15px;
-}
-
-.stat-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-}
-
-.stat{
-  background:#f5f7fb;
-  border-radius:12px;
-  padding:15px;
-}
-
-.stat strong{
-  display:block;
-  font-size:24px;
-  margin-bottom:5px;
+.user-actions button{
+  flex:1;
 }
 
 .messages-layout{
@@ -497,20 +480,29 @@ main{
 }
 
 .chat-user{
-  width:100%;
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:10px;
   padding:10px;
-  border:0;
-  background:#f6f8fb;
-  margin-bottom:8px;
   border-radius:10px;
-  text-align:left;
+  cursor:pointer;
 }
 
+.chat-user:hover,
 .chat-user.active{
-  background:#ecebfa;
+  background:#ecebff;
+}
+
+.chat-avatar{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#e5e9f1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  flex:none;
 }
 
 .chat-main{
@@ -519,30 +511,40 @@ main{
   flex-direction:column;
 }
 
+.chat-header{
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+
 .messages-list{
   flex:1;
-  min-height:350px;
-  max-height:500px;
+  min-height:360px;
+  max-height:520px;
   overflow-y:auto;
   padding:15px 0;
 }
 
 .message{
-  max-width:70%;
-  padding:10px 14px;
+  max-width:75%;
+  padding:10px 13px;
   border-radius:14px;
-  margin:8px 0;
-  background:#edf0f5;
+  margin-bottom:10px;
+  font-size:14px;
 }
 
 .message.mine{
   margin-left:auto;
-  background:#6254c7;
+  background:var(--primary);
   color:white;
+  border-bottom-right-radius:4px;
+}
+
+.message.theirs{
+  background:#eef1f6;
+  border-bottom-left-radius:4px;
 }
 
 .message-time{
-  display:block;
   font-size:9px;
   opacity:.7;
   margin-top:5px;
@@ -550,7 +552,9 @@ main{
 
 .chat-input{
   display:flex;
-  gap:10px;
+  gap:8px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
 }
 
 .chat-input input{
@@ -558,41 +562,94 @@ main{
 }
 
 .empty{
-  text-align:center;
   color:var(--muted);
-  padding:40px;
+  text-align:center;
+  padding:40px 15px;
+}
+
+.post{
+  background:white;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:12px;
+}
+
+.post-head{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.post-image{
+  width:100%;
+  max-height:400px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-top:12px;
+}
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.stat{
+  padding:18px 10px;
+  background:#f5f7fb;
+  border-radius:12px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.stat strong{
+  display:block;
+  font-size:24px;
+  margin-bottom:5px;
 }
 
 .leader{
   display:flex;
-  justify-content:space-between;
-  padding:13px;
+  align-items:center;
+  gap:12px;
+  padding:12px;
   border-bottom:1px solid var(--line);
+}
+
+.leader:last-child{
+  border-bottom:0;
+}
+
+.rank{
+  width:30px;
+  font-weight:bold;
 }
 
 @media(max-width:800px){
 
   .topbar{
-    padding:0 12px;
+    height:auto;
+    padding:12px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .actions{
+    width:100%;
   }
 
   .actions input{
-    display:none;
+    width:100%;
   }
 
   .layout{
-    display:block;
+    grid-template-columns:1fr;
   }
 
   .side{
-    width:100%;
-    padding:10px;
     border-right:0;
     border-bottom:1px solid var(--line);
-  }
-
-  .mini{
-    display:none;
   }
 
   .menu{
@@ -604,10 +661,6 @@ main{
     white-space:nowrap;
   }
 
-  main{
-    padding:15px;
-  }
-
   .messages-layout{
     grid-template-columns:1fr;
   }
@@ -616,7 +669,7 @@ main{
     border-right:0;
     border-bottom:1px solid var(--line);
     padding-right:0;
-    padding-bottom:15px;
+    padding-bottom:10px;
   }
 
   .chat-main{
@@ -624,12 +677,20 @@ main{
     padding-top:15px;
   }
 
-  .hero{
-    padding:20px;
+  main{
+    padding:14px;
   }
 
   .hero-icon{
     display:none;
+  }
+
+  .row{
+    flex-direction:column;
+  }
+
+  .row button{
+    width:100%;
   }
 }
 </style>
@@ -637,7 +698,7 @@ main{
 
 <body>
 
-<!-- ================= AUTH ================= -->
+<!-- ================= AUTH VIEW ================= -->
 
 <div id="authView">
 
@@ -669,11 +730,19 @@ main{
 
     </div>
 
+    <!-- LOGIN -->
+
     <div id="loginPane">
 
-      <input id="loginEmail" type="email" placeholder="EMAIL">
+      <input
+        id="loginEmail"
+        type="email"
+        placeholder="EMAIL">
 
-      <input id="loginPass" type="password" placeholder="PASSWORD">
+      <input
+        id="loginPass"
+        type="password"
+        placeholder="PASSWORD">
 
       <button
         class="primary"
@@ -683,6 +752,8 @@ main{
       </button>
 
     </div>
+
+    <!-- REGISTER -->
 
     <div id="registerPane" class="hidden">
 
@@ -699,7 +770,7 @@ main{
       <input
         id="regPass"
         type="password"
-        placeholder="PASSWORD">
+        placeholder="PASSWORD (MINIMUM 6 CHARACTERS)">
 
       <select id="regAvatar">
         <option>👾</option>
@@ -730,7 +801,7 @@ main{
 </div>
 
 
-<!-- ================= APP ================= -->
+<!-- ================= APP VIEW ================= -->
 
 <div id="appView" class="hidden">
 
@@ -748,7 +819,9 @@ main{
         placeholder="SEARCH FRIENDS..."
         oninput="searchUsers()">
 
-      <button class="icon" onclick="theme()">🌙</button>
+      <button class="icon" onclick="theme()">
+        🌙
+      </button>
 
       <button
         id="headAvatar"
@@ -763,6 +836,8 @@ main{
 
 
   <div class="layout">
+
+    <!-- SIDEBAR -->
 
     <aside class="side">
 
@@ -795,9 +870,12 @@ main{
 
       </div>
 
+
       <nav class="menu">
 
-        <button class="active" onclick="page('home',this)">
+        <button
+          class="active"
+          onclick="page('home',this)">
           🏠 HOME
         </button>
 
@@ -817,7 +895,9 @@ main{
           👤 PROFILE
         </button>
 
-        <button class="danger" onclick="logout()">
+        <button
+          class="danger"
+          onclick="logout()">
           🚪 LOGOUT
         </button>
 
@@ -964,7 +1044,10 @@ main{
 
               </div>
 
-              <div id="messageStatus" class="status"></div>
+              <div
+                id="messageStatus"
+                class="status">
+              </div>
 
             </div>
 
@@ -1011,11 +1094,13 @@ main{
 
           <div
             id="profileBadges"
-            class="badges"></div>
+            class="badges">
+          </div>
 
           <p id="profileBio">
             PIXEL EXPLORER
           </p>
+
 
           <div class="stat-grid">
 
@@ -1046,6 +1131,8 @@ main{
 
         </div>
 
+
+        <!-- EDIT PROFILE -->
 
         <div
           id="profileEditor"
@@ -1092,6 +1179,7 @@ main{
             <option>🐲</option>
           </select>
 
+
           <div class="row">
 
             <button
@@ -1110,7 +1198,8 @@ main{
 
           <div
             id="profileStatus"
-            class="status"></div>
+            class="status">
+          </div>
 
         </div>
 
@@ -1127,108 +1216,128 @@ main{
 
 /* =========================================================
    SUPABASE CONFIGURATION
-   ========================================================= */
+   Project ID: vvfkfpsyxipnypaltixq
+   IMPORTANT: Use publishable key only in browser HTML.
+   Do NOT put the Supabase secret/service_role key here.
+========================================================= */
 
 const SUPABASE_URL =
   "https://vvfkfpsyxipnypaltixq.supabase.co";
 
-const SUPABASE_KEY =
+const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 
-const supabase =
+const sb =
   window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_KEY
+    SUPABASE_PUBLISHABLE_KEY
   );
 
 
 /* =========================================================
-   GLOBAL VARIABLES
-   ========================================================= */
+   GLOBAL STATE
+========================================================= */
 
 let currentUser = null;
 let currentProfile = null;
-let selectedChatUser = null;
-let messageTimer = null;
+let selectedUser = null;
+let profileImageData = null;
+let messageSubscription = null;
 
 
 /* =========================================================
-   AUTH TABS
-   ========================================================= */
+   HELPERS
+========================================================= */
 
-function authTab(tab){
-
-  document
-    .getElementById("loginPane")
-    .classList.toggle(
-      "hidden",
-      tab !== "login"
-    );
-
-  document
-    .getElementById("registerPane")
-    .classList.toggle(
-      "hidden",
-      tab !== "register"
-    );
-
-  document
-    .getElementById("loginTab")
-    .classList.toggle(
-      "active",
-      tab === "login"
-    );
-
-  document
-    .getElementById("regTab")
-    .classList.toggle(
-      "active",
-      tab === "register"
-    );
-
-  setStatus("authStatus","");
-
+function $(id){
+  return document.getElementById(id);
 }
 
-
-/* =========================================================
-   STATUS
-   ========================================================= */
-
 function setStatus(id,message,type=""){
-
-  const el = document.getElementById(id);
+  const el = $(id);
 
   if(!el) return;
 
   el.textContent = message;
+  el.className = "status " + type;
+}
 
-  el.className = "status";
+function escapeHTML(value=""){
+  const div = document.createElement("div");
+  div.textContent = value;
+  return div.innerHTML;
+}
 
-  if(type){
-    el.classList.add(type);
+function avatarHTML(avatar, extraClass=""){
+  if(
+    avatar &&
+    typeof avatar === "string" &&
+    (
+      avatar.startsWith("data:image") ||
+      avatar.startsWith("http")
+    )
+  ){
+    return `<img src="${avatar}" alt="avatar">`;
   }
 
+  return `<span class="${extraClass}">${escapeHTML(avatar || "👾")}</span>`;
+}
+
+function getLevel(xp){
+  return Math.floor((xp || 0) / 100) + 1;
+}
+
+
+/* =========================================================
+   AUTH TABS
+========================================================= */
+
+function authTab(tab){
+
+  const loginPane = $("loginPane");
+  const registerPane = $("registerPane");
+
+  $("loginTab").classList.toggle(
+    "active",
+    tab === "login"
+  );
+
+  $("regTab").classList.toggle(
+    "active",
+    tab === "register"
+  );
+
+  loginPane.classList.toggle(
+    "hidden",
+    tab !== "login"
+  );
+
+  registerPane.classList.toggle(
+    "hidden",
+    tab !== "register"
+  );
+
+  setStatus("authStatus","");
 }
 
 
 /* =========================================================
    REGISTER
-   ========================================================= */
+========================================================= */
 
 async function register(){
 
   const username =
-    document.getElementById("regName").value.trim();
+    $("regName").value.trim();
 
   const email =
-    document.getElementById("regEmail").value.trim();
+    $("regEmail").value.trim();
 
   const password =
-    document.getElementById("regPass").value;
+    $("regPass").value;
 
   const avatar =
-    document.getElementById("regAvatar").value;
+    $("regAvatar").value;
 
   if(!username || !email || !password){
 
@@ -1239,19 +1348,17 @@ async function register(){
     );
 
     return;
-
   }
 
   if(password.length < 6){
 
     setStatus(
       "authStatus",
-      "Password must be at least 6 characters.",
+      "Password must contain at least 6 characters.",
       "error"
     );
 
     return;
-
   }
 
   setStatus(
@@ -1259,70 +1366,66 @@ async function register(){
     "Creating your Pixel account..."
   );
 
-  const {data,error} =
-    await supabase.auth.signUp({
+  try{
 
+    const {
+      data,
+      error
+    } =
+    await sb.auth.signUp({
       email,
       password,
-
       options:{
         data:{
           username,
           avatar
         }
       }
-
     });
 
-  if(error){
+    if(error) throw error;
 
-    setStatus(
-      "authStatus",
-      error.message,
-      "error"
-    );
+    /*
+      If email confirmation is enabled,
+      Supabase may create the account
+      but return no active session.
+    */
 
-    return;
+    if(!data.session){
 
-  }
+      setStatus(
+        "authStatus",
+        "Account created. Please check your email and verify your account before logging in.",
+        "success"
+      );
 
-  if(data.user){
-
-    const {error:profileError} =
-      await supabase
-        .from("profiles")
-        .upsert({
-
-          id:data.user.id,
-          username:username,
-          avatar:avatar,
-          bio:"PIXEL EXPLORER",
-          xp:0
-
-        });
-
-    if(profileError){
-
-      console.error(profileError);
-
+      return;
     }
-
-  }
-
-  if(data.session){
 
     currentUser = data.user;
 
-    await loadCurrentProfile();
+    await ensureProfile(
+      username,
+      avatar
+    );
 
-    showApp();
-
-  }else{
+    await startApp();
 
     setStatus(
       "authStatus",
-      "Account created! Please check your email and verify your account before logging in.",
+      "Account created successfully!",
       "success"
+    );
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "authStatus",
+      error.message || "Registration failed.",
+      "error"
     );
 
   }
@@ -1332,26 +1435,25 @@ async function register(){
 
 /* =========================================================
    LOGIN
-   ========================================================= */
+========================================================= */
 
 async function login(){
 
   const email =
-    document.getElementById("loginEmail").value.trim();
+    $("loginEmail").value.trim();
 
   const password =
-    document.getElementById("loginPass").value;
+    $("loginPass").value;
 
   if(!email || !password){
 
     setStatus(
       "authStatus",
-      "Enter your email and password.",
+      "Please enter your email and password.",
       "error"
     );
 
     return;
-
   }
 
   setStatus(
@@ -1359,379 +1461,373 @@ async function login(){
     "Logging in..."
   );
 
-  const {data,error} =
-    await supabase.auth.signInWithPassword({
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await sb.auth.signInWithPassword({
       email,
       password
     });
 
-  if(error){
+    if(error) throw error;
+
+    currentUser = data.user;
+
+    await ensureProfile();
+
+    await startApp();
+
+  }
+  catch(error){
+
+    console.error(error);
 
     setStatus(
       "authStatus",
-      error.message,
+      error.message || "Login failed.",
       "error"
     );
 
-    return;
-
   }
-
-  currentUser = data.user;
-
-  await ensureProfile();
-
-  await loadCurrentProfile();
-
-  showApp();
 
 }
 
 
 /* =========================================================
    ENSURE PROFILE EXISTS
-   ========================================================= */
+========================================================= */
 
-async function ensureProfile(){
+async function ensureProfile(
+  newUsername = null,
+  newAvatar = null
+){
 
-  const {data} =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id",currentUser.id)
-      .maybeSingle();
+  if(!currentUser) return;
 
-  if(data) return;
-
-  const username =
-    currentUser.user_metadata?.username ||
-    currentUser.email.split("@")[0];
-
-  const avatar =
-    currentUser.user_metadata?.avatar ||
-    "👾";
-
-  await supabase
+  const {
+    data:existing,
+    error
+  } =
+  await sb
     .from("profiles")
-    .insert({
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
 
-      id:currentUser.id,
-      username:username,
-      avatar:avatar,
-      bio:"PIXEL EXPLORER",
-      xp:0
+  if(error){
+    console.error("Profile check:",error);
+  }
 
-    });
+  if(!existing){
+
+    const metadata =
+      currentUser.user_metadata || {};
+
+    const username =
+      newUsername ||
+      metadata.username ||
+      currentUser.email.split("@")[0];
+
+    const avatar =
+      newAvatar ||
+      metadata.avatar ||
+      "👾";
+
+    const {
+      error:insertError
+    } =
+    await sb
+      .from("profiles")
+      .insert({
+        id:currentUser.id,
+        username:username,
+        avatar:avatar,
+        bio:"PIXEL EXPLORER",
+        xp:0
+      });
+
+    if(insertError){
+      console.error(
+        "Profile creation error:",
+        insertError
+      );
+    }
+
+  }
 
 }
 
 
 /* =========================================================
-   LOAD PROFILE
-   ========================================================= */
+   START APP
+========================================================= */
 
-async function loadCurrentProfile(){
+async function startApp(){
 
-  const {data,error} =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id",currentUser.id)
-      .single();
+  $("authView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+
+  await loadMyProfile();
+  await loadFeed();
+  await searchUsers();
+  await loadLeaderboard();
+  await loadMessageUsers();
+
+}
+
+
+/* =========================================================
+   LOAD CURRENT PROFILE
+========================================================= */
+
+async function loadMyProfile(){
+
+  if(!currentUser) return;
+
+  const {
+    data,
+    error
+  } =
+  await sb
+    .from("profiles")
+    .select("*")
+    .eq("id",currentUser.id)
+    .maybeSingle();
 
   if(error){
 
     console.error(error);
-
     return;
 
   }
 
-  currentProfile = data;
+  currentProfile =
+    data || {
+      id:currentUser.id,
+      username:"PLAYER",
+      avatar:"👾",
+      bio:"PIXEL EXPLORER",
+      xp:0
+    };
 
-  updateProfileUI();
-
-}
-
-
-function avatarHTML(value){
-
-  if(!value) return "👾";
-
-  if(
-    value.startsWith("data:image") ||
-    value.startsWith("http")
-  ){
-
-    return `<img src="${value}">`;
-
-  }
-
-  return value;
+  renderProfile();
 
 }
 
 
-function updateProfileUI(){
+function renderProfile(){
 
   if(!currentProfile) return;
-
-  const avatar =
-    currentProfile.avatar || "👾";
-
-  const username =
-    currentProfile.username || "PLAYER";
-
-  const bio =
-    currentProfile.bio || "PIXEL EXPLORER";
 
   const xp =
     Number(currentProfile.xp || 0);
 
   const level =
-    Math.floor(xp / 100) + 1;
+    getLevel(xp);
 
-  const xpCurrent =
-    xp % 100;
+  $("sideAvatar").innerHTML =
+    avatarHTML(currentProfile.avatar) +
+    '<span class="online"></span>';
 
-  document
-    .getElementById("sideAvatar")
-    .innerHTML =
-      avatarHTML(avatar) +
-      `<span class="online"></span>`;
+  $("profileAvatar").innerHTML =
+    avatarHTML(currentProfile.avatar) +
+    '<span class="online"></span>';
 
-  document
-    .getElementById("profileAvatar")
-    .innerHTML =
-      avatarHTML(avatar) +
-      `<span class="online"></span>`;
+  $("headAvatar").innerHTML =
+    avatarHTML(currentProfile.avatar);
 
-  document
-    .getElementById("headAvatar")
-    .innerHTML =
-      avatarHTML(avatar);
+  $("sideName").textContent =
+    currentProfile.username || "PLAYER";
 
-  document
-    .getElementById("sideName")
-    .textContent = username;
+  $("profileName").textContent =
+    currentProfile.username || "PLAYER";
 
-  document
-    .getElementById("profileName")
-    .textContent = username;
+  $("sideBio").textContent =
+    currentProfile.bio || "PIXEL EXPLORER";
 
-  document
-    .getElementById("sideBio")
-    .textContent = bio;
+  $("profileBio").textContent =
+    currentProfile.bio || "PIXEL EXPLORER";
 
-  document
-    .getElementById("profileBio")
-    .textContent = bio;
+  $("sideLevel").textContent =
+    level;
 
-  document
-    .getElementById("sideLevel")
-    .textContent = level;
+  $("statLevel").textContent =
+    level;
 
-  document
-    .getElementById("statLevel")
-    .textContent = level;
+  $("statXP").textContent =
+    xp;
 
-  document
-    .getElementById("statXP")
-    .textContent = xp;
+  $("xpText").textContent =
+    `${xp % 100} / 100 XP`;
 
-  document
-    .getElementById("xpText")
-    .textContent =
-      `${xpCurrent} / 100 XP`;
+  $("xpBar").style.width =
+    `${xp % 100}%`;
 
-  document
-    .getElementById("xpBar")
-    .style.width =
-      `${xpCurrent}%`;
+  renderBadges(
+    $("sideBadges")
+  );
 
-  let badges = "";
-
-  if(currentProfile.is_admin){
-
-    badges +=
-      `<span class="badge admin">
-        👑 ADMIN
-      </span>`;
-
-  }
-
-  if(currentProfile.is_verified){
-
-    badges +=
-      `<span class="badge verified">
-        ✓ VERIFIED
-      </span>`;
-
-  }
-
-  if(!badges){
-
-    badges =
-      `<span class="badge">
-        🎮 USER
-      </span>`;
-
-  }
-
-  document
-    .getElementById("sideBadges")
-    .innerHTML = badges;
-
-  document
-    .getElementById("profileBadges")
-    .innerHTML = badges;
+  renderBadges(
+    $("profileBadges")
+  );
 
 }
 
 
-/* =========================================================
-   SHOW APP
-   ========================================================= */
+function renderBadges(container){
 
-async function showApp(){
+  if(!container) return;
 
-  document
-    .getElementById("authView")
-    .classList.add("hidden");
+  let html =
+    '<span class="badge">🎮 USER</span>';
 
-  document
-    .getElementById("appView")
-    .classList.remove("hidden");
+  if(currentProfile?.is_admin){
+    html +=
+      '<span class="badge admin">👑 ADMIN</span>';
+  }
 
-  await loadFeed();
+  if(currentProfile?.is_verified){
+    html +=
+      '<span class="badge verified">✓ VERIFIED</span>';
+  }
 
-  await searchUsers();
-
-  await loadMessageUsers();
-
-  await loadLeaderboard();
-
-  await loadPostCount();
+  container.innerHTML = html;
 
 }
 
 
 /* =========================================================
    PAGE NAVIGATION
-   ========================================================= */
+========================================================= */
 
-function page(id,button){
+async function page(
+  pageName,
+  button = null
+){
 
   document
     .querySelectorAll(".page")
-    .forEach(p =>
-      p.classList.remove("active")
-    );
+    .forEach(p=>{
+      p.classList.remove("active");
+    });
+
+  const target =
+    $(pageName);
+
+  if(target){
+    target.classList.add("active");
+  }
 
   document
-    .getElementById(id)
-    .classList.add("active");
+    .querySelectorAll(".menu button")
+    .forEach(b=>{
+      b.classList.remove("active");
+    });
 
   if(button){
-
-    document
-      .querySelectorAll(".menu button")
-      .forEach(b =>
-        b.classList.remove("active")
-      );
-
     button.classList.add("active");
-
   }
 
-  if(id === "friends"){
-    searchUsers();
+  if(pageName === "friends"){
+    await searchUsers();
   }
 
-  if(id === "messages"){
-    loadMessageUsers();
+  if(pageName === "messages"){
+    await loadMessageUsers();
   }
 
-  if(id === "leaderboard"){
-    loadLeaderboard();
+  if(pageName === "leaderboard"){
+    await loadLeaderboard();
+  }
+
+  if(pageName === "home"){
+    await loadFeed();
   }
 
 }
 
 
 /* =========================================================
-   SEARCH USERS
-   ========================================================= */
+   SEARCH USERS / FRIENDS
+========================================================= */
 
 async function searchUsers(){
 
   if(!currentUser) return;
 
-  const friendInput =
-    document.getElementById("friendSearch");
+  const global =
+    $("globalSearch")?.value.trim() || "";
 
-  const globalInput =
-    document.getElementById("globalSearch");
+  const friend =
+    $("friendSearch")?.value.trim() || "";
 
   const query =
-    (
-      friendInput?.value ||
-      globalInput?.value ||
-      ""
-    )
-    .trim()
-    .toLowerCase();
+    friend || global;
 
-  const {data,error} =
-    await supabase
+  let request =
+    sb
       .from("profiles")
       .select("*")
       .neq("id",currentUser.id)
       .order("username");
 
-  if(error){
-
-    console.error(error);
-
-    return;
-
-  }
-
-  let users = data || [];
-
   if(query){
 
-    users =
-      users.filter(user =>
-        (user.username || "")
-          .toLowerCase()
-          .includes(query)
+    request =
+      request.ilike(
+        "username",
+        `%${query}%`
       );
 
   }
 
-  const container =
-    document.getElementById("searchResults");
+  const {
+    data:users,
+    error
+  } =
+  await request;
 
-  if(!container) return;
+  if(error){
 
-  if(!users.length){
+    console.error(
+      "Search error:",
+      error
+    );
 
-    container.innerHTML =
+    if($("searchResults")){
+      $("searchResults").innerHTML =
+        `<div class="empty">
+          Cannot load users: ${escapeHTML(error.message)}
+        </div>`;
+    }
+
+    return;
+  }
+
+  const results =
+    $("searchResults");
+
+  if(!results) return;
+
+  if(!users || users.length === 0){
+
+    results.innerHTML =
       `<div class="empty">
         No Pixel users found.
       </div>`;
 
     return;
-
   }
 
-  container.innerHTML =
-    users.map(user => `
+  results.innerHTML =
+    users.map(user=>`
 
       <div class="user-card">
 
-        <div class="small-avatar">
+        <div class="user-avatar">
           ${avatarHTML(user.avatar)}
         </div>
 
@@ -1739,41 +1835,41 @@ async function searchUsers(){
           ${escapeHTML(user.username || "PLAYER")}
         </h3>
 
-        <div>
+        <div class="badges">
+
+          <span class="badge">
+            🎮 USER
+          </span>
 
           ${
             user.is_admin
-              ? `<span class="badge admin">👑 ADMIN</span>`
-              : ""
+            ? '<span class="badge admin">👑 ADMIN</span>'
+            : ""
           }
 
           ${
             user.is_verified
-              ? `<span class="badge verified">✓ VERIFIED</span>`
-              : ""
+            ? '<span class="badge verified">✓ VERIFIED</span>'
+            : ""
           }
 
         </div>
 
         <p class="tiny">
-          ${escapeHTML(user.bio || "PIXEL EXPLORER")}
+          ${escapeHTML(
+            user.bio || "PIXEL EXPLORER"
+          )}
         </p>
 
-        <button
-          class="primary friend-btn"
-          onclick="addFriend('${user.id}')">
+        <div class="user-actions">
 
-          🤝 ADD FRIEND
+          <button
+            class="primary"
+            onclick="openChat('${user.id}')">
+            💬 MESSAGE
+          </button>
 
-        </button>
-
-        <button
-          class="secondary friend-btn"
-          onclick="openChat('${user.id}')">
-
-          💬 MESSAGE
-
-        </button>
+        </div>
 
       </div>
 
@@ -1783,110 +1879,61 @@ async function searchUsers(){
 
 
 /* =========================================================
-   ADD FRIEND
-   ========================================================= */
-
-async function addFriend(friendId){
-
-  if(friendId === currentUser.id) return;
-
-  const {data:existing} =
-    await supabase
-      .from("friendships")
-      .select("*")
-      .or(
-        `and(user_id.eq.${currentUser.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${currentUser.id})`
-      )
-      .maybeSingle();
-
-  if(existing){
-
-    alert("You are already connected with this Pixel user.");
-
-    return;
-
-  }
-
-  const {error} =
-    await supabase
-      .from("friendships")
-      .insert({
-
-        user_id:currentUser.id,
-        friend_id:friendId
-
-      });
-
-  if(error){
-
-    console.error(error);
-
-    alert(error.message);
-
-    return;
-
-  }
-
-  alert("Friend added!");
-
-  await loadMessageUsers();
-
-}
-
-
-/* =========================================================
-   MESSAGE USERS
-   ========================================================= */
+   LOAD USERS FOR MESSAGE LIST
+========================================================= */
 
 async function loadMessageUsers(){
 
   if(!currentUser) return;
 
-  const {data,error} =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .neq("id",currentUser.id)
-      .order("username");
+  const {
+    data:users,
+    error
+  } =
+  await sb
+    .from("profiles")
+    .select("*")
+    .neq("id",currentUser.id)
+    .order("username");
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "Message users error:",
+      error
+    );
+
+    $("messageUsers").innerHTML =
+      `<div class="tiny">
+        Cannot load users.
+      </div>`;
 
     return;
-
   }
 
-  const container =
-    document.getElementById("messageUsers");
+  if(!users || users.length === 0){
 
-  if(!data?.length){
-
-    container.innerHTML =
-      `<div class="empty">
+    $("messageUsers").innerHTML =
+      `<div class="tiny">
         No other users yet.
       </div>`;
 
     return;
-
   }
 
-  container.innerHTML =
-    data.map(user => `
+  $("messageUsers").innerHTML =
+    users.map(user=>`
 
-      <button
+      <div
         class="chat-user ${
-          selectedChatUser?.id === user.id
-            ? "active"
-            : ""
+          selectedUser?.id === user.id
+          ? "active"
+          : ""
         }"
         onclick="openChat('${user.id}')">
 
-        <div class="small-avatar"
-          style="width:42px;height:42px;margin:0">
-
+        <div class="chat-avatar">
           ${avatarHTML(user.avatar)}
-
         </div>
 
         <div>
@@ -1898,14 +1945,16 @@ async function loadMessageUsers(){
           <div class="tiny">
             ${
               user.is_admin
-                ? "👑 ADMIN"
-                : "PIXEL USER"
+              ? "👑 ADMIN"
+              : user.is_verified
+              ? "✓ VERIFIED"
+              : "PIXEL USER"
             }
           </div>
 
         </div>
 
-      </button>
+      </div>
 
     `).join("");
 
@@ -1914,127 +1963,146 @@ async function loadMessageUsers(){
 
 /* =========================================================
    OPEN CHAT
-   ========================================================= */
+========================================================= */
 
 async function openChat(userId){
 
-  const {data,error} =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id",userId)
-      .single();
+  if(!currentUser) return;
 
-  if(error){
+  const {
+    data:user,
+    error
+  } =
+  await sb
+    .from("profiles")
+    .select("*")
+    .eq("id",userId)
+    .maybeSingle();
 
-    console.error(error);
+  if(error || !user){
+
+    console.error(
+      error || "User not found"
+    );
 
     return;
-
   }
 
-  selectedChatUser = data;
+  selectedUser = user;
 
-  page("messages");
+  await page("messages");
 
-  document
-    .getElementById("chatTitle")
-    .textContent =
-      data.username || "PLAYER";
+  $("chatTitle").textContent =
+    user.username || "PLAYER";
 
-  document
-    .getElementById("chatSubtitle")
-    .textContent =
-      "YOUR PRIVATE PIXEL CHAT";
+  $("chatSubtitle").textContent =
+    user.is_admin
+      ? "👑 ADMIN CHAT"
+      : user.is_verified
+      ? "✓ VERIFIED PIXEL USER"
+      : "YOUR PIXEL CHAT";
 
-  document
-    .getElementById("messageInput")
-    .disabled = false;
-
-  document
-    .getElementById("sendButton")
-    .disabled = false;
+  $("messageInput").disabled = false;
+  $("sendButton").disabled = false;
 
   await loadMessages();
+  subscribeMessages();
 
-  await loadMessageUsers();
-
-  if(messageTimer){
-
-    clearInterval(messageTimer);
-
-  }
-
-  messageTimer =
-    setInterval(
-      loadMessages,
-      3000
-    );
+  $("messageInput").focus();
 
 }
 
 
 /* =========================================================
    LOAD MESSAGES
-   ========================================================= */
+========================================================= */
 
 async function loadMessages(){
 
-  if(!selectedChatUser || !currentUser) return;
+  if(
+    !currentUser ||
+    !selectedUser
+  ){
+    return;
+  }
 
-  const otherId =
-    selectedChatUser.id;
-
-  const {data,error} =
-    await supabase
-      .from("messages")
-      .select("*")
-      .or(
-        `and(sender_id.eq.${currentUser.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${currentUser.id})`
-      )
-      .order("created_at",{ascending:true});
+  const {
+    data,
+    error
+  } =
+  await sb
+    .from("messages")
+    .select("*")
+    .or(
+      `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`
+    )
+    .order(
+      "created_at",
+      {ascending:true}
+    );
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "Load messages:",
+      error
+    );
 
-    return;
-
-  }
-
-  const container =
-    document.getElementById("messagesList");
-
-  if(!data?.length){
-
-    container.innerHTML =
+    $("messagesList").innerHTML =
       `<div class="empty">
-        NO MESSAGES YET. SAY HELLO 👋
+        Cannot load messages: ${escapeHTML(error.message)}
       </div>`;
 
     return;
+  }
 
+  renderMessages(data || []);
+
+}
+
+
+function renderMessages(messages){
+
+  const container =
+    $("messagesList");
+
+  if(!messages.length){
+
+    container.innerHTML =
+      `<div class="empty">
+        No messages yet. Say hello! 👋
+      </div>`;
+
+    return;
   }
 
   container.innerHTML =
-    data.map(message => {
+    messages.map(message=>{
 
       const mine =
-        message.sender_id === currentUser.id;
+        message.sender_id ===
+        currentUser.id;
+
+      const date =
+        new Date(
+          message.created_at
+        );
 
       return `
 
-        <div class="message ${mine ? "mine" : ""}">
+        <div class="message ${
+          mine ? "mine" : "theirs"
+        }">
 
-          ${escapeHTML(message.content)}
+          <div>
+            ${escapeHTML(
+              message.content || ""
+            )}
+          </div>
 
-          <span class="message-time">
-
-            ${new Date(
-              message.created_at
-            ).toLocaleString()}
-
-          </span>
+          <div class="message-time">
+            ${date.toLocaleString()}
+          </div>
 
         </div>
 
@@ -2050,244 +2118,412 @@ async function loadMessages(){
 
 /* =========================================================
    SEND MESSAGE
-   ========================================================= */
+========================================================= */
 
 async function sendMessage(){
 
-  if(!selectedChatUser){
-
+  if(
+    !currentUser ||
+    !selectedUser
+  ){
     return;
-
   }
-
-  const input =
-    document.getElementById("messageInput");
 
   const content =
-    input.value.trim();
+    $("messageInput").value.trim();
 
-  if(!content){
+  if(!content) return;
 
-    return;
-
-  }
-
-  input.disabled = true;
-
-  const {error} =
-    await supabase
-      .from("messages")
-      .insert({
-
-        sender_id:currentUser.id,
-        receiver_id:selectedChatUser.id,
-        content:content
-
-      });
-
-  input.disabled = false;
-
-  if(error){
-
-    console.error(error);
-
-    setStatus(
-      "messageStatus",
-      error.message,
-      "error"
-    );
-
-    return;
-
-  }
-
-  input.value = "";
+  $("sendButton").disabled = true;
 
   setStatus(
     "messageStatus",
-    ""
+    "Sending..."
   );
 
-  await loadMessages();
+  try{
 
-}
-
-
-/* =========================================================
-   POSTS
-   ========================================================= */
-
-async function createPost(){
-
-  const text =
-    document.getElementById("postText")
-    .value
-    .trim();
-
-  if(!text){
-
-    setStatus(
-      "postStatus",
-      "Write something first.",
-      "error"
-    );
-
-    return;
-
-  }
-
-  const {error} =
-    await supabase
-      .from("posts")
+    const {
+      error
+    } =
+    await sb
+      .from("messages")
       .insert({
 
-        user_id:currentUser.id,
-        content:text
+        sender_id:
+          currentUser.id,
+
+        receiver_id:
+          selectedUser.id,
+
+        content:
+          content
 
       });
 
-  if(error){
+    if(error) throw error;
 
-    console.error(error);
+    $("messageInput").value = "";
 
     setStatus(
-      "postStatus",
-      error.message,
+      "messageStatus",
+      "Message sent.",
+      "success"
+    );
+
+    await loadMessages();
+
+  }
+  catch(error){
+
+    console.error(
+      "Send message error:",
+      error
+    );
+
+    setStatus(
+      "messageStatus",
+      error.message ||
+      "Message could not be sent.",
       "error"
     );
 
-    return;
+  }
+  finally{
+
+    $("sendButton").disabled = false;
 
   }
-
-  await supabase
-    .from("profiles")
-    .update({
-
-      xp:
-        Number(currentProfile.xp || 0) + 10
-
-    })
-    .eq(
-      "id",
-      currentUser.id
-    );
-
-  document
-    .getElementById("postText")
-    .value = "";
-
-  setStatus(
-    "postStatus",
-    "POST PUBLISHED! +10 XP",
-    "success"
-  );
-
-  await loadCurrentProfile();
-
-  await loadFeed();
-
-  await loadPostCount();
 
 }
 
 
 /* =========================================================
-   LOAD FEED
-   ========================================================= */
+   REALTIME MESSAGES
+========================================================= */
 
-async function loadFeed(){
+function subscribeMessages(){
 
-  const {data,error} =
-    await supabase
-      .from("posts")
-      .select(`
-        *,
-        profiles:user_id(
-          username,
-          avatar,
-          is_admin,
-          is_verified
-        )
-      `)
-      .order(
-        "created_at",
-        {ascending:false}
+  if(messageSubscription){
+
+    sb.removeChannel(
+      messageSubscription
+    );
+
+  }
+
+  messageSubscription =
+    sb
+      .channel(
+        "pixel-messages-" +
+        currentUser.id
       )
-      .limit(50);
+      .on(
+        "postgres_changes",
+        {
+          event:"*",
+          schema:"public",
+          table:"messages"
+        },
+        async(payload)=>{
 
-  if(error){
+          if(!selectedUser) return;
+
+          const row =
+            payload.new ||
+            payload.old;
+
+          if(!row) return;
+
+          const related =
+            (
+              row.sender_id === currentUser.id &&
+              row.receiver_id === selectedUser.id
+            )
+            ||
+            (
+              row.sender_id === selectedUser.id &&
+              row.receiver_id === currentUser.id
+            );
+
+          if(related){
+            await loadMessages();
+          }
+
+        }
+      )
+      .subscribe();
+
+}
+
+
+/* =========================================================
+   CREATE POST
+========================================================= */
+
+async function createPost(){
+
+  if(!currentUser) return;
+
+  const content =
+    $("postText").value.trim();
+
+  if(!content){
+
+    setStatus(
+      "postStatus",
+      "Please write something first.",
+      "error"
+    );
+
+    return;
+  }
+
+  setStatus(
+    "postStatus",
+    "Publishing..."
+  );
+
+  try{
+
+    /*
+      Current simple version saves post text.
+      Image upload requires Supabase Storage.
+    */
+
+    const {
+      error
+    } =
+    await sb
+      .from("posts")
+      .insert({
+
+        user_id:
+          currentUser.id,
+
+        content:
+          content
+
+      });
+
+    if(error) throw error;
+
+    $("postText").value = "";
+
+    /*
+      Add XP
+    */
+
+    const newXP =
+      Number(currentProfile.xp || 0) + 10;
+
+    await sb
+      .from("profiles")
+      .update({
+        xp:newXP
+      })
+      .eq(
+        "id",
+        currentUser.id
+      );
+
+    currentProfile.xp =
+      newXP;
+
+    renderProfile();
+
+    setStatus(
+      "postStatus",
+      "Post published! +10 XP",
+      "success"
+    );
+
+    await loadFeed();
+
+  }
+  catch(error){
 
     console.error(error);
 
-    return;
+    setStatus(
+      "postStatus",
+      error.message ||
+      "Post failed.",
+      "error"
+    );
 
   }
 
-  const feed =
-    document.getElementById("feed");
+}
 
-  if(!data?.length){
 
-    feed.innerHTML =
+/* =========================================================
+   LOAD POSTS
+========================================================= */
+
+async function loadFeed(){
+
+  if(!currentUser) return;
+
+  const {
+    data:posts,
+    error
+  } =
+  await sb
+    .from("posts")
+    .select(`
+      *,
+      profiles:user_id (
+        username,
+        avatar
+      )
+    `)
+    .order(
+      "created_at",
+      {ascending:false}
+    )
+    .limit(50);
+
+  if(error){
+
+    console.error(
+      "Posts error:",
+      error
+    );
+
+    $("feed").innerHTML =
       `<div class="empty">
-        NO POSTS YET. CREATE THE FIRST PIXEL POST!
+        Cannot load posts.
       </div>`;
 
     return;
-
   }
 
-  feed.innerHTML =
-    data.map(post => `
+  $("feed").innerHTML =
+    posts.map(post=>{
 
-      <div class="post">
+      const profile =
+        post.profiles || {};
 
-        <div class="post-head">
+      return `
 
-          <div class="small-avatar"
-            style="width:45px;height:45px;margin:0">
+        <div class="post">
 
-            ${avatarHTML(post.profiles?.avatar)}
+          <div class="post-head">
 
-          </div>
-
-          <div>
-
-            <strong>
-              ${escapeHTML(
-                post.profiles?.username ||
-                "PIXEL USER"
+            <div class="chat-avatar">
+              ${avatarHTML(
+                profile.avatar
               )}
-            </strong>
+            </div>
 
-            <div class="tiny">
+            <div>
 
-              ${
-                post.profiles?.is_admin
-                  ? "👑 ADMIN "
+              <strong>
+                ${escapeHTML(
+                  profile.username ||
+                  "PIXEL PLAYER"
+                )}
+              </strong>
+
+              <div class="tiny">
+                ${
+                  post.created_at
+                  ? new Date(
+                      post.created_at
+                    ).toLocaleString()
                   : ""
-              }
-
-              ${
-                post.profiles?.is_verified
-                  ? "✓ VERIFIED "
-                  : ""
-              }
-
-              ${new Date(
-                post.created_at
-              ).toLocaleString()}
+                }
+              </div>
 
             </div>
 
           </div>
 
+          <p>
+            ${escapeHTML(
+              post.content || ""
+            )}
+          </p>
+
         </div>
 
-        <div class="post-content">
-          ${escapeHTML(post.content || "")}
+      `;
+
+    }).join("");
+
+  const myPosts =
+    posts.filter(
+      p=>p.user_id === currentUser.id
+    ).length;
+
+  $("statPosts").textContent =
+    myPosts;
+
+}
+
+
+/* =========================================================
+   LEADERBOARD
+========================================================= */
+
+async function loadLeaderboard(){
+
+  const {
+    data:users,
+    error
+  } =
+  await sb
+    .from("profiles")
+    .select("*")
+    .order(
+      "xp",
+      {ascending:false}
+    )
+    .limit(50);
+
+  if(error){
+
+    console.error(error);
+
+    $("leaders").innerHTML =
+      `<div class="empty">
+        Cannot load leaderboard.
+      </div>`;
+
+    return;
+  }
+
+  $("leaders").innerHTML =
+    users.map((user,index)=>`
+
+      <div class="leader">
+
+        <div class="rank">
+          #${index + 1}
         </div>
+
+        <div class="chat-avatar">
+          ${avatarHTML(user.avatar)}
+        </div>
+
+        <div style="flex:1">
+
+          <strong>
+            ${escapeHTML(
+              user.username || "PLAYER"
+            )}
+          </strong>
+
+          <div class="tiny">
+            LEVEL ${getLevel(user.xp)}
+          </div>
+
+        </div>
+
+        <strong>
+          ${user.xp || 0} XP
+        </strong>
 
       </div>
 
@@ -2297,373 +2533,292 @@ async function loadFeed(){
 
 
 /* =========================================================
-   POST COUNT
-   ========================================================= */
-
-async function loadPostCount(){
-
-  const {count} =
-    await supabase
-      .from("posts")
-      .select(
-        "*",
-        {
-          count:"exact",
-          head:true
-        }
-      )
-      .eq(
-        "user_id",
-        currentUser.id
-      );
-
-  document
-    .getElementById("statPosts")
-    .textContent =
-      count || 0;
-
-}
-
-
-/* =========================================================
-   LEADERBOARD
-   ========================================================= */
-
-async function loadLeaderboard(){
-
-  const {data,error} =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .order(
-        "xp",
-        {ascending:false}
-      )
-      .limit(50);
-
-  if(error){
-
-    console.error(error);
-
-    return;
-
-  }
-
-  document
-    .getElementById("leaders")
-    .innerHTML =
-      data.map((user,index) => `
-
-        <div class="leader">
-
-          <div>
-
-            <strong>
-              #${index + 1}
-            </strong>
-
-            ${escapeHTML(
-              user.username || "PLAYER"
-            )}
-
-            ${
-              user.is_admin
-                ? " 👑"
-                : ""
-            }
-
-            ${
-              user.is_verified
-                ? " ✓"
-                : ""
-            }
-
-          </div>
-
-          <strong>
-            ${user.xp || 0} XP
-          </strong>
-
-        </div>
-
-      `).join("");
-
-}
-
-
-/* =========================================================
-   PROFILE EDIT
-   ========================================================= */
+   PROFILE EDITOR
+========================================================= */
 
 function openProfile(){
 
-  document
-    .getElementById("profileEditor")
+  if(!currentProfile) return;
+
+  $("profileEditor")
     .classList.remove("hidden");
 
-  document
-    .getElementById("editName")
-    .value =
-      currentProfile.username || "";
+  $("editName").value =
+    currentProfile.username || "";
 
-  document
-    .getElementById("editBio")
-    .value =
-      currentProfile.bio || "";
+  $("editBio").value =
+    currentProfile.bio || "";
 
-  document
-    .getElementById("editAvatar")
-    .value =
-      currentProfile.avatar?.startsWith("data:")
-        ? "👾"
-        : currentProfile.avatar || "👾";
+  $("editAvatar").value =
+    currentProfile.avatar &&
+    !String(
+      currentProfile.avatar
+    ).startsWith("data:image")
+      ? currentProfile.avatar
+      : "👾";
 
-  document
-    .getElementById("profilePreview")
-    .innerHTML =
-      avatarHTML(
-        currentProfile.avatar || "👾"
-      );
+  $("profilePreview").innerHTML =
+    avatarHTML(
+      currentProfile.avatar
+    );
+
+  profileImageData = null;
 
 }
 
 
 function closeProfile(){
 
-  document
-    .getElementById("profileEditor")
+  $("profileEditor")
     .classList.add("hidden");
+
+  profileImageData = null;
 
 }
 
 
-/* =========================================================
-   PROFILE IMAGE
-   ========================================================= */
-
 function previewProfileImage(){
 
   const file =
-    document
-      .getElementById("profileImage")
-      .files[0];
+    $("profileImage").files[0];
 
   if(!file) return;
+
+  if(file.size > 1000000){
+
+    setStatus(
+      "profileStatus",
+      "Please use an image smaller than 1MB.",
+      "error"
+    );
+
+    return;
+  }
 
   const reader =
     new FileReader();
 
-  reader.onload = e => {
+  reader.onload =
+    function(event){
 
-    document
-      .getElementById("profilePreview")
-      .innerHTML =
-        `<img src="${e.target.result}">`;
+      profileImageData =
+        event.target.result;
 
-  };
+      $("profilePreview").innerHTML =
+        `<img
+          src="${profileImageData}"
+          alt="profile picture"
+        >`;
+
+    };
 
   reader.readAsDataURL(file);
 
 }
 
 
-async function getSelectedAvatar(){
-
-  const file =
-    document
-      .getElementById("profileImage")
-      .files[0];
-
-  if(!file){
-
-    return document
-      .getElementById("editAvatar")
-      .value;
-
-  }
-
-  return new Promise((resolve,reject)=>{
-
-    const reader =
-      new FileReader();
-
-    reader.onload =
-      e => resolve(e.target.result);
-
-    reader.onerror =
-      reject;
-
-    reader.readAsDataURL(file);
-
-  });
-
-}
-
-
 /* =========================================================
    SAVE PROFILE
-   ========================================================= */
+========================================================= */
 
 async function saveProfile(){
 
+  if(!currentUser) return;
+
   const username =
-    document
-      .getElementById("editName")
-      .value
-      .trim();
+    $("editName").value.trim();
 
   const bio =
-    document
-      .getElementById("editBio")
-      .value
-      .trim();
+    $("editBio").value.trim();
+
+  let avatar =
+    profileImageData ||
+    $("editAvatar").value;
 
   if(!username){
 
     setStatus(
       "profileStatus",
-      "Username cannot be empty.",
+      "Username is required.",
       "error"
     );
 
     return;
-
   }
 
-  const avatar =
-    await getSelectedAvatar();
+  setStatus(
+    "profileStatus",
+    "Saving profile..."
+  );
 
-  const {error} =
-    await supabase
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await sb
       .from("profiles")
       .update({
 
-        username,
-        bio,
-        avatar
+        username:
+          username,
+
+        bio:
+          bio,
+
+        avatar:
+          avatar
 
       })
       .eq(
         "id",
         currentUser.id
-      );
+      )
+      .select()
+      .single();
 
-  if(error){
+    if(error) throw error;
+
+    currentProfile = data;
+
+    renderProfile();
+
+    closeProfile();
+
+    setStatus(
+      "profileStatus",
+      "Profile updated!",
+      "success"
+    );
+
+    await searchUsers();
+    await loadMessageUsers();
+
+  }
+  catch(error){
 
     console.error(error);
 
     setStatus(
       "profileStatus",
-      error.message,
+      error.message ||
+      "Profile update failed.",
       "error"
     );
 
-    return;
-
   }
-
-  setStatus(
-    "profileStatus",
-    "PROFILE UPDATED!",
-    "success"
-  );
-
-  await loadCurrentProfile();
-
-  await searchUsers();
-
-  closeProfile();
 
 }
 
 
 /* =========================================================
    LOGOUT
-   ========================================================= */
+========================================================= */
 
 async function logout(){
 
-  if(messageTimer){
+  if(messageSubscription){
 
-    clearInterval(messageTimer);
+    await sb.removeChannel(
+      messageSubscription
+    );
+
+    messageSubscription = null;
 
   }
 
-  await supabase.auth.signOut();
+  await sb.auth.signOut();
 
   currentUser = null;
   currentProfile = null;
-  selectedChatUser = null;
+  selectedUser = null;
 
-  document
-    .getElementById("appView")
+  $("appView")
     .classList.add("hidden");
 
-  document
-    .getElementById("authView")
+  $("authView")
     .classList.remove("hidden");
 
-  document
-    .getElementById("loginEmail")
-    .value = "";
+  authTab("login");
 
-  document
-    .getElementById("loginPass")
-    .value = "";
+  $("loginPass").value = "";
+
+  setStatus(
+    "authStatus",
+    "Logged out successfully.",
+    "success"
+  );
 
 }
 
 
 /* =========================================================
-   THEME
-   ========================================================= */
+   DARK MODE
+========================================================= */
 
 function theme(){
 
-  document.body.classList.toggle("dark");
+  document.body.classList.toggle("dark-mode");
 
-  if(document.body.classList.contains("dark")){
+  const dark =
+    document.body.classList.contains(
+      "dark-mode"
+    );
+
+  if(dark){
 
     document.documentElement.style.setProperty(
       "--bg",
-      "#1c2030"
+      "#18202c"
     );
 
     document.documentElement.style.setProperty(
-      "--card",
-      "#262c3e"
+      "--panel",
+      "#222c3b"
     );
 
     document.documentElement.style.setProperty(
       "--text",
-      "#edf0f7"
+      "#edf2f7"
     );
 
     document.documentElement.style.setProperty(
       "--muted",
-      "#aab3c5"
+      "#a9b5c5"
     );
 
-  }else{
+    document.documentElement.style.setProperty(
+      "--line",
+      "#394657"
+    );
+
+  }
+  else{
 
     document.documentElement.style.setProperty(
       "--bg",
-      "#eef1f7"
+      "#e8ebf2"
     );
 
     document.documentElement.style.setProperty(
-      "--card",
+      "--panel",
       "#ffffff"
     );
 
     document.documentElement.style.setProperty(
       "--text",
-      "#25334a"
+      "#26384e"
     );
 
     document.documentElement.style.setProperty(
       "--muted",
-      "#6b778c"
+      "#718096"
+    );
+
+    document.documentElement.style.setProperty(
+      "--line",
+      "#d7deea"
     );
 
   }
@@ -2672,49 +2827,81 @@ function theme(){
 
 
 /* =========================================================
-   SECURITY HELPER
-   ========================================================= */
+   CHECK EXISTING LOGIN
+========================================================= */
 
-function escapeHTML(value){
+async function checkSession(){
 
-  return String(value || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  try{
 
-}
+    const {
+      data:{session}
+    } =
+    await sb.auth.getSession();
 
+    if(session){
 
-/* =========================================================
-   INITIAL SESSION
-   ========================================================= */
+      currentUser =
+        session.user;
 
-async function startApp(){
+      await ensureProfile();
 
-  const {
-    data:{session}
-  } =
-    await supabase.auth.getSession();
+      await startApp();
 
-  if(session){
+    }
+    else{
 
-    currentUser =
-      session.user;
+      $("authView")
+        .classList.remove("hidden");
 
-    await ensureProfile();
+    }
 
-    await loadCurrentProfile();
+  }
+  catch(error){
 
-    showApp();
+    console.error(
+      "Session error:",
+      error
+    );
+
+    $("authView")
+      .classList.remove("hidden");
 
   }
 
 }
 
 
-startApp();
+/* =========================================================
+   AUTH STATE CHANGE
+========================================================= */
+
+sb.auth.onAuthStateChange(
+  async(event,session)=>{
+
+    if(
+      event === "SIGNED_OUT"
+    ){
+
+      currentUser = null;
+      currentProfile = null;
+      selectedUser = null;
+
+      $("appView")
+        .classList.add("hidden");
+
+      $("authView")
+        .classList.remove("hidden");
+
+    }
+
+  }
+);
+
+
+/* START */
+
+checkSession();
 
 </script>
 
