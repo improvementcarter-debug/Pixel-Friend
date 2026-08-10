@@ -6,20 +6,35 @@
 
 <title>PIXEL FRIEND</title>
 
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
-  --bg:#0b1020;
-  --panel:#151d31;
-  --panel2:#1d2740;
-  --border:#2b3a59;
+  --bg:#080b16;
+  --bg2:#10162a;
+  --card:rgba(20,27,50,.88);
+  --card2:#151d35;
   --text:#f5f7ff;
-  --muted:#9eacc8;
-  --primary:#7c5ce6;
+  --muted:#9ba7c5;
+  --primary:#7c5cff;
   --primary2:#9b7cff;
-  --blue:#27c7e8;
-  --danger:#ff5d73;
-  --success:#39d98a;
-  --yellow:#ffc857;
+  --blue:#38bdf8;
+  --yellow:#fbbf24;
+  --danger:#fb7185;
+  --border:rgba(255,255,255,.10);
+  --shadow:0 15px 40px rgba(0,0,0,.35);
+}
+
+body.light{
+  --bg:#eef2ff;
+  --bg2:#dbeafe;
+  --card:rgba(255,255,255,.92);
+  --card2:#ffffff;
+  --text:#182033;
+  --muted:#64748b;
+  --border:rgba(0,0,0,.10);
+  --shadow:0 15px 40px rgba(50,60,100,.15);
 }
 
 *{
@@ -30,16 +45,14 @@ body{
   margin:0;
   font-family:Arial,Helvetica,sans-serif;
   background:
-    radial-gradient(circle at top left,#1b2142 0%,transparent 35%),
-    radial-gradient(circle at bottom right,#211842 0%,transparent 35%),
+    radial-gradient(circle at top left,#25206a 0,transparent 30%),
+    radial-gradient(circle at bottom right,#123d67 0,transparent 30%),
     var(--bg);
   color:var(--text);
+  min-height:100vh;
 }
 
-button,
-input,
-textarea,
-select{
+button,input,textarea,select{
   font:inherit;
 }
 
@@ -56,36 +69,99 @@ button{
   font-size:12px;
 }
 
+input,textarea,select{
+  width:100%;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.06);
+  color:var(--text);
+  padding:13px;
+  border-radius:12px;
+  outline:none;
+  margin:7px 0;
+}
+
+body.light input,
+body.light textarea,
+body.light select{
+  background:#fff;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+button{
+  border:none;
+  border-radius:12px;
+  padding:12px 16px;
+  background:rgba(255,255,255,.08);
+  color:var(--text);
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  opacity:.92;
+}
+
+.primary{
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:white;
+  font-weight:bold;
+}
+
+.blue{
+  background:var(--blue);
+  color:#06111d;
+  font-weight:bold;
+}
+
+.yellow{
+  background:var(--yellow);
+  color:#211600;
+  font-weight:bold;
+}
+
+.danger{
+  background:rgba(251,113,133,.15);
+  color:#ff9cad;
+}
+
+.secondary{
+  background:rgba(255,255,255,.08);
+}
+
 /* AUTH */
 
 #authScreen{
   min-height:100vh;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   padding:20px;
 }
 
 .auth-card{
   width:100%;
-  max-width:420px;
-  background:rgba(21,29,49,.95);
+  max-width:430px;
+  background:var(--card);
   border:1px solid var(--border);
-  border-radius:26px;
-  padding:34px;
-  box-shadow:0 20px 80px rgba(0,0,0,.45);
+  border-radius:24px;
+  padding:30px;
+  box-shadow:var(--shadow);
 }
 
 .logo{
   text-align:center;
-  font-size:28px;
+  font-size:30px;
   font-weight:900;
-  letter-spacing:4px;
+  letter-spacing:2px;
 }
 
 .logo-icon{
-  font-size:50px;
-  margin-bottom:10px;
+  font-size:55px;
+  margin-bottom:8px;
 }
 
 .tagline{
@@ -97,111 +173,55 @@ button{
 
 .tabs{
   display:flex;
-  gap:8px;
-  margin:24px 0 16px;
+  gap:10px;
+  margin:25px 0 15px;
 }
 
 .tabs button{
   flex:1;
-  padding:13px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:transparent;
-  color:var(--text);
-  font-weight:bold;
 }
 
 .tabs button.active{
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  border-color:transparent;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  border:1px solid var(--border);
-  background:#0d1425;
-  color:var(--text);
-  padding:14px;
-  border-radius:12px;
-  outline:none;
-  margin-bottom:12px;
-}
-
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-  border-color:var(--primary2);
-}
-
-.primary,
-.blue,
-.secondary,
-.yellow{
-  border:none;
-  border-radius:12px;
-  padding:13px 18px;
+  background:var(--primary);
   color:white;
-  font-weight:bold;
 }
 
-.primary{
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-}
-
-.blue{
-  background:var(--blue);
-  color:#07121a;
-}
-
-.secondary{
-  background:#26334d;
-}
-
-.yellow{
-  background:var(--yellow);
-  color:#171108;
-}
-
-.danger{
-  background:transparent;
-  color:var(--danger) !important;
+.demo-text{
+  text-align:center;
+  margin-top:18px;
 }
 
 /* APP */
 
-#app{
+#appScreen{
   min-height:100vh;
 }
 
 header{
-  height:72px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 24px;
-  background:rgba(11,16,32,.85);
-  backdrop-filter:blur(16px);
   position:sticky;
   top:0;
   z-index:10;
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 25px;
+  background:rgba(8,11,22,.88);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--border);
+}
+
+body.light header{
+  background:rgba(255,255,255,.85);
 }
 
 .brand{
-  font-size:20px;
-  font-weight:900;
-  letter-spacing:2px;
-  cursor:pointer;
   display:flex;
   align-items:center;
   gap:10px;
+  font-weight:900;
+  font-size:20px;
+  cursor:pointer;
 }
 
 .brand-icon{
@@ -211,65 +231,56 @@ header{
 .actions{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
 }
 
 .actions input{
+  width:230px;
   margin:0;
-  width:220px;
-  padding:10px 14px;
+  padding:10px 12px;
 }
 
 .icon{
-  min-width:42px;
-  height:42px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:var(--panel);
-  color:white;
-  position:relative;
+  min-width:45px;
+  height:43px;
+  padding:7px;
+  font-size:18px;
 }
 
-.badge{
-  position:absolute;
-  top:-6px;
-  right:-6px;
-  background:var(--danger);
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  font-size:10px;
-  display:grid;
-  place-items:center;
+#headAvatar{
+  overflow:hidden;
 }
 
-.layout{
-  display:grid;
-  grid-template-columns:270px 1fr;
-  min-height:calc(100vh - 72px);
+.app-layout{
+  display:flex;
+  min-height:calc(100vh - 70px);
 }
 
 .side{
+  width:260px;
+  padding:20px;
   border-right:1px solid var(--border);
-  background:rgba(15,22,39,.7);
-  padding:22px 14px;
+  background:rgba(0,0,0,.08);
 }
 
 .mini{
   text-align:center;
-  padding:16px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:20px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--border);
 }
 
 .avatar{
-  background:linear-gradient(135deg,#31245f,#1b2440);
-  border:2px solid var(--primary2);
-  display:grid;
-  place-items:center;
   position:relative;
+  width:58px;
+  height:58px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--blue));
+  margin:auto;
   overflow:hidden;
+  font-size:30px;
 }
 
 .avatar img{
@@ -279,65 +290,76 @@ header{
 }
 
 .big{
-  width:80px;
-  height:80px;
-  border-radius:22px;
-  font-size:38px;
-  margin:0 auto 12px;
+  margin:0 auto 10px;
 }
 
 .online{
   position:absolute;
-  width:13px;
-  height:13px;
-  background:var(--success);
-  border-radius:50%;
-  border:2px solid var(--panel);
-  bottom:5px;
   right:5px;
+  bottom:5px;
+  width:12px;
+  height:12px;
+  background:#22c55e;
+  border:2px solid white;
+  border-radius:50%;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  margin:3px;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.admin-badge{
+  background:#fbbf24;
+  color:#2a1d00;
+}
+
+.verified-badge{
+  background:#38bdf8;
+  color:#06111d;
 }
 
 .xp{
-  height:9px;
-  background:#0a1020;
+  height:10px;
+  background:rgba(255,255,255,.08);
   border-radius:20px;
   overflow:hidden;
-  margin-top:10px;
+  margin-top:8px;
 }
 
 #xpBar{
   height:100%;
   width:0%;
-  background:linear-gradient(90deg,var(--blue),var(--primary2));
+  background:linear-gradient(90deg,var(--primary),var(--blue));
+  transition:.3s;
 }
 
 .menu{
-  margin-top:18px;
   display:flex;
   flex-direction:column;
-  gap:7px;
+  gap:8px;
+  margin-top:20px;
 }
 
 .menu button{
   text-align:left;
-  padding:13px;
-  border:none;
-  border-radius:12px;
-  background:transparent;
-  color:var(--muted);
 }
 
-.menu button:hover,
 .menu button.active{
-  background:#202b46;
+  background:var(--primary);
   color:white;
 }
 
 main{
-  padding:28px;
-  max-width:1100px;
-  width:100%;
+  flex:1;
+  padding:25px;
+  max-width:1200px;
   margin:auto;
+  width:100%;
 }
 
 .page{
@@ -348,25 +370,16 @@ main{
   display:block;
 }
 
-.card{
-  background:rgba(21,29,49,.92);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:22px;
-  margin-bottom:20px;
-}
-
 .hero{
-  background:
-    linear-gradient(135deg,rgba(124,92,230,.35),rgba(39,199,232,.12)),
-    var(--panel);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:28px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  background:
+    linear-gradient(135deg,rgba(124,92,255,.9),rgba(56,189,248,.5));
+  border-radius:24px;
+  padding:28px;
   margin-bottom:20px;
+  box-shadow:var(--shadow);
 }
 
 .hero h1{
@@ -374,16 +387,25 @@ main{
 }
 
 .hero p{
-  color:var(--muted);
+  margin-bottom:0;
 }
 
 .hero-icon{
   font-size:70px;
 }
 
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:20px;
+  box-shadow:var(--shadow);
+}
+
 .row{
   display:flex;
-  gap:12px;
+  gap:10px;
   align-items:center;
 }
 
@@ -392,7 +414,7 @@ main{
 }
 
 .row input{
-  margin:0;
+  flex:1;
 }
 
 .grid{
@@ -402,14 +424,53 @@ main{
 }
 
 .user-card{
-  background:var(--panel);
+  background:var(--card);
   border:1px solid var(--border);
   border-radius:18px;
-  padding:16px;
+  padding:18px;
+  text-align:center;
 }
 
-.user-card h3{
-  margin:8px 0;
+.user-card .avatar{
+  margin:0 auto 10px;
+}
+
+.post{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.post-head{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.post-head .avatar{
+  margin:0;
+  flex:none;
+}
+
+.post-text{
+  margin:15px 0;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+
+.post-image{
+  width:100%;
+  max-height:450px;
+  object-fit:cover;
+  border-radius:14px;
+  margin-top:10px;
+}
+
+.post-meta{
+  color:var(--muted);
+  font-size:12px;
 }
 
 .stat-grid{
@@ -419,114 +480,64 @@ main{
 }
 
 .stat{
-  padding:18px;
+  background:rgba(255,255,255,.05);
+  padding:16px;
   border-radius:16px;
-  background:#0e1527;
-  border:1px solid var(--border);
-  display:flex;
-  flex-direction:column;
-  gap:5px;
 }
 
 .stat strong{
+  display:block;
   font-size:26px;
 }
 
-.badge-admin,
-.badge-verified{
-  display:inline-block;
-  margin:3px;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:bold;
-}
-
-.badge-admin{
-  background:rgba(255,200,87,.15);
-  color:var(--yellow);
-  border:1px solid rgba(255,200,87,.4);
-}
-
-.badge-verified{
-  background:rgba(39,199,232,.14);
-  color:var(--blue);
-  border:1px solid rgba(39,199,232,.4);
-}
-
-.post{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:14px;
-}
-
-.post-head{
+.rank-item{
   display:flex;
-  justify-content:space-between;
-  margin-bottom:10px;
+  align-items:center;
+  gap:15px;
+  padding:15px;
+  border-bottom:1px solid var(--border);
 }
 
-.post-image{
-  width:100%;
-  max-height:420px;
-  object-fit:cover;
-  border-radius:14px;
-  margin-top:12px;
-}
-
-#profileAvatar{
-  margin-bottom:16px;
+.rank-number{
+  width:35px;
+  font-size:20px;
+  font-weight:bold;
 }
 
 .profile-image-upload{
   margin-bottom:10px;
 }
 
-.toast{
-  position:fixed;
-  left:50%;
-  bottom:25px;
-  transform:translateX(-50%);
-  background:#19243b;
-  border:1px solid var(--primary2);
-  padding:14px 20px;
-  border-radius:14px;
-  z-index:100;
-  display:none;
-}
-
-.toast.show{
-  display:block;
-}
-
 @media(max-width:800px){
 
   header{
-    padding:0 14px;
-  }
-
-  .layout{
-    grid-template-columns:1fr;
-  }
-
-  .side{
-    border-right:none;
-    border-bottom:1px solid var(--border);
-  }
-
-  .menu{
-    flex-direction:row;
-    overflow:auto;
-  }
-
-  .menu button{
-    white-space:nowrap;
+    padding:0 12px;
   }
 
   .actions input{
-    width:130px;
+    display:none;
+  }
+
+  .side{
+    width:85px;
+    padding:10px;
+  }
+
+  .side .mini h3,
+  .side .mini p,
+  .side .mini > div:not(.avatar):not(.xp),
+  .side .xp,
+  .menu button{
+    font-size:0;
+  }
+
+  .menu button{
+    text-align:center;
+    padding:15px 5px;
+  }
+
+  .menu button::first-letter{
+    font-size:20px;
   }
 
   main{
@@ -534,13 +545,27 @@ main{
   }
 
   .hero{
-    flex-direction:column;
-    text-align:center;
+    padding:20px;
+  }
+
+  .hero h1{
+    font-size:22px;
+  }
+
+  .hero-icon{
+    font-size:45px;
   }
 
   .mobile-stack{
     flex-direction:column;
-    align-items:stretch;
+  }
+
+  .mobile-stack>*{
+    width:100%;
+  }
+
+  .actions{
+    gap:4px;
   }
 }
 </style>
@@ -549,6 +574,7 @@ main{
 <body>
 
 <!-- AUTH SCREEN -->
+
 <div id="authScreen">
 
   <div class="auth-card">
@@ -563,34 +589,60 @@ main{
     </p>
 
     <div class="tabs">
-      <button id="loginTab" class="active" onclick="authTab('login')">
+
+      <button id="loginTab"
+              class="active"
+              onclick="authTab('login')">
         LOGIN
       </button>
 
-      <button id="regTab" onclick="authTab('register')">
+      <button id="regTab"
+              onclick="authTab('register')">
         REGISTER
       </button>
+
     </div>
+
+    <!-- LOGIN -->
 
     <div id="loginPane">
 
-      <input id="loginEmail" type="email" placeholder="EMAIL">
+      <input id="loginEmail"
+             type="email"
+             placeholder="EMAIL">
 
-      <input id="loginPass" type="password" placeholder="PASSWORD">
+      <input id="loginPass"
+             type="password"
+             placeholder="PASSWORD">
 
-      <button class="primary" style="width:100%" onclick="login()">
+      <button class="primary"
+              style="width:100%"
+              onclick="login()">
         ENTER PIXEL WORLD
       </button>
 
+      <p class="tiny demo-text">
+        🌐 REAL PIXEL ACCOUNTS • REGISTER • LOGIN • CONNECT
+      </p>
+
     </div>
 
-    <div id="registerPane" class="hidden">
+    <!-- REGISTER -->
 
-      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">
+    <div id="registerPane"
+         class="hidden">
 
-      <input id="regEmail" type="email" placeholder="EMAIL">
+      <input id="regName"
+             maxlength="20"
+             placeholder="PIXEL USERNAME">
 
-      <input id="regPass" type="password" placeholder="PASSWORD">
+      <input id="regEmail"
+             type="email"
+             placeholder="EMAIL">
+
+      <input id="regPass"
+             type="password"
+             placeholder="PASSWORD">
 
       <select id="regAvatar">
         <option>👾</option>
@@ -605,7 +657,9 @@ main{
         <option>🐲</option>
       </select>
 
-      <button class="primary" style="width:100%" onclick="register()">
+      <button class="primary"
+              style="width:100%"
+              onclick="register()">
         CREATE ACCOUNT
       </button>
 
@@ -617,26 +671,35 @@ main{
 
 
 <!-- APP -->
-<div id="app" class="hidden">
+
+<div id="appScreen"
+     class="hidden">
 
 <header>
 
-  <div class="brand" onclick="page('home')">
+  <div class="brand"
+       onclick="page('home')">
+
     <div class="brand-icon">🎮</div>
+
     PIXEL FRIEND
+
   </div>
 
   <div class="actions">
 
-    <input
-      id="globalSearch"
-      placeholder="SEARCH FRIENDS..."
-      oninput="searchUsers()"
-    >
+    <input id="globalSearch"
+           placeholder="SEARCH FRIENDS..."
+           oninput="searchUsers()">
 
-    <button class="icon" onclick="theme()">🌙</button>
+    <button class="icon"
+            onclick="theme()">
+      🌙
+    </button>
 
-    <button id="headAvatar" class="icon" onclick="page('profile')">
+    <button id="headAvatar"
+            class="icon"
+            onclick="page('profile')">
       👾
     </button>
 
@@ -645,34 +708,42 @@ main{
 </header>
 
 
-<div class="layout">
+<div class="app-layout">
+
+<!-- SIDEBAR -->
 
 <aside class="side">
 
   <div class="mini">
 
-    <div id="sideAvatar" class="avatar big">
+    <div id="sideAvatar"
+         class="avatar big">
       👾
       <span class="online"></span>
     </div>
 
-    <h3 id="sideName">PLAYER</h3>
+    <h3 id="sideName">
+      PLAYER
+    </h3>
 
     <div id="sideBadges"></div>
 
-    <p id="sideBio" class="tiny">
+    <p id="sideBio"
+       class="tiny">
       PIXEL EXPLORER
     </p>
 
     <div>
-      LEVEL <span id="sideLevel">1</span>
+      LEVEL
+      <span id="sideLevel">1</span>
     </div>
 
     <div class="xp">
       <div id="xpBar"></div>
     </div>
 
-    <p id="xpText" class="tiny">
+    <p id="xpText"
+       class="tiny">
       0 / 100 XP
     </p>
 
@@ -681,7 +752,8 @@ main{
 
   <nav class="menu">
 
-    <button class="active" onclick="page('home')">
+    <button class="active"
+            onclick="page('home')">
       🏠 HOME
     </button>
 
@@ -697,7 +769,8 @@ main{
       👤 PROFILE
     </button>
 
-    <button class="danger" onclick="logout()">
+    <button class="danger"
+            onclick="logout()">
       🚪 LOGOUT
     </button>
 
@@ -706,19 +779,28 @@ main{
 </aside>
 
 
+<!-- MAIN -->
+
 <main>
 
 <!-- HOME -->
-<section id="home" class="page active">
+
+<section id="home"
+         class="page active">
 
   <div class="hero">
 
     <div>
       <h1>WELCOME TO PIXEL WORLD 👾</h1>
-      <p>SHARE POSTS • MAKE FRIENDS • EARN XP</p>
+
+      <p>
+        SHARE POSTS • MAKE FRIENDS • EARN XP
+      </p>
     </div>
 
-    <div class="hero-icon">🕹️</div>
+    <div class="hero-icon">
+      🕹️
+    </div>
 
   </div>
 
@@ -727,21 +809,18 @@ main{
 
     <h2>✍️ CREATE PIXEL POST</h2>
 
-    <textarea
-      id="postText"
-      maxlength="1000"
-      placeholder="WHAT'S ON YOUR PIXEL MIND?"
-    ></textarea>
+    <textarea id="postText"
+              maxlength="1000"
+              placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
 
     <div class="row mobile-stack">
 
-      <input
-        id="postImage"
-        type="file"
-        accept="image/*"
-      >
+      <input id="postImage"
+             type="file"
+             accept="image/*">
 
-      <button class="primary" onclick="createPost()">
+      <button class="primary"
+              onclick="createPost()">
         🚀 PUBLISH +10 XP
       </button>
 
@@ -749,33 +828,37 @@ main{
 
   </div>
 
+
   <div id="feed"></div>
 
 </section>
 
 
 <!-- FRIENDS -->
-<section id="friends" class="page">
+
+<section id="friends"
+         class="page">
 
   <div class="card">
 
     <h1>👥 PIXEL COMMUNITY</h1>
 
-    <input
-      id="friendSearch"
-      placeholder="SEARCH PIXEL FRIENDS..."
-      oninput="searchUsers()"
-    >
+    <input id="friendSearch"
+           placeholder="SEARCH PIXEL FRIENDS..."
+           oninput="searchUsers()">
 
   </div>
 
-  <div id="searchResults" class="grid"></div>
+  <div id="communityList"
+       class="grid"></div>
 
 </section>
 
 
 <!-- LEADERBOARD -->
-<section id="leaderboard" class="page">
+
+<section id="leaderboard"
+         class="page">
 
   <div class="card">
 
@@ -793,20 +876,27 @@ main{
 
 
 <!-- PROFILE -->
-<section id="profile" class="page">
 
-  <div class="card" style="text-align:center">
+<section id="profile"
+         class="page">
 
-    <div
-      id="profileAvatar"
-      class="avatar big"
-      style="width:140px;height:140px;font-size:68px"
-    >
+  <div class="card"
+       style="text-align:center">
+
+    <div id="profileAvatar"
+         class="avatar big"
+         style="width:140px;height:140px;font-size:68px">
+
       👾
+
       <span class="online"></span>
+
     </div>
 
-    <h1 id="profileName">PLAYER</h1>
+
+    <h1 id="profileName">
+      PLAYER
+    </h1>
 
     <div id="profileBadges"></div>
 
@@ -836,7 +926,8 @@ main{
 
     <br>
 
-    <button class="blue" onclick="openProfile()">
+    <button class="blue"
+            onclick="openProfile()">
       ✏️ EDIT PROFILE
     </button>
 
@@ -844,17 +935,17 @@ main{
 
 
   <!-- EDIT PROFILE -->
-  <div id="profileEditor" class="card hidden">
+
+  <div id="profileEditor"
+       class="card hidden">
 
     <h2>✏️ EDIT PROFILE</h2>
 
     <div class="profile-image-upload">
 
-      <input
-        id="profileImage"
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-      >
+      <input id="profileImage"
+             type="file"
+             accept="image/png,image/jpeg,image/webp">
 
     </div>
 
@@ -862,17 +953,13 @@ main{
       Upload a JPG, PNG, or WEBP profile picture.
     </p>
 
-    <input
-      id="editName"
-      maxlength="20"
-      placeholder="USERNAME"
-    >
+    <input id="editName"
+           maxlength="20"
+           placeholder="USERNAME">
 
-    <textarea
-      id="editBio"
-      maxlength="200"
-      placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."
-    ></textarea>
+    <textarea id="editBio"
+              maxlength="200"
+              placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea>
 
     <select id="editAvatar">
       <option>👾</option>
@@ -887,13 +974,16 @@ main{
       <option>🐲</option>
     </select>
 
+
     <div class="row wrap">
 
-      <button class="primary" onclick="saveProfile()">
+      <button class="primary"
+              onclick="saveProfile()">
         💾 SAVE
       </button>
 
-      <button class="secondary" onclick="closeProfile()">
+      <button class="secondary"
+              onclick="closeProfile()">
         CANCEL
       </button>
 
@@ -907,63 +997,75 @@ main{
 
 </div>
 
+</div>
 
-<div id="toast" class="toast"></div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-/* =====================================================
-   SUPABASE SETTINGS
-   REPLACE THESE TWO VALUES
-===================================================== */
+/* =========================================================
+   SUPABASE CONFIGURATION
+   ========================================================= */
 
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_URL =
+"https://vvfkfpsyxipnypaltixq.supabase.co";
 
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_KEY =
+"sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 
-const supabase = window.supabase.createClient(
+const ADMIN_EMAIL =
+"improvementcarter@gmail.com";
+
+const supabase =
+window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY
+  SUPABASE_KEY
 );
 
 
-/* =====================================================
-   APP STATE
-===================================================== */
+/* =========================================================
+   GLOBAL DATA
+   ========================================================= */
 
 let currentUser = null;
-let profile = null;
+let currentProfile = null;
 
 
-/* =====================================================
+/* =========================================================
    AUTH TABS
-===================================================== */
+   ========================================================= */
 
-function authTab(type){
+function authTab(tab){
 
-  const loginPane = document.getElementById("loginPane");
-  const registerPane = document.getElementById("registerPane");
+  const loginPane =
+  document.getElementById("loginPane");
 
-  const loginTab = document.getElementById("loginTab");
-  const regTab = document.getElementById("regTab");
+  const registerPane =
+  document.getElementById("registerPane");
 
-  if(type === "login"){
+  const loginTab =
+  document.getElementById("loginTab");
+
+  const regTab =
+  document.getElementById("regTab");
+
+  if(tab === "login"){
 
     loginPane.classList.remove("hidden");
+
     registerPane.classList.add("hidden");
 
     loginTab.classList.add("active");
+
     regTab.classList.remove("active");
 
   }else{
 
     registerPane.classList.remove("hidden");
+
     loginPane.classList.add("hidden");
 
     regTab.classList.add("active");
+
     loginTab.classList.remove("active");
 
   }
@@ -971,25 +1073,50 @@ function authTab(type){
 }
 
 
-/* =====================================================
+/* =========================================================
    REGISTER
-===================================================== */
+   ========================================================= */
 
 async function register(){
 
-  const username = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
-  const password = document.getElementById("regPass").value;
-  const avatar = document.getElementById("regAvatar").value;
+  const name =
+  document.getElementById("regName").value.trim();
 
-  if(!username || !email || !password){
+  const email =
+  document.getElementById("regEmail").value.trim();
 
-    toast("Please complete all fields.");
+  const password =
+  document.getElementById("regPass").value;
+
+  const avatar =
+  document.getElementById("regAvatar").value;
+
+
+  if(!name || !email || !password){
+
+    alert(
+      "Please complete username, email and password."
+    );
+
     return;
-
   }
 
-  const { data, error } = await supabase.auth.signUp({
+
+  if(password.length < 6){
+
+    alert(
+      "Password must be at least 6 characters."
+    );
+
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+  await supabase.auth.signUp({
 
     email:email,
 
@@ -997,307 +1124,479 @@ async function register(){
 
     options:{
       data:{
-        username:username,
+        username:name,
         avatar:avatar
       }
     }
 
   });
 
+
   if(error){
 
-    toast(error.message);
-    return;
+    alert(error.message);
 
+    return;
   }
 
-  toast("Account created. Please check your email if confirmation is enabled.");
+
+  if(!data.user){
+
+    alert(
+      "Registration failed. Please try again."
+    );
+
+    return;
+  }
+
+
+  const isAdmin =
+  email.toLowerCase() ===
+  ADMIN_EMAIL.toLowerCase();
+
+
+  const {
+    error:profileError
+  } =
+  await supabase
+  .from("profiles")
+  .upsert({
+
+    id:data.user.id,
+
+    username:name,
+
+    avatar:avatar,
+
+    bio:"PIXEL EXPLORER",
+
+    xp:0,
+
+    level:1,
+
+    is_admin:isAdmin,
+
+    is_verified:isAdmin
+
+  });
+
+
+  if(profileError){
+
+    console.log(profileError);
+
+    alert(
+      "Account created, but profile setup failed: " +
+      profileError.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    "Account created successfully. Please check your email if confirmation is enabled, then log in."
+  );
+
+
+  authTab("login");
+
+  document.getElementById("loginEmail").value =
+  email;
+
+  document.getElementById("loginPass").value =
+  "";
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOGIN
-===================================================== */
+   ========================================================= */
 
 async function login(){
 
-  const email = document.getElementById("loginEmail").value.trim();
+  const email =
+  document.getElementById("loginEmail").value.trim();
 
-  const password = document.getElementById("loginPass").value;
+  const password =
+  document.getElementById("loginPass").value;
+
 
   if(!email || !password){
 
-    toast("Enter your email and password.");
-    return;
+    alert(
+      "Please enter your email and password."
+    );
 
+    return;
   }
 
-  const { data, error } =
-    await supabase.auth.signInWithPassword({
 
-      email:email,
-      password:password
+  const {
+    data,
+    error
+  } =
+  await supabase.auth.signInWithPassword({
 
-    });
+    email:email,
+
+    password:password
+
+  });
+
 
   if(error){
 
-    console.error(error);
-
-    toast("Invalid login credentials.");
+    alert(
+      "Login error: " + error.message
+    );
 
     return;
-
   }
 
-  currentUser = data.user;
+
+  currentUser =
+  data.user;
+
+
+  await startApp();
+
+}
+
+
+/* =========================================================
+   START APP
+   ========================================================= */
+
+async function startApp(){
+
+  document
+  .getElementById("authScreen")
+  .classList
+  .add("hidden");
+
+
+  document
+  .getElementById("appScreen")
+  .classList
+  .remove("hidden");
+
 
   await loadProfile();
 
-  showApp();
+  await loadPosts();
+
+  await loadCommunity();
+
+  await loadLeaderboard();
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LOAD PROFILE
-===================================================== */
+   ========================================================= */
 
 async function loadProfile(){
 
-  if(!currentUser) return;
+  const {
+    data,
+    error
+  } =
+  await supabase
+  .from("profiles")
+  .select("*")
+  .eq("id",currentUser.id)
+  .single();
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id",currentUser.id)
-    .single();
 
   if(error){
 
-    console.error(error);
+    console.log(error);
 
-    profile = {
-
-      id:currentUser.id,
-
-      username:
-        currentUser.user_metadata?.username ||
-        currentUser.email.split("@")[0],
-
-      bio:"PIXEL EXPLORER",
-
-      avatar:
-        currentUser.user_metadata?.avatar || "👾",
-
-      avatar_url:null,
-
-      xp:0,
-
-      level:1,
-
-      is_admin:
-        currentUser.email === "improvementcarter@gmail.com",
-
-      is_verified:
-        currentUser.email === "improvementcarter@gmail.com"
-
-    };
+    alert(
+      "Could not load profile: " +
+      error.message
+    );
 
     return;
+  }
+
+
+  currentProfile =
+  data;
+
+
+  /* Force admin email */
+
+  if(
+    currentUser.email.toLowerCase() ===
+    ADMIN_EMAIL.toLowerCase()
+  ){
+
+    if(
+      !currentProfile.is_admin ||
+      !currentProfile.is_verified
+    ){
+
+      await supabase
+      .from("profiles")
+      .update({
+
+        is_admin:true,
+
+        is_verified:true
+
+      })
+      .eq("id",currentUser.id);
+
+
+      currentProfile.is_admin =
+      true;
+
+      currentProfile.is_verified =
+      true;
+
+    }
 
   }
 
-  profile = data;
-
-}
-
-
-/* =====================================================
-   SHOW APP
-===================================================== */
-
-function showApp(){
-
-  document
-    .getElementById("authScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("app")
-    .classList.remove("hidden");
 
   updateProfileUI();
 
-  loadPosts();
-
-  loadCommunity();
-
-  loadLeaderboard();
-
 }
 
 
-/* =====================================================
+/* =========================================================
    UPDATE PROFILE UI
-===================================================== */
+   ========================================================= */
 
 function updateProfileUI(){
 
-  if(!profile) return;
+  if(!currentProfile) return;
 
-  setAvatar("sideAvatar");
 
-  setAvatar("profileAvatar");
+  const name =
+  currentProfile.username ||
+  "PLAYER";
 
-  document.getElementById("headAvatar").textContent =
-    profile.avatar || "👾";
 
-  document.getElementById("sideName").textContent =
-    profile.username || "PLAYER";
+  const bio =
+  currentProfile.bio ||
+  "PIXEL EXPLORER";
 
-  document.getElementById("profileName").textContent =
-    profile.username || "PLAYER";
 
-  document.getElementById("sideBio").textContent =
-    profile.bio || "PIXEL EXPLORER";
+  const xp =
+  Number(currentProfile.xp || 0);
 
-  document.getElementById("profileBio").textContent =
-    profile.bio || "PIXEL EXPLORER";
 
-  const xp = Number(profile.xp || 0);
+  const level =
+  Number(currentProfile.level || 1);
 
-  const level = Number(profile.level || 1);
 
-  document.getElementById("sideLevel").textContent = level;
+  const avatar =
+  currentProfile.avatar ||
+  "👾";
 
-  document.getElementById("statLevel").textContent = level;
 
-  document.getElementById("statXP").textContent = xp;
+  document
+  .getElementById("sideName")
+  .textContent =
+  name;
 
-  document.getElementById("xpText").textContent =
-    xp + " / 100 XP";
 
-  document.getElementById("xpBar").style.width =
-    Math.min(xp,100) + "%";
+  document
+  .getElementById("profileName")
+  .textContent =
+  name;
 
-  renderBadges();
+
+  document
+  .getElementById("sideBio")
+  .textContent =
+  bio;
+
+
+  document
+  .getElementById("profileBio")
+  .textContent =
+  bio;
+
+
+  document
+  .getElementById("sideLevel")
+  .textContent =
+  level;
+
+
+  document
+  .getElementById("statLevel")
+  .textContent =
+  level;
+
+
+  document
+  .getElementById("statXP")
+  .textContent =
+  xp;
+
+
+  document
+  .getElementById("xpText")
+  .textContent =
+  xp + " / 100 XP";
+
+
+  document
+  .getElementById("xpBar")
+  .style.width =
+  Math.min(xp,100) + "%";
+
+
+  setAvatar(
+    "sideAvatar",
+    avatar
+  );
+
+
+  setAvatar(
+    "profileAvatar",
+    avatar
+  );
+
+
+  setAvatar(
+    "headAvatar",
+    avatar
+  );
+
+
+  const badges =
+  getBadges();
+
+
+  document
+  .getElementById("sideBadges")
+  .innerHTML =
+  badges;
+
+
+  document
+  .getElementById("profileBadges")
+  .innerHTML =
+  badges;
 
 }
 
 
-/* =====================================================
-   AVATAR
-===================================================== */
-
-function setAvatar(id){
-
-  const element = document.getElementById(id);
-
-  if(!element) return;
-
-  const online = '<span class="online"></span>';
-
-  if(profile.avatar_url){
-
-    element.innerHTML =
-      '<img src="' +
-      profile.avatar_url +
-      '">' +
-      online;
-
-  }else{
-
-    element.innerHTML =
-      (profile.avatar || "👾") +
-      online;
-
-  }
-
-}
-
-
-/* =====================================================
-   BADGES
-===================================================== */
-
-function renderBadges(){
+function getBadges(){
 
   let html = "";
 
-  if(profile.is_admin){
+
+  if(currentProfile.is_admin){
 
     html +=
-      '<span class="badge-admin">👑 ADMIN</span>';
+    '<span class="badge admin-badge">👑 ADMIN</span>';
 
   }
 
-  if(profile.is_verified){
+
+  if(currentProfile.is_verified){
 
     html +=
-      '<span class="badge-verified">✓ VERIFIED</span>';
+    '<span class="badge verified-badge">✓ VERIFIED</span>';
 
   }
 
-  document.getElementById("sideBadges").innerHTML = html;
 
-  document.getElementById("profileBadges").innerHTML = html;
+  return html;
 
 }
 
 
-/* =====================================================
-   PAGE NAVIGATION
-===================================================== */
+/* =========================================================
+   AVATAR
+   ========================================================= */
 
-function page(id){
+function setAvatar(id,value){
 
-  document
-    .querySelectorAll(".page")
-    .forEach(function(el){
+  const el =
+  document.getElementById(id);
 
-      el.classList.remove("active");
+  if(!el) return;
 
-    });
 
-  const target = document.getElementById(id);
+  const online =
+  id !== "headAvatar" ?
+  '<span class="online"></span>' :
+  "";
 
-  if(target){
 
-    target.classList.add("active");
+  if(
+    typeof value === "string" &&
+    (
+      value.startsWith("http://") ||
+      value.startsWith("https://")
+    )
+  ){
+
+    el.innerHTML =
+    '<img src="' +
+    escapeHtml(value) +
+    '" alt="Profile picture">' +
+    online;
+
+  }else{
+
+    el.innerHTML =
+    escapeHtml(value || "👾") +
+    online;
 
   }
-
-  document
-    .querySelectorAll(".menu button")
-    .forEach(function(btn){
-
-      btn.classList.remove("active");
-
-    });
 
 }
 
 
-/* =====================================================
-   PROFILE EDITOR
-===================================================== */
+/* =========================================================
+   EDIT PROFILE
+   ========================================================= */
 
 function openProfile(){
 
+  if(!currentProfile) return;
+
+
   document
-    .getElementById("profileEditor")
-    .classList.remove("hidden");
+  .getElementById("profileEditor")
+  .classList
+  .remove("hidden");
 
-  document.getElementById("editName").value =
-    profile.username || "";
 
-  document.getElementById("editBio").value =
-    profile.bio || "";
+  document
+  .getElementById("editName")
+  .value =
+  currentProfile.username || "";
 
-  document.getElementById("editAvatar").value =
-    profile.avatar || "👾";
+
+  document
+  .getElementById("editBio")
+  .value =
+  currentProfile.bio || "";
+
+
+  document
+  .getElementById("editAvatar")
+  .value =
+  currentProfile.avatar || "👾";
+
+
+  document
+  .getElementById("profileEditor")
+  .scrollIntoView({
+    behavior:"smooth"
+  });
 
 }
 
@@ -1305,410 +1604,868 @@ function openProfile(){
 function closeProfile(){
 
   document
-    .getElementById("profileEditor")
-    .classList.add("hidden");
+  .getElementById("profileEditor")
+  .classList
+  .add("hidden");
 
 }
 
 
-/* =====================================================
+/* =========================================================
    SAVE PROFILE
-===================================================== */
+   ========================================================= */
 
 async function saveProfile(){
 
-  if(!currentUser || !profile) return;
+  if(!currentUser) return;
 
-  const username =
-    document.getElementById("editName").value.trim();
+
+  const name =
+  document
+  .getElementById("editName")
+  .value
+  .trim();
+
 
   const bio =
-    document.getElementById("editBio").value.trim();
+  document
+  .getElementById("editBio")
+  .value
+  .trim();
 
-  const avatar =
-    document.getElementById("editAvatar").value;
+
+  let avatar =
+  document
+  .getElementById("editAvatar")
+  .value;
+
 
   const file =
-    document.getElementById("profileImage").files[0];
+  document
+  .getElementById("profileImage")
+  .files[0];
 
-  let avatarUrl = profile.avatar_url || null;
 
+  if(!name){
 
-  /* Upload image */
+    alert(
+      "Username cannot be empty."
+    );
+
+    return;
+  }
+
 
   if(file){
 
     const extension =
-      file.name.split(".").pop();
+    file.name.split(".").pop();
 
-    const fileName =
-      currentUser.id +
-      "-" +
-      Date.now() +
-      "." +
-      extension;
 
-    const { error:uploadError } =
-      await supabase
-        .storage
-        .from("avatars")
-        .upload(fileName,file,{
-          upsert:true
-        });
+    const filePath =
+    currentUser.id +
+    "/avatar-" +
+    Date.now() +
+    "." +
+    extension;
+
+
+    const {
+      error:uploadError
+    } =
+    await supabase
+    .storage
+    .from("avatars")
+    .upload(
+      filePath,
+      file,
+      {
+        upsert:true
+      }
+    );
+
 
     if(uploadError){
 
-      console.error(uploadError);
-
-      toast(
-        "Image upload failed. Make sure the avatars storage bucket exists."
+      alert(
+        "Profile picture upload failed: " +
+        uploadError.message
       );
 
       return;
 
     }
 
-    const { data:urlData } =
-      supabase
-        .storage
-        .from("avatars")
-        .getPublicUrl(fileName);
 
-    avatarUrl =
-      urlData.publicUrl;
+    const {
+      data:urlData
+    } =
+    supabase
+    .storage
+    .from("avatars")
+    .getPublicUrl(filePath);
+
+
+    avatar =
+    urlData.publicUrl;
 
   }
 
 
-  const { error } =
-    await supabase
-      .from("profiles")
-      .update({
+  const {
+    error
+  } =
+  await supabase
+  .from("profiles")
+  .update({
 
-        username:username,
+    username:name,
 
-        bio:bio,
+    bio:bio,
 
-        avatar:avatar,
+    avatar:avatar
 
-        avatar_url:avatarUrl
-
-      })
-      .eq("id",currentUser.id);
+  })
+  .eq(
+    "id",
+    currentUser.id
+  );
 
 
   if(error){
 
-    console.error(error);
-
-    toast(error.message);
+    alert(
+      "Profile update failed: " +
+      error.message
+    );
 
     return;
-
   }
 
 
-  profile.username = username;
+  await loadProfile();
 
-  profile.bio = bio;
 
-  profile.avatar = avatar;
+  document
+  .getElementById("profileImage")
+  .value =
+  "";
 
-  profile.avatar_url = avatarUrl;
-
-  updateProfileUI();
 
   closeProfile();
 
-  toast("Profile updated successfully!");
+
+  alert(
+    "Profile updated successfully!"
+  );
 
 }
 
 
-/* =====================================================
+/* =========================================================
    CREATE POST
-===================================================== */
+   ========================================================= */
 
 async function createPost(){
 
   const text =
-    document.getElementById("postText").value.trim();
+  document
+  .getElementById("postText")
+  .value
+  .trim();
 
-  if(!text){
 
-    toast("Write something first.");
+  const imageFile =
+  document
+  .getElementById("postImage")
+  .files[0];
+
+
+  if(!text && !imageFile){
+
+    alert(
+      "Write something or choose an image."
+    );
 
     return;
 
   }
 
-  const { error } =
+
+  let imageUrl = null;
+
+
+  if(imageFile){
+
+    const extension =
+    imageFile.name
+    .split(".")
+    .pop();
+
+
+    const filePath =
+    currentUser.id +
+    "/post-" +
+    Date.now() +
+    "." +
+    extension;
+
+
+    const {
+      error:uploadError
+    } =
     await supabase
-      .from("posts")
-      .insert({
-
-        user_id:currentUser.id,
-
-        content:text
-
-      });
+    .storage
+    .from("posts")
+    .upload(
+      filePath,
+      imageFile
+    );
 
 
-  if(error){
+    if(uploadError){
 
-    console.error(error);
+      alert(
+        "Image upload failed: " +
+        uploadError.message
+      );
 
-    toast(error.message);
-
-    return;
-
-  }
-
-
-  document.getElementById("postText").value = "";
-
-  profile.xp = Number(profile.xp || 0) + 10;
-
-  await supabase
-    .from("profiles")
-    .update({
-
-      xp:profile.xp
-
-    })
-    .eq("id",currentUser.id);
-
-  updateProfileUI();
-
-  loadPosts();
-
-  toast("+10 XP! Post published.");
-
-}
-
-
-/* =====================================================
-   LOAD POSTS
-===================================================== */
-
-async function loadPosts(){
-
-  const feed =
-    document.getElementById("feed");
-
-  feed.innerHTML =
-    '<p class="tiny">Loading pixel posts...</p>';
-
-  const { data, error } =
-    await supabase
-      .from("posts")
-      .select("*")
-      .order("created_at",{
-        ascending:false
-      })
-      .limit(30);
-
-
-  if(error){
-
-    feed.innerHTML =
-      '<div class="card">No posts yet.</div>';
-
-    return;
-
-  }
-
-
-  feed.innerHTML = "";
-
-  for(const post of data){
-
-    let name = "PIXEL PLAYER";
-
-    if(post.user_id === currentUser.id){
-
-      name =
-        profile.username;
+      return;
 
     }
 
-    feed.innerHTML +=
-      '<div class="post">' +
-      '<div class="post-head">' +
-      '<strong>👾 ' + escapeHTML(name) + '</strong>' +
-      '<span class="tiny">' +
-      new Date(post.created_at).toLocaleString() +
-      '</span>' +
-      '</div>' +
-      '<div>' +
-      escapeHTML(post.content) +
-      '</div>' +
-      '</div>';
+
+    const {
+      data:urlData
+    } =
+    supabase
+    .storage
+    .from("posts")
+    .getPublicUrl(filePath);
+
+
+    imageUrl =
+    urlData.publicUrl;
 
   }
 
+
+  const {
+    error
+  } =
+  await supabase
+  .from("posts")
+  .insert({
+
+    user_id:
+    currentUser.id,
+
+    content:
+    text,
+
+    image_url:
+    imageUrl
+
+  });
+
+
+  if(error){
+
+    alert(
+      "Post failed: " +
+      error.message
+    );
+
+    return;
+
+  }
+
+
+  const newXP =
+  Number(currentProfile.xp || 0) + 10;
+
+
+  const newLevel =
+  Math.floor(newXP / 100) + 1;
+
+
+  await supabase
+  .from("profiles")
+  .update({
+
+    xp:newXP,
+
+    level:newLevel
+
+  })
+  .eq(
+    "id",
+    currentUser.id
+  );
+
+
+  document
+  .getElementById("postText")
+  .value =
+  "";
+
+
+  document
+  .getElementById("postImage")
+  .value =
+  "";
+
+
+  await loadProfile();
+
+  await loadPosts();
+
+  await loadLeaderboard();
+
 }
 
 
-/* =====================================================
+/* =========================================================
+   LOAD POSTS
+   ========================================================= */
+
+async function loadPosts(){
+
+  const {
+    data:posts,
+    error
+  } =
+  await supabase
+  .from("posts")
+  .select(`
+    id,
+    content,
+    image_url,
+    created_at,
+    profiles(
+      username,
+      avatar,
+      is_admin,
+      is_verified
+    )
+  `)
+  .order(
+    "created_at",
+    {
+      ascending:false
+    }
+  );
+
+
+  if(error){
+
+    console.log(error);
+
+    return;
+
+  }
+
+
+  const feed =
+  document.getElementById("feed");
+
+
+  if(!posts || posts.length === 0){
+
+    feed.innerHTML =
+    `
+    <div class="card" style="text-align:center">
+      👾
+      <h2>NO POSTS YET</h2>
+      <p class="tiny">
+        BE THE FIRST PLAYER TO POST!
+      </p>
+    </div>
+    `;
+
+    document
+    .getElementById("statPosts")
+    .textContent =
+    "0";
+
+    return;
+
+  }
+
+
+  let myPosts = 0;
+
+
+  feed.innerHTML =
+  posts.map(post => {
+
+    const profile =
+    post.profiles || {};
+
+
+    if(
+      post.user_id ===
+      currentUser.id
+    ){
+
+      myPosts++;
+
+    }
+
+
+    let badges = "";
+
+
+    if(profile.is_admin){
+
+      badges +=
+      '<span class="badge admin-badge">👑 ADMIN</span>';
+
+    }
+
+
+    if(profile.is_verified){
+
+      badges +=
+      '<span class="badge verified-badge">✓</span>';
+
+    }
+
+
+    const avatar =
+    profile.avatar || "👾";
+
+
+    const avatarHtml =
+    avatar.startsWith &&
+    (
+      avatar.startsWith("http://") ||
+      avatar.startsWith("https://")
+    )
+    ?
+    '<img src="' +
+    escapeHtml(avatar) +
+    '">'
+    :
+    escapeHtml(avatar);
+
+
+    const image =
+    post.image_url
+    ?
+    '<img class="post-image" src="' +
+    escapeHtml(post.image_url) +
+    '">'
+    :
+    "";
+
+
+    return
+    `
+    <article class="post">
+
+      <div class="post-head">
+
+        <div class="avatar">
+          ${avatarHtml}
+        </div>
+
+        <div>
+
+          <strong>
+            ${escapeHtml(
+              profile.username || "PLAYER"
+            )}
+          </strong>
+
+          <div>
+            ${badges}
+          </div>
+
+          <div class="post-meta">
+            ${new Date(
+              post.created_at
+            ).toLocaleString()}
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="post-text">
+        ${escapeHtml(
+          post.content || ""
+        )}
+      </div>
+
+      ${image}
+
+    </article>
+    `;
+
+  }).join("");
+
+
+  document
+  .getElementById("statPosts")
+  .textContent =
+  myPosts;
+
+}
+
+
+/* =========================================================
    COMMUNITY
-===================================================== */
+   ========================================================= */
 
 async function loadCommunity(){
 
-  const { data, error } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .limit(50);
+  const {
+    data,
+    error
+  } =
+  await supabase
+  .from("profiles")
+  .select("*")
+  .order(
+    "xp",
+    {
+      ascending:false
+    }
+  );
 
-  if(error) return;
 
-  window.communityUsers =
-    data || [];
+  if(error){
+
+    console.log(error);
+
+    return;
+
+  }
+
+
+  renderCommunity(
+    data || []
+  );
 
 }
 
 
-function searchUsers(){
+function renderCommunity(users){
 
-  const globalInput =
-    document.getElementById("globalSearch");
+  const list =
+  document
+  .getElementById("communityList");
 
-  const friendInput =
-    document.getElementById("friendSearch");
 
-  const term =
+  if(!users.length){
+
+    list.innerHTML =
+    '<p class="tiny">No players found.</p>';
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+  users.map(user => {
+
+    const avatar =
+    user.avatar || "👾";
+
+
+    const avatarHtml =
+    avatar.startsWith &&
     (
-      globalInput?.value ||
-      friendInput?.value ||
-      ""
+      avatar.startsWith("http://") ||
+      avatar.startsWith("https://")
+    )
+    ?
+    '<img src="' +
+    escapeHtml(avatar) +
+    '">'
+    :
+    escapeHtml(avatar);
+
+
+    let badges = "";
+
+
+    if(user.is_admin){
+
+      badges +=
+      '<span class="badge admin-badge">👑 ADMIN</span>';
+
+    }
+
+
+    if(user.is_verified){
+
+      badges +=
+      '<span class="badge verified-badge">✓ VERIFIED</span>';
+
+    }
+
+
+    return
+    `
+    <div class="user-card">
+
+      <div class="avatar">
+        ${avatarHtml}
+      </div>
+
+      <h3>
+        ${escapeHtml(
+          user.username || "PLAYER"
+        )}
+      </h3>
+
+      <div>
+        ${badges}
+      </div>
+
+      <p class="tiny">
+        ${escapeHtml(
+          user.bio || "PIXEL EXPLORER"
+        )}
+      </p>
+
+      <p>
+        LEVEL ${user.level || 1}
+        •
+        ${user.xp || 0} XP
+      </p>
+
+    </div>
+    `;
+
+  }).join("");
+
+}
+
+
+async function searchUsers(){
+
+  const text =
+  (
+    document
+    .getElementById("friendSearch")
+    ?.value ||
+    document
+    .getElementById("globalSearch")
+    ?.value ||
+    ""
+  )
+  .trim()
+  .toLowerCase();
+
+
+  const {
+    data
+  } =
+  await supabase
+  .from("profiles")
+  .select("*");
+
+
+  const filtered =
+  (data || [])
+  .filter(user =>
+    (
+      user.username || ""
     )
     .toLowerCase()
-    .trim();
+    .includes(text)
+  );
 
 
-  const results =
-    (window.communityUsers || [])
-    .filter(function(user){
-
-      return (
-        user.username ||
-        ""
-      )
-      .toLowerCase()
-      .includes(term);
-
-    });
-
-
-  const container =
-    document.getElementById("searchResults");
-
-  if(!container) return;
-
-
-  container.innerHTML =
-    results.map(function(user){
-
-      let badges = "";
-
-      if(user.is_admin){
-
-        badges +=
-          '<span class="badge-admin">👑 ADMIN</span>';
-
-      }
-
-      if(user.is_verified){
-
-        badges +=
-          '<span class="badge-verified">✓ VERIFIED</span>';
-
-      }
-
-
-      const avatar =
-        user.avatar_url
-        ?
-        '<img src="' +
-        user.avatar_url +
-        '" style="width:55px;height:55px;border-radius:14px;object-fit:cover">'
-        :
-        '<div style="font-size:42px">' +
-        (user.avatar || "👾") +
-        '</div>';
-
-
-      return
-        '<div class="user-card">' +
-        avatar +
-        '<h3>' +
-        escapeHTML(user.username || "PLAYER") +
-        '</h3>' +
-        badges +
-        '<p class="tiny">' +
-        escapeHTML(user.bio || "PIXEL EXPLORER") +
-        '</p>' +
-        '<p>LEVEL ' +
-        (user.level || 1) +
-        ' • ' +
-        (user.xp || 0) +
-        ' XP</p>' +
-        '</div>';
-
-    }).join("");
-
+  renderCommunity(filtered);
 
 }
 
 
-/* =====================================================
+/* =========================================================
    LEADERBOARD
-===================================================== */
+   ========================================================= */
 
 async function loadLeaderboard(){
 
-  const { data, error } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .order("xp",{
-        ascending:false
-      })
-      .limit(20);
+  const {
+    data,
+    error
+  } =
+  await supabase
+  .from("profiles")
+  .select("*")
+  .order(
+    "xp",
+    {
+      ascending:false
+    }
+  )
+  .limit(50);
 
-  if(error) return;
+
+  if(error){
+
+    console.log(error);
+
+    return;
+
+  }
+
 
   const leaders =
-    document.getElementById("leaders");
+  document
+  .getElementById("leaders");
 
-  leaders.innerHTML = "";
 
-  data.forEach(function(user,index){
+  if(!data || !data.length){
 
-    leaders.innerHTML +=
-      '<div class="post">' +
-      '<strong>#' +
-      (index + 1) +
-      ' 👾 ' +
-      escapeHTML(user.username || "PLAYER") +
-      '</strong>' +
-      '<div class="tiny">' +
-      (user.xp || 0) +
-      ' XP • LEVEL ' +
-      (user.level || 1) +
-      '</div>' +
-      '</div>';
+    leaders.innerHTML =
+    '<p class="tiny">No players yet.</p>';
+
+    return;
+
+  }
+
+
+  leaders.innerHTML =
+  data.map((user,index) => {
+
+    const avatar =
+    user.avatar || "👾";
+
+
+    const avatarHtml =
+    avatar.startsWith &&
+    (
+      avatar.startsWith("http://") ||
+      avatar.startsWith("https://")
+    )
+    ?
+    '<img src="' +
+    escapeHtml(avatar) +
+    '">'
+    :
+    escapeHtml(avatar);
+
+
+    return
+    `
+    <div class="rank-item">
+
+      <div class="rank-number">
+        #${index + 1}
+      </div>
+
+      <div class="avatar">
+        ${avatarHtml}
+      </div>
+
+      <div style="flex:1">
+
+        <strong>
+          ${escapeHtml(
+            user.username || "PLAYER"
+          )}
+        </strong>
+
+        <div class="tiny">
+          LEVEL ${user.level || 1}
+        </div>
+
+      </div>
+
+      <strong>
+        ${user.xp || 0} XP
+      </strong>
+
+    </div>
+    `;
+
+  }).join("");
+
+}
+
+
+/* =========================================================
+   PAGE NAVIGATION
+   ========================================================= */
+
+function page(id){
+
+  document
+  .querySelectorAll(".page")
+  .forEach(p =>
+    p.classList.remove("active")
+  );
+
+
+  document
+  .getElementById(id)
+  .classList
+  .add("active");
+
+
+  document
+  .querySelectorAll(".menu button")
+  .forEach(b =>
+    b.classList.remove("active")
+  );
+
+
+  document
+  .querySelectorAll(".menu button")
+  .forEach(button => {
+
+    if(
+      button.getAttribute("onclick") ===
+      "page('" + id + "')"
+    ){
+
+      button.classList.add("active");
+
+    }
 
   });
 
 }
 
 
-/* =====================================================
+/* =========================================================
+   THEME
+   ========================================================= */
+
+function theme(){
+
+  document.body.classList.toggle("light");
+
+  localStorage.setItem(
+    "pixelTheme",
+    document.body.classList.contains("light")
+    ? "light"
+    : "dark"
+  );
+
+}
+
+
+if(
+  localStorage.getItem("pixelTheme") ===
+  "light"
+){
+
+  document.body.classList.add("light");
+
+}
+
+
+/* =========================================================
    LOGOUT
-===================================================== */
+   ========================================================= */
 
 async function logout(){
 
@@ -1716,91 +2473,98 @@ async function logout(){
 
   currentUser = null;
 
-  profile = null;
+  currentProfile = null;
+
 
   document
-    .getElementById("app")
-    .classList.add("hidden");
+  .getElementById("appScreen")
+  .classList
+  .add("hidden");
+
 
   document
-    .getElementById("authScreen")
-    .classList.remove("hidden");
+  .getElementById("authScreen")
+  .classList
+  .remove("hidden");
+
+
+  document
+  .getElementById("loginPass")
+  .value =
+  "";
 
 }
 
 
-/* =====================================================
-   THEME
-===================================================== */
-
-function theme(){
-
-  document.body.classList.toggle("light-theme");
-
-  toast("Theme changed!");
-
-}
-
-
-/* =====================================================
-   TOAST
-===================================================== */
-
-function toast(message){
-
-  const element =
-    document.getElementById("toast");
-
-  element.textContent = message;
-
-  element.classList.add("show");
-
-  setTimeout(function(){
-
-    element.classList.remove("show");
-
-  },3000);
-
-}
-
-
-/* =====================================================
-   SECURITY
-===================================================== */
-
-function escapeHTML(value){
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
-   CHECK EXISTING SESSION
-===================================================== */
+/* =========================================================
+   SESSION CHECK
+   ========================================================= */
 
 async function checkSession(){
 
-  const { data } =
-    await supabase.auth.getSession();
+  const {
+    data:{
+      session
+    }
+  } =
+  await supabase
+  .auth
+  .getSession();
 
-  if(data.session){
+
+  if(session){
 
     currentUser =
-      data.session.user;
+    session.user;
 
-    await loadProfile();
-
-    showApp();
+    await startApp();
 
   }
 
 }
+
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+
+function escapeHtml(text){
+
+  return String(text)
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+
+}
+
+
+document.addEventListener(
+  "keydown",
+  function(event){
+
+    if(
+      event.ctrlKey &&
+      event.key === "Enter"
+    ){
+
+      const home =
+      document
+      .getElementById("home");
+
+      if(
+        home.classList.contains("active")
+      ){
+
+        createPost();
+
+      }
+
+    }
+
+  }
+);
 
 
 checkSession();
