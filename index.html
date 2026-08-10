@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <meta
   name="viewport"
   content="width=device-width, initial-scale=1.0"
@@ -20,25 +21,22 @@
 
 :root{
   --bg:#eef1f7;
-  --panel:#ffffff;
-  --panel2:#f7f8fc;
-  --text:#283548;
-  --muted:#748096;
-  --line:#dce2ec;
-  --primary:#6256d8;
-  --primary2:#7468eb;
-  --danger:#c55b5b;
-  --shadow:0 12px 35px rgba(37,50,75,.12);
+  --card:#ffffff;
+  --text:#26364b;
+  --muted:#667085;
+  --line:#d8deea;
+  --purple:#6257d9;
+  --purple2:#7769e8;
+  --danger:#c85a50;
+  --green:#35b56a;
 }
 
 body.dark{
-  --bg:#161923;
-  --panel:#202532;
-  --panel2:#292f3d;
-  --text:#edf1fb;
-  --muted:#aab3c5;
-  --line:#3b4354;
-  --shadow:0 12px 35px rgba(0,0,0,.3);
+  --bg:#171923;
+  --card:#222632;
+  --text:#edf1f8;
+  --muted:#a9b0bf;
+  --line:#353b4a;
 }
 
 body{
@@ -47,6 +45,14 @@ body{
   background:var(--bg);
   color:var(--text);
   min-height:100vh;
+}
+
+/* =========================
+   COMMON
+========================= */
+
+.hidden{
+  display:none !important;
 }
 
 button,
@@ -58,23 +64,55 @@ select{
 
 button{
   cursor:pointer;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--card);
+  color:var(--text);
+  outline:none;
+  margin:7px 0;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+button{
   border:0;
+  border-radius:10px;
+  padding:12px 16px;
+  font-weight:700;
+  letter-spacing:.5px;
 }
 
-.hidden{
-  display:none !important;
+.primary{
+  background:var(--purple);
+  color:white;
 }
 
-.status{
-  min-height:22px;
-  margin-top:12px;
-  text-align:center;
-  color:var(--danger);
-  font-size:13px;
+.primary:hover{
+  background:var(--purple2);
 }
 
-.success{
-  color:#218654 !important;
+.secondary{
+  background:#e6e9f1;
+  color:#38455b;
+}
+
+.blue{
+  background:#4e7ce8;
+  color:white;
+}
+
+.danger{
+  color:var(--danger) !important;
 }
 
 .tiny{
@@ -82,344 +120,20 @@ button{
   color:var(--muted);
 }
 
-/* AUTH */
-
-#authScreen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:25px;
-}
-
-.auth-card{
-  width:100%;
-  max-width:420px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:36px;
-  box-shadow:var(--shadow);
-}
-
-.logo{
+.status{
   text-align:center;
-  font-size:25px;
-  font-weight:900;
-  letter-spacing:3px;
-}
-
-.logo-icon{
-  font-size:48px;
-  margin-bottom:8px;
-}
-
-.tagline{
-  text-align:center;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1px;
-  margin:12px 0 24px;
-}
-
-.tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-bottom:20px;
-}
-
-.tabs button{
-  padding:12px;
-  border-radius:9px;
-  background:#e6eaf2;
-  color:#3b4657;
-  font-weight:bold;
-}
-
-.tabs button.active{
-  background:var(--primary);
-  color:white;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  border:1px solid var(--line);
-  background:var(--panel2);
-  color:var(--text);
-  padding:13px;
-  border-radius:10px;
-  margin:7px 0;
-  outline:none;
-}
-
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
-
-input:focus,
-textarea:focus,
-select:focus{
-  border-color:var(--primary);
-}
-
-.primary,
-.secondary,
-.blue,
-.danger{
-  padding:12px 16px;
-  border-radius:10px;
-  font-weight:bold;
-}
-
-.primary{
-  background:var(--primary);
-  color:white;
-}
-
-.primary:hover{
-  background:var(--primary2);
-}
-
-.secondary{
-  background:#e6eaf2;
-  color:#354154;
-}
-
-.blue{
-  background:#3f7edb;
-  color:white;
-}
-
-.danger{
-  background:transparent;
-  color:var(--danger);
-}
-
-/* APP */
-
-#appScreen{
-  min-height:100vh;
-}
-
-.topbar{
-  height:68px;
-  background:var(--panel);
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 25px;
-  position:sticky;
-  top:0;
-  z-index:20;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px;
-  font-weight:900;
-  letter-spacing:3px;
-  cursor:pointer;
-}
-
-.brand-icon{
-  font-size:24px;
-}
-
-.actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.actions input{
-  margin:0;
-  width:220px;
-}
-
-.icon{
-  width:42px;
-  height:42px;
-  border-radius:10px;
-  background:var(--panel2);
-  color:var(--text);
-}
-
-.layout{
-  display:grid;
-  grid-template-columns:250px 1fr;
-  min-height:calc(100vh - 68px);
-}
-
-.side{
-  background:var(--panel);
-  border-right:1px solid var(--line);
-  padding:22px 14px;
-}
-
-.mini{
-  text-align:center;
-  padding-bottom:20px;
-  border-bottom:1px solid var(--line);
-}
-
-.avatar{
-  width:80px;
-  height:80px;
-  margin:auto;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:42px;
-  background:linear-gradient(135deg,#dce8f4,#bfcbe0);
-  position:relative;
-  overflow:hidden;
-  background-size:cover;
-  background-position:center;
-}
-
-.avatar.big{
-  width:90px;
-  height:90px;
-  font-size:48px;
-}
-
-.online{
-  width:13px;
-  height:13px;
-  background:#25c777;
-  border:2px solid white;
-  border-radius:50%;
-  position:absolute;
-  right:4px;
-  bottom:5px;
-}
-
-.badges{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:6px;
-  margin:8px 0;
-}
-
-.badge{
-  display:inline-block;
-  font-size:10px;
-  font-weight:bold;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#e7e9ff;
-  color:#5046bd;
-}
-
-.badge.admin{
-  background:#fff0c5;
-  color:#9b6a00;
-}
-
-.badge.verified{
-  background:#dff7ea;
-  color:#147543;
-}
-
-.xp{
-  height:8px;
-  border-radius:20px;
-  background:#e0e5ed;
-  overflow:hidden;
-  margin:8px 0;
-}
-
-#xpBar{
-  width:0%;
-  height:100%;
-  background:var(--primary);
-  transition:.3s;
-}
-
-.menu{
-  padding-top:14px;
-}
-
-.menu button{
-  width:100%;
-  text-align:left;
-  padding:13px;
-  border-radius:9px;
-  margin:4px 0;
-  background:transparent;
-  color:var(--text);
-  font-weight:bold;
-  letter-spacing:.5px;
-}
-
-.menu button.active{
-  background:#e7e6fb;
-  color:#5045b8;
-}
-
-.menu button:hover{
-  background:var(--panel2);
-}
-
-.menu .danger{
-  color:var(--danger);
-}
-
-main{
-  padding:25px;
-  max-width:1100px;
-  width:100%;
-  margin:auto;
-}
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
-
-.hero{
-  background:linear-gradient(135deg,#5f54d7,#8a7ffc);
-  color:white;
-  padding:30px;
-  border-radius:20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:20px;
-}
-
-.hero h1{
-  margin:0;
-}
-
-.hero p{
-  margin-bottom:0;
-}
-
-.hero-icon{
-  font-size:70px;
+  font-size:13px;
+  min-height:22px;
+  margin-top:10px;
 }
 
 .card{
-  background:var(--panel);
+  background:var(--card);
   border:1px solid var(--line);
-  border-radius:16px;
+  border-radius:18px;
   padding:22px;
   margin-bottom:18px;
-  box-shadow:0 5px 20px rgba(20,30,50,.04);
+  box-shadow:0 8px 30px rgba(20,30,60,.05);
 }
 
 .row{
@@ -438,243 +152,371 @@ main{
   gap:15px;
 }
 
-.user-card{
-  background:var(--panel);
+.badges{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin:8px 0;
+}
+
+.badge{
+  background:#ecebff;
+  color:#5e55b8;
+  border-radius:20px;
+  padding:5px 9px;
+  font-size:10px;
+  font-weight:bold;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+#authScreen{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.auth-card{
+  width:100%;
+  max-width:390px;
+  background:var(--card);
   border:1px solid var(--line);
-  padding:18px;
-  border-radius:15px;
+  border-radius:22px;
+  padding:32px;
+  box-shadow:0 15px 45px rgba(30,40,70,.12);
+}
+
+.logo{
+  text-align:center;
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:4px;
+}
+
+.logo-icon{
+  font-size:48px;
+  margin-bottom:10px;
+}
+
+.tagline{
+  text-align:center;
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--muted);
+  margin:10px 0 20px;
+}
+
+.tabs{
+  display:flex;
+  gap:7px;
+  margin-bottom:14px;
+}
+
+.tabs button{
+  flex:1;
+  background:#e8ebf3;
+  color:var(--text);
+}
+
+.tabs button.active{
+  background:var(--purple);
+  color:white;
+}
+
+/* =========================
+   APP
+========================= */
+
+#appScreen{
+  min-height:100vh;
+}
+
+.topbar{
+  height:68px;
+  background:var(--card);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 25px;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+  letter-spacing:3px;
+  cursor:pointer;
+}
+
+.brand-icon{
+  font-size:24px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.actions input{
+  margin:0;
+  max-width:230px;
+}
+
+.icon{
+  background:#e8ebf3;
+  min-width:42px;
+}
+
+.layout{
+  display:flex;
+  min-height:calc(100vh - 68px);
+}
+
+.side{
+  width:245px;
+  background:var(--card);
+  border-right:1px solid var(--line);
+  padding:20px 14px;
+}
+
+.mini{
   text-align:center;
 }
 
-.user-card .avatar{
-  width:70px;
-  height:70px;
-  font-size:35px;
-}
-
-.user-card h3{
-  margin:10px 0 5px;
-}
-
+.avatar,
 .profile-main-avatar,
 .profile-image-preview{
-  width:140px;
-  height:140px;
-  margin:0 auto 15px;
-  border-radius:50%;
+  position:relative;
+  overflow:hidden;
+  background:#e7eaf2;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:68px;
-  background:#dce5f2;
-  background-size:cover;
-  background-position:center;
+  margin:auto;
+}
+
+.avatar{
+  width:75px;
+  height:75px;
+  border-radius:50%;
+  font-size:36px;
+}
+
+.avatar img,
+.profile-main-avatar img,
+.profile-image-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.big{
+  width:80px;
+  height:80px;
+}
+
+.profile-main-avatar{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  font-size:60px;
+}
+
+.profile-image-preview{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  font-size:45px;
+  margin-bottom:10px;
+}
+
+.online{
+  position:absolute;
+  width:14px;
+  height:14px;
+  background:var(--green);
+  border:2px solid white;
+  border-radius:50%;
+  right:3px;
+  bottom:3px;
+}
+
+.xp{
+  height:8px;
+  background:#e3e7ef;
+  border-radius:20px;
   overflow:hidden;
-  position:relative;
+  margin:10px 5px;
+}
+
+#xpBar{
+  height:100%;
+  width:0%;
+  background:var(--purple);
+}
+
+.menu{
+  margin-top:20px;
+}
+
+.menu button{
+  width:100%;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  margin:3px 0;
+}
+
+.menu button.active{
+  background:#e7e5ff;
+  color:#5148ba;
+}
+
+main{
+  flex:1;
+  padding:25px;
+  min-width:0;
+}
+
+.page{
+  display:none;
+  max-width:1000px;
+  margin:auto;
+}
+
+.page.active{
+  display:block;
+}
+
+.hero{
+  background:linear-gradient(135deg,#5f56d9,#8376eb);
+  color:white;
+  padding:28px;
+  border-radius:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.hero h1{
+  margin:0 0 8px;
+}
+
+.hero-icon{
+  font-size:65px;
 }
 
 .stat-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:12px;
+  gap:10px;
 }
 
 .stat{
-  background:var(--panel2);
-  border:1px solid var(--line);
+  background:#f0f2f7;
   border-radius:12px;
-  padding:18px;
+  padding:15px;
+}
+
+body.dark .stat{
+  background:#2b303e;
 }
 
 .stat strong{
   display:block;
   font-size:24px;
-  margin-bottom:7px;
 }
 
 .post{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
   padding:18px;
-  margin-bottom:15px;
 }
 
 .post-head{
   display:flex;
-  gap:10px;
   align-items:center;
+  gap:10px;
 }
 
 .post-avatar{
-  width:48px;
-  height:48px;
+  width:42px;
+  height:42px;
   border-radius:50%;
-  background:#dce5f2;
-  background-size:cover;
-  background-position:center;
+  background:#e7eaf2;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:25px;
   overflow:hidden;
+  flex-shrink:0;
 }
 
-.post-name{
-  font-weight:bold;
-}
-
-.post-content{
-  white-space:pre-wrap;
-  line-height:1.6;
-  margin:15px 0;
+.post-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
 .post-image{
-  max-width:100%;
+  width:100%;
+  max-height:450px;
+  object-fit:cover;
   border-radius:12px;
-  display:block;
+  margin-top:12px;
 }
 
-.messages-layout{
-  display:grid;
-  grid-template-columns:280px 1fr;
-  min-height:500px;
-  gap:15px;
+.user-card{
+  text-align:center;
 }
 
-.chat-users{
-  border-right:1px solid var(--line);
-  padding-right:12px;
+.user-card .avatar{
+  margin-bottom:10px;
+}
+
+.message-list{
+  max-height:400px;
   overflow:auto;
 }
 
-.chat-user{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  width:100%;
-  text-align:left;
-  background:var(--panel2);
-  color:var(--text);
-  padding:11px;
-  border-radius:10px;
-  margin-bottom:7px;
-}
-
-.chat-user.active{
-  background:#e4e2ff;
-}
-
-.chat-user .small-avatar{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#dce5f2;
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  overflow:hidden;
-  flex:none;
-}
-
-.chat-main{
-  display:flex;
-  flex-direction:column;
-  min-height:480px;
-}
-
-.chat-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding-bottom:12px;
+.message{
+  padding:10px;
   border-bottom:1px solid var(--line);
 }
 
-.messages-list{
-  flex:1;
-  min-height:320px;
-  max-height:500px;
-  overflow-y:auto;
-  padding:15px 4px;
-}
-
-.message{
-  max-width:75%;
-  padding:10px 13px;
-  margin:8px 0;
-  border-radius:13px;
-  word-break:break-word;
-}
-
-.message.me{
-  margin-left:auto;
-  background:var(--primary);
-  color:white;
-  border-bottom-right-radius:3px;
-}
-
-.message.other{
-  margin-right:auto;
-  background:var(--panel2);
-  border:1px solid var(--line);
-  border-bottom-left-radius:3px;
-}
-
-.message-time{
+.message strong{
   display:block;
-  font-size:9px;
-  opacity:.7;
-  margin-top:5px;
-}
-
-.chat-input{
-  display:flex;
-  gap:10px;
-  border-top:1px solid var(--line);
-  padding-top:12px;
-}
-
-.chat-input input{
-  margin:0;
-}
-
-.empty{
-  text-align:center;
-  color:var(--muted);
-  padding:30px;
 }
 
 @media(max-width:800px){
 
-  .layout{
-    grid-template-columns:1fr;
-  }
-
   .side{
-    border-right:0;
-    border-bottom:1px solid var(--line);
+    width:85px;
+    padding:10px 7px;
   }
 
-  .mini{
-    display:none;
-  }
-
-  .menu{
-    display:flex;
-    gap:4px;
-    overflow-x:auto;
-    padding:0;
+  .side h3,
+  .side .tiny,
+  .side .xp,
+  .side #xpText,
+  .side #sideLevel,
+  .side .mini > div:not(.avatar),
+  .menu button{
+    font-size:0;
   }
 
   .menu button{
-    width:auto;
-    white-space:nowrap;
+    text-align:center;
+    font-size:20px;
   }
 
   .actions input{
@@ -685,35 +527,32 @@ main{
     padding:15px;
   }
 
-  .hero{
-    padding:22px;
-  }
-
   .hero-icon{
-    font-size:45px;
+    display:none;
+  }
+}
+
+@media(max-width:500px){
+
+  .topbar{
+    padding:0 12px;
   }
 
-  .messages-layout{
-    grid-template-columns:1fr;
+  .brand{
+    font-size:13px;
   }
 
-  .chat-users{
-    border-right:0;
-    border-bottom:1px solid var(--line);
-    padding-right:0;
-    padding-bottom:10px;
-    max-height:230px;
-  }
-
-  .mobile-stack{
-    flex-direction:column;
-    align-items:stretch;
+  .side{
+    display:none;
   }
 
   .stat-grid{
-    grid-template-columns:1fr;
+    gap:5px;
   }
 
+  .hero h1{
+    font-size:22px;
+  }
 }
 
 </style>
@@ -721,38 +560,9 @@ main{
 
 <body>
 
-<!-- =========================================
-     SUPABASE CONFIGURATION
-     Project ID:
-     vvfkfpsyxipnypaltixq
-
-     Correct Project URL:
-     https://vvfkfpsyxipnypaltixq.supabase.co
-
-     Publishable Key:
-     Your provided publishable key is used below.
-
-     DO NOT put your sb_secret key here.
-========================================== -->
-
-<script>
-
-const SUPABASE_URL =
-  "https://vvfkfpsyxipnypaltixq.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
-
-const supabase =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-</script>
-
-
-<!-- ================= AUTH ================= -->
+<!-- =====================================
+     AUTH SCREEN
+===================================== -->
 
 <div id="authScreen">
 
@@ -814,10 +624,7 @@ const supabase =
 
     <!-- REGISTER -->
 
-    <div
-      id="registerPane"
-      class="hidden"
-    >
+    <div id="registerPane" class="hidden">
 
       <input
         id="regName"
@@ -834,7 +641,7 @@ const supabase =
       <input
         id="regPass"
         type="password"
-        placeholder="PASSWORD"
+        placeholder="PASSWORD (MINIMUM 6 CHARACTERS)"
       >
 
       <select id="regAvatar">
@@ -851,6 +658,7 @@ const supabase =
       </select>
 
       <button
+        id="registerButton"
         class="primary"
         style="width:100%"
         onclick="register()"
@@ -870,14 +678,11 @@ const supabase =
 </div>
 
 
-<!-- ================= APP ================= -->
+<!-- =====================================
+     APP SCREEN
+===================================== -->
 
-<div
-  id="appScreen"
-  class="hidden"
->
-
-  <!-- TOPBAR -->
+<div id="appScreen" class="hidden">
 
   <div class="topbar">
 
@@ -983,18 +788,16 @@ const supabase =
           👥 FRIENDS
         </button>
 
-        <!-- NEW MESSAGES BUTTON -->
+        <button
+          onclick="page('leaderboard',this)"
+        >
+          🏆 RANK
+        </button>
 
         <button
           onclick="page('messages',this)"
         >
           💬 MESSAGES
-        </button>
-
-        <button
-          onclick="page('leaderboard',this)"
-        >
-          🏆 RANK
         </button>
 
         <button
@@ -1017,7 +820,7 @@ const supabase =
 
     <main>
 
-      <!-- ================= HOME ================= -->
+      <!-- HOME -->
 
       <section
         id="home"
@@ -1027,7 +830,6 @@ const supabase =
         <div class="hero">
 
           <div>
-
             <h1>
               WELCOME TO PIXEL WORLD 👾
             </h1>
@@ -1035,7 +837,6 @@ const supabase =
             <p>
               SHARE POSTS • MAKE FRIENDS • EARN XP
             </p>
-
           </div>
 
           <div class="hero-icon">
@@ -1057,7 +858,7 @@ const supabase =
             placeholder="WHAT'S ON YOUR PIXEL MIND?"
           ></textarea>
 
-          <div class="row mobile-stack">
+          <div class="row wrap">
 
             <input
               id="postImage"
@@ -1086,7 +887,7 @@ const supabase =
       </section>
 
 
-      <!-- ================= FRIENDS ================= -->
+      <!-- FRIENDS -->
 
       <section
         id="friends"
@@ -1115,108 +916,7 @@ const supabase =
       </section>
 
 
-      <!-- ================= MESSAGES ================= -->
-
-      <section
-        id="messages"
-        class="page"
-      >
-
-        <div class="card">
-
-          <div class="messages-layout">
-
-            <!-- MESSAGE USERS -->
-
-            <div class="chat-users">
-
-              <h2>
-                💬 MESSAGES
-              </h2>
-
-              <p class="tiny">
-                SELECT A PIXEL FRIEND
-              </p>
-
-              <div id="messageUsers"></div>
-
-            </div>
-
-
-            <!-- CHAT -->
-
-            <div class="chat-main">
-
-              <div class="chat-header">
-
-                <div>
-
-                  <h2
-                    id="chatTitle"
-                    style="margin:0"
-                  >
-                    SELECT A FRIEND
-                  </h2>
-
-                  <span
-                    id="chatSubtitle"
-                    class="tiny"
-                  >
-                    YOUR REAL-TIME PIXEL CHAT
-                  </span>
-
-                </div>
-
-              </div>
-
-
-              <div
-                id="messagesList"
-                class="messages-list"
-              >
-
-                <div class="empty">
-                  👈 SELECT A USER TO START MESSAGING
-                </div>
-
-              </div>
-
-
-              <div class="chat-input">
-
-                <input
-                  id="messageInput"
-                  placeholder="TYPE A MESSAGE..."
-                  onkeydown="if(event.key==='Enter') sendMessage()"
-                  disabled
-                >
-
-                <button
-                  id="sendButton"
-                  class="primary"
-                  onclick="sendMessage()"
-                  disabled
-                >
-                  SEND
-                </button>
-
-              </div>
-
-              <div
-                id="messageStatus"
-                class="status"
-              ></div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- ================= LEADERBOARD ================= -->
+      <!-- LEADERBOARD -->
 
       <section
         id="leaderboard"
@@ -1240,7 +940,67 @@ const supabase =
       </section>
 
 
-      <!-- ================= PROFILE ================= -->
+      <!-- MESSAGES -->
+
+      <section
+        id="messages"
+        class="page"
+      >
+
+        <div class="card">
+
+          <h1>
+            💬 PIXEL MESSAGES
+          </h1>
+
+          <p class="tiny">
+            Send messages to your Pixel Friends.
+          </p>
+
+          <select id="messageUser">
+            <option value="">
+              SELECT A USER
+            </option>
+          </select>
+
+          <textarea
+            id="messageText"
+            maxlength="1000"
+            placeholder="WRITE YOUR PIXEL MESSAGE..."
+          ></textarea>
+
+          <button
+            class="primary"
+            onclick="sendMessage()"
+          >
+            SEND MESSAGE
+          </button>
+
+          <div
+            id="messageStatus"
+            class="status"
+          ></div>
+
+        </div>
+
+
+        <div class="card">
+
+          <h2>
+            📬 YOUR MESSAGES
+          </h2>
+
+          <div
+            id="messageList"
+            class="message-list"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PROFILE -->
 
       <section
         id="profile"
@@ -1273,37 +1033,27 @@ const supabase =
             PIXEL EXPLORER
           </p>
 
+          <p
+            id="verificationStatus"
+            class="tiny"
+          ></p>
+
 
           <div class="stat-grid">
 
             <div class="stat">
-
-              <strong id="statPosts">
-                0
-              </strong>
-
+              <strong id="statPosts">0</strong>
               POSTS
-
             </div>
 
             <div class="stat">
-
-              <strong id="statLevel">
-                1
-              </strong>
-
+              <strong id="statLevel">1</strong>
               LEVEL
-
             </div>
 
             <div class="stat">
-
-              <strong id="statXP">
-                0
-              </strong>
-
+              <strong id="statXP">0</strong>
               XP
-
             </div>
 
           </div>
@@ -1362,7 +1112,6 @@ const supabase =
           ></textarea>
 
           <select id="editAvatar">
-
             <option>👾</option>
             <option>🤖</option>
             <option>🦊</option>
@@ -1373,9 +1122,7 @@ const supabase =
             <option>🦁</option>
             <option>🐯</option>
             <option>🐲</option>
-
           </select>
-
 
           <div class="row wrap">
 
@@ -1383,7 +1130,7 @@ const supabase =
               class="primary"
               onclick="saveProfile()"
             >
-              💾 SAVE
+              💾 SAVE PROFILE
             </button>
 
             <button
@@ -1414,25 +1161,86 @@ const supabase =
 <script>
 
 /* =========================================
-   GLOBAL DATA
+   SUPABASE CONFIGURATION
+
+   Project ID:
+   vvfkfpsyxipnypaltixq
+
+   Full Project URL:
+   https://vvfkfpsyxipnypaltixq.supabase.co
 ========================================= */
 
-let currentUser = null;
-let currentProfile = null;
-let selectedChatUser = null;
-let selectedChatProfile = null;
-let messageSubscription = null;
+const SUPABASE_URL =
+  "https://vvfkfpsyxipnypaltixq.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
 
 /* =========================================
-   SAFE HTML
+   APP STATE
 ========================================= */
 
-function escapeHtml(text){
+let currentUser = null;
 
-  const div = document.createElement("div");
-  div.textContent = text || "";
-  return div.innerHTML;
+let currentProfile = {
+  username: "PLAYER",
+  bio: "PIXEL EXPLORER",
+  avatar: "👾",
+  avatar_url: "",
+  xp: 0,
+  role: "user"
+};
+
+let localPosts = [];
+let localMessages = [];
+
+
+/* =========================================
+   AUTH TAB
+========================================= */
+
+function authTab(tab){
+
+  document
+    .getElementById("loginPane")
+    .classList.toggle(
+      "hidden",
+      tab !== "login"
+    );
+
+  document
+    .getElementById("registerPane")
+    .classList.toggle(
+      "hidden",
+      tab !== "register"
+    );
+
+  document
+    .getElementById("loginTab")
+    .classList.toggle(
+      "active",
+      tab === "login"
+    );
+
+  document
+    .getElementById("regTab")
+    .classList.toggle(
+      "active",
+      tab === "register"
+    );
+
+  setStatus(
+    "authStatus",
+    "",
+    ""
+  );
 
 }
 
@@ -1441,57 +1249,16 @@ function escapeHtml(text){
    STATUS
 ========================================= */
 
-function setStatus(id, text="", success=false){
+function setStatus(id,text,color){
 
-  const element = document.getElementById(id);
+  const el =
+    document.getElementById(id);
 
-  if(!element) return;
+  if(!el) return;
 
-  element.textContent = text;
+  el.textContent = text;
 
-  element.classList.toggle(
-    "success",
-    success
-  );
-
-}
-
-
-/* =========================================
-   AUTH TABS
-========================================= */
-
-function authTab(type){
-
-  document
-    .getElementById("loginPane")
-    .classList.toggle(
-      "hidden",
-      type !== "login"
-    );
-
-  document
-    .getElementById("registerPane")
-    .classList.toggle(
-      "hidden",
-      type !== "register"
-    );
-
-  document
-    .getElementById("loginTab")
-    .classList.toggle(
-      "active",
-      type === "login"
-    );
-
-  document
-    .getElementById("regTab")
-    .classList.toggle(
-      "active",
-      type === "register"
-    );
-
-  setStatus("authStatus","");
+  el.style.color = color || "";
 
 }
 
@@ -1502,7 +1269,7 @@ function authTab(type){
 
 async function register(){
 
-  const username =
+  const name =
     document
       .getElementById("regName")
       .value
@@ -1524,131 +1291,156 @@ async function register(){
       .getElementById("regAvatar")
       .value;
 
-  if(!username || !email || !password){
+  const button =
+    document.getElementById("registerButton");
+
+
+  if(!name || !email || !password){
 
     setStatus(
       "authStatus",
-      "❌ PLEASE COMPLETE ALL FIELDS."
+      "❌ Please complete all fields.",
+      "#c0392b"
     );
 
     return;
-
   }
+
 
   if(password.length < 6){
 
     setStatus(
       "authStatus",
-      "❌ PASSWORD MUST BE AT LEAST 6 CHARACTERS."
+      "❌ Password must be at least 6 characters.",
+      "#c0392b"
     );
 
     return;
-
   }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "CREATING...";
+
 
   setStatus(
     "authStatus",
-    "CREATING YOUR PIXEL ACCOUNT..."
+    "⏳ Creating your Pixel account...",
+    "#6257d9"
   );
 
 
-  const {
-    data,
-    error
-  } =
-    await supabase.auth.signUp({
+  try{
 
-      email:email,
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .auth
+      .signUp({
 
-      password:password,
+        email: email,
 
-      options:{
-        data:{
-          username:username,
-          avatar:avatar
+        password: password,
+
+        options:{
+
+          data:{
+
+            username: name,
+
+            avatar: avatar,
+
+            bio: "PIXEL EXPLORER"
+
+          }
+
         }
-      }
 
-    });
-
-
-  if(error){
-
-    setStatus(
-      "authStatus",
-      "❌ " + error.message
-    );
-
-    return;
-
-  }
+      });
 
 
-  if(data.user){
+    if(error){
 
-    /*
-      Create the profile.
+      throw error;
 
-      If your project has email confirmation enabled,
-      the user may need to verify email first.
-    */
-
-    const profileResult =
-      await supabase
-        .from("profiles")
-        .upsert({
-
-          id:data.user.id,
-
-          username:username,
-
-          bio:"PIXEL EXPLORER",
-
-          avatar:avatar,
-
-          avatar_url:null,
-
-          xp:0,
-
-          role:"user",
-
-          verified:false
-
-        });
+    }
 
 
-    if(profileResult.error){
+    if(!data.user){
 
-      console.log(
-        "PROFILE ERROR:",
-        profileResult.error
+      throw new Error(
+        "Account was not created."
       );
 
     }
 
+
+    /*
+      IMPORTANT:
+
+      Registration has succeeded.
+
+      The profile data is stored inside
+      Supabase Auth user metadata.
+
+      This means registration will still work
+      even if your profiles database table
+      has not been created yet.
+    */
+
+
+    setStatus(
+      "authStatus",
+
+      "✅ Account created! Please check your email and verify your account before logging in.",
+
+      "#27ae60"
+    );
+
+
+    document
+      .getElementById("regName")
+      .value = "";
+
+    document
+      .getElementById("regEmail")
+      .value = "";
+
+    document
+      .getElementById("regPass")
+      .value = "";
+
+
   }
 
+  catch(error){
 
-  if(!data.session){
+    console.error(
+      "Registration error:",
+      error
+    );
+
 
     setStatus(
       "authStatus",
-      "📧 ACCOUNT CREATED. CHECK YOUR EMAIL TO VERIFY, THEN LOGIN.",
-      true
+
+      "❌ " + error.message,
+
+      "#c0392b"
     );
 
-  }else{
+  }
 
-    setStatus(
-      "authStatus",
-      "✅ ACCOUNT CREATED!",
-      true
-    );
+  finally{
 
-    setTimeout(
-      loadApp,
-      500
-    );
+    button.disabled = false;
+
+    button.textContent =
+      "CREATE ACCOUNT";
 
   }
 
@@ -1672,53 +1464,84 @@ async function login(){
       .getElementById("loginPass")
       .value;
 
+
   if(!email || !password){
 
     setStatus(
       "authStatus",
-      "❌ ENTER EMAIL AND PASSWORD."
+      "❌ Please enter your email and password.",
+      "#c0392b"
     );
 
     return;
 
   }
+
 
   setStatus(
     "authStatus",
-    "LOGGING IN..."
+    "⏳ Entering Pixel World...",
+    "#6257d9"
   );
 
 
-  const {
-    data,
-    error
-  } =
-    await supabase.auth.signInWithPassword({
+  try{
 
-      email:email,
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .auth
+      .signInWithPassword({
 
-      password:password
+        email: email,
 
-    });
+        password: password
+
+      });
 
 
-  if(error){
+    if(error){
+
+      throw error;
+
+    }
+
+
+    currentUser =
+      data.user;
+
 
     setStatus(
       "authStatus",
-      "❌ " + error.message
+      "✅ Welcome back!",
+      "#27ae60"
     );
 
-    return;
+
+    await openApp();
+
 
   }
 
+  catch(error){
 
-  currentUser = data.user;
+    console.error(
+      "Login error:",
+      error
+    );
 
-  await ensureProfile();
 
-  loadApp();
+    setStatus(
+      "authStatus",
+
+      "❌ " + error.message,
+
+      "#c0392b"
+    );
+
+  }
 
 }
 
@@ -1729,224 +1552,183 @@ async function login(){
 
 async function logout(){
 
-  if(messageSubscription){
+  await supabaseClient
+    .auth
+    .signOut();
 
-    await supabase.removeChannel(
-      messageSubscription
-    );
-
-  }
-
-  await supabase.auth.signOut();
 
   currentUser = null;
-  currentProfile = null;
-  selectedChatUser = null;
-  selectedChatProfile = null;
+
 
   document
     .getElementById("appScreen")
     .classList.add("hidden");
 
+
   document
     .getElementById("authScreen")
     .classList.remove("hidden");
 
-  setStatus("authStatus","");
+
+  setStatus(
+    "authStatus",
+    "",
+    ""
+  );
 
 }
 
 
 /* =========================================
-   ENSURE PROFILE EXISTS
+   OPEN APP
 ========================================= */
 
-async function ensureProfile(){
-
-  const {
-    data:profile,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id",currentUser.id)
-      .maybeSingle();
-
-
-  if(error){
-
-    console.log(error);
-
-    return;
-
-  }
-
-
-  if(!profile){
-
-    const metadata =
-      currentUser.user_metadata || {};
-
-    const username =
-      metadata.username ||
-      currentUser.email.split("@")[0];
-
-    const avatar =
-      metadata.avatar || "👾";
-
-
-    const {
-      data:newProfile,
-      error:newError
-    } =
-      await supabase
-        .from("profiles")
-        .insert({
-
-          id:currentUser.id,
-
-          username:username,
-
-          bio:"PIXEL EXPLORER",
-
-          avatar:avatar,
-
-          avatar_url:null,
-
-          xp:0,
-
-          role:"user",
-
-          verified:false
-
-        })
-        .select()
-        .single();
-
-
-    if(newError){
-
-      console.log(newError);
-      return;
-
-    }
-
-    currentProfile = newProfile;
-
-  }else{
-
-    currentProfile = profile;
-
-  }
-
-}
-
-
-/* =========================================
-   LOAD APP
-========================================= */
-
-async function loadApp(){
-
-  const {
-    data:{user}
-  } =
-    await supabase.auth.getUser();
-
-
-  if(!user) return;
-
-
-  currentUser = user;
-
-  await ensureProfile();
-
+async function openApp(){
 
   document
     .getElementById("authScreen")
     .classList.add("hidden");
+
 
   document
     .getElementById("appScreen")
     .classList.remove("hidden");
 
 
-  updateProfileUI();
+  await loadProfile();
 
-  await loadPosts();
-  await loadUsers();
-  await loadLeaderboard();
-  await loadMessageUsers();
+  renderProfile();
+
+  loadPosts();
+
+  loadMessages();
+
+  loadUsers();
 
 }
 
 
 /* =========================================
-   PROFILE UI
+   LOAD PROFILE
 ========================================= */
 
-function setAvatar(elementId, profile){
+async function loadProfile(){
 
-  const element =
-    document.getElementById(elementId);
-
-  if(!element) return;
+  if(!currentUser) return;
 
 
-  const online =
-    element.querySelector(".online");
+  const meta =
+    currentUser.user_metadata || {};
 
-  if(profile.avatar_url){
 
-    element.style.backgroundImage =
-      `url("${profile.avatar_url}")`;
+  currentProfile = {
 
-    element.textContent = "";
+    username:
+      meta.username ||
+      currentUser.email.split("@")[0],
 
-    if(online){
+    bio:
+      meta.bio ||
+      "PIXEL EXPLORER",
 
-      element.appendChild(online);
+    avatar:
+      meta.avatar ||
+      "👾",
 
-    }
+    avatar_url:
+      meta.avatar_url ||
+      "",
 
-  }else{
+    xp:
+      Number(meta.xp || 0),
 
-    element.style.backgroundImage = "";
-    element.textContent =
-      profile.avatar || "👾";
+    role:
+      meta.role ||
+      "user"
 
-    if(online){
-
-      element.appendChild(online);
-
-    }
-
-  }
+  };
 
 }
 
 
-function updateProfileUI(){
+/* =========================================
+   AVATAR HTML
+========================================= */
 
-  if(!currentProfile) return;
+function avatarHTML(size = ""){
+
+  if(currentProfile.avatar_url){
+
+    return `
+      <img
+        src="${escapeHTML(currentProfile.avatar_url)}"
+        alt="Profile picture"
+      >
+    `;
+
+  }
 
 
-  setAvatar(
-    "sideAvatar",
-    currentProfile
+  return escapeHTML(
+    currentProfile.avatar || "👾"
   );
 
-  setAvatar(
-    "profileAvatar",
-    currentProfile
-  );
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHTML(value){
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    value || "";
+
+  return div.innerHTML;
+
+}
+
+
+/* =========================================
+   RENDER PROFILE
+========================================= */
+
+function renderProfile(){
+
+  const level =
+    Math.floor(
+      currentProfile.xp / 100
+    ) + 1;
+
+
+  const progress =
+    currentProfile.xp % 100;
+
+
+  document
+    .getElementById("sideAvatar")
+    .innerHTML =
+      avatarHTML() +
+      '<span class="online"></span>';
+
+
+  document
+    .getElementById("profileAvatar")
+    .innerHTML =
+      avatarHTML() +
+      '<span class="online"></span>';
 
 
   document
     .getElementById("headAvatar")
-    .textContent =
-      currentProfile.avatar || "👾";
+    .innerHTML =
+      currentProfile.avatar_url
+        ? "👤"
+        : currentProfile.avatar;
 
 
   document
@@ -1964,25 +1746,13 @@ function updateProfileUI(){
   document
     .getElementById("sideBio")
     .textContent =
-      currentProfile.bio ||
-      "PIXEL EXPLORER";
+      currentProfile.bio;
 
 
   document
     .getElementById("profileBio")
     .textContent =
-      currentProfile.bio ||
-      "PIXEL EXPLORER";
-
-
-  const xp =
-    Number(currentProfile.xp || 0);
-
-  const level =
-    Math.floor(xp / 100) + 1;
-
-  const progress =
-    xp % 100;
+      currentProfile.bio;
 
 
   document
@@ -2000,13 +1770,7 @@ function updateProfileUI(){
   document
     .getElementById("statXP")
     .textContent =
-      xp;
-
-
-  document
-    .getElementById("xpText")
-    .textContent =
-      progress + " / 100 XP";
+      currentProfile.xp;
 
 
   document
@@ -2015,62 +1779,119 @@ function updateProfileUI(){
       progress + "%";
 
 
-  renderBadges(
-    "sideBadges",
-    currentProfile
-  );
+  document
+    .getElementById("xpText")
+    .textContent =
+      progress + " / 100 XP";
 
-  renderBadges(
-    "profileBadges",
-    currentProfile
-  );
 
-  loadPostCount();
+  const verified =
+    currentUser.email_confirmed_at
+      ? "✅ VERIFIED"
+      : "⚠️ EMAIL NOT VERIFIED";
+
+
+  document
+    .getElementById("verificationStatus")
+    .textContent =
+      verified;
+
+
+  const roleText =
+    currentProfile.role === "admin"
+      ? "👑 ADMIN"
+      : "🎮 USER";
+
+
+  const badges =
+    `
+      <span class="badge">
+        ${roleText}
+      </span>
+
+      <span class="badge">
+        ${verified}
+      </span>
+    `;
+
+
+  document
+    .getElementById("sideBadges")
+    .innerHTML =
+      badges;
+
+
+  document
+    .getElementById("profileBadges")
+    .innerHTML =
+      badges;
+
+
+  document
+    .getElementById("statPosts")
+    .textContent =
+      localPosts.filter(
+        post =>
+          post.userId === currentUser.id
+      ).length;
 
 }
 
 
-function renderBadges(containerId, profile){
+/* =========================================
+   PAGE
+========================================= */
 
-  const container =
-    document.getElementById(containerId);
+function page(pageId,button){
 
-  if(!container) return;
+  document
+    .querySelectorAll(".page")
+    .forEach(pageEl => {
 
+      pageEl.classList.remove("active");
 
-  let html = "";
-
-  if(profile.role === "admin"){
-
-    html += `
-      <span class="badge admin">
-        👑 ADMIN
-      </span>
-    `;
-
-  }else{
-
-    html += `
-      <span class="badge">
-        🎮 USER
-      </span>
-    `;
-
-  }
+    });
 
 
-  if(profile.verified){
+  document
+    .getElementById(pageId)
+    .classList.add("active");
 
-    html += `
-      <span class="badge verified">
-        ✓ VERIFIED
-      </span>
-    `;
+
+  if(button){
+
+    document
+      .querySelectorAll(".menu button")
+      .forEach(btn => {
+
+        btn.classList.remove("active");
+
+      });
+
+
+    button.classList.add("active");
 
   }
 
 
-  container.innerHTML = html;
+  if(pageId === "messages"){
+
+    loadUsers();
+
+    loadMessages();
+
+  }
+
+}
+
+
+/* =========================================
+   THEME
+========================================= */
+
+function theme(){
+
+  document.body.classList.toggle("dark");
 
 }
 
@@ -2089,40 +1910,25 @@ function openProfile(){
   document
     .getElementById("editName")
     .value =
-      currentProfile.username || "";
+      currentProfile.username;
 
 
   document
     .getElementById("editBio")
     .value =
-      currentProfile.bio || "";
+      currentProfile.bio;
 
 
   document
     .getElementById("editAvatar")
     .value =
-      currentProfile.avatar || "👾";
+      currentProfile.avatar;
 
 
-  const preview =
-    document.getElementById("profilePreview");
-
-  if(currentProfile.avatar_url){
-
-    preview.style.backgroundImage =
-      `url("${currentProfile.avatar_url}")`;
-
-    preview.textContent = "";
-
-  }else{
-
-    preview.style.backgroundImage = "";
-    preview.textContent =
-      currentProfile.avatar || "👾";
-
-  }
-
-  setStatus("profileStatus","");
+  document
+    .getElementById("profilePreview")
+    .innerHTML =
+      avatarHTML();
 
 }
 
@@ -2133,12 +1939,12 @@ function closeProfile(){
     .getElementById("profileEditor")
     .classList.add("hidden");
 
-  document
-    .getElementById("profileImage")
-    .value = "";
-
 }
 
+
+/* =========================================
+   PROFILE IMAGE PREVIEW
+========================================= */
 
 function previewProfileImage(){
 
@@ -2147,11 +1953,8 @@ function previewProfileImage(){
       .getElementById("profileImage")
       .files[0];
 
+
   if(!file) return;
-
-
-  const preview =
-    document.getElementById("profilePreview");
 
 
   const reader =
@@ -2161,10 +1964,10 @@ function previewProfileImage(){
   reader.onload =
     function(event){
 
-      preview.style.backgroundImage =
-        `url("${event.target.result}")`;
-
-      preview.textContent = "";
+      document
+        .getElementById("profilePreview")
+        .innerHTML =
+          `<img src="${event.target.result}">`;
 
     };
 
@@ -2180,11 +1983,12 @@ function previewProfileImage(){
 
 async function saveProfile(){
 
-  const username =
+  const name =
     document
       .getElementById("editName")
       .value
       .trim();
+
 
   const bio =
     document
@@ -2192,22 +1996,25 @@ async function saveProfile(){
       .value
       .trim();
 
+
   const avatar =
     document
       .getElementById("editAvatar")
       .value;
 
-  const imageFile =
+
+  const file =
     document
       .getElementById("profileImage")
       .files[0];
 
 
-  if(!username){
+  if(!name){
 
     setStatus(
       "profileStatus",
-      "❌ USERNAME IS REQUIRED."
+      "❌ Username is required.",
+      "#c0392b"
     );
 
     return;
@@ -2217,148 +2024,189 @@ async function saveProfile(){
 
   setStatus(
     "profileStatus",
-    "SAVING PROFILE..."
+    "⏳ Saving profile...",
+    "#6257d9"
   );
 
 
-  let avatarUrl =
-    currentProfile.avatar_url || null;
+  try{
+
+    let avatarURL =
+      currentProfile.avatar_url;
 
 
-  if(imageFile){
+    /*
+      Upload to avatars bucket.
+      If Storage policy is not ready,
+      the rest of the profile still saves.
+    */
 
-    const extension =
-      imageFile.name
-      .split(".")
-      .pop();
+    if(file){
 
-    const path =
-      `${currentUser.id}/avatar-${Date.now()}.${extension}`;
+      const extension =
+        file.name.split(".").pop();
 
 
-    const {
-      error:uploadError
-    } =
-      await supabase
+      const filePath =
+        currentUser.id +
+        "/avatar." +
+        extension;
+
+
+      const {
+        error: uploadError
+      } =
+      await supabaseClient
         .storage
         .from("avatars")
         .upload(
-          path,
-          imageFile,
+          filePath,
+          file,
           {
             upsert:true
           }
         );
 
 
-    if(uploadError){
+      if(!uploadError){
 
-      setStatus(
-        "profileStatus",
-        "❌ IMAGE UPLOAD: " +
-        uploadError.message
-      );
+        const {
+          data
+        } =
+        supabaseClient
+          .storage
+          .from("avatars")
+          .getPublicUrl(
+            filePath
+          );
 
-      return;
+
+        avatarURL =
+          data.publicUrl;
+
+      }
+
+      else{
+
+        console.warn(
+          "Avatar upload:",
+          uploadError.message
+        );
+
+      }
 
     }
 
 
+    const newMeta = {
+
+      username:name,
+
+      bio:
+        bio ||
+        "PIXEL EXPLORER",
+
+      avatar:avatar,
+
+      avatar_url:
+        avatarURL,
+
+      xp:
+        currentProfile.xp,
+
+      role:
+        currentProfile.role
+
+    };
+
+
     const {
-      data:urlData
+      error
     } =
-      supabase
-        .storage
-        .from("avatars")
-        .getPublicUrl(path);
+    await supabaseClient
+      .auth
+      .updateUser({
+
+        data:newMeta
+
+      });
 
 
-    avatarUrl =
-      urlData.publicUrl;
+    if(error){
 
-  }
+      throw error;
 
-
-  const {
-    data,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .update({
-
-        username:username,
-
-        bio:bio,
-
-        avatar:avatar,
-
-        avatar_url:avatarUrl
-
-      })
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .select()
-      .single();
+    }
 
 
-  if(error){
+    currentProfile =
+      newMeta;
+
+
+    renderProfile();
+
 
     setStatus(
       "profileStatus",
-      "❌ " + error.message
+      "✅ Profile updated successfully!",
+      "#27ae60"
     );
 
-    return;
+
+    setTimeout(
+      closeProfile,
+      800
+    );
+
 
   }
 
+  catch(error){
 
-  currentProfile = data;
-
-  updateProfileUI();
-
-
-  setStatus(
-    "profileStatus",
-    "✅ PROFILE SAVED!",
-    true
-  );
+    console.error(
+      "Profile error:",
+      error
+    );
 
 
-  setTimeout(
-    closeProfile,
-    700
-  );
+    setStatus(
+      "profileStatus",
+      "❌ " + error.message,
+      "#c0392b"
+    );
+
+  }
 
 }
 
 
 /* =========================================
-   CREATE POST
+   POSTS
+
+   Local browser storage fallback.
 ========================================= */
 
-async function createPost(){
+function createPost(){
 
-  const content =
+  const text =
     document
       .getElementById("postText")
       .value
       .trim();
 
-  const imageFile =
+
+  const file =
     document
       .getElementById("postImage")
       .files[0];
 
 
-  if(!content && !imageFile){
+  if(!text && !file){
 
     setStatus(
       "postStatus",
-      "❌ WRITE A POST OR SELECT AN IMAGE."
+      "❌ Write something or select an image.",
+      "#c0392b"
     );
 
     return;
@@ -2366,554 +2214,449 @@ async function createPost(){
   }
 
 
-  setStatus(
-    "postStatus",
-    "PUBLISHING..."
-  );
+  const finishPost =
+    image => {
+
+      const post = {
+
+        id:
+          Date.now(),
+
+        userId:
+          currentUser.id,
+
+        name:
+          currentProfile.username,
+
+        avatar:
+          currentProfile.avatar,
+
+        avatar_url:
+          currentProfile.avatar_url,
+
+        text:text,
+
+        image:image,
+
+        createdAt:
+          new Date().toLocaleString()
+
+      };
 
 
-  let imageUrl = null;
+      localPosts.unshift(post);
 
 
-  if(imageFile){
-
-    const extension =
-      imageFile.name
-      .split(".")
-      .pop();
-
-    const path =
-      `${currentUser.id}/post-${Date.now()}.${extension}`;
+      localStorage.setItem(
+        "pixelFriendPosts",
+        JSON.stringify(localPosts)
+      );
 
 
-    /*
-      This version uses the avatars bucket.
-
-      For production, you can create a separate
-      public bucket named "posts" and change
-      .from("avatars") to .from("posts").
-    */
-
-    const {
-      error:uploadError
-    } =
-      await supabase
-        .storage
-        .from("avatars")
-        .upload(
-          path,
-          imageFile,
-          {upsert:true}
-        );
+      currentProfile.xp += 10;
 
 
-    if(uploadError){
+      updateUserXP();
+
+
+      document
+        .getElementById("postText")
+        .value = "";
+
+
+      document
+        .getElementById("postImage")
+        .value = "";
+
 
       setStatus(
         "postStatus",
-        "❌ IMAGE ERROR: " +
-        uploadError.message
+        "✅ Post published! +10 XP",
+        "#27ae60"
       );
 
-      return;
 
-    }
+      renderPosts();
 
+      renderProfile();
 
-    const {
-      data:urlData
-    } =
-      supabase
-        .storage
-        .from("avatars")
-        .getPublicUrl(path);
+    };
 
 
-    imageUrl =
-      urlData.publicUrl;
+  if(file){
 
-  }
-
-
-  const {
-    error
-  } =
-    await supabase
-      .from("posts")
-      .insert({
-
-        user_id:currentUser.id,
-
-        content:content,
-
-        image_url:imageUrl
-
-      });
+    const reader =
+      new FileReader();
 
 
-  if(error){
+    reader.onload =
+      event => {
 
-    setStatus(
-      "postStatus",
-      "❌ " + error.message
-    );
+        finishPost(
+          event.target.result
+        );
 
-    return;
+      };
+
+
+    reader.readAsDataURL(file);
 
   }
 
+  else{
 
-  const newXP =
-    Number(currentProfile.xp || 0) + 10;
-
-
-  const {
-    data:updatedProfile
-  } =
-    await supabase
-      .from("profiles")
-      .update({
-        xp:newXP
-      })
-      .eq(
-        "id",
-        currentUser.id
-      )
-      .select()
-      .single();
-
-
-  if(updatedProfile){
-
-    currentProfile =
-      updatedProfile;
-
-    updateProfileUI();
+    finishPost("");
 
   }
-
-
-  document
-    .getElementById("postText")
-    .value = "";
-
-
-  document
-    .getElementById("postImage")
-    .value = "";
-
-
-  setStatus(
-    "postStatus",
-    "✅ POST PUBLISHED! +10 XP",
-    true
-  );
-
-
-  await loadPosts();
-
-  await loadLeaderboard();
 
 }
 
 
-/* =========================================
-   LOAD POSTS
-========================================= */
+async function updateUserXP(){
 
-async function loadPosts(){
+  try{
+
+    await supabaseClient
+      .auth
+      .updateUser({
+
+        data:{
+
+          xp:
+            currentProfile.xp
+
+        }
+
+      });
+
+  }
+
+  catch(error){
+
+    console.warn(error);
+
+  }
+
+}
+
+
+function loadPosts(){
+
+  try{
+
+    localPosts =
+      JSON.parse(
+        localStorage.getItem(
+          "pixelFriendPosts"
+        )
+      ) || [];
+
+  }
+
+  catch{
+
+    localPosts = [];
+
+  }
+
+
+  renderPosts();
+
+}
+
+
+function renderPosts(){
 
   const feed =
     document.getElementById("feed");
 
 
-  feed.innerHTML =
-    `<div class="empty">LOADING POSTS...</div>`;
-
-
-  const {
-    data:posts,
-    error
-  } =
-    await supabase
-      .from("posts")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
-
-
-  if(error){
+  if(!localPosts.length){
 
     feed.innerHTML =
-      `<div class="empty">
-        NO POSTS YET OR POSTS TABLE IS NOT CONFIGURED.
-      </div>`;
+      `
+        <div class="card tiny">
+          No Pixel posts yet. Be the first to post! 👾
+        </div>
+      `;
 
     return;
 
   }
 
 
-  if(!posts || posts.length === 0){
-
-    feed.innerHTML =
-      `<div class="card empty">
-        👾 NO POSTS YET. BE THE FIRST PIXEL FRIEND!
-      </div>`;
-
-    return;
-
-  }
-
-
-  const userIds =
-    [...new Set(
-      posts.map(
-        post => post.user_id
-      )
-    )];
-
-
-  const {
-    data:profiles
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .in(
-        "id",
-        userIds
-      );
-
-
-  const profileMap = {};
-
-
-  (profiles || []).forEach(
-    profile => {
-
-      profileMap[profile.id] =
-        profile;
-
-    }
-  );
-
-
   feed.innerHTML =
-    posts
-      .map(
-        post => {
+    localPosts
+      .map(post => {
 
-          const profile =
-            profileMap[post.user_id] || {};
+        const avatar =
+          post.avatar_url
+            ? `<img src="${escapeHTML(post.avatar_url)}">`
+            : escapeHTML(post.avatar || "👾");
 
-          const avatarStyle =
-            profile.avatar_url
-              ? `style="background-image:url('${profile.avatar_url}')"`
-              : "";
 
-          return `
+        return `
 
-            <div class="post">
+          <div class="card post">
 
-              <div class="post-head">
+            <div class="post-head">
 
-                <div
-                  class="post-avatar"
-                  ${avatarStyle}
-                >
-                  ${
-                    profile.avatar_url
-                      ? ""
-                      : escapeHtml(
-                          profile.avatar || "👾"
-                        )
-                  }
-                </div>
+              <div class="post-avatar">
+                ${avatar}
+              </div>
 
-                <div>
+              <div>
 
-                  <div class="post-name">
-                    ${escapeHtml(
-                      profile.username ||
-                      "PIXEL PLAYER"
-                    )}
-                  </div>
+                <strong>
+                  ${escapeHTML(post.name)}
+                </strong>
 
-                  <div class="tiny">
-                    ${
-                      new Date(
-                        post.created_at
-                      ).toLocaleString()
-                    }
-                  </div>
-
+                <div class="tiny">
+                  ${escapeHTML(post.createdAt)}
                 </div>
 
               </div>
 
-              ${
-                post.content
-                  ? `
-                    <div class="post-content">
-                      ${escapeHtml(post.content)}
-                    </div>
-                  `
-                  : ""
-              }
-
-              ${
-                post.image_url
-                  ? `
-                    <img
-                      class="post-image"
-                      src="${post.image_url}"
-                      alt="Post image"
-                    >
-                  `
-                  : ""
-              }
-
             </div>
 
-          `;
+            <p>
+              ${escapeHTML(post.text)}
+            </p>
 
-        }
-      )
+            ${
+              post.image
+                ? `
+                  <img
+                    class="post-image"
+                    src="${post.image}"
+                  >
+                `
+                : ""
+            }
+
+          </div>
+
+        `;
+
+      })
       .join("");
 
 }
 
 
 /* =========================================
-   POST COUNT
-========================================= */
-
-async function loadPostCount(){
-
-  if(!currentUser) return;
-
-
-  const {
-    count
-  } =
-    await supabase
-      .from("posts")
-      .select(
-        "*",
-        {
-          count:"exact",
-          head:true
-        }
-      )
-      .eq(
-        "user_id",
-        currentUser.id
-      );
-
-
-  document
-    .getElementById("statPosts")
-    .textContent =
-      count || 0;
-
-}
-
-
-/* =========================================
-   USERS / COMMUNITY
+   USERS
 ========================================= */
 
 async function loadUsers(){
 
-  const {
-    data:users,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .neq(
-        "id",
-        currentUser.id
+  /*
+    Supabase Auth does not allow normal users
+    to list all Auth users from the browser.
+
+    This section safely shows users already
+    known in the local app.
+
+    For a fully global community list,
+    create a public profiles table later.
+  */
+
+  const select =
+    document.getElementById("messageUser");
+
+
+  const result =
+    document.getElementById("searchResults");
+
+
+  const users = [];
+
+
+  localPosts.forEach(post => {
+
+    if(
+      post.userId &&
+      !users.some(
+        user =>
+          user.id === post.userId
       )
-      .order(
-        "xp",
-        {
-          ascending:false
-        }
-      );
+    ){
+
+      users.push({
+
+        id:post.userId,
+
+        username:post.name,
+
+        avatar:post.avatar
+
+      });
+
+    }
+
+  });
 
 
-  if(error){
+  if(!users.some(
+    user =>
+      user.id === currentUser.id
+  )){
 
-    console.log(error);
-    return;
+    users.unshift({
+
+      id:currentUser.id,
+
+      username:currentProfile.username,
+
+      avatar:currentProfile.avatar
+
+    });
 
   }
 
 
-  renderUsers(
-    users || []
-  );
+  if(select){
+
+    select.innerHTML =
+      `
+        <option value="">
+          SELECT A USER
+        </option>
+      ` +
+      users
+        .filter(
+          user =>
+            user.id !== currentUser.id
+        )
+        .map(user =>
+
+          `
+            <option value="${user.id}">
+              ${escapeHTML(user.username)}
+            </option>
+          `
+
+        )
+        .join("");
+
+  }
+
+
+  if(result){
+
+    renderUsers(users);
+
+  }
+
+}
+
+
+function searchUsers(){
+
+  const search =
+    (
+      document
+        .getElementById("globalSearch")
+        ?.value ||
+
+      document
+        .getElementById("friendSearch")
+        ?.value ||
+
+      ""
+    )
+    .toLowerCase();
+
+
+  const users = [];
+
+
+  localPosts.forEach(post => {
+
+    if(
+      !users.some(
+        user =>
+          user.id === post.userId
+      )
+    ){
+
+      users.push({
+
+        id:post.userId,
+
+        username:post.name,
+
+        avatar:post.avatar
+
+      });
+
+    }
+
+  });
+
+
+  const filtered =
+    users.filter(user =>
+
+      user.username
+        .toLowerCase()
+        .includes(search)
+
+    );
+
+
+  renderUsers(filtered);
 
 }
 
 
 function renderUsers(users){
 
-  const container =
+  const result =
     document.getElementById("searchResults");
+
+
+  if(!result) return;
 
 
   if(!users.length){
 
-    container.innerHTML =
-      `<div class="card empty">
-        👾 NO OTHER PIXEL USERS YET.
-      </div>`;
+    result.innerHTML =
+      `
+        <div class="card tiny">
+          No Pixel Friends found yet.
+        </div>
+      `;
 
     return;
 
   }
 
 
-  container.innerHTML =
+  result.innerHTML =
     users
-      .map(
-        user => {
+      .map(user =>
 
-          const avatarStyle =
-            user.avatar_url
-              ? `style="background-image:url('${user.avatar_url}')"`
-              : "";
+        `
+          <div class="card user-card">
 
-          const level =
-            Math.floor(
-              Number(user.xp || 0) / 100
-            ) + 1;
-
-
-          return `
-
-            <div class="user-card">
-
-              <div
-                class="avatar"
-                ${avatarStyle}
-              >
-                ${
-                  user.avatar_url
-                    ? ""
-                    : escapeHtml(
-                        user.avatar || "👾"
-                      )
-                }
-              </div>
-
-              <h3>
-                ${escapeHtml(user.username)}
-              </h3>
-
-              <div class="badges">
-
-                ${
-                  user.role === "admin"
-                    ? `
-                      <span class="badge admin">
-                        👑 ADMIN
-                      </span>
-                    `
-                    : `
-                      <span class="badge">
-                        🎮 USER
-                      </span>
-                    `
-                }
-
-                ${
-                  user.verified
-                    ? `
-                      <span class="badge verified">
-                        ✓ VERIFIED
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-              <p class="tiny">
-                LEVEL ${level}
-              </p>
-
-              <button
-                class="primary"
-                onclick="openChat('${user.id}')"
-              >
-                💬 MESSAGE
-              </button>
-
+            <div class="avatar">
+              ${escapeHTML(user.avatar || "👾")}
             </div>
 
-          `;
+            <h3>
+              ${escapeHTML(user.username)}
+            </h3>
 
-        }
+            <span class="badge">
+              🎮 USER
+            </span>
+
+          </div>
+        `
+
       )
       .join("");
-
-}
-
-
-/* =========================================
-   SEARCH USERS
-========================================= */
-
-async function searchUsers(){
-
-  const search =
-    (
-      document
-        .getElementById("friendSearch")
-        ?.value ||
-
-      document
-        .getElementById("globalSearch")
-        ?.value ||
-
-      ""
-    )
-    .toLowerCase()
-    .trim();
-
-
-  const {
-    data:users
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .neq(
-        "id",
-        currentUser.id
-      );
-
-
-  const filtered =
-    (users || [])
-      .filter(
-        user =>
-          user.username
-            .toLowerCase()
-            .includes(search)
-      );
-
-
-  renderUsers(filtered);
 
 }
 
@@ -2922,264 +2665,53 @@ async function searchUsers(){
    LEADERBOARD
 ========================================= */
 
-async function loadLeaderboard(){
+function renderLeaderboard(){
 
-  const container =
-    document.getElementById("leaders");
+  document
+    .getElementById("leaders")
+    .innerHTML =
+      `
+        <div class="card">
 
+          🥇
+          <strong>
+            ${escapeHTML(currentProfile.username)}
+          </strong>
 
-  const {
-    data:users,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .order(
-        "xp",
-        {
-          ascending:false
-        }
-      )
-      .limit(20);
+          —
+          ${currentProfile.xp} XP
 
-
-  if(error){
-
-    container.innerHTML =
-      `<div class="empty">
-        LEADERBOARD UNAVAILABLE.
-      </div>`;
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    (users || [])
-      .map(
-        (user,index) => {
-
-          const level =
-            Math.floor(
-              Number(user.xp || 0) / 100
-            ) + 1;
-
-
-          return `
-
-            <div
-              class="card"
-              style="
-                display:flex;
-                align-items:center;
-                gap:15px;
-                margin-bottom:10px
-              "
-            >
-
-              <strong style="font-size:22px">
-                #${index + 1}
-              </strong>
-
-              <div style="flex:1">
-
-                <strong>
-                  ${escapeHtml(user.username)}
-                </strong>
-
-                <div class="tiny">
-                  LEVEL ${level}
-                  •
-                  ${Number(user.xp || 0)} XP
-                </div>
-
-              </div>
-
-              <div class="badges">
-
-                ${
-                  user.role === "admin"
-                    ? `
-                      <span class="badge admin">
-                        👑 ADMIN
-                      </span>
-                    `
-                    : ""
-                }
-
-                ${
-                  user.verified
-                    ? `
-                      <span class="badge verified">
-                        ✓ VERIFIED
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-            </div>
-
-          `;
-
-        }
-      )
-      .join("");
+        </div>
+      `;
 
 }
 
 
 /* =========================================
-   MESSAGE USER LIST
+   MESSAGES
 ========================================= */
 
-async function loadMessageUsers(){
+function sendMessage(){
 
-  const container =
-    document.getElementById("messageUsers");
-
-
-  const {
-    data:users,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .neq(
-        "id",
-        currentUser.id
-      )
-      .order(
-        "username"
-      );
+  const receiver =
+    document
+      .getElementById("messageUser")
+      .value;
 
 
-  if(error){
-
-    container.innerHTML =
-      `<div class="tiny">
-        MESSAGE USERS UNAVAILABLE.
-      </div>`;
-
-    return;
-
-  }
+  const text =
+    document
+      .getElementById("messageText")
+      .value
+      .trim();
 
 
-  if(!users || users.length === 0){
-
-    container.innerHTML =
-      `<div class="empty">
-        NO PIXEL FRIENDS YET.
-      </div>`;
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    users
-      .map(
-        user => {
-
-          const active =
-            selectedChatUser === user.id
-              ? "active"
-              : "";
-
-          const avatarStyle =
-            user.avatar_url
-              ? `style="background-image:url('${user.avatar_url}')"`
-              : "";
-
-
-          return `
-
-            <button
-              class="chat-user ${active}"
-              onclick="openChat('${user.id}')"
-            >
-
-              <div
-                class="small-avatar"
-                ${avatarStyle}
-              >
-                ${
-                  user.avatar_url
-                    ? ""
-                    : escapeHtml(
-                        user.avatar || "👾"
-                      )
-                }
-              </div>
-
-              <div>
-
-                <strong>
-                  ${escapeHtml(user.username)}
-                </strong>
-
-                <div class="tiny">
-
-                  ${
-                    user.role === "admin"
-                      ? "👑 ADMIN"
-                      : user.verified
-                        ? "✓ VERIFIED"
-                        : "PIXEL USER"
-                  }
-
-                </div>
-
-              </div>
-
-            </button>
-
-          `;
-
-        }
-      )
-      .join("");
-
-}
-
-
-/* =========================================
-   OPEN CHAT
-========================================= */
-
-async function openChat(userId){
-
-  page("messages");
-
-  selectedChatUser =
-    userId;
-
-
-  const {
-    data:profile,
-    error
-  } =
-    await supabase
-      .from("profiles")
-      .select("*")
-      .eq(
-        "id",
-        userId
-      )
-      .single();
-
-
-  if(error){
+  if(!receiver){
 
     setStatus(
       "messageStatus",
-      "❌ COULD NOT OPEN CHAT."
+      "❌ Select a user first.",
+      "#c0392b"
     );
 
     return;
@@ -3187,121 +2719,112 @@ async function openChat(userId){
   }
 
 
-  selectedChatProfile =
-    profile;
+  if(!text){
 
-
-  document
-    .getElementById("chatTitle")
-    .textContent =
-      "💬 " + profile.username;
-
-
-  document
-    .getElementById("chatSubtitle")
-    .textContent =
-      profile.role === "admin"
-        ? "👑 ADMIN"
-        : profile.verified
-          ? "✓ VERIFIED USER"
-          : "PIXEL FRIEND";
-
-
-  document
-    .getElementById("messageInput")
-    .disabled = false;
-
-
-  document
-    .getElementById("sendButton")
-    .disabled = false;
-
-
-  await loadMessages();
-
-  await loadMessageUsers();
-
-  subscribeToMessages();
-
-}
-
-
-/* =========================================
-   LOAD MESSAGES
-========================================= */
-
-async function loadMessages(){
-
-  if(!selectedChatUser) return;
-
-
-  const list =
-    document.getElementById(
-      "messagesList"
+    setStatus(
+      "messageStatus",
+      "❌ Write a message first.",
+      "#c0392b"
     );
-
-
-  list.innerHTML =
-    `<div class="empty">
-      LOADING MESSAGES...
-    </div>`;
-
-
-  const {
-    data:messages,
-    error
-  } =
-    await supabase
-      .from("messages")
-      .select("*")
-      .or(
-        `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedChatUser}),and(sender_id.eq.${selectedChatUser},receiver_id.eq.${currentUser.id})`
-      )
-      .order(
-        "created_at",
-        {
-          ascending:true
-        }
-      );
-
-
-  if(error){
-
-    list.innerHTML =
-      `<div class="empty">
-        ❌ ${escapeHtml(error.message)}
-      </div>`;
 
     return;
 
   }
 
 
-  renderMessages(
-    messages || []
+  const message = {
+
+    id:
+      Date.now(),
+
+    from:
+      currentUser.id,
+
+    to:
+      receiver,
+
+    name:
+      currentProfile.username,
+
+    text:
+      text,
+
+    createdAt:
+      new Date().toLocaleString()
+
+  };
+
+
+  localMessages.unshift(message);
+
+
+  localStorage.setItem(
+    "pixelFriendMessages",
+    JSON.stringify(localMessages)
   );
 
+
+  document
+    .getElementById("messageText")
+    .value = "";
+
+
+  setStatus(
+    "messageStatus",
+    "✅ Message sent!",
+    "#27ae60"
+  );
+
+
+  loadMessages();
+
 }
 
 
-/* =========================================
-   RENDER MESSAGES
-========================================= */
+function loadMessages(){
 
-function renderMessages(messages){
+  try{
+
+    localMessages =
+      JSON.parse(
+        localStorage.getItem(
+          "pixelFriendMessages"
+        )
+      ) || [];
+
+  }
+
+  catch{
+
+    localMessages = [];
+
+  }
+
 
   const list =
-    document.getElementById(
-      "messagesList"
+    document.getElementById("messageList");
+
+
+  if(!list) return;
+
+
+  const messages =
+    localMessages.filter(message =>
+
+      message.from === currentUser.id ||
+      message.to === currentUser.id
+
     );
 
 
   if(!messages.length){
 
     list.innerHTML =
-      `<div class="empty">
-        👋 SAY HELLO TO YOUR PIXEL FRIEND!
-      </div>`;
+      `
+        <p class="tiny">
+          No messages yet.
+        </p>
+      `;
 
     return;
 
@@ -3310,356 +2833,105 @@ function renderMessages(messages){
 
   list.innerHTML =
     messages
-      .map(
-        message => {
+      .map(message =>
 
-          const mine =
-            message.sender_id ===
-            currentUser.id;
+        `
+          <div class="message">
 
+            <strong>
+              ${
+                message.from === currentUser.id
+                  ? "You"
+                  : escapeHTML(message.name)
+              }
+            </strong>
 
-          return `
+            ${escapeHTML(message.text)}
 
-            <div
-              class="message ${
-                mine ? "me" : "other"
-              }"
-            >
-
-              ${escapeHtml(
-                message.content
-              )}
-
-              <span class="message-time">
-
-                ${
-                  new Date(
-                    message.created_at
-                  ).toLocaleString()
-                }
-
-              </span>
-
+            <div class="tiny">
+              ${escapeHTML(message.createdAt)}
             </div>
 
-          `;
+          </div>
+        `
 
-        }
       )
       .join("");
 
-
-  list.scrollTop =
-    list.scrollHeight;
-
 }
 
 
 /* =========================================
-   SEND MESSAGE
+   SUPABASE AUTH STATE
 ========================================= */
 
-async function sendMessage(){
+supabaseClient
+  .auth
+  .onAuthStateChange(
+    async (event,session) => {
 
-  if(!selectedChatUser) return;
+      if(session?.user){
 
-
-  const input =
-    document.getElementById(
-      "messageInput"
-    );
-
-
-  const content =
-    input.value.trim();
-
-
-  if(!content) return;
-
-
-  input.disabled = true;
-
-
-  const {
-    error
-  } =
-    await supabase
-      .from("messages")
-      .insert({
-
-        sender_id:
-          currentUser.id,
-
-        receiver_id:
-          selectedChatUser,
-
-        content:content
-
-      });
-
-
-  input.disabled = false;
-
-
-  if(error){
-
-    setStatus(
-      "messageStatus",
-      "❌ " + error.message
-    );
-
-    return;
-
-  }
-
-
-  input.value = "";
-
-  setStatus(
-    "messageStatus",
-    ""
-  );
-
-  await loadMessages();
-
-  input.focus();
-
-}
-
-
-/* =========================================
-   REAL-TIME MESSAGE SUBSCRIPTION
-========================================= */
-
-async function subscribeToMessages(){
-
-  if(messageSubscription){
-
-    await supabase.removeChannel(
-      messageSubscription
-    );
-
-  }
-
-
-  messageSubscription =
-    supabase
-      .channel(
-        "pixel-friend-chat-" +
-        currentUser.id
-      )
-      .on(
-
-        "postgres_changes",
-
-        {
-
-          event:"INSERT",
-
-          schema:"public",
-
-          table:"messages"
-
-        },
-
-        payload => {
-
-          const message =
-            payload.new;
-
-
-          const relevant =
-            selectedChatUser &&
-
-            (
-              (
-                message.sender_id ===
-                currentUser.id &&
-
-                message.receiver_id ===
-                selectedChatUser
-              )
-
-              ||
-
-              (
-                message.sender_id ===
-                selectedChatUser &&
-
-                message.receiver_id ===
-                currentUser.id
-              )
-            );
-
-
-          if(relevant){
-
-            loadMessages();
-
-          }
-
-        }
-
-      )
-      .subscribe();
-
-}
-
-
-/* =========================================
-   PAGE NAVIGATION
-========================================= */
-
-function page(
-  pageId,
-  button
-){
-
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      pageElement => {
-
-        pageElement
-          .classList.remove("active");
+        currentUser =
+          session.user;
 
       }
-    );
 
-
-  document
-    .getElementById(pageId)
-    .classList.add("active");
-
-
-  document
-    .querySelectorAll(".menu button")
-    .forEach(
-      menuButton => {
-
-        menuButton
-          .classList.remove("active");
-
-      }
-    );
-
-
-  if(button){
-
-    button
-      .classList.add("active");
-
-  }
-
-
-  if(pageId === "friends"){
-
-    loadUsers();
-
-  }
-
-
-  if(pageId === "leaderboard"){
-
-    loadLeaderboard();
-
-  }
-
-
-  if(pageId === "messages"){
-
-    loadMessageUsers();
-
-  }
-
-}
+    }
+  );
 
 
 /* =========================================
-   DARK MODE
-========================================= */
-
-function theme(){
-
-  document.body.classList.toggle(
-    "dark"
-  );
-
-
-  localStorage.setItem(
-    "pixel-theme",
-
-    document.body.classList.contains("dark")
-      ? "dark"
-      : "light"
-  );
-
-}
-
-
-if(
-  localStorage.getItem(
-    "pixel-theme"
-  ) === "dark"
-){
-
-  document.body.classList.add(
-    "dark"
-  );
-
-}
-
-
-/* =========================================
-   START APPLICATION
+   START APP
 ========================================= */
 
 async function startApp(){
 
-  const {
-    data:{session}
-  } =
-    await supabase.auth.getSession();
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await supabaseClient
+      .auth
+      .getSession();
 
 
-  if(session){
+    if(error){
 
-    currentUser =
-      session.user;
-
-    await loadApp();
-
-  }
-
-}
-
-
-supabase.auth.onAuthStateChange(
-  async (
-    event,
-    session
-  ) => {
-
-    if(
-      event === "SIGNED_OUT"
-    ){
+      console.error(error);
 
       return;
 
     }
 
-    if(
-      session &&
-      !currentUser
-    ){
+
+    if(data.session?.user){
 
       currentUser =
-        session.user;
+        data.session.user;
+
+
+      await openApp();
 
     }
 
+
+    renderLeaderboard();
+
   }
-);
+
+  catch(error){
+
+    console.error(
+      "Startup error:",
+      error
+    );
+
+  }
+
+}
 
 
 startApp();
