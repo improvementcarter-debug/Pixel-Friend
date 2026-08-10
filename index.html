@@ -1,2540 +1,2573 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
-
-<title>PIXEL FRIEND</title>
-
-<style>
-:root{
-  --bg:#f4f7fb;
-  --panel:#ffffff;
-  --text:#172033;
-  --muted:#718096;
-  --primary:#6c63ff;
-  --primary2:#8b5cf6;
-  --blue:#3b82f6;
-  --danger:#ef4444;
-  --yellow:#f59e0b;
-  --border:#e5e7eb;
-  --shadow:0 10px 30px rgba(20,30,60,.08);
-}
-
-body.dark{
-  --bg:#111827;
-  --panel:#1f2937;
-  --text:#f9fafb;
-  --muted:#9ca3af;
-  --border:#374151;
-  --shadow:0 10px 30px rgba(0,0,0,.25);
-}
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  font-family:Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-
-button,
-input,
-textarea,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-/* AUTH */
-
-#authScreen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.auth-box{
-  width:100%;
-  max-width:430px;
-  background:var(--panel);
-  padding:32px;
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  border:1px solid var(--border);
-}
-
-.logo{
-  text-align:center;
-  font-size:30px;
-  font-weight:900;
-  letter-spacing:1px;
-}
-
-.logo-icon{
-  font-size:54px;
-  margin-bottom:8px;
-}
-
-.tagline{
-  text-align:center;
-  color:var(--muted);
-  font-size:12px;
-  letter-spacing:1px;
-}
-
-.tabs{
-  display:flex;
-  gap:8px;
-  margin:25px 0 20px;
-}
-
-.tabs button{
-  flex:1;
-  border:none;
-  padding:12px;
-  border-radius:10px;
-  background:transparent;
-  color:var(--muted);
-  font-weight:bold;
-}
-
-.tabs button.active{
-  background:var(--primary);
-  color:white;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  margin:8px 0;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--panel);
-  color:var(--text);
-}
-
-textarea{
-  min-height:120px;
-  resize:vertical;
-}
-
-.primary,
-.blue,
-.secondary{
-  border:none;
-  padding:12px 18px;
-  border-radius:10px;
-  font-weight:bold;
-}
-
-.primary{
-  background:var(--primary);
-  color:white;
-}
-
-.blue{
-  background:var(--blue);
-  color:white;
-}
-
-.secondary{
-  background:var(--border);
-  color:var(--text);
-}
-
-.danger{
-  background:var(--danger)!important;
-  color:white!important;
-}
-
-.status{
-  margin-top:12px;
-  font-size:14px;
-  text-align:center;
-  color:var(--muted);
-}
-
-.hidden{
-  display:none!important;
-}
-
-.tiny{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.demo-text{
-  text-align:center;
-}
-
-/* APP */
-
-#appScreen{
-  min-height:100vh;
-}
-
-.topbar{
-  height:70px;
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 25px;
-  position:sticky;
-  top:0;
-  z-index:10;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.brand-icon{
-  font-size:30px;
-}
-
-.actions{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.actions input{
-  width:230px;
-  margin:0;
-}
-
-.icon{
-  width:44px;
-  height:44px;
-  border:none;
-  border-radius:12px;
-  background:var(--bg);
-  font-size:20px;
-}
-
-.layout{
-  display:grid;
-  grid-template-columns:260px 1fr;
-  min-height:calc(100vh - 70px);
-}
-
-.side{
-  background:var(--panel);
-  border-right:1px solid var(--border);
-  padding:20px;
-}
-
-.mini{
-  text-align:center;
-  padding-bottom:20px;
-  border-bottom:1px solid var(--border);
-}
-
-.avatar{
-  width:70px;
-  height:70px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:0 auto 10px;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  color:white;
-  font-size:32px;
-  overflow:hidden;
-  position:relative;
-}
-
-.avatar img,
-.profile-main-avatar img,
-.profile-image-preview img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.online{
-  width:14px;
-  height:14px;
-  border-radius:50%;
-  background:#22c55e;
-  border:2px solid var(--panel);
-  position:absolute;
-  bottom:4px;
-  right:5px;
-}
-
-.badges{
-  margin:8px 0;
-}
-
-.badge{
-  display:inline-block;
-  margin:3px;
-  padding:5px 8px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:bold;
-  background:#e0e7ff;
-  color:#4338ca;
-}
-
-.admin-badge{
-  background:#fef3c7;
-  color:#92400e;
-}
-
-.verify-badge{
-  background:#dbeafe;
-  color:#1d4ed8;
-}
-
-.menu{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-top:20px;
-}
-
-.menu button{
-  border:none;
-  text-align:left;
-  padding:13px;
-  border-radius:10px;
-  background:transparent;
-  color:var(--text);
-  font-weight:bold;
-}
-
-.menu button:hover,
-.menu button.active{
-  background:var(--primary);
-  color:white;
-}
-
-main{
-  padding:25px;
-  max-width:1100px;
-  width:100%;
-  margin:0 auto;
-}
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
-}
-
-.card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  border-radius:18px;
-  padding:22px;
-  margin-bottom:20px;
-}
-
-.hero{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  color:white;
-  border-radius:20px;
-  padding:30px;
-  margin-bottom:20px;
-}
-
-.hero h1{
-  margin:0 0 8px;
-}
-
-.hero p{
-  margin:0;
-}
-
-.hero-icon{
-  font-size:70px;
-}
-
-.row{
-  display:flex;
-  gap:10px;
-  align-items:center;
-}
-
-.wrap{
-  flex-wrap:wrap;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:15px;
-}
-
-.user-card{
-  background:var(--panel);
-  border:1px solid var(--border);
-  padding:18px;
-  border-radius:15px;
-  text-align:center;
-}
-
-.user-avatar{
-  width:65px;
-  height:65px;
-  margin:auto;
-  border-radius:50%;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:30px;
-  overflow:hidden;
-}
-
-.user-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.post{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:15px;
-}
-
-.post-head{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.post-avatar{
-  width:45px;
-  height:45px;
-  border-radius:50%;
-  background:var(--primary);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:23px;
-  overflow:hidden;
-}
-
-.post-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.post-image{
-  width:100%;
-  max-height:500px;
-  object-fit:cover;
-  border-radius:12px;
-  margin-top:12px;
-}
-
-.stat-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-
-.stat{
-  background:var(--bg);
-  padding:15px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-.stat strong{
-  font-size:24px;
-}
-
-.xp{
-  height:10px;
-  border-radius:20px;
-  background:var(--border);
-  overflow:hidden;
-  margin-top:8px;
-}
-
-#xpBar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--primary),var(--blue));
-}
-
-.profile-main-avatar,
-.profile-image-preview{
-  width:140px;
-  height:140px;
-  margin:0 auto 15px;
-  border-radius:50%;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:65px;
-  background:linear-gradient(135deg,var(--primary),var(--primary2));
-  position:relative;
-}
-
-.profile-image-preview{
-  width:100px;
-  height:100px;
-  font-size:45px;
-}
-
-@media(max-width:800px){
-
-  .layout{
-    grid-template-columns:1fr;
-  }
-
-  .side{
-    border-right:none;
-    border-bottom:1px solid var(--border);
-  }
-
-  .menu{
-    flex-direction:row;
-    overflow:auto;
-  }
-
-  .menu button{
-    white-space:nowrap;
-  }
-
-  .actions input{
-    display:none;
-  }
-
-  .hero{
-    padding:20px;
-  }
-
-  .hero-icon{
-    font-size:45px;
-  }
-
-  main{
-    padding:15px;
-  }
-
-  .mobile-stack{
-    flex-direction:column;
-    align-items:stretch;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Pixel Friend</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --panel:#ffffff;
+      --panel2:#eef3ff;
+      --text:#1d2433;
+      --muted:#687085;
+      --border:#dce2ee;
+      --primary:#635bff;
+      --primary2:#4f46e5;
+      --blue:#2196f3;
+      --danger:#ef4444;
+      --shadow:0 12px 40px rgba(30,41,59,.10);
+    }
+
+    body.dark{
+      --bg:#12151c;
+      --panel:#1c212b;
+      --panel2:#252c38;
+      --text:#f4f6fb;
+      --muted:#aab3c4;
+      --border:#343d4d;
+      --primary:#8b83ff;
+      --primary2:#7168ff;
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    button,input,textarea,select{
+      font:inherit;
+    }
+
+    button{
+      border:0;
+      cursor:pointer;
+      border-radius:10px;
+      padding:12px 16px;
+      font-weight:700;
+      transition:.2s;
+    }
+
+    button:hover{
+      transform:translateY(-1px);
+      opacity:.95;
+    }
+
+    input,textarea,select{
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      border-radius:10px;
+      padding:12px;
+      margin:8px 0;
+      outline:none;
+    }
+
+    textarea{
+      min-height:110px;
+      resize:vertical;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    /* AUTH */
+
+    #authScreen{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .auth-card{
+      width:100%;
+      max-width:430px;
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:32px;
+      box-shadow:var(--shadow);
+    }
+
+    .logo{
+      text-align:center;
+      font-size:30px;
+      font-weight:900;
+      letter-spacing:2px;
+    }
+
+    .logo-icon{
+      font-size:56px;
+      margin-bottom:8px;
+    }
+
+    .tagline{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:1px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin:25px 0;
+    }
+
+    .tabs button{
+      flex:1;
+      background:var(--panel2);
+      color:var(--text);
+    }
+
+    .tabs button.active{
+      background:var(--primary);
+      color:white;
+    }
+
+    .primary{
+      background:var(--primary);
+      color:white;
+    }
+
+    .blue{
+      background:var(--blue);
+      color:white;
+    }
+
+    .secondary{
+      background:var(--panel2);
+      color:var(--text);
+    }
+
+    .danger{
+      background:var(--danger) !important;
+      color:white !important;
+    }
+
+    .status{
+      margin-top:12px;
+      min-height:20px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    /* APP */
+
+    #app{
+      min-height:100vh;
+    }
+
+    .topbar{
+      height:70px;
+      background:var(--panel);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 25px;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:22px;
+      font-weight:900;
+      cursor:pointer;
+    }
+
+    .brand-icon{
+      font-size:30px;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .actions input{
+      width:220px;
+      margin:0;
+    }
+
+    .icon{
+      background:var(--panel2);
+      color:var(--text);
+      min-width:46px;
+      padding:11px;
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:260px 1fr;
+      min-height:calc(100vh - 70px);
+    }
+
+    .side{
+      background:var(--panel);
+      border-right:1px solid var(--border);
+      padding:20px;
+    }
+
+    .mini{
+      text-align:center;
+      padding-bottom:20px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .avatar{
+      width:75px;
+      height:75px;
+      border-radius:50%;
+      background:var(--panel2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:36px;
+      margin:0 auto 10px;
+      position:relative;
+      overflow:hidden;
+      border:2px solid var(--border);
+    }
+
+    .avatar img,
+    .profile-main-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .big{
+      width:90px;
+      height:90px;
+      font-size:45px;
+    }
+
+    .online{
+      position:absolute;
+      width:15px;
+      height:15px;
+      border-radius:50%;
+      background:#22c55e;
+      border:2px solid var(--panel);
+      bottom:4px;
+      right:4px;
+    }
+
+    .badges{
+      display:flex;
+      justify-content:center;
+      gap:6px;
+      flex-wrap:wrap;
+      margin:8px 0;
+    }
+
+    .badge-admin,
+    .badge-verified{
+      display:inline-block;
+      padding:5px 8px;
+      border-radius:20px;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .badge-admin{
+      background:#ffe08a;
+      color:#6d4c00;
+    }
+
+    .badge-verified{
+      background:#dcecff;
+      color:#1565c0;
+    }
+
+    .xp{
+      height:9px;
+      background:var(--panel2);
+      border-radius:20px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+
+    #xpBar{
+      height:100%;
+      width:0%;
+      background:var(--primary);
+      transition:.3s;
+    }
+
+    .menu{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:20px;
+    }
+
+    .menu button{
+      text-align:left;
+      background:transparent;
+      color:var(--text);
+    }
+
+    .menu button.active{
+      background:var(--primary);
+      color:white;
+    }
+
+    main{
+      padding:30px;
+      max-width:1100px;
+      width:100%;
+      margin:auto;
+    }
+
+    .page{
+      display:none;
+    }
+
+    .page.active{
+      display:block;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      margin-bottom:20px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero{
+      background:linear-gradient(135deg,var(--primary),var(--primary2));
+      color:white;
+      border-radius:22px;
+      padding:35px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+    }
+
+    .hero-icon{
+      font-size:75px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+
+    .row input{
+      flex:1;
+    }
+
+    .wrap{
+      flex-wrap:wrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:15px;
+      margin-top:15px;
+    }
+
+    .user-card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      text-align:center;
+    }
+
+    .post{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:20px;
+      margin-bottom:15px;
+    }
+
+    .post-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .post-avatar{
+      width:45px;
+      height:45px;
+      border-radius:50%;
+      background:var(--panel2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .post-avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .post-image{
+      width:100%;
+      max-height:420px;
+      object-fit:cover;
+      border-radius:12px;
+      margin-top:12px;
+    }
+
+    .profile-main-avatar{
+      width:140px;
+      height:140px;
+      border-radius:50%;
+      background:var(--panel2);
+      border:3px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:68px;
+      margin:0 auto 15px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .stat{
+      padding:18px;
+      background:var(--panel2);
+      border-radius:14px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:24px;
+      margin-bottom:5px;
+    }
+
+    .profile-image-preview{
+      width:110px;
+      height:110px;
+      margin:0 auto 12px;
+      border-radius:50%;
+      background:var(--panel2);
+      border:2px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:55px;
+      overflow:hidden;
+    }
+
+    .profile-image-preview img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .leader{
+      display:flex;
+      align-items:center;
+      gap:15px;
+      padding:14px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .leader:last-child{
+      border-bottom:0;
+    }
+
+    @media(max-width:800px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+
+      .side{
+        border-right:0;
+        border-bottom:1px solid var(--border);
+      }
+
+      .menu{
+        flex-direction:row;
+        flex-wrap:wrap;
+      }
+
+      .menu button{
+        flex:1 1 120px;
+        text-align:center;
+      }
+
+      .actions input{
+        display:none;
+      }
+
+      main{
+        padding:15px;
+      }
+
+      .hero{
+        padding:25px;
+      }
+
+      .hero-icon{
+        font-size:50px;
+      }
+
+      .mobile-stack{
+        flex-direction:column;
+        align-items:stretch;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- AUTH SCREEN -->
+  <!-- LOGIN / REGISTER -->
 
-<div id="authScreen">
+  <div id="authScreen">
 
-  <div class="auth-box">
+    <div class="auth-card">
 
-    <div class="logo">
-      <div class="logo-icon">👾</div>
-      PIXEL FRIEND
-    </div>
+      <div class="logo">
+        <div class="logo-icon">👾</div>
+        PIXEL FRIEND
+      </div>
 
-    <p class="tagline">
-      CONNECT • SHARE • PLAY • LEVEL UP
-    </p>
-
-    <div class="tabs">
-
-      <button
-        id="loginTab"
-        class="active"
-        onclick="authTab('login')">
-        LOGIN
-      </button>
-
-      <button
-        id="regTab"
-        onclick="authTab('register')">
-        REGISTER
-      </button>
-
-    </div>
-
-    <!-- LOGIN -->
-
-    <div id="loginPane">
-
-      <input
-        id="loginEmail"
-        type="email"
-        placeholder="EMAIL">
-
-      <input
-        id="loginPass"
-        type="password"
-        placeholder="PASSWORD">
-
-      <button
-        class="primary"
-        style="width:100%"
-        onclick="login()">
-        ENTER PIXEL WORLD
-      </button>
-
-      <p class="tiny demo-text">
-        🌐 REAL PIXEL ACCOUNTS • REGISTER • LOGIN • CONNECT
+      <p class="tagline">
+        CONNECT • SHARE • PLAY • LEVEL UP
       </p>
 
-    </div>
+      <div class="tabs">
+        <button id="loginTab" class="active" onclick="authTab('login')">
+          LOGIN
+        </button>
 
-    <!-- REGISTER -->
-
-    <div
-      id="registerPane"
-      class="hidden">
-
-      <input
-        id="regName"
-        maxlength="20"
-        placeholder="PIXEL USERNAME">
-
-      <input
-        id="regEmail"
-        type="email"
-        placeholder="EMAIL">
-
-      <input
-        id="regPass"
-        type="password"
-        placeholder="PASSWORD">
-
-      <select id="regAvatar">
-        <option>👾</option>
-        <option>🤖</option>
-        <option>🦊</option>
-        <option>🐸</option>
-        <option>🐱</option>
-        <option>🐼</option>
-        <option>🧙</option>
-        <option>🦁</option>
-        <option>🐯</option>
-        <option>🐲</option>
-      </select>
-
-      <button
-        class="primary"
-        style="width:100%"
-        onclick="register()">
-        CREATE ACCOUNT
-      </button>
-
-    </div>
-
-    <div id="authStatus" class="status"></div>
-
-  </div>
-
-</div>
-
-
-<!-- APP SCREEN -->
-
-<div
-  id="appScreen"
-  class="hidden">
-
-  <div class="topbar">
-
-    <div
-      class="brand"
-      onclick="page('home')">
-
-      <div class="brand-icon">
-        🎮
+        <button id="regTab" onclick="authTab('register')">
+          REGISTER
+        </button>
       </div>
 
-      PIXEL FRIEND
+      <div id="loginPane">
 
-    </div>
+        <input id="loginEmail" type="email" placeholder="EMAIL">
 
-    <div class="actions">
+        <input id="loginPass" type="password" placeholder="PASSWORD">
 
-      <input
-        id="globalSearch"
-        placeholder="SEARCH FRIENDS..."
-        oninput="searchUsers()">
+        <button class="primary" style="width:100%" onclick="login()">
+          ENTER PIXEL WORLD
+        </button>
 
-      <button
-        class="icon"
-        onclick="theme()">
-        🌙
-      </button>
+      </div>
 
-      <button
-        id="headAvatar"
-        class="icon"
-        onclick="page('profile')">
-        👾
-      </button>
+      <div id="registerPane" class="hidden">
+
+        <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">
+
+        <input id="regEmail" type="email" placeholder="EMAIL">
+
+        <input id="regPass" type="password" placeholder="PASSWORD">
+
+        <select id="regAvatar">
+          <option>👾</option>
+          <option>🤖</option>
+          <option>🦊</option>
+          <option>🐸</option>
+          <option>🐱</option>
+          <option>🐼</option>
+          <option>🧙</option>
+          <option>🦁</option>
+          <option>🐯</option>
+          <option>🐲</option>
+        </select>
+
+        <button class="primary" style="width:100%" onclick="register()">
+          CREATE ACCOUNT
+        </button>
+
+      </div>
+
+      <div id="authStatus" class="status"></div>
 
     </div>
 
   </div>
 
 
-  <div class="layout">
+  <!-- APP -->
 
-    <!-- SIDEBAR -->
+  <div id="app" class="hidden">
 
-    <aside class="side">
+    <div class="topbar">
 
-      <div class="mini">
+      <div class="brand" onclick="page('home')">
+        <div class="brand-icon">🎮</div>
+        PIXEL FRIEND
+      </div>
 
-        <div
-          id="sideAvatar"
-          class="avatar">
+      <div class="actions">
 
+        <input
+          id="globalSearch"
+          placeholder="SEARCH FRIENDS..."
+          oninput="searchUsers()"
+        >
+
+        <button class="icon" onclick="theme()">🌙</button>
+
+        <button
+          id="headAvatar"
+          class="icon"
+          onclick="page('profile')"
+        >
           👾
-
-          <span class="online"></span>
-
-        </div>
-
-        <h3 id="sideName">
-          PLAYER
-        </h3>
-
-        <div
-          id="sideBadges"
-          class="badges">
-        </div>
-
-        <p
-          id="sideBio"
-          class="tiny">
-          PIXEL EXPLORER
-        </p>
-
-        <div>
-          LEVEL
-          <span id="sideLevel">1</span>
-        </div>
-
-        <div class="xp">
-          <div id="xpBar"></div>
-        </div>
-
-        <p
-          id="xpText"
-          class="tiny">
-          0 / 100 XP
-        </p>
+        </button>
 
       </div>
 
-
-      <nav class="menu">
-
-        <button
-          class="active"
-          onclick="page('home',this)">
-          🏠 HOME
-        </button>
-
-        <button
-          onclick="page('friends',this)">
-          👥 FRIENDS
-        </button>
-
-        <button
-          onclick="page('leaderboard',this)">
-          🏆 RANK
-        </button>
-
-        <button
-          onclick="page('profile',this)">
-          👤 PROFILE
-        </button>
-
-        <button
-          class="danger"
-          onclick="logout()">
-          🚪 LOGOUT
-        </button>
-
-      </nav>
-
-    </aside>
+    </div>
 
 
-    <main>
+    <div class="layout">
 
-      <!-- HOME -->
+      <aside class="side">
 
-      <section
-        id="home"
-        class="page active">
+        <div class="mini">
 
-        <div class="hero">
-
-          <div>
-
-            <h1>
-              WELCOME TO PIXEL WORLD 👾
-            </h1>
-
-            <p>
-              SHARE POSTS • MAKE FRIENDS • EARN XP
-            </p>
-
-          </div>
-
-          <div class="hero-icon">
-            🕹️
-          </div>
-
-        </div>
-
-
-        <div class="card">
-
-          <h2>
-            ✍️ CREATE PIXEL POST
-          </h2>
-
-          <textarea
-            id="postText"
-            maxlength="1000"
-            placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
-
-          <div class="row mobile-stack">
-
-            <input
-              id="postImage"
-              type="file"
-              accept="image/*">
-
-            <button
-              class="primary"
-              onclick="createPost()">
-              🚀 PUBLISH +10 XP
-            </button>
-
-          </div>
-
-          <div
-            id="postStatus"
-            class="status">
-          </div>
-
-        </div>
-
-        <div id="feed"></div>
-
-      </section>
-
-
-      <!-- FRIENDS -->
-
-      <section
-        id="friends"
-        class="page">
-
-        <div class="card">
-
-          <h1>
-            👥 PIXEL COMMUNITY
-          </h1>
-
-          <input
-            id="friendSearch"
-            placeholder="SEARCH PIXEL FRIENDS..."
-            oninput="searchUsers()">
-
-        </div>
-
-        <div
-          id="searchResults"
-          class="grid">
-        </div>
-
-      </section>
-
-
-      <!-- LEADERBOARD -->
-
-      <section
-        id="leaderboard"
-        class="page">
-
-        <div class="card">
-
-          <h1>
-            🏆 PIXEL LEADERBOARD
-          </h1>
-
-          <p class="tiny">
-            TOP PLAYERS IN THE PIXEL WORLD
-          </p>
-
-          <div id="leaders"></div>
-
-        </div>
-
-      </section>
-
-
-      <!-- PROFILE -->
-
-      <section
-        id="profile"
-        class="page">
-
-        <div
-          class="card"
-          style="text-align:center">
-
-          <div
-            id="profileAvatar"
-            class="profile-main-avatar">
-
+          <div id="sideAvatar" class="avatar big">
             👾
-
             <span class="online"></span>
-
           </div>
 
-          <h1 id="profileName">
-            PLAYER
-          </h1>
+          <h3 id="sideName">PLAYER</h3>
 
-          <div
-            id="profileBadges"
-            class="badges">
-          </div>
+          <div id="sideBadges" class="badges"></div>
 
-          <p id="profileBio">
+          <p id="sideBio" class="tiny">
             PIXEL EXPLORER
           </p>
 
-
-          <div class="stat-grid">
-
-            <div class="stat">
-
-              <strong id="statPosts">
-                0
-              </strong>
-
-              POSTS
-
-            </div>
-
-            <div class="stat">
-
-              <strong id="statLevel">
-                1
-              </strong>
-
-              LEVEL
-
-            </div>
-
-            <div class="stat">
-
-              <strong id="statXP">
-                0
-              </strong>
-
-              XP
-
-            </div>
-
+          <div>
+            LEVEL <span id="sideLevel">1</span>
           </div>
 
-          <br>
-
-          <button
-            class="blue"
-            onclick="openProfile()">
-
-            ✏️ EDIT PROFILE
-
-          </button>
-
-        </div>
-
-
-        <!-- EDIT PROFILE -->
-
-        <div
-          id="profileEditor"
-          class="card hidden">
-
-          <h2>
-            ✏️ EDIT PROFILE
-          </h2>
-
-          <div
-            id="profilePreview"
-            class="profile-image-preview">
-            👾
+          <div class="xp">
+            <div id="xpBar"></div>
           </div>
 
-          <input
-            id="profileImage"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            onchange="previewProfileImage()">
-
-          <p class="tiny">
-            Upload a JPG, PNG, or WEBP profile picture.
+          <p id="xpText" class="tiny">
+            0 / 100 XP
           </p>
 
-          <input
-            id="editName"
-            maxlength="20"
-            placeholder="USERNAME">
-
-          <textarea
-            id="editBio"
-            maxlength="200"
-            placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea>
-
-          <select id="editAvatar">
-            <option>👾</option>
-            <option>🤖</option>
-            <option>🦊</option>
-            <option>🐸</option>
-            <option>🐱</option>
-            <option>🐼</option>
-            <option>🧙</option>
-            <option>🦁</option>
-            <option>🐯</option>
-            <option>🐲</option>
-          </select>
-
-
-          <div class="row wrap">
-
-            <button
-              class="primary"
-              onclick="saveProfile()">
-              💾 SAVE
-            </button>
-
-            <button
-              class="secondary"
-              onclick="closeProfile()">
-              CANCEL
-            </button>
-
-          </div>
-
-          <div
-            id="profileStatus"
-            class="status">
-          </div>
-
         </div>
 
-      </section>
+        <nav class="menu">
 
-    </main>
+          <button class="active" onclick="page('home',this)">
+            🏠 HOME
+          </button>
+
+          <button onclick="page('friends',this)">
+            👥 FRIENDS
+          </button>
+
+          <button onclick="page('leaderboard',this)">
+            🏆 RANK
+          </button>
+
+          <button onclick="page('profile',this)">
+            👤 PROFILE
+          </button>
+
+          <button class="danger" onclick="logout()">
+            🚪 LOGOUT
+          </button>
+
+        </nav>
+
+      </aside>
+
+
+      <main>
+
+        <!-- HOME -->
+
+        <section id="home" class="page active">
+
+          <div class="hero">
+
+            <div>
+              <h1>WELCOME TO PIXEL WORLD 👾</h1>
+
+              <p>SHARE POSTS • MAKE FRIENDS • EARN XP</p>
+            </div>
+
+            <div class="hero-icon">🕹️</div>
+
+          </div>
+
+
+          <div class="card">
+
+            <h2>✍️ CREATE PIXEL POST</h2>
+
+            <textarea
+              id="postText"
+              maxlength="1000"
+              placeholder="WHAT'S ON YOUR PIXEL MIND?"
+            ></textarea>
+
+            <div class="row mobile-stack">
+
+              <input
+                id="postImage"
+                type="file"
+                accept="image/*"
+              >
+
+              <button class="primary" onclick="createPost()">
+                🚀 PUBLISH +10 XP
+              </button>
+
+            </div>
+
+            <div id="postStatus" class="status"></div>
+
+          </div>
+
+          <div id="feed"></div>
+
+        </section>
+
+
+        <!-- FRIENDS -->
+
+        <section id="friends" class="page">
+
+          <div class="card">
+
+            <h1>👥 PIXEL COMMUNITY</h1>
+
+            <input
+              id="friendSearch"
+              placeholder="SEARCH PIXEL FRIENDS..."
+              oninput="searchUsers()"
+            >
+
+          </div>
+
+          <div id="searchResults" class="grid"></div>
+
+        </section>
+
+
+        <!-- LEADERBOARD -->
+
+        <section id="leaderboard" class="page">
+
+          <div class="card">
+
+            <h1>🏆 PIXEL LEADERBOARD</h1>
+
+            <p class="tiny">
+              TOP PLAYERS IN THE PIXEL WORLD
+            </p>
+
+            <div id="leaders"></div>
+
+          </div>
+
+        </section>
+
+
+        <!-- PROFILE -->
+
+        <section id="profile" class="page">
+
+          <div class="card" style="text-align:center">
+
+            <div
+              id="profileAvatar"
+              class="profile-main-avatar"
+            >
+              👾
+              <span class="online"></span>
+            </div>
+
+            <h1 id="profileName">PLAYER</h1>
+
+            <div
+              id="profileBadges"
+              class="badges"
+            ></div>
+
+            <p id="profileBio">
+              PIXEL EXPLORER
+            </p>
+
+            <div class="stat-grid">
+
+              <div class="stat">
+                <strong id="statPosts">0</strong>
+                POSTS
+              </div>
+
+              <div class="stat">
+                <strong id="statLevel">1</strong>
+                LEVEL
+              </div>
+
+              <div class="stat">
+                <strong id="statXP">0</strong>
+                XP
+              </div>
+
+            </div>
+
+            <br>
+
+            <button class="blue" onclick="openProfile()">
+              ✏️ EDIT PROFILE
+            </button>
+
+          </div>
+
+
+          <div
+            id="profileEditor"
+            class="card hidden"
+          >
+
+            <h2>✏️ EDIT PROFILE</h2>
+
+            <div
+              id="profilePreview"
+              class="profile-image-preview"
+            >
+              👾
+            </div>
+
+            <input
+              id="profileImage"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onchange="previewProfileImage()"
+            >
+
+            <p class="tiny">
+              Upload a JPG, PNG, or WEBP profile picture.
+            </p>
+
+            <input
+              id="editName"
+              maxlength="20"
+              placeholder="USERNAME"
+            >
+
+            <textarea
+              id="editBio"
+              maxlength="200"
+              placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."
+            ></textarea>
+
+            <select id="editAvatar">
+              <option>👾</option>
+              <option>🤖</option>
+              <option>🦊</option>
+              <option>🐸</option>
+              <option>🐱</option>
+              <option>🐼</option>
+              <option>🧙</option>
+              <option>🦁</option>
+              <option>🐯</option>
+              <option>🐲</option>
+            </select>
+
+            <div class="row wrap">
+
+              <button class="primary" onclick="saveProfile()">
+                💾 SAVE
+              </button>
+
+              <button class="secondary" onclick="closeProfile()">
+                CANCEL
+              </button>
+
+            </div>
+
+            <div id="profileStatus" class="status"></div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
 
   </div>
 
-</div>
+
+  <script>
+
+    /* =========================================================
+       IMPORTANT:
+       REPLACE THESE TWO VALUES WITH YOUR SUPABASE PROJECT DATA
+       ========================================================= */
+
+    const SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL_HERE";
+
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
 
 
-<!-- SUPABASE -->
+    /* ========================================================= */
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    const ADMIN_EMAIL = "improvementcarter@gmail.com";
 
-<script>
-
-/* =========================================
-   SUPABASE SETTINGS
-========================================= */
-
-const SUPABASE_URL =
-"https://vvfkfpsyxipnypaltixq.supabase.co";
-
-const SUPABASE_ANON_KEY =
-"sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
-
-const ADMIN_EMAIL =
-"improvementcarter@gmail.com";
-
-const supabase =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+    let supabaseClient = null;
+    let currentUser = null;
+    let currentProfile = null;
 
 
-/* =========================================
-   GLOBAL VARIABLES
-========================================= */
+    try {
 
-let currentUser = null;
-let currentProfile = null;
-let previewImageURL = null;
-
-
-/* =========================================
-   AUTH TABS
-========================================= */
-
-function authTab(type){
-
-  const loginPane =
-  document.getElementById("loginPane");
-
-  const registerPane =
-  document.getElementById("registerPane");
-
-  const loginTab =
-  document.getElementById("loginTab");
-
-  const regTab =
-  document.getElementById("regTab");
-
-  document.getElementById(
-    "authStatus"
-  ).textContent = "";
-
-  if(type === "login"){
-
-    loginPane.classList.remove("hidden");
-    registerPane.classList.add("hidden");
-
-    loginTab.classList.add("active");
-    regTab.classList.remove("active");
-
-  }else{
-
-    registerPane.classList.remove("hidden");
-    loginPane.classList.add("hidden");
-
-    regTab.classList.add("active");
-    loginTab.classList.remove("active");
-
-  }
-
-}
-
-
-/* =========================================
-   REGISTER
-========================================= */
-
-async function register(){
-
-  const name =
-  document.getElementById("regName").value.trim();
-
-  const email =
-  document.getElementById("regEmail").value.trim();
-
-  const password =
-  document.getElementById("regPass").value;
-
-  const avatar =
-  document.getElementById("regAvatar").value;
-
-  const status =
-  document.getElementById("authStatus");
-
-  if(!name || !email || !password){
-
-    status.textContent =
-    "Please complete all fields.";
-
-    return;
-
-  }
-
-  if(password.length < 6){
-
-    status.textContent =
-    "Password must be at least 6 characters.";
-
-    return;
-
-  }
-
-  status.textContent =
-  "Creating your Pixel Friend account...";
-
-  const {
-    data,
-    error
-  } =
-  await supabase.auth.signUp({
-
-    email:email,
-
-    password:password,
-
-    options:{
-      data:{
-        username:name,
-        avatar:avatar
+      if(
+        SUPABASE_URL.includes("PASTE_YOUR") ||
+        SUPABASE_ANON_KEY.includes("PASTE_YOUR")
+      ){
+        console.warn("Please add your Supabase credentials.");
+      }else{
+        supabaseClient =
+          supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+          );
       }
+
+    }catch(error){
+
+      console.error(error);
+
     }
 
-  });
 
-  if(error){
+    function setStatus(id,message){
 
-    status.textContent =
-    error.message;
+      const element =
+        document.getElementById(id);
 
-    return;
+      if(element){
+        element.textContent = message || "";
+      }
 
-  }
+    }
 
-  if(data.user){
 
-    status.textContent =
-    "Account created! Please check your email and confirm your account before logging in.";
+    function authTab(tab){
 
-  }
+      document
+        .getElementById("loginPane")
+        .classList
+        .toggle(
+          "hidden",
+          tab !== "login"
+        );
 
-}
+      document
+        .getElementById("registerPane")
+        .classList
+        .toggle(
+          "hidden",
+          tab !== "register"
+        );
 
+      document
+        .getElementById("loginTab")
+        .classList
+        .toggle(
+          "active",
+          tab === "login"
+        );
 
-/* =========================================
-   LOGIN
-========================================= */
+      document
+        .getElementById("regTab")
+        .classList
+        .toggle(
+          "active",
+          tab === "register"
+        );
 
-async function login(){
+      setStatus("authStatus","");
 
-  const email =
-  document.getElementById("loginEmail").value.trim();
+    }
 
-  const password =
-  document.getElementById("loginPass").value;
 
-  const status =
-  document.getElementById("authStatus");
+    async function register(){
 
-  if(!email || !password){
+      if(!supabaseClient){
 
-    status.textContent =
-    "Please enter your email and password.";
+        setStatus(
+          "authStatus",
+          "❌ Add your Supabase URL and Anon Key first."
+        );
 
-    return;
+        return;
 
-  }
+      }
 
-  status.textContent =
-  "Logging in...";
 
-  const {
-    data,
-    error
-  } =
-  await supabase.auth.signInWithPassword({
+      const name =
+        document
+          .getElementById("regName")
+          .value
+          .trim();
 
-    email:email,
+      const email =
+        document
+          .getElementById("regEmail")
+          .value
+          .trim();
 
-    password:password
+      const password =
+        document
+          .getElementById("regPass")
+          .value;
 
-  });
+      const avatar =
+        document
+          .getElementById("regAvatar")
+          .value;
 
-  if(error){
 
-    status.textContent =
-    error.message;
+      if(!name || !email || !password){
 
-    return;
+        setStatus(
+          "authStatus",
+          "❌ Please complete all fields."
+        );
 
-  }
+        return;
 
-  currentUser = data.user;
+      }
 
-  await loadApp();
 
-}
+      setStatus(
+        "authStatus",
+        "Creating your Pixel account..."
+      );
 
 
-/* =========================================
-   LOGOUT
-========================================= */
+      const {
+        data,
+        error
+      } =
+      await supabaseClient.auth.signUp({
 
-async function logout(){
+        email:email,
 
-  await supabase.auth.signOut();
+        password:password,
 
-  currentUser = null;
-  currentProfile = null;
+        options:{
+          data:{
+            username:name,
+            avatar:avatar
+          }
+        }
 
-  document
-  .getElementById("appScreen")
-  .classList.add("hidden");
+      });
 
-  document
-  .getElementById("authScreen")
-  .classList.remove("hidden");
 
-}
+      if(error){
 
+        setStatus(
+          "authStatus",
+          "❌ " + error.message
+        );
 
-/* =========================================
-   CHECK SESSION
-========================================= */
+        return;
 
-async function checkSession(){
+      }
 
-  const {
-    data
-  } =
-  await supabase.auth.getSession();
 
-  if(data.session){
+      if(data.user){
 
-    currentUser =
-    data.session.user;
+        const isAdmin =
+          email.toLowerCase() ===
+          ADMIN_EMAIL.toLowerCase();
 
-    await loadApp();
 
-  }
+        const {
+          error:profileError
+        } =
+        await supabaseClient
+          .from("profiles")
+          .upsert({
 
-}
+            id:data.user.id,
 
+            username:name,
 
-/* =========================================
-   LOAD APP
-========================================= */
+            avatar:avatar,
 
-async function loadApp(){
+            bio:"PIXEL EXPLORER",
 
-  document
-  .getElementById("authScreen")
-  .classList.add("hidden");
+            level:1,
 
-  document
-  .getElementById("appScreen")
-  .classList.remove("hidden");
+            xp:0,
 
-  await loadProfile();
+            is_admin:isAdmin,
 
-  await loadPosts();
+            is_verified:isAdmin
 
-  await loadCommunity();
+          });
 
-  await loadLeaderboard();
 
-}
+        if(profileError){
 
+          console.error(profileError);
 
-/* =========================================
-   CREATE PROFILE IF MISSING
-========================================= */
+        }
 
-async function ensureProfile(){
+      }
 
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("profiles")
-  .select("*")
-  .eq("id",currentUser.id)
-  .maybeSingle();
 
-  if(error){
+      setStatus(
+        "authStatus",
+        "✅ Account created. Check your email if confirmation is required."
+      );
 
-    console.error(error);
+    }
 
-    return null;
 
-  }
+    async function login(){
 
-  if(data){
+      if(!supabaseClient){
 
-    return data;
+        setStatus(
+          "authStatus",
+          "❌ Add your Supabase URL and Anon Key first."
+        );
 
-  }
+        return;
 
-  const metadata =
-  currentUser.user_metadata || {};
+      }
 
-  const isAdmin =
-  currentUser.email.toLowerCase() ===
-  ADMIN_EMAIL.toLowerCase();
 
-  const profile = {
+      const email =
+        document
+          .getElementById("loginEmail")
+          .value
+          .trim();
 
-    id:currentUser.id,
+      const password =
+        document
+          .getElementById("loginPass")
+          .value;
 
-    username:
-    metadata.username ||
-    currentUser.email.split("@")[0],
 
-    avatar:
-    metadata.avatar || "👾",
+      if(!email || !password){
 
-    bio:"PIXEL EXPLORER",
+        setStatus(
+          "authStatus",
+          "❌ Enter your email and password."
+        );
 
-    xp:0,
+        return;
 
-    level:1,
+      }
 
-    is_admin:isAdmin,
 
-    is_verified:isAdmin,
+      setStatus(
+        "authStatus",
+        "Logging in..."
+      );
 
-    profile_image:null
 
-  };
+      const {
+        data,
+        error
+      } =
+      await supabaseClient.auth.signInWithPassword({
 
-  const {
-    data:newProfile,
-    error:insertError
-  } =
-  await supabase
-  .from("profiles")
-  .insert(profile)
-  .select()
-  .single();
+        email:email,
 
-  if(insertError){
+        password:password
 
-    console.error(insertError);
+      });
 
-    return null;
 
-  }
+      if(error){
 
-  return newProfile;
+        setStatus(
+          "authStatus",
+          "❌ " + error.message
+        );
 
-}
+        return;
 
+      }
 
-/* =========================================
-   LOAD PROFILE
-========================================= */
 
-async function loadProfile(){
+      currentUser =
+        data.user;
 
-  currentProfile =
-  await ensureProfile();
+      await startApp();
 
-  if(!currentProfile){
+    }
 
-    document.getElementById(
-      "authStatus"
-    ).textContent =
-    "Profile database is not ready. Please check your Supabase profiles table.";
 
-    return;
+    async function logout(){
 
-  }
+      if(supabaseClient){
 
-  updateProfileUI();
+        await supabaseClient.auth.signOut();
 
-  const {
-    count
-  } =
-  await supabase
-  .from("posts")
-  .select("*",{
-    count:"exact",
-    head:true
-  })
-  .eq("user_id",currentUser.id);
+      }
 
-  document.getElementById(
-    "statPosts"
-  ).textContent =
-  count || 0;
+      currentUser = null;
 
-}
+      currentProfile = null;
 
+      document
+        .getElementById("app")
+        .classList
+        .add("hidden");
 
-/* =========================================
-   UPDATE PROFILE UI
-========================================= */
+      document
+        .getElementById("authScreen")
+        .classList
+        .remove("hidden");
 
-function updateProfileUI(){
+    }
 
-  if(!currentProfile) return;
 
-  const name =
-  currentProfile.username ||
-  "PLAYER";
+    async function startApp(){
 
-  const bio =
-  currentProfile.bio ||
-  "PIXEL EXPLORER";
+      document
+        .getElementById("authScreen")
+        .classList
+        .add("hidden");
 
-  const avatar =
-  currentProfile.avatar ||
-  "👾";
+      document
+        .getElementById("app")
+        .classList
+        .remove("hidden");
 
-  document.getElementById(
-    "sideName"
-  ).textContent = name;
 
-  document.getElementById(
-    "profileName"
-  ).textContent = name;
+      await loadProfile();
 
-  document.getElementById(
-    "sideBio"
-  ).textContent = bio;
+      await loadPosts();
 
-  document.getElementById(
-    "profileBio"
-  ).textContent = bio;
+      await searchUsers();
 
-  document.getElementById(
-    "sideLevel"
-  ).textContent =
-  currentProfile.level || 1;
+      await loadLeaderboard();
 
-  document.getElementById(
-    "statLevel"
-  ).textContent =
-  currentProfile.level || 1;
+    }
 
-  document.getElementById(
-    "statXP"
-  ).textContent =
-  currentProfile.xp || 0;
 
-  document.getElementById(
-    "xpText"
-  ).textContent =
-  `${currentProfile.xp || 0} / 100 XP`;
+    async function loadProfile(){
 
-  document.getElementById(
-    "xpBar"
-  ).style.width =
-  `${Math.min(currentProfile.xp || 0,100)}%`;
+      if(!currentUser){
 
-  renderAvatar(
-    document.getElementById("sideAvatar"),
-    avatar,
-    currentProfile.profile_image,
-    true
-  );
+        return;
 
-  renderAvatar(
-    document.getElementById("profileAvatar"),
-    avatar,
-    currentProfile.profile_image,
-    true
-  );
+      }
 
-  renderAvatar(
-    document.getElementById("headAvatar"),
-    avatar,
-    currentProfile.profile_image,
-    false
-  );
 
-  renderBadges(
-    document.getElementById("sideBadges")
-  );
+      let {
+        data,
+        error
+      } =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .single();
 
-  renderBadges(
-    document.getElementById("profileBadges")
-  );
 
-}
+      if(error || !data){
 
+        const email =
+          currentUser.email
+            .toLowerCase();
 
-/* =========================================
-   AVATAR RENDER
-========================================= */
 
-function renderAvatar(
-  element,
-  emoji,
-  image,
-  online
-){
+        const isAdmin =
+          email ===
+          ADMIN_EMAIL.toLowerCase();
 
-  if(image){
 
-    element.innerHTML =
-    `<img src="${image}" alt="Profile">`;
+        const newProfile = {
 
-  }else{
+          id:currentUser.id,
 
-    element.textContent = emoji;
+          username:
+            currentUser
+              .user_metadata
+              ?.username ||
+            currentUser.email.split("@")[0],
 
-  }
+          avatar:
+            currentUser
+              .user_metadata
+              ?.avatar ||
+            "👾",
 
-  if(online){
+          bio:"PIXEL EXPLORER",
 
-    const dot =
-    document.createElement("span");
+          level:1,
 
-    dot.className = "online";
+          xp:0,
 
-    element.appendChild(dot);
+          is_admin:isAdmin,
 
-  }
+          is_verified:isAdmin
 
-}
+        };
 
 
-/* =========================================
-   BADGES
-========================================= */
+        const result =
+          await supabaseClient
+            .from("profiles")
+            .upsert(newProfile)
+            .select()
+            .single();
 
-function renderBadges(container){
 
-  if(!currentProfile) return;
+        data =
+          result.data ||
+          newProfile;
 
-  let html = "";
+      }
 
-  if(currentProfile.is_admin){
 
-    html +=
-    `<span class="badge admin-badge">👑 ADMIN</span>`;
+      if(
+        currentUser.email
+          .toLowerCase() ===
+        ADMIN_EMAIL.toLowerCase()
+      ){
 
-  }
+        data.is_admin = true;
 
-  if(currentProfile.is_verified){
+        data.is_verified = true;
 
-    html +=
-    `<span class="badge verify-badge">✓ VERIFIED</span>`;
+      }
 
-  }
 
-  container.innerHTML = html;
+      currentProfile =
+        data;
 
-}
 
+      updateProfileUI();
 
-/* =========================================
-   PROFILE EDITOR
-========================================= */
+    }
 
-function openProfile(){
 
-  document
-  .getElementById("profileEditor")
-  .classList.remove("hidden");
+    function avatarHTML(profile){
 
-  document.getElementById(
-    "editName"
-  ).value =
-  currentProfile.username || "";
+      if(profile.profile_image){
 
-  document.getElementById(
-    "editBio"
-  ).value =
-  currentProfile.bio || "";
+        return `
+          <img
+            src="${escapeHTML(profile.profile_image)}"
+            alt="Profile"
+          >
+        `;
 
-  document.getElementById(
-    "editAvatar"
-  ).value =
-  currentProfile.avatar || "👾";
+      }
 
-  renderAvatar(
-    document.getElementById("profilePreview"),
-    currentProfile.avatar || "👾",
-    currentProfile.profile_image,
-    false
-  );
+      return profile.avatar || "👾";
 
-}
+    }
 
 
-function closeProfile(){
+    function updateProfileUI(){
 
-  document
-  .getElementById("profileEditor")
-  .classList.add("hidden");
+      if(!currentProfile){
 
-  document
-  .getElementById("profileStatus")
-  .textContent = "";
+        return;
 
-}
+      }
 
 
-/* =========================================
-   PROFILE IMAGE PREVIEW
-========================================= */
+      document
+        .getElementById("sideName")
+        .textContent =
+          currentProfile.username;
 
-function previewProfileImage(){
 
-  const file =
-  document.getElementById(
-    "profileImage"
-  ).files[0];
+      document
+        .getElementById("profileName")
+        .textContent =
+          currentProfile.username;
 
-  if(!file) return;
 
-  previewImageURL =
-  URL.createObjectURL(file);
+      document
+        .getElementById("sideBio")
+        .textContent =
+          currentProfile.bio ||
+          "PIXEL EXPLORER";
 
-  document.getElementById(
-    "profilePreview"
-  ).innerHTML =
-  `<img src="${previewImageURL}" alt="Preview">`;
 
-}
+      document
+        .getElementById("profileBio")
+        .textContent =
+          currentProfile.bio ||
+          "PIXEL EXPLORER";
 
 
-/* =========================================
-   SAVE PROFILE
-========================================= */
+      document
+        .getElementById("sideAvatar")
+        .innerHTML =
+          avatarHTML(currentProfile) +
+          `<span class="online"></span>`;
 
-async function saveProfile(){
 
-  const status =
-  document.getElementById(
-    "profileStatus"
-  );
+      document
+        .getElementById("profileAvatar")
+        .innerHTML =
+          avatarHTML(currentProfile) +
+          `<span class="online"></span>`;
 
-  const username =
-  document.getElementById(
-    "editName"
-  ).value.trim();
 
-  const bio =
-  document.getElementById(
-    "editBio"
-  ).value.trim();
+      document
+        .getElementById("headAvatar")
+        .innerHTML =
+          currentProfile.profile_image
+            ? `<img
+                 src="${escapeHTML(currentProfile.profile_image)}"
+                 style="width:28px;height:28px;border-radius:50%;object-fit:cover"
+               >`
+            : currentProfile.avatar;
 
-  const avatar =
-  document.getElementById(
-    "editAvatar"
-  ).value;
 
-  const file =
-  document.getElementById(
-    "profileImage"
-  ).files[0];
+      const level =
+        Number(currentProfile.level || 1);
 
-  if(!username){
+      const xp =
+        Number(currentProfile.xp || 0);
 
-    status.textContent =
-    "Username is required.";
 
-    return;
+      document
+        .getElementById("sideLevel")
+        .textContent =
+          level;
 
-  }
 
-  status.textContent =
-  "Saving profile...";
+      document
+        .getElementById("statLevel")
+        .textContent =
+          level;
 
-  let imageUrl =
-  currentProfile.profile_image;
 
-  if(file){
+      document
+        .getElementById("statXP")
+        .textContent =
+          xp;
 
-    const extension =
-    file.name.split(".").pop();
 
-    const filePath =
-    `${currentUser.id}/avatar-${Date.now()}.${extension}`;
+      document
+        .getElementById("xpText")
+        .textContent =
+          `${xp % 100} / 100 XP`;
 
-    const {
-      error:uploadError
-    } =
-    await supabase.storage
-    .from("avatars")
-    .upload(
-      filePath,
-      file,
-      {
-        upsert:true
+
+      document
+        .getElementById("xpBar")
+        .style.width =
+          `${xp % 100}%`;
+
+
+      const badges =
+        getBadges(currentProfile);
+
+
+      document
+        .getElementById("sideBadges")
+        .innerHTML =
+          badges;
+
+
+      document
+        .getElementById("profileBadges")
+        .innerHTML =
+          badges;
+
+    }
+
+
+    function getBadges(profile){
+
+      let html = "";
+
+
+      const isAdmin =
+        profile.is_admin ||
+        (
+          currentUser &&
+          currentUser.email
+            .toLowerCase() ===
+          ADMIN_EMAIL.toLowerCase()
+        );
+
+
+      const isVerified =
+        profile.is_verified ||
+        isAdmin;
+
+
+      if(isAdmin){
+
+        html += `
+          <span class="badge-admin">
+            👑 ADMIN
+          </span>
+        `;
+
+      }
+
+
+      if(isVerified){
+
+        html += `
+          <span class="badge-verified">
+            ✓ VERIFIED
+          </span>
+        `;
+
+      }
+
+
+      return html;
+
+    }
+
+
+    function page(name,button){
+
+      document
+        .querySelectorAll(".page")
+        .forEach(
+          p => p.classList.remove("active")
+        );
+
+
+      const target =
+        document.getElementById(name);
+
+
+      if(target){
+
+        target.classList.add("active");
+
+      }
+
+
+      document
+        .querySelectorAll(".menu button")
+        .forEach(
+          b => b.classList.remove("active")
+        );
+
+
+      if(button){
+
+        button.classList.add("active");
+
+      }
+
+
+      if(name === "friends"){
+
+        searchUsers();
+
+      }
+
+
+      if(name === "leaderboard"){
+
+        loadLeaderboard();
+
+      }
+
+
+      if(name === "profile"){
+
+        loadPostCount();
+
+      }
+
+
+      window.scrollTo({
+        top:0,
+        behavior:"smooth"
+      });
+
+    }
+
+
+    function theme(){
+
+      document.body.classList.toggle("dark");
+
+    }
+
+
+    function openProfile(){
+
+      document
+        .getElementById("profileEditor")
+        .classList
+        .remove("hidden");
+
+
+      document
+        .getElementById("editName")
+        .value =
+          currentProfile.username ||
+          "";
+
+
+      document
+        .getElementById("editBio")
+        .value =
+          currentProfile.bio ||
+          "";
+
+
+      document
+        .getElementById("editAvatar")
+        .value =
+          currentProfile.avatar ||
+          "👾";
+
+
+      document
+        .getElementById("profilePreview")
+        .innerHTML =
+          avatarHTML(currentProfile);
+
+
+      setStatus(
+        "profileStatus",
+        ""
+      );
+
+    }
+
+
+    function closeProfile(){
+
+      document
+        .getElementById("profileEditor")
+        .classList
+        .add("hidden");
+
+    }
+
+
+    function previewProfileImage(){
+
+      const file =
+        document
+          .getElementById("profileImage")
+          .files[0];
+
+
+      if(!file){
+
+        return;
+
+      }
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(event){
+
+          document
+            .getElementById("profilePreview")
+            .innerHTML =
+              `<img src="${event.target.result}">`;
+
+        };
+
+
+      reader.readAsDataURL(file);
+
+    }
+
+
+    async function saveProfile(){
+
+      if(!currentUser){
+
+        return;
+
+      }
+
+
+      const name =
+        document
+          .getElementById("editName")
+          .value
+          .trim();
+
+
+      const bio =
+        document
+          .getElementById("editBio")
+          .value
+          .trim();
+
+
+      const avatar =
+        document
+          .getElementById("editAvatar")
+          .value;
+
+
+      if(!name){
+
+        setStatus(
+          "profileStatus",
+          "❌ Username is required."
+        );
+
+        return;
+
+      }
+
+
+      setStatus(
+        "profileStatus",
+        "Saving profile..."
+      );
+
+
+      let profileImage =
+        currentProfile.profile_image ||
+        null;
+
+
+      const file =
+        document
+          .getElementById("profileImage")
+          .files[0];
+
+
+      if(file){
+
+        const extension =
+          file.name.split(".").pop();
+
+
+        const filePath =
+          `${currentUser.id}/avatar.${extension}`;
+
+
+        const upload =
+          await supabaseClient
+            .storage
+            .from("avatars")
+            .upload(
+              filePath,
+              file,
+              {
+                upsert:true,
+                contentType:file.type
+              }
+            );
+
+
+        if(upload.error){
+
+          setStatus(
+            "profileStatus",
+            "❌ Image upload error: " +
+            upload.error.message
+          );
+
+          return;
+
+        }
+
+
+        const publicResult =
+          supabaseClient
+            .storage
+            .from("avatars")
+            .getPublicUrl(filePath);
+
+
+        profileImage =
+          publicResult.data.publicUrl;
+
+      }
+
+
+      const isAdmin =
+        currentUser.email
+          .toLowerCase() ===
+        ADMIN_EMAIL.toLowerCase();
+
+
+      const update = {
+
+        id:currentUser.id,
+
+        username:name,
+
+        bio:bio,
+
+        avatar:avatar,
+
+        profile_image:profileImage,
+
+        is_admin:
+          currentProfile.is_admin ||
+          isAdmin,
+
+        is_verified:
+          currentProfile.is_verified ||
+          isAdmin,
+
+        level:
+          currentProfile.level || 1,
+
+        xp:
+          currentProfile.xp || 0
+
+      };
+
+
+      const {
+        data,
+        error
+      } =
+      await supabaseClient
+        .from("profiles")
+        .upsert(update)
+        .select()
+        .single();
+
+
+      if(error){
+
+        setStatus(
+          "profileStatus",
+          "❌ " + error.message
+        );
+
+        return;
+
+      }
+
+
+      currentProfile =
+        data ||
+        update;
+
+
+      updateProfileUI();
+
+
+      setStatus(
+        "profileStatus",
+        "✅ Profile saved successfully!"
+      );
+
+
+      setTimeout(
+        closeProfile,
+        1000
+      );
+
+    }
+
+
+    async function createPost(){
+
+      if(!currentUser){
+
+        return;
+
+      }
+
+
+      const text =
+        document
+          .getElementById("postText")
+          .value
+          .trim();
+
+
+      if(!text){
+
+        setStatus(
+          "postStatus",
+          "❌ Write something before publishing."
+        );
+
+        return;
+
+      }
+
+
+      setStatus(
+        "postStatus",
+        "Publishing..."
+      );
+
+
+      let imageUrl =
+        null;
+
+
+      const file =
+        document
+          .getElementById("postImage")
+          .files[0];
+
+
+      if(file){
+
+        const filePath =
+          `${currentUser.id}/${Date.now()}-${file.name}`;
+
+
+        const upload =
+          await supabaseClient
+            .storage
+            .from("post-images")
+            .upload(
+              filePath,
+              file,
+              {
+                contentType:file.type
+              }
+            );
+
+
+        if(upload.error){
+
+          setStatus(
+            "postStatus",
+            "❌ Image upload error: " +
+            upload.error.message
+          );
+
+          return;
+
+        }
+
+
+        const publicResult =
+          supabaseClient
+            .storage
+            .from("post-images")
+            .getPublicUrl(filePath);
+
+
+        imageUrl =
+          publicResult.data.publicUrl;
+
+      }
+
+
+      const {
+        error
+      } =
+      await supabaseClient
+        .from("posts")
+        .insert({
+
+          user_id:
+            currentUser.id,
+
+          content:
+            text,
+
+          image_url:
+            imageUrl
+
+        });
+
+
+      if(error){
+
+        setStatus(
+          "postStatus",
+          "❌ " + error.message
+        );
+
+        return;
+
+      }
+
+
+      currentProfile.xp =
+        Number(currentProfile.xp || 0) +
+        10;
+
+
+      if(currentProfile.xp >= 100){
+
+        currentProfile.level =
+          Number(currentProfile.level || 1) +
+          Math.floor(
+            currentProfile.xp / 100
+          );
+
+      }
+
+
+      await supabaseClient
+        .from("profiles")
+        .update({
+
+          xp:
+            currentProfile.xp,
+
+          level:
+            currentProfile.level
+
+        })
+        .eq(
+          "id",
+          currentUser.id
+        );
+
+
+      updateProfileUI();
+
+
+      document
+        .getElementById("postText")
+        .value = "";
+
+
+      document
+        .getElementById("postImage")
+        .value = "";
+
+
+      setStatus(
+        "postStatus",
+        "✅ Post published! +10 XP"
+      );
+
+
+      await loadPosts();
+
+      await loadPostCount();
+
+      await loadLeaderboard();
+
+    }
+
+
+    async function loadPosts(){
+
+      const feed =
+        document.getElementById("feed");
+
+
+      feed.innerHTML =
+        `<div class="tiny">
+          Loading posts...
+        </div>`;
+
+
+      const {
+        data:posts,
+        error
+      } =
+      await supabaseClient
+        .from("posts")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending:false
+          }
+        );
+
+
+      if(error){
+
+        feed.innerHTML =
+          `<div class="card">
+            ❌ ${escapeHTML(error.message)}
+          </div>`;
+
+        return;
+
+      }
+
+
+      if(!posts || posts.length === 0){
+
+        feed.innerHTML =
+          `<div class="card">
+            No posts yet. Be the first Pixel Friend! 👾
+          </div>`;
+
+        return;
+
+      }
+
+
+      const userIds =
+        [...new Set(
+          posts.map(
+            post => post.user_id
+          )
+        )];
+
+
+      const {
+        data:profiles
+      } =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .in(
+          "id",
+          userIds
+        );
+
+
+      const profileMap =
+        {};
+
+
+      (profiles || [])
+        .forEach(
+          profile => {
+
+            profileMap[profile.id] =
+              profile;
+
+          }
+        );
+
+
+      feed.innerHTML =
+        posts
+          .map(
+            post => {
+
+              const profile =
+                profileMap[post.user_id] ||
+                {
+                  username:"PLAYER",
+                  avatar:"👾"
+                };
+
+
+              return `
+                <div class="post">
+
+                  <div class="post-head">
+
+                    <div class="post-avatar">
+                      ${avatarHTML(profile)}
+                    </div>
+
+                    <div>
+
+                      <strong>
+                        ${escapeHTML(profile.username)}
+                      </strong>
+
+                      <div class="tiny">
+                        ${getBadges(profile)}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div>
+                    ${formatText(post.content)}
+                  </div>
+
+                  ${
+                    post.image_url
+                    ? `
+                      <img
+                        class="post-image"
+                        src="${escapeHTML(post.image_url)}"
+                      >
+                    `
+                    : ""
+                  }
+
+                </div>
+              `;
+
+            }
+          )
+          .join("");
+
+    }
+
+
+    async function searchUsers(){
+
+      const search =
+        (
+          document
+            .getElementById("friendSearch")
+            ?.value ||
+
+          document
+            .getElementById("globalSearch")
+            ?.value ||
+
+          ""
+        )
+        .trim();
+
+
+      let query =
+        supabaseClient
+          .from("profiles")
+          .select("*")
+          .order(
+            "xp",
+            {
+              ascending:false
+            }
+          )
+          .limit(30);
+
+
+      if(search){
+
+        query =
+          query.ilike(
+            "username",
+            `%${search}%`
+          );
+
+      }
+
+
+      const {
+        data,
+        error
+      } =
+      await query;
+
+
+      const results =
+        document
+          .getElementById("searchResults");
+
+
+      if(!results){
+
+        return;
+
+      }
+
+
+      if(error){
+
+        results.innerHTML =
+          `<div class="card">
+            ❌ ${escapeHTML(error.message)}
+          </div>`;
+
+        return;
+
+      }
+
+
+      results.innerHTML =
+        (data || [])
+          .map(
+            profile => `
+              <div class="user-card">
+
+                <div class="avatar">
+                  ${avatarHTML(profile)}
+                </div>
+
+                <strong>
+                  ${escapeHTML(profile.username)}
+                </strong>
+
+                <div class="badges">
+                  ${getBadges(profile)}
+                </div>
+
+                <p class="tiny">
+                  Level ${profile.level || 1}
+                  •
+                  ${profile.xp || 0} XP
+                </p>
+
+              </div>
+            `
+          )
+          .join("");
+
+    }
+
+
+    async function loadLeaderboard(){
+
+      const {
+        data,
+        error
+      } =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .order(
+          "xp",
+          {
+            ascending:false
+          }
+        )
+        .limit(20);
+
+
+      const leaders =
+        document
+          .getElementById("leaders");
+
+
+      if(error){
+
+        leaders.innerHTML =
+          `❌ ${escapeHTML(error.message)}`;
+
+        return;
+
+      }
+
+
+      leaders.innerHTML =
+        (data || [])
+          .map(
+            (profile,index) => `
+              <div class="leader">
+
+                <strong>
+                  #${index + 1}
+                </strong>
+
+                <div class="post-avatar">
+                  ${avatarHTML(profile)}
+                </div>
+
+                <div style="flex:1">
+
+                  <strong>
+                    ${escapeHTML(profile.username)}
+                  </strong>
+
+                  <div class="badges">
+                    ${getBadges(profile)}
+                  </div>
+
+                </div>
+
+                <strong>
+                  LV.${profile.level || 1}
+                  •
+                  ${profile.xp || 0} XP
+                </strong>
+
+              </div>
+            `
+          )
+          .join("");
+
+    }
+
+
+    async function loadPostCount(){
+
+      if(!currentUser){
+
+        return;
+
+      }
+
+
+      const {
+        count
+      } =
+      await supabaseClient
+        .from("posts")
+        .select(
+          "*",
+          {
+            count:"exact",
+            head:true
+          }
+        )
+        .eq(
+          "user_id",
+          currentUser.id
+        );
+
+
+      document
+        .getElementById("statPosts")
+        .textContent =
+          count || 0;
+
+    }
+
+
+    function escapeHTML(value){
+
+      if(value === null || value === undefined){
+
+        return "";
+
+      }
+
+
+      return String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+    }
+
+
+    function formatText(text){
+
+      return escapeHTML(text)
+        .replace(
+          /\n/g,
+          "<br>"
+        );
+
+    }
+
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      async () => {
+
+        if(!supabaseClient){
+
+          return;
+
+        }
+
+
+        const {
+          data
+        } =
+        await supabaseClient
+          .auth
+          .getSession();
+
+
+        if(data.session){
+
+          currentUser =
+            data.session.user;
+
+          await startApp();
+
+        }
+
+
+        supabaseClient
+          .auth
+          .onAuthStateChange(
+            async (
+              event,
+              session
+            ) => {
+
+              if(
+                event === "SIGNED_IN" &&
+                session
+              ){
+
+                currentUser =
+                  session.user;
+
+              }
+
+
+              if(
+                event === "SIGNED_OUT"
+              ){
+
+                currentUser = null;
+
+              }
+
+            }
+          );
+
       }
     );
 
-    if(uploadError){
-
-      status.textContent =
-      `Image upload error: ${uploadError.message}`;
-
-      return;
-
-    }
-
-    const {
-      data:urlData
-    } =
-    supabase.storage
-    .from("avatars")
-    .getPublicUrl(filePath);
-
-    imageUrl =
-    urlData.publicUrl;
-
-  }
-
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("profiles")
-  .update({
-
-    username:username,
-
-    bio:bio,
-
-    avatar:avatar,
-
-    profile_image:imageUrl
-
-  })
-  .eq("id",currentUser.id)
-  .select()
-  .single();
-
-  if(error){
-
-    status.textContent =
-    error.message;
-
-    return;
-
-  }
-
-  currentProfile = data;
-
-  updateProfileUI();
-
-  status.textContent =
-  "Profile saved successfully!";
-
-  setTimeout(
-    closeProfile,
-    1200
-  );
-
-}
-
-
-/* =========================================
-   CREATE POST
-========================================= */
-
-async function createPost(){
-
-  const text =
-  document.getElementById(
-    "postText"
-  ).value.trim();
-
-  const file =
-  document.getElementById(
-    "postImage"
-  ).files[0];
-
-  const status =
-  document.getElementById(
-    "postStatus"
-  );
-
-  if(!text && !file){
-
-    status.textContent =
-    "Write something or select an image.";
-
-    return;
-
-  }
-
-  status.textContent =
-  "Publishing post...";
-
-  let imageUrl = null;
-
-  if(file){
-
-    const extension =
-    file.name.split(".").pop();
-
-    const path =
-    `${currentUser.id}/post-${Date.now()}.${extension}`;
-
-    const {
-      error:uploadError
-    } =
-    await supabase.storage
-    .from("posts")
-    .upload(path,file);
-
-    if(uploadError){
-
-      status.textContent =
-      uploadError.message;
-
-      return;
-
-    }
-
-    const {
-      data:urlData
-    } =
-    supabase.storage
-    .from("posts")
-    .getPublicUrl(path);
-
-    imageUrl =
-    urlData.publicUrl;
-
-  }
-
-  const {
-    error
-  } =
-  await supabase
-  .from("posts")
-  .insert({
-
-    user_id:currentUser.id,
-
-    content:text,
-
-    image_url:imageUrl
-
-  });
-
-  if(error){
-
-    status.textContent =
-    error.message;
-
-    return;
-
-  }
-
-  document.getElementById(
-    "postText"
-  ).value = "";
-
-  document.getElementById(
-    "postImage"
-  ).value = "";
-
-  currentProfile.xp =
-  (currentProfile.xp || 0) + 10;
-
-  if(currentProfile.xp >= 100){
-
-    currentProfile.level =
-    (currentProfile.level || 1) + 1;
-
-    currentProfile.xp =
-    0;
-
-  }
-
-  await supabase
-  .from("profiles")
-  .update({
-
-    xp:currentProfile.xp,
-
-    level:currentProfile.level
-
-  })
-  .eq("id",currentUser.id);
-
-  status.textContent =
-  "Post published! +10 XP";
-
-  await loadProfile();
-
-  await loadPosts();
-
-}
-
-
-/* =========================================
-   LOAD POSTS
-========================================= */
-
-async function loadPosts(){
-
-  const feed =
-  document.getElementById("feed");
-
-  feed.innerHTML =
-  `<div class="tiny">Loading posts...</div>`;
-
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("posts")
-  .select(`
-    *,
-    profiles (
-      username,
-      avatar,
-      profile_image,
-      is_admin,
-      is_verified
-    )
-  `)
-  .order(
-    "created_at",
-    {
-      ascending:false
-    }
-  );
-
-  if(error){
-
-    feed.innerHTML =
-    `<div class="tiny">${error.message}</div>`;
-
-    return;
-
-  }
-
-  if(!data || data.length === 0){
-
-    feed.innerHTML =
-    `<div class="card">
-      No posts yet. Be the first Pixel Friend!
-    </div>`;
-
-    return;
-
-  }
-
-  feed.innerHTML =
-  data.map(post => {
-
-    const p =
-    post.profiles || {};
-
-    const avatarHtml =
-    p.profile_image
-    ?
-    `<img src="${p.profile_image}">`
-    :
-    (p.avatar || "👾");
-
-    let badges = "";
-
-    if(p.is_admin){
-
-      badges +=
-      `<span class="badge admin-badge">👑 ADMIN</span>`;
-
-    }
-
-    if(p.is_verified){
-
-      badges +=
-      `<span class="badge verify-badge">✓ VERIFIED</span>`;
-
-    }
-
-    return `
-    <div class="post">
-
-      <div class="post-head">
-
-        <div class="post-avatar">
-          ${avatarHtml}
-        </div>
-
-        <div>
-
-          <strong>
-            ${escapeHtml(p.username || "PLAYER")}
-          </strong>
-
-          <div>
-            ${badges}
-          </div>
-
-          <div class="tiny">
-            ${new Date(post.created_at).toLocaleString()}
-          </div>
-
-        </div>
-
-      </div>
-
-      ${
-        post.content
-        ?
-        `<p>${escapeHtml(post.content)}</p>`
-        :
-        ""
-      }
-
-      ${
-        post.image_url
-        ?
-        `<img
-          class="post-image"
-          src="${post.image_url}"
-        >`
-        :
-        ""
-      }
-
-    </div>
-    `;
-
-  }).join("");
-
-}
-
-
-/* =========================================
-   COMMUNITY SEARCH
-========================================= */
-
-async function loadCommunity(){
-
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("profiles")
-  .select("*")
-  .order(
-    "xp",
-    {
-      ascending:false
-    }
-  );
-
-  if(error){
-
-    console.error(error);
-
-    return;
-
-  }
-
-  renderUsers(data || []);
-
-}
-
-
-async function searchUsers(){
-
-  const global =
-  document.getElementById(
-    "globalSearch"
-  );
-
-  const friend =
-  document.getElementById(
-    "friendSearch"
-  );
-
-  const term =
-  (
-    friend?.value ||
-    global?.value ||
-    ""
-  )
-  .trim()
-  .toLowerCase();
-
-  if(!term){
-
-    await loadCommunity();
-
-    return;
-
-  }
-
-  const {
-    data
-  } =
-  await supabase
-  .from("profiles")
-  .select("*")
-  .ilike(
-    "username",
-    `%${term}%`
-  );
-
-  renderUsers(data || []);
-
-}
-
-
-function renderUsers(users){
-
-  const container =
-  document.getElementById(
-    "searchResults"
-  );
-
-  if(!container) return;
-
-  container.innerHTML =
-  users.map(user => {
-
-    const avatar =
-    user.profile_image
-    ?
-    `<img src="${user.profile_image}">`
-    :
-    (user.avatar || "👾");
-
-    return `
-    <div class="user-card">
-
-      <div class="user-avatar">
-        ${avatar}
-      </div>
-
-      <h3>
-        ${escapeHtml(user.username || "PLAYER")}
-      </h3>
-
-      <div class="badges">
-
-        ${
-          user.is_admin
-          ?
-          `<span class="badge admin-badge">👑 ADMIN</span>`
-          :
-          ""
-        }
-
-        ${
-          user.is_verified
-          ?
-          `<span class="badge verify-badge">✓ VERIFIED</span>`
-          :
-          ""
-        }
-
-      </div>
-
-      <p class="tiny">
-        ${escapeHtml(user.bio || "PIXEL EXPLORER")}
-      </p>
-
-      <strong>
-        LEVEL ${user.level || 1}
-      </strong>
-
-    </div>
-    `;
-
-  }).join("");
-
-}
-
-
-/* =========================================
-   LEADERBOARD
-========================================= */
-
-async function loadLeaderboard(){
-
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("profiles")
-  .select("*")
-  .order(
-    "level",
-    {
-      ascending:false
-    }
-  )
-  .order(
-    "xp",
-    {
-      ascending:false
-    }
-  )
-  .limit(50);
-
-  const leaders =
-  document.getElementById(
-    "leaders"
-  );
-
-  if(error){
-
-    leaders.textContent =
-    error.message;
-
-    return;
-
-  }
-
-  leaders.innerHTML =
-  (data || []).map(
-    (user,index) => {
-
-      const avatar =
-      user.profile_image
-      ?
-      `<img
-        src="${user.profile_image}"
-        style="
-          width:40px;
-          height:40px;
-          border-radius:50%;
-          object-fit:cover;
-        "
-      >`
-      :
-      (user.avatar || "👾");
-
-      return `
-      <div
-        style="
-          display:flex;
-          align-items:center;
-          gap:12px;
-          padding:14px;
-          border-bottom:1px solid var(--border);
-        "
-      >
-
-        <strong>
-          #${index + 1}
-        </strong>
-
-        <div
-          style="
-            width:45px;
-            height:45px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:25px;
-          "
-        >
-          ${avatar}
-        </div>
-
-        <div style="flex:1">
-
-          <strong>
-            ${escapeHtml(user.username || "PLAYER")}
-          </strong>
-
-          ${
-            user.is_admin
-            ?
-            `<span class="badge admin-badge">👑 ADMIN</span>`
-            :
-            ""
-          }
-
-          ${
-            user.is_verified
-            ?
-            `<span class="badge verify-badge">✓ VERIFIED</span>`
-            :
-            ""
-          }
-
-          <div class="tiny">
-            LEVEL ${user.level || 1}
-            •
-            ${user.xp || 0} XP
-          </div>
-
-        </div>
-
-      </div>
-      `;
-
-    }
-  ).join("");
-
-}
-
-
-/* =========================================
-   PAGE NAVIGATION
-========================================= */
-
-function page(
-  pageId,
-  button
-){
-
-  document
-  .querySelectorAll(".page")
-  .forEach(p => {
-
-    p.classList.remove("active");
-
-  });
-
-  const target =
-  document.getElementById(pageId);
-
-  if(target){
-
-    target.classList.add("active");
-
-  }
-
-  document
-  .querySelectorAll(".menu button")
-  .forEach(btn => {
-
-    btn.classList.remove("active");
-
-  });
-
-  if(button){
-
-    button.classList.add("active");
-
-  }
-
-  if(pageId === "friends"){
-
-    loadCommunity();
-
-  }
-
-  if(pageId === "leaderboard"){
-
-    loadLeaderboard();
-
-  }
-
-}
-
-
-/* =========================================
-   THEME
-========================================= */
-
-function theme(){
-
-  document.body.classList.toggle("dark");
-
-  localStorage.setItem(
-    "pixelTheme",
-    document.body.classList.contains("dark")
-    ? "dark"
-    : "light"
-  );
-
-}
-
-
-/* =========================================
-   ESCAPE HTML
-========================================= */
-
-function escapeHtml(value){
-
-  const div =
-  document.createElement("div");
-
-  div.textContent =
-  value || "";
-
-  return div.innerHTML;
-
-}
-
-
-/* =========================================
-   RESTORE THEME
-========================================= */
-
-if(
-  localStorage.getItem("pixelTheme")
-  === "dark"
-){
-
-  document.body.classList.add("dark");
-
-}
-
-
-/* =========================================
-   AUTH STATE
-========================================= */
-
-supabase.auth.onAuthStateChange(
-  async (
-    event,
-    session
-  ) => {
-
-    if(
-      event === "SIGNED_OUT"
-    ){
-
-      currentUser = null;
-      currentProfile = null;
-
-    }
-
-  }
-);
-
-
-/* =========================================
-   START APP
-========================================= */
-
-checkSession();
-
-</script>
+  </script>
 
 </body>
 </html>
