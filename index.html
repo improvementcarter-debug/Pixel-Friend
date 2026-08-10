@@ -1,3092 +1,567 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Pixel Friend</title>
-
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-
-    :root{
-      --bg:#eef1f7;
-      --card:#ffffff;
-      --text:#26364a;
-      --muted:#718096;
-      --border:#d9dfeb;
-      --primary:#6557d6;
-      --primary2:#5748c5;
-      --danger:#c95a52;
-      --shadow:0 10px 35px rgba(30,40,70,.08);
-    }
-
-    body.dark{
-      --bg:#171b26;
-      --card:#222838;
-      --text:#edf1f8;
-      --muted:#aeb7c7;
-      --border:#394156;
-      --shadow:0 10px 35px rgba(0,0,0,.3);
-    }
-
-    *{
-      box-sizing:border-box;
-    }
-
-    body{
-      margin:0;
-      font-family:Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    button,
-    input,
-    textarea,
-    select{
-      font:inherit;
-    }
-
-    button{
-      cursor:pointer;
-    }
-
-    input,
-    textarea,
-    select{
-      width:100%;
-      padding:13px;
-      margin:7px 0;
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:var(--bg);
-      color:var(--text);
-      outline:none;
-    }
-
-    textarea{
-      min-height:100px;
-      resize:vertical;
-    }
-
-    .hidden{
-      display:none !important;
-    }
-
-    .auth-screen{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-    }
-
-    .auth-card{
-      width:100%;
-      max-width:430px;
-      background:var(--card);
-      padding:35px;
-      border:1px solid var(--border);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      text-align:center;
-    }
-
-    .logo{
-      font-size:28px;
-      font-weight:900;
-      letter-spacing:4px;
-      margin-bottom:8px;
-    }
-
-    .logo-icon{
-      font-size:50px;
-      margin-bottom:10px;
-    }
-
-    .tagline{
-      font-size:11px;
-      font-weight:bold;
-      letter-spacing:1px;
-      color:var(--muted);
-      margin-bottom:25px;
-    }
-
-    .tabs{
-      display:flex;
-      gap:8px;
-      margin-bottom:18px;
-    }
-
-    .tabs button{
-      flex:1;
-      border:0;
-      padding:12px;
-      border-radius:9px;
-      background:#e5e9f1;
-      color:var(--text);
-      font-weight:bold;
-    }
-
-    .tabs button.active{
-      background:var(--primary);
-      color:white;
-    }
-
-    .primary{
-      border:0;
-      background:var(--primary);
-      color:white;
-      padding:13px 18px;
-      border-radius:9px;
-      font-weight:bold;
-    }
-
-    .primary:hover{
-      background:var(--primary2);
-    }
-
-    .secondary{
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--text);
-      padding:12px 18px;
-      border-radius:9px;
-      font-weight:bold;
-    }
-
-    .blue{
-      border:0;
-      background:#4d7fe8;
-      color:white;
-      padding:12px 18px;
-      border-radius:9px;
-      font-weight:bold;
-    }
-
-    .danger{
-      color:var(--danger) !important;
-    }
-
-    .status{
-      min-height:24px;
-      margin-top:12px;
-      font-size:13px;
-      color:var(--muted);
-    }
-
-    .error{
-      color:#d9534f;
-    }
-
-    .success{
-      color:#28a745;
-    }
-
-    .tiny{
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    /* APP */
-
-    #app{
-      min-height:100vh;
-    }
-
-    .topbar{
-      height:64px;
-      background:var(--card);
-      border-bottom:1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding:0 20px;
-      position:sticky;
-      top:0;
-      z-index:10;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-weight:900;
-      letter-spacing:3px;
-      cursor:pointer;
-    }
-
-    .brand-icon{
-      font-size:22px;
-    }
-
-    .actions{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .actions input{
-      width:220px;
-      margin:0;
-      padding:9px 12px;
-    }
-
-    .icon{
-      border:0;
-      background:transparent;
-      font-size:20px;
-      padding:7px;
-    }
-
-    .layout{
-      display:flex;
-      min-height:calc(100vh - 64px);
-    }
-
-    .side{
-      width:240px;
-      background:var(--card);
-      border-right:1px solid var(--border);
-      padding:20px 14px;
-    }
-
-    .mini{
-      text-align:center;
-      padding-bottom:20px;
-    }
-
-    .avatar,
-    .profile-main-avatar{
-      width:72px;
-      height:72px;
-      margin:auto;
-      border-radius:50%;
-      background:linear-gradient(135deg,#8f9eb7,#d9e1ec);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:38px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .avatar img,
-    .profile-main-avatar img,
-    .profile-image-preview img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .big{
-      margin-top:10px;
-    }
-
-    .online{
-      position:absolute;
-      width:13px;
-      height:13px;
-      border-radius:50%;
-      background:#2ecc71;
-      border:2px solid white;
-      right:4px;
-      bottom:4px;
-    }
-
-    .badges{
-      margin:8px 0;
-    }
-
-    .badge{
-      display:inline-block;
-      padding:5px 9px;
-      border-radius:20px;
-      background:#ebe9ff;
-      color:#5e52bd;
-      font-size:10px;
-      font-weight:bold;
-    }
-
-    .xp{
-      height:8px;
-      background:#e3e7ee;
-      border-radius:10px;
-      overflow:hidden;
-      margin-top:8px;
-    }
-
-    #xpBar{
-      width:0%;
-      height:100%;
-      background:var(--primary);
-      transition:.3s;
-    }
-
-    .menu{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .menu button{
-      text-align:left;
-      border:0;
-      background:transparent;
-      padding:13px;
-      border-radius:9px;
-      color:var(--text);
-      font-weight:bold;
-    }
-
-    .menu button.active{
-      background:#e7e5fa;
-      color:var(--primary);
-    }
-
-    main{
-      flex:1;
-      padding:25px;
-      max-width:1200px;
-    }
-
-    .page{
-      display:none;
-    }
-
-    .page.active{
-      display:block;
-    }
-
-    .hero{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      background:linear-gradient(135deg,#6457d8,#8a80e8);
-      color:white;
-      padding:30px;
-      border-radius:18px;
-      margin-bottom:20px;
-    }
-
-    .hero h1{
-      margin:0 0 8px;
-    }
-
-    .hero-icon{
-      font-size:60px;
-    }
-
-    .card{
-      background:var(--card);
-      border:1px solid var(--border);
-      box-shadow:var(--shadow);
-      padding:20px;
-      border-radius:16px;
-      margin-bottom:18px;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-
-    .wrap{
-      flex-wrap:wrap;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-      gap:15px;
-    }
-
-    .user-card{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:15px;
-      padding:18px;
-      text-align:center;
-    }
-
-    .user-card .avatar{
-      width:60px;
-      height:60px;
-      font-size:30px;
-    }
-
-    .user-card button{
-      width:100%;
-      margin-top:10px;
-    }
-
-    .stat-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-top:20px;
-    }
-
-    .stat{
-      padding:16px;
-      background:var(--bg);
-      border-radius:12px;
-      font-size:11px;
-    }
-
-    .stat strong{
-      display:block;
-      font-size:25px;
-      margin-bottom:5px;
-    }
-
-    .profile-main-avatar{
-      width:110px;
-      height:110px;
-      font-size:55px;
-    }
-
-    .profile-image-preview{
-      width:100px;
-      height:100px;
-      margin:10px auto;
-      border-radius:50%;
-      overflow:hidden;
-      background:var(--bg);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:45px;
-    }
-
-    .post{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:15px;
-      padding:18px;
-      margin-bottom:15px;
-    }
-
-    .post-header{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin-bottom:12px;
-    }
-
-    .post-avatar{
-      width:45px;
-      height:45px;
-      border-radius:50%;
-      background:#e4e7ee;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    .post-avatar img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .post-image{
-      width:100%;
-      max-height:400px;
-      object-fit:cover;
-      border-radius:12px;
-      margin-top:12px;
-    }
-
-    /* MESSAGES */
-
-    .messages-layout{
-      display:grid;
-      grid-template-columns:260px 1fr;
-      min-height:500px;
-    }
-
-    .chat-users{
-      border-right:1px solid var(--border);
-      padding-right:15px;
-    }
-
-    .chat-user{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px;
-      border-radius:10px;
-      cursor:pointer;
-      margin-bottom:5px;
-    }
-
-    .chat-user:hover,
-    .chat-user.selected{
-      background:var(--bg);
-    }
-
-    .chat-user-avatar{
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      background:#e4e7ee;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      flex-shrink:0;
-    }
-
-    .chat-user-avatar img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-    }
-
-    .chat-main{
-      padding-left:20px;
-      display:flex;
-      flex-direction:column;
-      min-width:0;
-    }
-
-    .chat-header{
-      padding-bottom:12px;
-      border-bottom:1px solid var(--border);
-    }
-
-    .messages-list{
-      flex:1;
-      min-height:350px;
-      max-height:500px;
-      overflow-y:auto;
-      padding:20px 0;
-    }
-
-    .message{
-      max-width:75%;
-      padding:10px 13px;
-      margin:8px 0;
-      border-radius:14px;
-      background:var(--bg);
-    }
-
-    .message.mine{
-      margin-left:auto;
-      background:var(--primary);
-      color:white;
-    }
-
-    .message-time{
-      font-size:9px;
-      opacity:.7;
-      margin-top:4px;
-    }
-
-    .chat-input{
-      display:flex;
-      gap:8px;
-    }
-
-    .chat-input input{
-      margin:0;
-    }
-
-    .empty{
-      text-align:center;
-      color:var(--muted);
-      padding:40px 10px;
-    }
-
-    .leader{
-      display:flex;
-      align-items:center;
-      gap:15px;
-      padding:12px;
-      border-bottom:1px solid var(--border);
-    }
-
-    .leader-number{
-      font-weight:bold;
-      font-size:20px;
-      width:35px;
-    }
-
-    @media(max-width:800px){
-
-      .side{
-        width:190px;
-      }
-
-      .messages-layout{
-        grid-template-columns:1fr;
-      }
-
-      .chat-users{
-        border-right:0;
-        border-bottom:1px solid var(--border);
-        padding-right:0;
-        padding-bottom:15px;
-      }
-
-      .chat-main{
-        padding-left:0;
-        padding-top:15px;
-      }
-
-      .actions input{
-        width:140px;
-      }
-
-    }
-
-    @media(max-width:600px){
-
-      .topbar{
-        padding:0 10px;
-      }
-
-      .brand{
-        font-size:12px;
-        letter-spacing:1px;
-      }
-
-      .actions input{
-        display:none;
-      }
-
-      .layout{
-        flex-direction:column;
-      }
-
-      .side{
-        width:100%;
-        border-right:0;
-        border-bottom:1px solid var(--border);
-      }
-
-      .mini{
-        display:none;
-      }
-
-      .menu{
-        flex-direction:row;
-        overflow-x:auto;
-      }
-
-      .menu button{
-        white-space:nowrap;
-      }
-
-      main{
-        padding:15px;
-      }
-
-      .hero{
-        padding:20px;
-      }
-
-      .hero h1{
-        font-size:22px;
-      }
-
-      .hero-icon{
-        font-size:40px;
-      }
-
-      .mobile-stack{
-        flex-direction:column;
-      }
-
-      .mobile-stack button{
-        width:100%;
-      }
-
-      .stat-grid{
-        grid-template-columns:1fr;
-      }
-
-    }
-
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Friend</title>
+
+<!--
+PIXEL FRIEND — SINGLE FILE VERSION
+
+SUPABASE DATABASE SETUP (run this ONCE in Supabase SQL Editor):
+
+create table if not exists public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  username text not null default 'PLAYER',
+  bio text default 'PIXEL EXPLORER',
+  avatar text default '👾',
+  avatar_url text,
+  xp integer not null default 0,
+  level integer not null default 1,
+  role text not null default 'user',
+  created_at timestamptz default now()
+);
+
+create table if not exists public.posts (
+  id bigint generated by default as identity primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  content text not null,
+  image_url text,
+  created_at timestamptz default now()
+);
+
+alter table public.profiles enable row level security;
+alter table public.posts enable row level security;
+
+drop policy if exists "profiles readable" on public.profiles;
+create policy "profiles readable" on public.profiles
+for select using (true);
+
+drop policy if exists "users update own profile" on public.profiles;
+create policy "users update own profile" on public.profiles
+for update using (auth.uid() = id);
+
+drop policy if exists "users insert own profile" on public.profiles;
+create policy "users insert own profile" on public.profiles
+for insert with check (auth.uid() = id);
+
+drop policy if exists "posts readable" on public.posts;
+create policy "posts readable" on public.posts
+for select using (true);
+
+drop policy if exists "users create own posts" on public.posts;
+create policy "users create own posts" on public.posts
+for insert with check (auth.uid() = user_id);
+
+STORAGE:
+You already have a PUBLIC bucket named: avatars
+-->
+
+<!-- IMPORTANT SUPABASE SQL (run once in SQL Editor):
+create table if not exists public.messages (
+ id bigint generated by default as identity primary key,
+ sender_id uuid references auth.users(id) on delete cascade not null,
+ receiver_id uuid references auth.users(id) on delete cascade not null,
+ content text not null check (char_length(content) <= 2000),
+ created_at timestamptz default now()
+);
+alter table public.messages enable row level security;
+drop policy if exists "users read own messages" on public.messages;
+create policy "users read own messages" on public.messages for select using (auth.uid()=sender_id or auth.uid()=receiver_id);
+drop policy if exists "users send messages" on public.messages;
+create policy "users send messages" on public.messages for insert with check (auth.uid()=sender_id);
+-- In Database > Replication, enable realtime for public.messages.
+-->
+<style>
+:root{
+  --bg:#e9edf5;--panel:#fff;--text:#27364a;--muted:#708096;
+  --purple:#6559d9;--purple2:#5145c8;--line:#d8deea;
+  --danger:#d9534f;--success:#1e9b62;--shadow:0 12px 30px rgba(34,45,70,.12)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0}
+.hidden{display:none!important}
+.status{min-height:22px;margin-top:12px;text-align:center;font-size:13px;color:var(--muted)}
+.status.error{color:#c43c36}.status.success{color:var(--success)}
+.auth-screen{min-height:100vh;display:grid;place-items:center;padding:20px}
+.auth-card{width:min(420px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:34px;box-shadow:var(--shadow)}
+.logo{text-align:center;font-size:28px;font-weight:900;letter-spacing:3px}
+.logo-icon{font-size:52px;margin-bottom:8px}
+.tagline{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);margin:12px 0 24px}
+.tabs{display:flex;gap:8px;margin-bottom:24px}.tabs button{flex:1;padding:12px;border-radius:9px;background:#e8edf5;font-weight:800;color:var(--text)}
+.tabs button.active{background:var(--purple);color:#fff}
+input,textarea,select{width:100%;border:1px solid #cfd7e5;border-radius:9px;padding:13px;margin:7px 0;background:#f7f9fc;color:var(--text);outline:none}
+textarea{min-height:100px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(101,89,217,.12)}
+.primary,.blue{background:var(--purple);color:#fff;font-weight:800;padding:12px 16px;border-radius:9px}.primary:hover,.blue:hover{background:var(--purple2)}
+.secondary{background:#e8edf5;color:var(--text);font-weight:800;padding:12px 16px;border-radius:9px}
+.danger{background:transparent!important;color:var(--danger)!important}
+.app{min-height:100vh}.topbar{height:68px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:15px;position:sticky;top:0;z-index:10}
+.brand{display:flex;align-items:center;gap:9px;font-size:20px;font-weight:900;letter-spacing:2px;cursor:pointer}.brand-icon{font-size:28px}
+.actions{display:flex;align-items:center;gap:8px}.actions input{width:220px;margin:0;padding:10px}.icon{width:42px;height:42px;border-radius:9px;background:#edf1f7;font-size:18px}
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 68px)}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:20px}
+.mini{text-align:center}.avatar{position:relative;width:76px;height:76px;border-radius:50%;background:#eceaff;margin:auto;display:grid;place-items:center;font-size:38px;overflow:hidden;border:3px solid #fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}.avatar img,.profile-main-avatar img,.profile-image-preview img{width:100%;height:100%;object-fit:cover}
+.online{position:absolute;width:14px;height:14px;background:#20b56b;border:2px solid #fff;border-radius:50%;right:4px;bottom:4px}
+.tiny{font-size:12px;color:var(--muted)}.badges{min-height:22px}.badge{display:inline-block;background:#eeeaff;color:#5145c8;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;margin:2px}
+.xp{height:10px;background:#e6eaf1;border-radius:999px;overflow:hidden;margin-top:8px}.xp>div{height:100%;width:0;background:var(--purple);transition:.3s}
+.menu{display:grid;gap:7px;margin-top:25px}.menu button{text-align:left;padding:13px;border-radius:9px;background:transparent;font-weight:800;color:var(--text)}.menu button.active{background:#eceaff;color:#5145c8}
+main{padding:26px;max-width:1250px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{background:linear-gradient(135deg,#6256d6,#7c72e7);color:#fff;border-radius:18px;padding:28px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow)}.hero h1{margin:0 0 8px}.hero p{margin:0}.hero-icon{font-size:70px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-top:18px;box-shadow:0 6px 18px rgba(30,45,70,.05)}
+.row{display:flex;gap:10px;align-items:center}.row input{margin:0}.wrap{flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px}
+.user-card,.post{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}.user-head{display:flex;align-items:center;gap:12px}.small-avatar{width:48px;height:48px;border-radius:50%;background:#eceaff;display:grid;place-items:center;font-size:24px;overflow:hidden;flex:none}.small-avatar img{width:100%;height:100%;object-fit:cover}
+.post img{max-width:100%;border-radius:10px;margin-top:12px}.post-meta{font-size:12px;color:var(--muted);margin-top:10px}
+.profile-main-avatar{width:140px;height:140px;border-radius:50%;margin:auto;background:#eceaff;display:grid;place-items:center;font-size:68px;position:relative;overflow:hidden;border:4px solid #fff;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.profile-image-preview{width:100px;height:100px;border-radius:50%;margin:0 auto 10px;background:#eceaff;display:grid;place-items:center;font-size:48px;overflow:hidden}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f4f6fa;border-radius:12px;padding:18px;font-size:12px}.stat strong{display:block;font-size:25px;margin-bottom:5px}
+.admin-card{border:2px solid #d4b65a}.admin-title{color:#9a7411}
+.verify-box{background:#fff7d6;border:1px solid #f0d884;padding:12px;border-radius:10px;margin-top:12px;font-size:13px}
+
+.messages-layout{display:grid;grid-template-columns:280px 1fr;gap:18px;min-height:520px}.chat-users{border-right:1px solid var(--line);padding-right:14px}.chat-user{width:100%;text-align:left;padding:10px;background:transparent;border-radius:10px;margin:5px 0}.chat-user.active{background:#eceaff}.chat-main{display:flex;flex-direction:column;min-height:480px}.chat-header{padding-bottom:14px;border-bottom:1px solid var(--line)}.messages-list{flex:1;overflow:auto;padding:14px 0;display:flex;flex-direction:column;gap:8px}.message{max-width:75%;padding:10px 12px;border-radius:12px;background:#edf1f7;align-self:flex-start}.message.mine{background:#e8e5ff;align-self:flex-end}.message-time{font-size:10px;color:var(--muted);margin-top:5px}.chat-input{display:flex;gap:8px}.chat-input input{margin:0}.empty{text-align:center;color:var(--muted);padding:30px}
+body.dark{--bg:#151923;--panel:#202633;--text:#edf1f8;--muted:#a9b4c5;--line:#343d4e}body.dark input,body.dark textarea,body.dark select,body.dark .stat{background:#1a202b;color:#edf1f8;border-color:#3b4557}body.dark .icon,body.dark .tabs button{background:#2b3444;color:#edf1f8}
+@media(max-width:760px){.messages-layout{grid-template-columns:1fr}.chat-users{border-right:0;border-bottom:1px solid var(--line);padding:0 0 10px}.chat-user{display:inline-block;width:auto;margin-right:5px}.layout{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.menu{grid-template-columns:repeat(5,1fr);margin-top:12px}.menu button{font-size:11px;text-align:center;padding:9px}.menu .danger{grid-column:auto}.actions input{display:none}.topbar{padding:0 12px}.brand{font-size:15px}main{padding:15px}.hero{padding:20px}.hero h1{font-size:24px}.hero-icon{font-size:48px}.mobile-stack{flex-direction:column;align-items:stretch}}
+</style>
 </head>
-
 <body>
 
-  <!-- ================= LOGIN / REGISTER ================= -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="logo"><div class="logo-icon">👾</div>PIXEL FRIEND</div>
+    <p class="tagline">CONNECT • SHARE • PLAY • LEVEL UP</p>
 
-  <div
-    id="authScreen"
-    class="auth-screen"
-  >
-
-    <div class="auth-card">
-
-      <div class="logo">
-        <div class="logo-icon">👾</div>
-        PIXEL FRIEND
-      </div>
-
-      <p class="tagline">
-        CONNECT • SHARE • PLAY • LEVEL UP
-      </p>
-
-      <div class="tabs">
-
-        <button
-          id="loginTab"
-          class="active"
-          onclick="authTab('login')"
-        >
-          LOGIN
-        </button>
-
-        <button
-          id="regTab"
-          onclick="authTab('register')"
-        >
-          REGISTER
-        </button>
-
-      </div>
-
-      <!-- LOGIN -->
-
-      <div id="loginPane">
-
-        <input
-          id="loginEmail"
-          type="email"
-          placeholder="EMAIL"
-        >
-
-        <input
-          id="loginPass"
-          type="password"
-          placeholder="PASSWORD"
-        >
-
-        <button
-          class="primary"
-          style="width:100%"
-          onclick="login()"
-        >
-          ENTER PIXEL WORLD
-        </button>
-
-      </div>
-
-      <!-- REGISTER -->
-
-      <div
-        id="registerPane"
-        class="hidden"
-      >
-
-        <input
-          id="regName"
-          maxlength="20"
-          placeholder="PIXEL USERNAME"
-        >
-
-        <input
-          id="regEmail"
-          type="email"
-          placeholder="EMAIL"
-        >
-
-        <input
-          id="regPass"
-          type="password"
-          placeholder="PASSWORD"
-        >
-
-        <select id="regAvatar">
-          <option>👾</option>
-          <option>🤖</option>
-          <option>🦊</option>
-          <option>🐸</option>
-          <option>🐱</option>
-          <option>🐼</option>
-          <option>🧙</option>
-          <option>🦁</option>
-          <option>🐯</option>
-          <option>🐲</option>
-        </select>
-
-        <button
-          class="primary"
-          style="width:100%"
-          onclick="register()"
-        >
-          CREATE ACCOUNT
-        </button>
-
-      </div>
-
-      <div
-        id="authStatus"
-        class="status"
-      ></div>
-
+    <div class="tabs">
+      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>
+      <button id="regTab" onclick="authTab('register')">REGISTER</button>
     </div>
 
+    <div id="loginPane">
+      <input id="loginEmail" type="email" placeholder="EMAIL">
+      <input id="loginPass" type="password" placeholder="PASSWORD">
+      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button>
+    </div>
+
+    <div id="registerPane" class="hidden">
+      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">
+      <input id="regEmail" type="email" placeholder="EMAIL">
+      <input id="regPass" type="password" placeholder="PASSWORD (MINIMUM 6)">
+      <select id="regAvatar">
+        <option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option>
+        <option>🐼</option><option>🧙</option><option>🦁</option><option>🐯</option><option>🐲</option>
+      </select>
+      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>
+    </div>
+    <div id="authStatus" class="status"></div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <div class="topbar">
+    <div class="brand" onclick="page('home')"><div class="brand-icon">🎮</div>PIXEL FRIEND</div>
+    <div class="actions">
+      <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
+      <button class="icon" onclick="theme()">🌙</button>
+      <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
+    </div>
   </div>
 
-
-  <!-- ================= APP ================= -->
-
-  <div
-    id="app"
-    class="hidden"
-  >
-
-    <div class="topbar">
-
-      <div
-        class="brand"
-        onclick="page('home')"
-      >
-        <div class="brand-icon">🎮</div>
-        PIXEL FRIEND
+  <div class="layout">
+    <aside class="side">
+      <div class="mini">
+        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>
+        <h3 id="sideName">PLAYER</h3>
+        <div id="sideBadges" class="badges"></div>
+        <p id="sideBio" class="tiny">PIXEL EXPLORER</p>
+        <div>LEVEL <span id="sideLevel">1</span></div>
+        <div class="xp"><div id="xpBar"></div></div>
+        <p id="xpText" class="tiny">0 / 100 XP</p>
       </div>
+      <nav class="menu">
+        <button class="active" onclick="page('home',this)">🏠 HOME</button>
+        <button onclick="page('friends',this)">👥 FRIENDS</button>
+        <button onclick="page('messages',this)">💬 MESSAGES</button>
+        <button onclick="page('leaderboard',this)">🏆 RANK</button>
+        <button onclick="page('profile',this)">👤 PROFILE</button>
+        <button id="adminNav" class="hidden" onclick="page('admin',this)">🛡️ ADMIN</button>
+        <button class="danger" onclick="logout()">🚪 LOGOUT</button>
+      </nav>
+    </aside>
 
-      <div class="actions">
+    <main>
+      <section id="home" class="page active">
+        <div class="hero"><div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>SHARE POSTS • MAKE FRIENDS • EARN XP</p></div><div class="hero-icon">🕹️</div></div>
+        <div class="card">
+          <h2>✍️ CREATE PIXEL POST</h2>
+          <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
+          <div class="row mobile-stack"><input id="postImage" type="file" accept="image/*"><button class="primary" onclick="createPost()">🚀 PUBLISH +10 XP</button></div>
+          <div id="postStatus" class="status"></div>
+        </div>
+        <div id="feed"></div>
+      </section>
 
-        <input
-          id="globalSearch"
-          placeholder="SEARCH FRIENDS..."
-          oninput="searchUsers()"
-        >
+      <section id="friends" class="page">
+        <div class="card"><h1>👥 PIXEL COMMUNITY</h1><input id="friendSearch" placeholder="SEARCH PIXEL FRIENDS..." oninput="searchUsers()"></div>
+        <div id="searchResults" class="grid"></div>
+      </section>
 
-        <button
-          class="icon"
-          onclick="theme()"
-        >
-          🌙
-        </button>
+      <section id="messages" class="page">
+        <div class="card"><div class="messages-layout">
+          <div class="chat-users"><h2>💬 MESSAGES</h2><p class="tiny">SELECT A PIXEL FRIEND</p><div id="messageUsers"></div></div>
+          <div class="chat-main"><div class="chat-header"><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2><span id="chatSubtitle" class="tiny">REAL-TIME PIXEL CHAT</span></div><div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A USER TO START MESSAGING</div></div><div class="chat-input"><input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter') sendMessage()" disabled><button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button></div><div id="messageStatus" class="status"></div></div>
+        </div></div>
+      </section>
 
-        <button
-          id="headAvatar"
-          class="icon"
-          onclick="page('profile')"
-        >
-          👾
-        </button>
+      <section id="leaderboard" class="page">
+        <div class="card"><h1>🏆 PIXEL LEADERBOARD</h1><p class="tiny">TOP PLAYERS IN THE PIXEL WORLD</p><div id="leaders"></div></div>
+      </section>
 
-      </div>
-
-    </div>
-
-
-    <div class="layout">
-
-      <!-- SIDEBAR -->
-
-      <aside class="side">
-
-        <div class="mini">
-
-          <div
-            id="sideAvatar"
-            class="avatar big"
-          >
-            👾
-            <span class="online"></span>
-          </div>
-
-          <h3 id="sideName">
-            PLAYER
-          </h3>
-
-          <div id="sideBadges"></div>
-
-          <p
-            id="sideBio"
-            class="tiny"
-          >
-            PIXEL EXPLORER
-          </p>
-
-          <div>
-            LEVEL
-            <span id="sideLevel">1</span>
-          </div>
-
-          <div class="xp">
-            <div id="xpBar"></div>
-          </div>
-
-          <p
-            id="xpText"
-            class="tiny"
-          >
-            0 / 100 XP
-          </p>
-
+      <section id="profile" class="page">
+        <div class="card" style="text-align:center">
+          <div id="profileAvatar" class="profile-main-avatar">👾<span class="online"></span></div>
+          <h1 id="profileName">PLAYER</h1>
+          <div id="profileBadges" class="badges"></div>
+          <p id="profileBio">PIXEL EXPLORER</p>
+          <div id="verifyBox" class="verify-box hidden"></div>
+          <div class="stat-grid">
+            <div class="stat"><strong id="statPosts">0</strong>POSTS</div>
+            <div class="stat"><strong id="statLevel">1</strong>LEVEL</div>
+            <div class="stat"><strong id="statXP">0</strong>XP</div>
+          </div><br>
+          <button class="blue" onclick="openProfile()">✏️ EDIT PROFILE</button>
         </div>
 
-
-        <nav class="menu">
-
-          <button
-            class="active"
-            onclick="page('home',this)"
-          >
-            🏠 HOME
-          </button>
-
-          <button
-            onclick="page('friends',this)"
-          >
-            👥 FRIENDS
-          </button>
-
-          <button
-            onclick="page('messages',this)"
-          >
-            💬 MESSAGES
-          </button>
-
-          <button
-            onclick="page('leaderboard',this)"
-          >
-            🏆 RANK
-          </button>
-
-          <button
-            onclick="page('profile',this)"
-          >
-            👤 PROFILE
-          </button>
-
-          <button
-            class="danger"
-            onclick="logout()"
-          >
-            🚪 LOGOUT
-          </button>
-
-        </nav>
-
-      </aside>
-
-
-      <main>
-
-        <!-- HOME -->
-
-        <section
-          id="home"
-          class="page active"
-        >
-
-          <div class="hero">
-
-            <div>
-
-              <h1>
-                WELCOME TO PIXEL WORLD 👾
-              </h1>
-
-              <p>
-                SHARE POSTS • MAKE FRIENDS • EARN XP
-              </p>
-
-            </div>
-
-            <div class="hero-icon">
-              🕹️
-            </div>
-
-          </div>
-
-
-          <div class="card">
-
-            <h2>
-              ✍️ CREATE PIXEL POST
-            </h2>
-
-            <textarea
-              id="postText"
-              maxlength="1000"
-              placeholder="WHAT'S ON YOUR PIXEL MIND?"
-            ></textarea>
-
-            <div class="row mobile-stack">
-
-              <input
-                id="postImage"
-                type="file"
-                accept="image/*"
-              >
-
-              <button
-                class="primary"
-                onclick="createPost()"
-              >
-                🚀 PUBLISH +10 XP
-              </button>
-
-            </div>
-
-            <div
-              id="postStatus"
-              class="status"
-            ></div>
-
-          </div>
-
-          <div id="feed"></div>
-
-        </section>
-
-
-        <!-- FRIENDS -->
-
-        <section
-          id="friends"
-          class="page"
-        >
-
-          <div class="card">
-
-            <h1>
-              👥 PIXEL COMMUNITY
-            </h1>
-
-            <input
-              id="friendSearch"
-              placeholder="SEARCH PIXEL FRIENDS..."
-              oninput="searchUsers()"
-            >
-
-          </div>
-
-          <div
-            id="searchResults"
-            class="grid"
-          ></div>
-
-        </section>
-
-
-        <!-- MESSAGES -->
-
-        <section
-          id="messages"
-          class="page"
-        >
-
-          <div class="card">
-
-            <div class="messages-layout">
-
-              <div class="chat-users">
-
-                <h2>
-                  💬 MESSAGES
-                </h2>
-
-                <p class="tiny">
-                  SELECT A PIXEL FRIEND
-                </p>
-
-                <div id="messageUsers"></div>
-
-              </div>
-
-
-              <div class="chat-main">
-
-                <div class="chat-header">
-
-                  <h2
-                    id="chatTitle"
-                    style="margin:0"
-                  >
-                    SELECT A FRIEND
-                  </h2>
-
-                  <span
-                    id="chatSubtitle"
-                    class="tiny"
-                  >
-                    YOUR REAL-TIME PIXEL CHAT
-                  </span>
-
-                </div>
-
-
-                <div
-                  id="messagesList"
-                  class="messages-list"
-                >
-                  <div class="empty">
-                    👈 SELECT A USER TO START MESSAGING
-                  </div>
-                </div>
-
-
-                <div class="chat-input">
-
-                  <input
-                    id="messageInput"
-                    placeholder="TYPE A MESSAGE..."
-                    onkeydown="if(event.key==='Enter') sendMessage()"
-                    disabled
-                  >
-
-                  <button
-                    id="sendButton"
-                    class="primary"
-                    onclick="sendMessage()"
-                    disabled
-                  >
-                    SEND
-                  </button>
-
-                </div>
-
-                <div
-                  id="messageStatus"
-                  class="status"
-                ></div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- LEADERBOARD -->
-
-        <section
-          id="leaderboard"
-          class="page"
-        >
-
-          <div class="card">
-
-            <h1>
-              🏆 PIXEL LEADERBOARD
-            </h1>
-
-            <p class="tiny">
-              TOP PLAYERS IN THE PIXEL WORLD
-            </p>
-
-            <div id="leaders"></div>
-
-          </div>
-
-        </section>
-
-
-        <!-- PROFILE -->
-
-        <section
-          id="profile"
-          class="page"
-        >
-
-          <div
-            class="card"
-            style="text-align:center"
-          >
-
-            <div
-              id="profileAvatar"
-              class="profile-main-avatar"
-            >
-              👾
-              <span class="online"></span>
-            </div>
-
-            <h1 id="profileName">
-              PLAYER
-            </h1>
-
-            <div id="profileBadges"></div>
-
-            <p id="profileBio">
-              PIXEL EXPLORER
-            </p>
-
-
-            <div class="stat-grid">
-
-              <div class="stat">
-
-                <strong id="statPosts">
-                  0
-                </strong>
-
-                POSTS
-
-              </div>
-
-              <div class="stat">
-
-                <strong id="statLevel">
-                  1
-                </strong>
-
-                LEVEL
-
-              </div>
-
-              <div class="stat">
-
-                <strong id="statXP">
-                  0
-                </strong>
-
-                XP
-
-              </div>
-
-            </div>
-
-            <br>
-
-            <button
-              class="blue"
-              onclick="openProfile()"
-            >
-              ✏️ EDIT PROFILE
-            </button>
-
-          </div>
-
-
-          <!-- EDIT PROFILE -->
-
-          <div
-            id="profileEditor"
-            class="card hidden"
-          >
-
-            <h2>
-              ✏️ EDIT PROFILE
-            </h2>
-
-            <div
-              id="profilePreview"
-              class="profile-image-preview"
-            >
-              👾
-            </div>
-
-            <input
-              id="profileImage"
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              onchange="previewProfileImage()"
-            >
-
-            <p class="tiny">
-              Upload a JPG, PNG, or WEBP profile picture.
-            </p>
-
-            <input
-              id="editName"
-              maxlength="20"
-              placeholder="USERNAME"
-            >
-
-            <textarea
-              id="editBio"
-              maxlength="200"
-              placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."
-            ></textarea>
-
-            <select id="editAvatar">
-
-              <option>👾</option>
-              <option>🤖</option>
-              <option>🦊</option>
-              <option>🐸</option>
-              <option>🐱</option>
-              <option>🐼</option>
-              <option>🧙</option>
-              <option>🦁</option>
-              <option>🐯</option>
-              <option>🐲</option>
-
-            </select>
-
-
-            <div class="row wrap">
-
-              <button
-                class="primary"
-                onclick="saveProfile()"
-              >
-                💾 SAVE
-              </button>
-
-              <button
-                class="secondary"
-                onclick="closeProfile()"
-              >
-                CANCEL
-              </button>
-
-            </div>
-
-            <div
-              id="profileStatus"
-              class="status"
-            ></div>
-
-          </div>
-
-        </section>
-
-      </main>
-
-    </div>
-
+        <div id="profileEditor" class="card hidden">
+          <h2>✏️ EDIT PROFILE PICTURE & DETAILS</h2>
+          <div id="profilePreview" class="profile-image-preview">👾</div>
+          <input id="profileImage" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewProfileImage()">
+          <p class="tiny">Upload JPG, PNG, or WEBP. Your picture will be stored in the public avatars bucket.</p>
+          <input id="editName" maxlength="20" placeholder="USERNAME">
+          <textarea id="editBio" maxlength="200" placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea>
+          <select id="editAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option><option>🐯</option><option>🐲</option></select>
+          <div class="row wrap"><button class="primary" onclick="saveProfile()">💾 SAVE PROFILE</button><button class="secondary" onclick="closeProfile()">CANCEL</button></div>
+          <div id="profileStatus" class="status"></div>
+        </div>
+      </section>
+
+      <section id="admin" class="page">
+        <div class="card admin-card">
+          <h1 class="admin-title">🛡️ ADMIN CONTROL PANEL</h1>
+          <p>Only users whose <b>profiles.role</b> is set to <b>admin</b> can see this page.</p>
+          <div id="adminStatus" class="status"></div>
+          <div id="adminUsers" class="grid"></div>
+        </div>
+      </section>
+    </main>
   </div>
-
-
-  <script>
-
-    /* =====================================================
-       SUPABASE CONFIGURATION
-       Your Project ID:
-       vvfkfpsyxipnypaltixq
-
-       Correct Project URL:
-       https://vvfkfpsyxipnypaltixq.supabase.co
-    ====================================================== */
-
-    const SUPABASE_URL =
-      "https://vvfkfpsyxipnypaltixq.supabase.co";
-
-    const SUPABASE_ANON_KEY =
-      "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
-
-
-    const db =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-      );
-
-
-    let currentUser = null;
-    let currentProfile = null;
-    let selectedUser = null;
-    let selectedUserName = "";
-    let selectedUserAvatar = "";
-    let messageInterval = null;
-
-
-    /* =====================================================
-       HELPERS
-    ====================================================== */
-
-    function escapeHTML(value){
-      const div = document.createElement("div");
-      div.textContent = value || "";
-      return div.innerHTML;
-    }
-
-
-    function avatarHTML(profile, className="avatar"){
-
-      if(profile && profile.avatar_url){
-        return `
-          <div class="${className}">
-            <img src="${profile.avatar_url}">
-          </div>
-        `;
-      }
-
-      return `
-        <div class="${className}">
-          ${profile?.avatar || "👾"}
-        </div>
-      `;
-    }
-
-
-    function getAvatarContent(profile){
-
-      if(profile && profile.avatar_url){
-        return `<img src="${profile.avatar_url}">`;
-      }
-
-      return profile?.avatar || "👾";
-    }
-
-
-    function setStatus(id, text, type=""){
-
-      const el = document.getElementById(id);
-
-      if(!el) return;
-
-      el.textContent = text;
-      el.className = "status " + type;
-
-    }
-
-
-    /* =====================================================
-       AUTH TABS
-    ====================================================== */
-
-    function authTab(tab){
-
-      const loginPane =
-        document.getElementById("loginPane");
-
-      const registerPane =
-        document.getElementById("registerPane");
-
-      const loginTab =
-        document.getElementById("loginTab");
-
-      const regTab =
-        document.getElementById("regTab");
-
-      setStatus("authStatus","");
-
-      if(tab === "login"){
-
-        loginPane.classList.remove("hidden");
-        registerPane.classList.add("hidden");
-
-        loginTab.classList.add("active");
-        regTab.classList.remove("active");
-
-      }else{
-
-        registerPane.classList.remove("hidden");
-        loginPane.classList.add("hidden");
-
-        regTab.classList.add("active");
-        loginTab.classList.remove("active");
-
-      }
-
-    }
-
-
-    /* =====================================================
-       REGISTER
-    ====================================================== */
-
-    async function register(){
-
-      const name =
-        document.getElementById("regName").value.trim();
-
-      const email =
-        document.getElementById("regEmail").value.trim();
-
-      const password =
-        document.getElementById("regPass").value;
-
-      const avatar =
-        document.getElementById("regAvatar").value;
-
-
-      if(!name || !email || !password){
-
-        setStatus(
-          "authStatus",
-          "❌ Please complete all fields.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      if(password.length < 6){
-
-        setStatus(
-          "authStatus",
-          "❌ Password must contain at least 6 characters.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      setStatus(
-        "authStatus",
-        "CREATING YOUR PIXEL ACCOUNT..."
-      );
-
-
-      const {
-        data,
-        error
-      } =
-      await db.auth.signUp({
-
-        email:email,
-
-        password:password,
-
-        options:{
-          data:{
-            username:name,
-            avatar:avatar
-          }
-        }
-
-      });
-
-
-      if(error){
-
-        setStatus(
-          "authStatus",
-          "❌ " + error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      if(data.user){
-
-        const {
-          error:profileError
-        } =
-        await db
-          .from("profiles")
-          .upsert({
-
-            id:data.user.id,
-            username:name,
-            avatar:avatar,
-            bio:"PIXEL EXPLORER",
-            xp:0,
-            level:1,
-            role:"USER"
-
-          });
-
-
-        if(profileError){
-
-          console.log(
-            "Profile creation:",
-            profileError.message
-          );
-
-        }
-
-      }
-
-
-      document
-        .getElementById("regName").value = "";
-
-      document
-        .getElementById("regEmail").value = "";
-
-      document
-        .getElementById("regPass").value = "";
-
-
-      if(data.session){
-
-        setStatus(
-          "authStatus",
-          "✅ ACCOUNT CREATED! ENTERING PIXEL WORLD...",
-          "success"
-        );
-
-        await loadUser();
-
-      }else{
-
-        setStatus(
-          "authStatus",
-          "✅ ACCOUNT CREATED! PLEASE CHECK YOUR EMAIL TO CONFIRM, THEN LOGIN.",
-          "success"
-        );
-
-        authTab("login");
-
-      }
-
-    }
-
-
-    /* =====================================================
-       LOGIN
-    ====================================================== */
-
-    async function login(){
-
-      const email =
-        document.getElementById("loginEmail").value.trim();
-
-      const password =
-        document.getElementById("loginPass").value;
-
-
-      if(!email || !password){
-
-        setStatus(
-          "authStatus",
-          "❌ Enter your email and password.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      setStatus(
-        "authStatus",
-        "LOGGING IN..."
-      );
-
-
-      const {
-        data,
-        error
-      } =
-      await db.auth.signInWithPassword({
-
-        email:email,
-        password:password
-
-      });
-
-
-      if(error){
-
-        setStatus(
-          "authStatus",
-          "❌ " + error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      currentUser = data.user;
-
-      await loadUser();
-
-    }
-
-
-    /* =====================================================
-       LOAD USER
-    ====================================================== */
-
-    async function loadUser(){
-
-      const {
-        data:{user}
-      } =
-      await db.auth.getUser();
-
-
-      if(!user) return;
-
-
-      currentUser = user;
-
-
-      let {
-        data:profile,
-        error
-      } =
-      await db
-        .from("profiles")
-        .select("*")
-        .eq("id",user.id)
-        .maybeSingle();
-
-
-      if(!profile){
-
-        const metadata =
-          user.user_metadata || {};
-
-
-        const newProfile = {
-
-          id:user.id,
-
-          username:
-            metadata.username ||
-            user.email.split("@")[0],
-
-          avatar:
-            metadata.avatar ||
-            "👾",
-
-          bio:"PIXEL EXPLORER",
-
-          xp:0,
-
-          level:1,
-
-          role:"USER"
-
-        };
-
-
-        const result =
-          await db
-            .from("profiles")
-            .upsert(newProfile)
-            .select()
-            .maybeSingle();
-
-
-        if(result.data){
-
-          profile = result.data;
-
-        }else{
-
-          profile = newProfile;
-
-        }
-
-      }
-
-
-      currentProfile = profile;
-
-
-      document
-        .getElementById("authScreen")
-        .classList.add("hidden");
-
-
-      document
-        .getElementById("app")
-        .classList.remove("hidden");
-
-
-      updateProfileUI();
-
-      await loadFeed();
-
-      await searchUsers();
-
-      await loadLeaderboard();
-
-      await loadMessageUsers();
-
-    }
-
-
-    /* =====================================================
-       PROFILE UI
-    ====================================================== */
-
-    function updateProfileUI(){
-
-      if(!currentProfile) return;
-
-
-      const profile =
-        currentProfile;
-
-
-      document
-        .getElementById("sideAvatar")
-        .innerHTML =
-          getAvatarContent(profile) +
-          `<span class="online"></span>`;
-
-
-      document
-        .getElementById("profileAvatar")
-        .innerHTML =
-          getAvatarContent(profile) +
-          `<span class="online"></span>`;
-
-
-      document
-        .getElementById("headAvatar")
-        .innerHTML =
-          profile.avatar_url
-            ? `<img style="width:32px;height:32px;border-radius:50%;object-fit:cover" src="${profile.avatar_url}">`
-            : profile.avatar;
-
-
-      document
-        .getElementById("sideName")
-        .textContent =
-          profile.username ||
-          "PLAYER";
-
-
-      document
-        .getElementById("profileName")
-        .textContent =
-          profile.username ||
-          "PLAYER";
-
-
-      document
-        .getElementById("sideBio")
-        .textContent =
-          profile.bio ||
-          "PIXEL EXPLORER";
-
-
-      document
-        .getElementById("profileBio")
-        .textContent =
-          profile.bio ||
-          "PIXEL EXPLORER";
-
-
-      const xp =
-        Number(profile.xp || 0);
-
-
-      const level =
-        Math.floor(xp / 100) + 1;
-
-
-      document
-        .getElementById("sideLevel")
-        .textContent =
-          level;
-
-
-      document
-        .getElementById("statLevel")
-        .textContent =
-          level;
-
-
-      document
-        .getElementById("statXP")
-        .textContent =
-          xp;
-
-
-      document
-        .getElementById("xpText")
-        .textContent =
-          (xp % 100) + " / 100 XP";
-
-
-      document
-        .getElementById("xpBar")
-        .style.width =
-          (xp % 100) + "%";
-
-
-      const role =
-        profile.role ||
-        "USER";
-
-
-      document
-        .getElementById("sideBadges")
-        .innerHTML =
-          `<span class="badge">🎮 ${escapeHTML(role)}</span>`;
-
-
-      document
-        .getElementById("profileBadges")
-        .innerHTML =
-          `<span class="badge">🎮 ${escapeHTML(role)}</span>`;
-
-    }
-
-
-    /* =====================================================
-       PAGE NAVIGATION
-    ====================================================== */
-
-    function page(name,button){
-
-      document
-        .querySelectorAll(".page")
-        .forEach(p => p.classList.remove("active"));
-
-
-      const selected =
-        document.getElementById(name);
-
-      if(selected){
-
-        selected.classList.add("active");
-
-      }
-
-
-      document
-        .querySelectorAll(".menu button")
-        .forEach(b => b.classList.remove("active"));
-
-
-      if(button){
-
-        button.classList.add("active");
-
-      }
-
-
-      if(name === "friends"){
-
-        searchUsers();
-
-      }
-
-
-      if(name === "leaderboard"){
-
-        loadLeaderboard();
-
-      }
-
-
-      if(name === "messages"){
-
-        loadMessageUsers();
-
-      }
-
-    }
-
-
-    /* =====================================================
-       SEARCH FRIENDS
-    ====================================================== */
-
-    async function searchUsers(){
-
-      const globalValue =
-        document
-          .getElementById("globalSearch")
-          ?.value
-          .trim()
-          .toLowerCase() || "";
-
-
-      const friendValue =
-        document
-          .getElementById("friendSearch")
-          ?.value
-          .trim()
-          .toLowerCase() || "";
-
-
-      const search =
-        friendValue || globalValue;
-
-
-      const {
-        data:users,
-        error
-      } =
-      await db
-        .from("profiles")
-        .select("*")
-        .neq("id",currentUser.id)
-        .order("username");
-
-
-      const results =
-        document.getElementById("searchResults");
-
-
-      if(error){
-
-        results.innerHTML = `
-          <div class="card">
-            ❌ Unable to load users:
-            ${escapeHTML(error.message)}
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      const filtered =
-        (users || [])
-        .filter(user => {
-
-          return (
-            (user.username || "")
-              .toLowerCase()
-              .includes(search)
-            ||
-            (user.role || "")
-              .toLowerCase()
-              .includes(search)
-          );
-
-        });
-
-
-      if(!filtered.length){
-
-        results.innerHTML = `
-          <div class="card">
-            NO PIXEL FRIENDS FOUND YET.
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      results.innerHTML =
-        filtered
-          .map(user => `
-
-            <div class="user-card">
-
-              ${avatarHTML(user)}
-
-              <h3>
-                ${escapeHTML(user.username || "PLAYER")}
-              </h3>
-
-              <p class="tiny">
-                ${escapeHTML(user.bio || "PIXEL EXPLORER")}
-              </p>
-
-              <div>
-                <span class="badge">
-                  ${escapeHTML(user.role || "USER")}
-                </span>
-              </div>
-
-              <button
-                class="primary"
-                onclick='startMessage(
-                  ${JSON.stringify(user.id)},
-                  ${JSON.stringify(user.username || "PLAYER")},
-                  ${JSON.stringify(user.avatar || "👾")},
-                  ${JSON.stringify(user.avatar_url || "")}
-                )'
-              >
-                💬 MESSAGE
-              </button>
-
-            </div>
-
-          `)
-          .join("");
-
-    }
-
-
-    /* =====================================================
-       MESSAGE USERS
-    ====================================================== */
-
-    async function loadMessageUsers(){
-
-      const {
-        data:users,
-        error
-      } =
-      await db
-        .from("profiles")
-        .select("*")
-        .neq("id",currentUser.id)
-        .order("username");
-
-
-      const container =
-        document.getElementById("messageUsers");
-
-
-      if(error){
-
-        container.innerHTML =
-          `<p class="tiny">
-            ${escapeHTML(error.message)}
-          </p>`;
-
-        return;
-
-      }
-
-
-      if(!users || !users.length){
-
-        container.innerHTML =
-          `<p class="tiny">
-            No other Pixel users yet.
-          </p>`;
-
-        return;
-
-      }
-
-
-      container.innerHTML =
-        users.map(user => `
-
-          <div
-            class="chat-user"
-            onclick='startMessage(
-              ${JSON.stringify(user.id)},
-              ${JSON.stringify(user.username || "PLAYER")},
-              ${JSON.stringify(user.avatar || "👾")},
-              ${JSON.stringify(user.avatar_url || "")}
-            )'
-          >
-
-            <div class="chat-user-avatar">
-
-              ${
-                user.avatar_url
-                  ? `<img src="${user.avatar_url}">`
-                  : user.avatar || "👾"
-              }
-
-            </div>
-
-            <div>
-
-              <strong>
-                ${escapeHTML(user.username || "PLAYER")}
-              </strong>
-
-              <div class="tiny">
-                ${escapeHTML(user.role || "USER")}
-              </div>
-
-            </div>
-
-          </div>
-
-        `).join("");
-
-    }
-
-
-    /* =====================================================
-       START CHAT
-    ====================================================== */
-
-    async function startMessage(
-      userId,
-      username,
-      avatar,
-      avatarUrl
-    ){
-
-      selectedUser =
-        userId;
-
-      selectedUserName =
-        username;
-
-      selectedUserAvatar =
-        avatarUrl || avatar;
-
-
-      page("messages");
-
-
-      document
-        .getElementById("chatTitle")
-        .textContent =
-          username;
-
-
-      document
-        .getElementById("chatSubtitle")
-        .textContent =
-          "REAL-TIME PIXEL CHAT";
-
-
-      document
-        .getElementById("messageInput")
-        .disabled =
-          false;
-
-
-      document
-        .getElementById("sendButton")
-        .disabled =
-          false;
-
-
-      await loadMessages();
-
-
-      if(messageInterval){
-
-        clearInterval(messageInterval);
-
-      }
-
-
-      messageInterval =
-        setInterval(
-          loadMessages,
-          2500
-        );
-
-    }
-
-
-    /* =====================================================
-       LOAD MESSAGES
-    ====================================================== */
-
-    async function loadMessages(){
-
-      if(!selectedUser || !currentUser) return;
-
-
-      const {
-        data:messages,
-        error
-      } =
-      await db
-        .from("messages")
-        .select("*")
-        .or(
-          `and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`
-        )
-        .order("created_at",{ascending:true});
-
-
-      const container =
-        document.getElementById("messagesList");
-
-
-      if(error){
-
-        container.innerHTML = `
-          <div class="empty">
-            ❌ ${escapeHTML(error.message)}
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      if(!messages || !messages.length){
-
-        container.innerHTML = `
-          <div class="empty">
-            START YOUR PIXEL CONVERSATION 💬
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      container.innerHTML =
-        messages.map(message => {
-
-          const mine =
-            message.sender_id ===
-            currentUser.id;
-
-
-          const date =
-            new Date(
-              message.created_at
-            );
-
-
-          return `
-
-            <div
-              class="message ${mine ? "mine" : ""}"
-            >
-
-              ${escapeHTML(message.content)}
-
-              <div class="message-time">
-
-                ${date.toLocaleTimeString(
-                  [],
-                  {
-                    hour:"2-digit",
-                    minute:"2-digit"
-                  }
-                )}
-
-              </div>
-
-            </div>
-
-          `;
-
-        }).join("");
-
-
-      container.scrollTop =
-        container.scrollHeight;
-
-    }
-
-
-    /* =====================================================
-       SEND MESSAGE
-    ====================================================== */
-
-    async function sendMessage(){
-
-      if(!selectedUser) return;
-
-
-      const input =
-        document.getElementById("messageInput");
-
-
-      const content =
-        input.value.trim();
-
-
-      if(!content) return;
-
-
-      input.value = "";
-
-
-      const {
-        error
-      } =
-      await db
-        .from("messages")
-        .insert({
-
-          sender_id:
-            currentUser.id,
-
-          receiver_id:
-            selectedUser,
-
-          content:
-            content
-
-        });
-
-
-      if(error){
-
-        setStatus(
-          "messageStatus",
-          "❌ " + error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      await loadMessages();
-
-    }
-
-
-    /* =====================================================
-       POSTS
-    ====================================================== */
-
-    async function createPost(){
-
-      const text =
-        document
-          .getElementById("postText")
-          .value
-          .trim();
-
-
-      if(!text){
-
-        setStatus(
-          "postStatus",
-          "❌ Write something first.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      setStatus(
-        "postStatus",
-        "PUBLISHING..."
-      );
-
-
-      const {
-        error
-      } =
-      await db
-        .from("posts")
-        .insert({
-
-          user_id:
-            currentUser.id,
-
-          content:
-            text
-
-        });
-
-
-      if(error){
-
-        setStatus(
-          "postStatus",
-          "❌ " + error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      document
-        .getElementById("postText")
-        .value = "";
-
-
-      setStatus(
-        "postStatus",
-        "✅ POST PUBLISHED! +10 XP",
-        "success"
-      );
-
-
-      const newXP =
-        Number(currentProfile.xp || 0) + 10;
-
-
-      currentProfile.xp =
-        newXP;
-
-
-      await db
-        .from("profiles")
-        .update({
-          xp:newXP
-        })
-        .eq("id",currentUser.id);
-
-
-      updateProfileUI();
-
-      await loadFeed();
-
-      await loadLeaderboard();
-
-    }
-
-
-    /* =====================================================
-       LOAD POSTS
-    ====================================================== */
-
-    async function loadFeed(){
-
-      const {
-        data:posts,
-        error
-      } =
-      await db
-        .from("posts")
-        .select("*")
-        .order("created_at",{ascending:false});
-
-
-      const feed =
-        document.getElementById("feed");
-
-
-      if(error){
-
-        feed.innerHTML = `
-          <div class="card">
-            ❌ ${escapeHTML(error.message)}
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      if(!posts || !posts.length){
-
-        feed.innerHTML = `
-          <div class="card">
-            NO POSTS YET. BE THE FIRST PIXEL PLAYER! 🚀
-          </div>
-        `;
-
-        return;
-
-      }
-
-
-      const userIds =
-        [...new Set(
-          posts.map(post => post.user_id)
-        )];
-
-
-      const {
-        data:profiles
-      } =
-      await db
-        .from("profiles")
-        .select("*")
-        .in("id",userIds);
-
-
-      const profileMap =
-        {};
-
-
-      (profiles || []).forEach(profile => {
-
-        profileMap[profile.id] =
-          profile;
-
-      });
-
-
-      feed.innerHTML =
-        posts.map(post => {
-
-          const profile =
-            profileMap[post.user_id] ||
-            {};
-
-          return `
-
-            <div class="post">
-
-              <div class="post-header">
-
-                <div class="post-avatar">
-
-                  ${
-                    profile.avatar_url
-                      ? `<img src="${profile.avatar_url}">`
-                      : profile.avatar || "👾"
-                  }
-
-                </div>
-
-                <div>
-
-                  <strong>
-                    ${escapeHTML(
-                      profile.username ||
-                      "PIXEL PLAYER"
-                    )}
-                  </strong>
-
-                  <div class="tiny">
-                    ${
-                      new Date(
-                        post.created_at
-                      ).toLocaleString()
-                    }
-                  </div>
-
-                </div>
-
-              </div>
-
-              <div>
-                ${escapeHTML(post.content)}
-              </div>
-
-            </div>
-
-          `;
-
-        }).join("");
-
-      const myPosts =
-        posts.filter(
-          post =>
-            post.user_id ===
-            currentUser.id
-        ).length;
-
-
-      document
-        .getElementById("statPosts")
-        .textContent =
-          myPosts;
-
-    }
-
-
-    /* =====================================================
-       LEADERBOARD
-    ====================================================== */
-
-    async function loadLeaderboard(){
-
-      const {
-        data:users,
-        error
-      } =
-      await db
-        .from("profiles")
-        .select("*")
-        .order("xp",{ascending:false})
-        .limit(50);
-
-
-      const leaders =
-        document.getElementById("leaders");
-
-
-      if(error){
-
-        leaders.innerHTML =
-          `❌ ${escapeHTML(error.message)}`;
-
-        return;
-
-      }
-
-
-      leaders.innerHTML =
-        (users || [])
-          .map((user,index) => `
-
-            <div class="leader">
-
-              <div class="leader-number">
-                #${index + 1}
-              </div>
-
-              <div
-                class="post-avatar"
-              >
-
-                ${
-                  user.avatar_url
-                    ? `<img src="${user.avatar_url}">`
-                    : user.avatar || "👾"
-                }
-
-              </div>
-
-              <div>
-
-                <strong>
-                  ${escapeHTML(
-                    user.username ||
-                    "PLAYER"
-                  )}
-                </strong>
-
-                <div class="tiny">
-                  LEVEL ${
-                    Math.floor(
-                      Number(user.xp || 0) / 100
-                    ) + 1
-                  }
-                  •
-                  ${Number(user.xp || 0)} XP
-                </div>
-
-              </div>
-
-            </div>
-
-          `)
-          .join("");
-
-    }
-
-
-    /* =====================================================
-       EDIT PROFILE
-    ====================================================== */
-
-    function openProfile(){
-
-      document
-        .getElementById("profileEditor")
-        .classList.remove("hidden");
-
-
-      document
-        .getElementById("editName")
-        .value =
-          currentProfile.username ||
-          "";
-
-
-      document
-        .getElementById("editBio")
-        .value =
-          currentProfile.bio ||
-          "";
-
-
-      document
-        .getElementById("editAvatar")
-        .value =
-          currentProfile.avatar ||
-          "👾";
-
-
-      document
-        .getElementById("profilePreview")
-        .innerHTML =
-          getAvatarContent(currentProfile);
-
-    }
-
-
-    function closeProfile(){
-
-      document
-        .getElementById("profileEditor")
-        .classList.add("hidden");
-
-    }
-
-
-    function previewProfileImage(){
-
-      const file =
-        document
-          .getElementById("profileImage")
-          .files[0];
-
-
-      if(!file) return;
-
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function(event){
-
-          document
-            .getElementById("profilePreview")
-            .innerHTML =
-              `<img src="${event.target.result}">`;
-
-        };
-
-
-      reader.readAsDataURL(file);
-
-    }
-
-
-    async function saveProfile(){
-
-      const username =
-        document
-          .getElementById("editName")
-          .value
-          .trim();
-
-
-      const bio =
-        document
-          .getElementById("editBio")
-          .value
-          .trim();
-
-
-      const avatar =
-        document
-          .getElementById("editAvatar")
-          .value;
-
-
-      const imageFile =
-        document
-          .getElementById("profileImage")
-          .files[0];
-
-
-      if(!username){
-
-        setStatus(
-          "profileStatus",
-          "❌ Username cannot be empty.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      setStatus(
-        "profileStatus",
-        "SAVING PROFILE..."
-      );
-
-
-      let avatarURL =
-        currentProfile.avatar_url ||
-        null;
-
-
-      if(imageFile){
-
-        avatarURL =
-          await new Promise((resolve,reject) => {
-
-            const reader =
-              new FileReader();
-
-
-            reader.onload =
-              event =>
-                resolve(
-                  event.target.result
-                );
-
-
-            reader.onerror =
-              reject;
-
-
-            reader.readAsDataURL(
-              imageFile
-            );
-
-          });
-
-      }
-
-
-      const updateData = {
-
-        username:username,
-
-        bio:bio,
-
-        avatar:avatar,
-
-        avatar_url:avatarURL
-
-      };
-
-
-      const {
-        data,
-        error
-      } =
-      await db
-        .from("profiles")
-        .update(updateData)
-        .eq("id",currentUser.id)
-        .select()
-        .maybeSingle();
-
-
-      if(error){
-
-        setStatus(
-          "profileStatus",
-          "❌ " + error.message,
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      currentProfile =
-        data ||
-        {
-          ...currentProfile,
-          ...updateData
-        };
-
-
-      updateProfileUI();
-
-
-      setStatus(
-        "profileStatus",
-        "✅ PROFILE UPDATED!",
-        "success"
-      );
-
-
-      setTimeout(
-        closeProfile,
-        1000
-      );
-
-    }
-
-
-    /* =====================================================
-       THEME
-    ====================================================== */
-
-    function theme(){
-
-      document
-        .body
-        .classList
-        .toggle("dark");
-
-    }
-
-
-    /* =====================================================
-       LOGOUT
-    ====================================================== */
-
-    async function logout(){
-
-      if(messageInterval){
-
-        clearInterval(
-          messageInterval
-        );
-
-      }
-
-
-      await db.auth.signOut();
-
-
-      currentUser = null;
-
-      currentProfile = null;
-
-      selectedUser = null;
-
-
-      document
-        .getElementById("app")
-        .classList.add("hidden");
-
-
-      document
-        .getElementById("authScreen")
-        .classList.remove("hidden");
-
-
-      document
-        .getElementById("loginPass")
-        .value = "";
-
-
-      setStatus(
-        "authStatus",
-        "LOGGED OUT."
-      );
-
-    }
-
-
-    /* =====================================================
-       SESSION CHECK
-    ====================================================== */
-
-    db.auth.onAuthStateChange(
-      async (event,session) => {
-
-        if(session && session.user){
-
-          currentUser =
-            session.user;
-
-          if(
-            document
-              .getElementById("app")
-              .classList.contains("hidden")
-          ){
-
-            await loadUser();
-
-          }
-
-        }
-
-      }
-    );
-
-
-    window.addEventListener(
-      "load",
-      async () => {
-
-        const {
-          data:{session}
-        } =
-        await db.auth.getSession();
-
-
-        if(session){
-
-          currentUser =
-            session.user;
-
-          await loadUser();
-
-        }
-
-      }
-    );
-
-  </script>
-
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/*
+  Your real Supabase project details:
+  Project ID: vvfkfpsyxipnypaltixq
+  Full Project URL = https:// + Project ID + .supabase.co
+*/
+const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let currentUser = null;
+let currentProfile = null;
+let previewObjectUrl = null;
+let selectedChatUser = null;
+let chatChannel = null;
+
+function $(id){ return document.getElementById(id); }
+function status(id,msg,type=""){ const el=$(id); el.textContent=msg; el.className="status "+type; }
+
+function authTab(tab){
+  $("loginPane").classList.toggle("hidden",tab!=="login");
+  $("registerPane").classList.toggle("hidden",tab!=="register");
+  $("loginTab").classList.toggle("active",tab==="login");
+  $("regTab").classList.toggle("active",tab==="register");
+  status("authStatus","");
+}
+
+async function register(){
+  const username=$("regName").value.trim();
+  const email=$("regEmail").value.trim();
+  const password=$("regPass").value;
+  const avatar=$("regAvatar").value;
+  if(!username || !email || !password) return status("authStatus","❌ Please complete all fields.","error");
+  if(password.length<6) return status("authStatus","❌ Password must contain at least 6 characters.","error");
+  status("authStatus","Creating your Pixel account...");
+  const {data,error}=await sb.auth.signUp({
+    email,password,
+    options:{data:{username,avatar},emailRedirectTo:location.href}
+  });
+  if(error) return status("authStatus","❌ "+error.message,"error");
+
+  if(data.session && data.user){
+    await ensureProfile(data.user,{username,avatar});
+    status("authStatus","✅ Account created! You are logged in.","success");
+    await startApp(data.user);
+  } else {
+    status("authStatus","📧 Account created. Check your email and verify your account, then log in.","success");
+    authTab("login");
+  }
+}
+
+async function login(){
+  const email=$("loginEmail").value.trim(), password=$("loginPass").value;
+  if(!email || !password) return status("authStatus","❌ Enter your email and password.","error");
+  status("authStatus","Logging in...");
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error) return status("authStatus","❌ "+error.message,"error");
+  if(!data.user.email_confirmed_at){
+    await sb.auth.signOut();
+    return status("authStatus","📧 Please verify your email before entering Pixel World.","error");
+  }
+  await startApp(data.user);
+}
+
+async function ensureProfile(user,extra={}){
+  let {data,error}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();
+  if(error) throw error;
+  if(!data){
+    const meta=user.user_metadata||{};
+    const profile={
+      id:user.id,
+      username:extra.username || meta.username || user.email.split("@")[0],
+      avatar:extra.avatar || meta.avatar || "👾",
+      bio:"PIXEL EXPLORER",xp:0,level:1,role:"user"
+    };
+    const r=await sb.from("profiles").insert(profile).select().single();
+    if(r.error) throw r.error;
+    data=r.data;
+  }
+  return data;
+}
+
+async function startApp(user){
+  currentUser=user;
+  try{
+    currentProfile=await ensureProfile(user);
+  }catch(e){
+    status("authStatus","❌ Database setup error: "+e.message,"error");
+    return;
+  }
+  $("authScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  renderProfile();
+  await Promise.all([loadFeed(),searchUsers(),loadLeaderboard(),loadPostCount(),loadMessageUsers()]);
+  if(currentProfile.role==="admin"){
+    $("adminNav").classList.remove("hidden");
+    await loadAdmin();
+  }
+}
+
+function avatarHTML(profile){
+  if(profile?.avatar_url) return `<img src="${escapeHTML(profile.avatar_url)}" alt="Profile picture">`;
+  return escapeHTML(profile?.avatar || "👾");
+}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function renderProfile(){
+  const p=currentProfile;
+  $("sideAvatar").innerHTML=avatarHTML(p)+'<span class="online"></span>';
+  $("profileAvatar").innerHTML=avatarHTML(p)+'<span class="online"></span>';
+  $("profilePreview").innerHTML=avatarHTML(p);
+  $("headAvatar").innerHTML=p.avatar_url?'<img src="'+escapeHTML(p.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;border-radius:9px">':escapeHTML(p.avatar||"👾");
+  $("sideName").textContent=p.username||"PLAYER"; $("profileName").textContent=p.username||"PLAYER";
+  $("sideBio").textContent=p.bio||"PIXEL EXPLORER"; $("profileBio").textContent=p.bio||"PIXEL EXPLORER";
+  $("sideLevel").textContent=p.level||1; $("statLevel").textContent=p.level||1; $("statXP").textContent=p.xp||0;
+  const progress=(p.xp||0)%100; $("xpBar").style.width=progress+"%"; $("xpText").textContent=progress+" / 100 XP";
+  const role=(p.role||"user").toUpperCase();
+  const badge=`<span class="badge">${role==="ADMIN"?"🛡️ ADMIN":"🎮 USER"}</span>`;
+  $("sideBadges").innerHTML=badge; $("profileBadges").innerHTML=badge;
+  const verified=!!currentUser.email_confirmed_at;
+  $("verifyBox").classList.toggle("hidden",verified);
+  if(!verified) $("verifyBox").textContent="📧 Your email is not verified. Please check your inbox.";
+}
+
+function page(name,button){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const target=$(name); if(target) target.classList.add("active");
+  document.querySelectorAll(".menu button").forEach(b=>b.classList.remove("active"));
+  if(button) button.classList.add("active");
+  if(name==="friends") searchUsers();
+  if(name==="messages") loadMessageUsers();
+  if(name==="leaderboard") loadLeaderboard();
+  if(name==="admin") loadAdmin();
+  if(name==="profile") loadPostCount();
+}
+
+async function uploadFile(file,path,bucket="avatars"){
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const contentType=file.type||"image/jpeg";
+  const finalPath=path+"."+ext;
+  const {error}=await sb.storage.from(bucket).upload(finalPath,file,{upsert:true,contentType});
+  if(error) throw error;
+  const {data}=sb.storage.from(bucket).getPublicUrl(finalPath);
+  return data.publicUrl;
+}
+
+async function createPost(){
+  const content=$("postText").value.trim(), file=$("postImage").files[0];
+  if(!content) return status("postStatus","❌ Write something before publishing.","error");
+  status("postStatus","Publishing...");
+  try{
+    let image_url=null;
+    if(file) image_url=await uploadFile(file,`${currentUser.id}/posts/${Date.now()}`);
+    const {error}=await sb.from("posts").insert({user_id:currentUser.id,content,image_url});
+    if(error) throw error;
+    $("postText").value=""; $("postImage").value="";
+    await addXP(10);
+    status("postStatus","✅ Post published! +10 XP","success");
+    await Promise.all([loadFeed(),loadPostCount(),loadLeaderboard()]);
+  }catch(e){status("postStatus","❌ "+e.message,"error");}
+}
+
+async function addXP(amount){
+  const xp=(currentProfile.xp||0)+amount;
+  const level=Math.floor(xp/100)+1;
+  const {data,error}=await sb.from("profiles").update({xp,level}).eq("id",currentUser.id).select().single();
+  if(!error&&data){currentProfile=data;renderProfile();}
+}
+
+async function loadFeed(){
+  const {data,error}=await sb.from("posts").select("*").order("created_at",{ascending:false}).limit(50);
+  if(error){$("feed").innerHTML=`<div class="status error">❌ ${escapeHTML(error.message)}</div>`;return;}
+  const userIds=[...new Set((data||[]).map(p=>p.user_id))];
+  let profiles={};
+  if(userIds.length){
+    const r=await sb.from("profiles").select("id,username,avatar,avatar_url,role").in("id",userIds);
+    (r.data||[]).forEach(p=>profiles[p.id]=p);
+  }
+  $("feed").innerHTML=(data||[]).map(post=>{
+    const p=profiles[post.user_id]||{};
+    return `<article class="post"><div class="user-head"><div class="small-avatar">${avatarHTML(p)}</div><div><b>${escapeHTML(p.username||"PIXEL PLAYER")}</b><div class="tiny">${escapeHTML(p.role||"user").toUpperCase()} • ${new Date(post.created_at).toLocaleString()}</div></div></div><p>${escapeHTML(post.content).replace(/\n/g,"<br>")}</p>${post.image_url?`<img src="${escapeHTML(post.image_url)}" alt="Post image">`:""}</article>`;
+  }).join("")||'<div class="card tiny">No posts yet. Be the first Pixel Friend to post!</div>';
+}
+
+async function searchUsers(){
+  const q=(($("friendSearch")?.value)||($("globalSearch")?.value)||"").trim();
+  let query=sb.from("profiles").select("id,username,bio,avatar,avatar_url,xp,level,role").order("xp",{ascending:false}).limit(50);
+  if(q) query=query.ilike("username","%"+q+"%");
+  const {data,error}=await query;
+  if(error){$("searchResults").innerHTML=`<div class="status error">❌ ${escapeHTML(error.message)}</div>`;return;}
+  $("searchResults").innerHTML=(data||[]).map(p=>`<div class="user-card"><div class="user-head"><div class="small-avatar">${avatarHTML(p)}</div><div><b>${escapeHTML(p.username)}</b><div class="tiny">LEVEL ${p.level||1} • ${p.xp||0} XP</div></div></div><p class="tiny">${escapeHTML(p.bio||"PIXEL EXPLORER")}</p><span class="badge">${p.role==="admin"?"🛡️ ADMIN":"🎮 PLAYER"}</span><br><button class="secondary" style="margin-top:10px" onclick="openChat(\'${p.id}\')">💬 MESSAGE</button></div>`).join("")||'<div class="card tiny">No users found.</div>';
+}
+
+async function loadLeaderboard(){
+  const {data,error}=await sb.from("profiles").select("username,avatar,avatar_url,xp,level,role").order("xp",{ascending:false}).limit(20);
+  if(error){$("leaders").innerHTML=`<div class="status error">❌ ${escapeHTML(error.message)}</div>`;return;}
+  $("leaders").innerHTML=(data||[]).map((p,i)=>`<div class="user-card"><div class="user-head"><b>#${i+1}</b><div class="small-avatar">${avatarHTML(p)}</div><div><b>${escapeHTML(p.username)}</b><div class="tiny">LEVEL ${p.level||1} • ${p.xp||0} XP ${p.role==="admin"?"• 🛡️ ADMIN":""}</div></div></div></div>`).join("")||"No players yet.";
+}
+
+async function loadPostCount(){
+  const {count}=await sb.from("posts").select("*",{count:"exact",head:true}).eq("user_id",currentUser.id);
+  $("statPosts").textContent=count||0;
+}
+
+function openProfile(){
+  $("editName").value=currentProfile.username||"";
+  $("editBio").value=currentProfile.bio||"";
+  $("editAvatar").value=currentProfile.avatar||"👾";
+  $("profileImage").value="";
+  $("profilePreview").innerHTML=avatarHTML(currentProfile);
+  $("profileEditor").classList.remove("hidden");
+  $("profileEditor").scrollIntoView({behavior:"smooth"});
+}
+function closeProfile(){$("profileEditor").classList.add("hidden");status("profileStatus","");}
+function previewProfileImage(){
+  const file=$("profileImage").files[0]; if(!file) return;
+  if(previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+  previewObjectUrl=URL.createObjectURL(file);
+  $("profilePreview").innerHTML=`<img src="${previewObjectUrl}" alt="Preview">`;
+}
+
+async function saveProfile(){
+  const username=$("editName").value.trim(),bio=$("editBio").value.trim(),avatar=$("editAvatar").value,file=$("profileImage").files[0];
+  if(!username) return status("profileStatus","❌ Username is required.","error");
+  status("profileStatus","Saving profile...");
+  try{
+    let avatar_url=currentProfile.avatar_url||null;
+    if(file) avatar_url=await uploadFile(file,`${currentUser.id}/avatar`);
+    const {data,error}=await sb.from("profiles").update({username,bio,avatar,avatar_url}).eq("id",currentUser.id).select().single();
+    if(error) throw error;
+    currentProfile=data; renderProfile();
+    status("profileStatus","✅ Profile updated successfully!","success");
+    setTimeout(closeProfile,1000);
+  }catch(e){status("profileStatus","❌ "+e.message,"error");}
+}
+
+async function loadAdmin(){
+  if(!currentProfile||currentProfile.role!=="admin") return;
+  status("adminStatus","Loading users...");
+  const {data,error}=await sb.from("profiles").select("id,username,bio,avatar,avatar_url,xp,level,role,created_at").order("created_at",{ascending:false}).limit(100);
+  if(error){status("adminStatus","❌ "+error.message,"error");return;}
+  status("adminStatus",`${data.length} users loaded.`,"success");
+  $("adminUsers").innerHTML=data.map(p=>`<div class="user-card"><div class="user-head"><div class="small-avatar">${avatarHTML(p)}</div><div><b>${escapeHTML(p.username)}</b><div class="tiny">${escapeHTML(p.id)}</div></div></div><p class="tiny">Role: <b>${escapeHTML(p.role||"user")}</b> • Level ${p.level||1} • ${p.xp||0} XP</p></div>`).join("");
+}
+
+
+async function loadMessageUsers(){
+  if(!currentUser) return;
+  const {data,error}=await sb.from("profiles").select("id,username,avatar,avatar_url,role").neq("id",currentUser.id).order("username").limit(100);
+  if(error){$("messageUsers").innerHTML=`<div class="status error">❌ ${escapeHTML(error.message)}</div>`;return;}
+  $("messageUsers").innerHTML=(data||[]).map(p=>`<button class="chat-user ${selectedChatUser?.id===p.id?"active":""}" onclick="openChat('${p.id}')"><span class="small-avatar" style="display:inline-grid;vertical-align:middle;margin-right:8px">${avatarHTML(p)}</span><b>${escapeHTML(p.username)}</b></button>`).join("")||'<div class="tiny">No other users yet.</div>';
+}
+async function openChat(userId){
+  const {data,error}=await sb.from("profiles").select("id,username,avatar,avatar_url").eq("id",userId).single();
+  if(error) return status("messageStatus","❌ "+error.message,"error");
+  selectedChatUser=data; page("messages"); $("chatTitle").textContent=data.username; $("messageInput").disabled=false; $("sendButton").disabled=false;
+  await loadMessageUsers(); await loadMessages(); subscribeChat();
+}
+async function loadMessages(){
+  if(!selectedChatUser) return;
+  const a=currentUser.id,b=selectedChatUser.id;
+  const {data,error}=await sb.from("messages").select("*").or(`and(sender_id.eq.${a},receiver_id.eq.${b}),and(sender_id.eq.${b},receiver_id.eq.${a})`).order("created_at",{ascending:true}).limit(300);
+  if(error){$("messagesList").innerHTML=`<div class="status error">❌ ${escapeHTML(error.message)}</div>`;return;}
+  $("messagesList").innerHTML=(data||[]).map(m=>`<div class="message ${m.sender_id===currentUser.id?"mine":""}">${escapeHTML(m.content)}<div class="message-time">${new Date(m.created_at).toLocaleString()}</div></div>`).join("")||'<div class="empty">START THE CONVERSATION 👋</div>';
+  $("messagesList").scrollTop=$("messagesList").scrollHeight;
+}
+async function sendMessage(){
+  if(!selectedChatUser) return; const content=$("messageInput").value.trim(); if(!content) return;
+  const {error}=await sb.from("messages").insert({sender_id:currentUser.id,receiver_id:selectedChatUser.id,content});
+  if(error) return status("messageStatus","❌ "+error.message,"error");
+  $("messageInput").value=""; await loadMessages();
+}
+function subscribeChat(){
+  if(chatChannel) sb.removeChannel(chatChannel);
+  chatChannel=sb.channel("pixel-friend-chat").on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},payload=>{
+    const m=payload.new,a=currentUser.id,b=selectedChatUser?.id;
+    if(b&&((m.sender_id===a&&m.receiver_id===b)||(m.sender_id===b&&m.receiver_id===a))) loadMessages();
+  }).subscribe();
+}
+
+async function logout(){
+  if(chatChannel){sb.removeChannel(chatChannel);chatChannel=null;}
+  await sb.auth.signOut();
+  currentUser=null;currentProfile=null;
+  $("app").classList.add("hidden");$("authScreen").classList.remove("hidden");
+  $("loginPass").value="";
+  status("authStatus","You have logged out.","success");
+}
+
+function theme(){document.body.classList.toggle("dark");}
+
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="SIGNED_OUT"){
+    $("app").classList.add("hidden");$("authScreen").classList.remove("hidden");
+  }
+});
+
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(session?.user){
+    if(session.user.email_confirmed_at) await startApp(session.user);
+    else { await sb.auth.signOut(); status("authStatus","📧 Please verify your email before logging in.","error"); }
+  }
+})();
+</script>
 </body>
 </html>
