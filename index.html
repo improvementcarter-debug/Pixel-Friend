@@ -181,134 +181,128 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 </div>
 
 <div id="app" class="app">
-<header class="topbar">  
-  <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> PIXEL MESSENGER</div>  
-  <div class="actions">    
-    <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">    
-    <button class="notification-button" onclick="page('messages')" title="Notifications">
+<header class="topbar">
+    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> PIXEL MESSENGER</div>
+    <div class="actions">
+        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">
+        <button class="notification-button" onclick="page('messages')" title="Notifications">
       🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span>
     </button>
-    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>  
-  </div>
-</header>
-
-<div class="layout">
-<aside class="side">  
-  <div class="mini">    
-    <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>    
-    <h3 id="sideName">PLAYER</h3>    
-    <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>
-    <div>LEVEL <span id="sideLevel">1</span></div>    
-    <div class="xp"><div id="xpBar"></div></div>    
-    <p id="xpText" class="tiny">0 / 100 XP</p>  
-  </div>  
-  <nav class="menu">    
-    <button class="active" onclick="page('home',this)">🏠 HOME</button>    
-    <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>    
-    <button onclick="page('messages',this)">💬 MESSAGES</button>    
-    <button onclick="page('leaderboard',this)">🏆 RANK</button>    
-    <button onclick="page('profile',this)">👤 PROFILE</button>    
-    <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>
-    <button class="danger" onclick="logout()">🚪 LOGOUT</button>  
-  </nav>
-</aside>
-
-<main>
-<section id="home" class="page active">  
-  <div class="hero">
-    <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>REALTIME MESSAGING • MEDIA • EMOJI REACTIONS</p></div>
-    <div style="font-size:50px">🕹️</div>
-  </div>  
-  <div class="card" style="padding:20px">    
-    <h2>✍️ CREATE POST</h2>    
-    <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>        
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;">      
-      <button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PICTURE</button>      
-      <button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button>      
-      <button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button>
-
-      <span id="postImagePill" class="file-pill hidden"></span>
-      <span id="postVideoPill" class="file-pill hidden"></span>
-      <span id="postAudioPill" class="file-pill hidden"></span>
-
-      <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')">      
-      <input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')">      
-      <input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">    
+    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
     </div>
-    <div class="row"><button class="primary" onclick="createPost()">🚀 PUBLISH POST (+10 XP)</button></div>    
-    <div id="postStatus" class="status"></div>  
-  </div>  
-  <div id="feed"></div>
-</section>
+</header>
+<div class="layout">
+<aside class="side">
+    <div class="mini">
+        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>
+        <h3 id="sideName">PLAYER</h3>
+        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>
+    <div>LEVEL <span id="sideLevel">1</span></div>
+        <div class="xp"><div id="xpBar"></div></div>
+        <p id="xpText" class="tiny">0 / 100 XP</p>
+    </div>
+    <nav class="menu">
+        <button class="active" onclick="page('home',this)">🏠 HOME</button>
+        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>
+        <button onclick="page('messages',this)">💬 MESSAGES</button>
+        <button onclick="page('leaderboard',this)">🏆 RANK</button>
+        <button onclick="page('profile',this)">👤 PROFILE</button>
+        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>
+        <button class="danger" onclick="logout()">🚪 LOGOUT</button>
+    </nav>
+</aside>
+<main>
+<section id="home" class="page active">
+    <div class="hero">
+      <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>REALTIME MESSAGING • MEDIA • EMOJI REACTIONS</p></div>
+      <div style="font-size:50px">🕹️</div>
+    </div>
+    <div class="card" style="padding:20px">
+        <h2>✍️ CREATE POST</h2>
+        <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;">
+            <button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PICTURE</button>
+            <button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button>
+            <button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button>
 
-<section id="friends" class="page">  
-  <div class="card" style="padding:20px">    
-    <h1>👥 PIXEL COMMUNITY</h1>    
-    <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">  
-  </div>  
-  <div id="searchResults" class="grid" style="margin-top:15px"></div>  
-  <div class="card" style="padding:20px;margin-top:20px">    
-    <h2>🤝 RECOMMENDED FRIENDS</h2>    
-    <div id="friendsList" class="grid" style="margin-top:15px"></div>  
-  </div>
-</section>
+            <span id="postImagePill" class="file-pill hidden"></span>
+            <span id="postVideoPill" class="file-pill hidden"></span>
+            <span id="postAudioPill" class="file-pill hidden"></span>
 
-<section id="messages" class="page">  
-  <div class="card" style="padding:20px">    
-    <div class="messages-layout">      
-      <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>      
-      <div class="chat-main" style="position:relative">        
-        <div class="chat-header">          
-          <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>          
-          <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>        
-        </div>                
-        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                
-        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
-
-        <!-- Cute Pixel Stickers Picker Drawer -->
-        <div id="stickerPicker" class="sticker-picker">
-          <div class="sticker-item" onclick="sendSticker('👾')">👾</div>
-          <div class="sticker-item" onclick="sendSticker('🕹️')">🕹️</div>
-          <div class="sticker-item" onclick="sendSticker('❤️')">❤️</div>
-          <div class="sticker-item" onclick="sendSticker('🔥')">🔥</div>
-          <div class="sticker-item" onclick="sendSticker('🚀')">🚀</div>
-          <div class="sticker-item" onclick="sendSticker('⭐')">⭐</div>
-          <div class="sticker-item" onclick="sendSticker('🐱')">🐱</div>
-          <div class="sticker-item" onclick="sendSticker('🦊')">🦊</div>
+            <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')">
+            <input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')">
+            <input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">
         </div>
-
-        <div class="chat-input-bar">          
-          <!-- Reply Bar Preview -->
-          <div id="replyBar" class="hidden" style="display:flex;justify-content:space-between;align-items:center;background:#09101d;border:1px solid var(--cyan);padding:6px 10px;border-radius:2px;margin-bottom:6px">
-            <span id="replyBarText" class="tiny" style="color:var(--cyan)">Replying to message</span>
-            <button class="danger" style="padding:2px 6px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button>
-          </div>
-
-          <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">            
-            <span id="chatAttachmentPill" class="file-pill"></span>            
-            <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>          
-          </div>
-
-          <div class="chat-controls" style="flex-wrap:wrap">            
-            <button class="secondary" style="padding:10px 12px" onclick="toggleStickerPicker()" title="Cute Pixel Stickers" disabled id="btnSticker">🎨</button>
-            <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>            
-            <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>            
-            <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>
-
-            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="selectChatMedia('image')">            
-            <input id="chatVideoInput" type="file" accept="video/*" class="hidden" onchange="selectChatMedia('video')">
-
-            <input id="messageInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">            
-            <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>          
-          </div>        
-        </div>
-      </div>    
-    </div>  
-  </div>
+        <div class="row"><button class="primary" onclick="createPost()">🚀 PUBLISH POST (+10 XP)</button></div>
+        <div id="postStatus" class="status"></div>
+    </div>
+    <div id="feed"></div>
 </section>
 
-<section id="leaderboard" class="page">  
-  <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div>
+<section id="friends" class="page">
+    <div class="card" style="padding:20px">
+        <h1>👥 PIXEL COMMUNITY</h1>
+        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">
+    </div>
+    <div id="searchResults" class="grid" style="margin-top:15px"></div>
+    <div class="card" style="padding:20px;margin-top:20px">
+        <h2>🤝 RECOMMENDED FRIENDS</h2>
+        <div id="friendsList" class="grid" style="margin-top:15px"></div>
+    </div>
+</section>
+
+<section id="messages" class="page">
+    <div class="card" style="padding:20px">
+        <div class="messages-layout">
+            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>
+            <div class="chat-main" style="position:relative">
+                <div class="chat-header">
+                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>
+                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>
+                </div>
+                <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>
+                <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
+
+                <!-- Cute Pixel Stickers Picker Drawer -->
+                <div id="stickerPicker" class="sticker-picker">
+                  <div class="sticker-item" onclick="sendSticker('👾')">👾</div>
+                  <div class="sticker-item" onclick="sendSticker('🕹️')">🕹️</div>
+                  <div class="sticker-item" onclick="sendSticker('❤️')">❤️</div>
+                  <div class="sticker-item" onclick="sendSticker('🔥')">🔥</div>
+                  <div class="sticker-item" onclick="sendSticker('🚀')">🚀</div>
+                  <div class="sticker-item" onclick="sendSticker('⭐')">⭐</div>
+                  <div class="sticker-item" onclick="sendSticker('🐱')">🐱</div>
+                  <div class="sticker-item" onclick="sendSticker('🦊')">🦊</div>
+                </div>
+
+                <div class="chat-input-bar">
+                  <!-- Reply Bar Preview -->
+                  <div id="replyBar" class="hidden" style="display:flex;justify-content:space-between;align-items:center;background:#09101d;border:1px solid var(--cyan);padding:6px 10px;border-radius:2px;margin-bottom:6px">
+                    <span id="replyBarText" class="tiny" style="color:var(--cyan)">Replying to message</span>
+                    <button class="danger" style="padding:2px 6px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button>
+                  </div>
+                  <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+                    <span id="chatAttachmentPill" class="file-pill"></span>
+                    <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>
+                  </div>
+                  <div class="chat-controls" style="flex-wrap:wrap">
+                    <button class="secondary" style="padding:10px 12px" onclick="toggleStickerPicker()" title="Cute Pixel Stickers" disabled id="btnSticker">🎨</button>
+                    <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>
+                    <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>
+                    <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>
+                    <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="selectChatMedia('image')">
+                    <input id="chatVideoInput" type="file" accept="video/*" class="hidden" onchange="selectChatMedia('video')">
+                    <input id="messageInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">
+                    <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="leaderboard" class="page">
+    <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div>
 </section>
 
 <section id="adminPanel" class="page">
@@ -319,49 +313,47 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
   </div>
 </section>
 
-<section id="profile" class="page">  
-  <div class="card" style="padding:24px;max-width:540px;margin:0 auto">    
-    <div style="text-align:center;margin-bottom:20px">
-      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>    
-      <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>    
-      <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>
-    </div>        
+<section id="profile" class="page">
+    <div class="card" style="padding:24px;max-width:540px;margin:0 auto">
+        <div style="text-align:center;margin-bottom:20px">
+          <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>
+          <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>
+          <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>
+        </div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+          <div class="card" style="padding:14px;text-align:center">
+            <div class="tiny" style="margin-bottom:4px">CURRENT LEVEL</div>
+            <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong>
+          </div>
+          <div class="card" style="padding:14px;text-align:center">
+            <div class="tiny" style="margin-bottom:4px">TOTAL XP</div>
+            <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong>
+          </div>
+        </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
-      <div class="card" style="padding:14px;text-align:center">
-        <div class="tiny" style="margin-bottom:4px">CURRENT LEVEL</div>
-        <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong>
-      </div>
-      <div class="card" style="padding:14px;text-align:center">
-        <div class="tiny" style="margin-bottom:4px">TOTAL XP</div>
-        <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong>
-      </div>
+        <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">
+          <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>
+          <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>
+          <input id="editUsernameInput" placeholder="Enter new username...">
+          <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>
+          <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>
+          <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>
+        </div>
+
+        <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">
+          <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>
+              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>
+              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">
+          </div>
+        </div>
     </div>
-
-    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">
-      <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>
-      <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>
-      <input id="editUsernameInput" placeholder="Enter new username...">
-      
-      <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>
-      <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>
-      
-      <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>
-    </div>
-
-    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">
-      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">      
-        <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>      
-        <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>      
-        <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">    
-      </div>
-    </div>  
-  </div>
 </section>
-
 </main>
-</div></div>
+</div>
+</div>
 <div id="toast" class="toast hidden"></div>
 
 <script>
@@ -376,7 +368,6 @@ let mediaRecorder = null, audioChunks = [], isRecording = false;
 let replyingToMessageId = null;
 
 const ADMIN_EMAIL = "admin@pixel.com"; 
-
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 
@@ -386,12 +377,12 @@ function playRetroSound(type = 'click') {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    
+
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
+
     const now = audioCtx.currentTime;
-    
+
     if (type === 'click') {
       osc.type = 'square';
       osc.frequency.setValueAtTime(440, now);
@@ -442,7 +433,7 @@ function toast(m){
 }
 
 function status(id, m, err=false){
-  if($(id)){ 
+  if($(id)){
     $(id).textContent = m;
     $(id).style.color = err ? "#ff7795" : "var(--green)";
   }
@@ -479,10 +470,10 @@ async function register(){
   const avatar = $("regAvatar").value;
   if(username.length < 2 || !email.includes("@") || password.length < 6) return status("authStatus","Check input fields.",true);
   status("authStatus","Creating account...");
-  
+
   const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});
   if(r.error) return status("authStatus", r.error.message, true);
-  
+
   const loginRes = await sb.auth.signInWithPassword({email, password});
   if(loginRes.error){
     status("authStatus", "Account created! Please log in.");
@@ -559,10 +550,10 @@ async function saveProfileInfo(){
   const username = $("editUsernameInput").value.trim();
   const bio = $("editBioInput").value.trim();
   if(!username) return toast("Username cannot be empty");
-  
+
   const r = await sb.from("profiles").update({ username, bio }).eq("id", currentUser.id);
   if(r.error) return toast("❌ Error updating profile: " + r.error.message);
-  
+
   currentProfile.username = username;
   currentProfile.bio = bio;
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
@@ -642,290 +633,320 @@ async function loadAdminUsers(){
 }
 window.loadAdminUsers = loadAdminUsers;
 
-async function toggleUserAdmin(targetUserId, currentStatus){
-  if(!isAdmin()) return toast("❌ Admin privileges required.");
-  const newStatus = !currentStatus;
-  const r = await sb.from("profiles").update({ is_admin: newStatus }).eq("id", targetUserId);
-  if(r.error){
-    toast("❌ Error: " + r.error.message);
-  } else {
-    toast(newStatus ? "✅ User promoted to Admin!" : "ℹ️ Admin role revoked.");
-    playRetroSound('success');
-    loadAdminUsers();
-  }
-}
-window.toggleUserAdmin = toggleUserAdmin;
-
-async function toggleUserVerify(targetUserId, currentStatus){
-  if(!isAdmin()) return toast("❌ Admin privileges required.");
-  const newStatus = !currentStatus;
-  const r = await sb.from("profiles").update({ is_verified: newStatus }).eq("id", targetUserId);
-  if(r.error){
-    toast("❌ Error: " + r.error.message);
-  } else {
-    toast(newStatus ? "✅ Account verified successfully!" : "ℹ️ Account verification removed.");
-    playRetroSound('success');
-    loadAdminUsers();
-  }
+async function toggleUserVerify(userId, currentStatus){
+  if(!isAdmin()) return;
+  const r = await sb.from("profiles").update({ is_verified: !currentStatus }).eq("id", userId);
+  if(r.error) return toast("❌ Error: " + r.error.message);
+  playRetroSound('success');
+  toast("✅ User verification updated!");
+  loadAdminUsers();
 }
 window.toggleUserVerify = toggleUserVerify;
 
-// --- NOTIFICATIONS ---
-async function updateNotificationBadge(){
-  try {
-    const { count } = await sb.from("messages").select("*", { count: 'exact', head: true }).eq("receiver_id", currentUser.id).eq("is_read", false);
-    const badge = $("notifBadge");
-    if(badge && count > 0){
-      badge.textContent = count;
-      badge.style.display = "inline-block";
-    } else if(badge){
-      badge.style.display = "none";
-    }
-  } catch(e){ console.warn(e); }
+async function toggleUserAdmin(userId, currentStatus){
+  if(!isAdmin()) return;
+  const r = await sb.from("profiles").update({ is_admin: !currentStatus }).eq("id", userId);
+  if(r.error) return toast("❌ Error: " + r.error.message);
+  playRetroSound('success');
+  toast("🛡️ Admin status updated!");
+  loadAdminUsers();
 }
+window.toggleUserAdmin = toggleUserAdmin;
 
-// --- POSTS & FEED ---
+// --- FILE PREVIEWS & UPLOADS ---
 function previewPostFile(type){
-  if(type==='image'){
-    postImageFile = $("postImageInput").files[0];
-    if(postImageFile){ $("postImagePill").textContent = "🖼️ " + postImageFile.name; $("postImagePill").classList.remove("hidden"); }
-  } else if(type==='video'){
-    postVideoFile = $("postVideoInput").files[0];
-    if(postVideoFile){ $("postVideoPill").textContent = "📹 " + postVideoFile.name; $("postVideoPill").classList.remove("hidden"); }
-  } else if(type==='audio'){
-    postAudioFile = $("postAudioInput").files[0];
-    if(postAudioFile){ $("postAudioPill").textContent = "🎵 " + postAudioFile.name; $("postAudioPill").classList.remove("hidden"); }
-  }
+  const fileInput = $(`post${type.charAt(0).toUpperCase() + type.slice(1)}Input`);
+  const file = fileInput.files[0];
+  if(!file) return;
+
+  if(type === 'image') postImageFile = file;
+  if(type === 'video') postVideoFile = file;
+  if(type === 'audio') postAudioFile = file;
+
+  const pill = $(`post${type.charAt(0).toUpperCase() + type.slice(1)}Pill`);
+  pill.textContent = `${type.toUpperCase()}: ${file.name}`;
+  pill.classList.remove("hidden");
+  toast(`Attached ${type}!`);
 }
 window.previewPostFile = previewPostFile;
 
+// --- POSTS & COMMUNITY FEED ---
 async function createPost(){
-  const text = $("postText").value.trim();
-  if(!text && !postImageFile && !postVideoFile && !postAudioFile) return toast("Write content or attach media to post.");
+  const content = $("postText").value.trim();
+  if(!content && !postImageFile && !postVideoFile && !postAudioFile) {
+    return status("postStatus", "Write something or attach media!", true);
+  }
+
   status("postStatus", "Publishing post...");
-  let image_url = null, video_url = null, audio_url = null;
-
   try {
-    if(postImageFile){
-      const path = `${currentUser.id}/img_${Date.now()}.${postImageFile.name.split('.').pop()}`;
+    let image_url = null, video_url = null, audio_url = null;
+
+    if(postImageFile) {
+      const ext = postImageFile.name.split('.').pop();
+      const path = `${currentUser.id}/post_img_${Date.now()}.${ext}`;
       const u = await sb.storage.from("posts_media").upload(path, postImageFile);
-      if(u.data) image_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+      if(u.error) throw u.error;
+      image_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
     }
-    if(postVideoFile){
-      const path = `${currentUser.id}/vid_${Date.now()}.${postVideoFile.name.split('.').pop()}`;
+
+    if(postVideoFile) {
+      const ext = postVideoFile.name.split('.').pop();
+      const path = `${currentUser.id}/post_vid_${Date.now()}.${ext}`;
       const u = await sb.storage.from("posts_media").upload(path, postVideoFile);
-      if(u.data) video_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+      if(u.error) throw u.error;
+      video_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
     }
-    if(postAudioFile){
-      const path = `${currentUser.id}/audio_${Date.now()}.${postAudioFile.name.split('.').pop()}`;
+
+    if(postAudioFile) {
+      const ext = postAudioFile.name.split('.').pop();
+      const path = `${currentUser.id}/post_aud_${Date.now()}.${ext}`;
       const u = await sb.storage.from("posts_media").upload(path, postAudioFile);
-      if(u.data) audio_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+      if(u.error) throw u.error;
+      audio_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
     }
-  } catch(e){ console.warn("Media upload failed:", e); }
 
-  const payload = { user_id: currentUser.id, content: text || "" };
-  if(image_url) payload.image_url = image_url;
-  if(video_url) payload.video_url = video_url;
-  if(audio_url) payload.audio_url = audio_url;
+    const { error } = await sb.from("posts").insert({
+      user_id: currentUser.id,
+      content,
+      image_url,
+      video_url,
+      audio_url
+    });
 
-  const r = await sb.from("posts").insert(payload);
-  if(r.error){
-    status("postStatus", "Error: " + r.error.message, true);
-  } else {
-    currentProfile.xp = (currentProfile.xp || 0) + 10;
-    await sb.from("profiles").update({ xp: currentProfile.xp }).eq("id", currentUser.id);
-    loadProfile();
-    $("postText").value=""; postImageFile=null; postVideoFile=null; postAudioFile=null;
-    $("postImagePill").classList.add("hidden"); $("postVideoPill").classList.add("hidden"); $("postAudioPill").classList.add("hidden");
-    status("postStatus", "");
+    if(error) throw error;
+
+    const newXP = (currentProfile.xp || 0) + 10;
+    await sb.from("profiles").update({ xp: newXP }).eq("id", currentUser.id);
+    currentProfile.xp = newXP;
+
+    $("postText").value = "";
+    postImageFile = null; postVideoFile = null; postAudioFile = null;
+    $("postImagePill").classList.add("hidden");
+    $("postVideoPill").classList.add("hidden");
+    $("postAudioPill").classList.add("hidden");
+
+    status("postStatus", "✅ Post published! +10 XP");
     playRetroSound('success');
-    toast("🎉 Post published! +10 XP");
+    loadProfile();
     loadFeed();
+  } catch(err) {
+    status("postStatus", "❌ Error publishing post: " + err.message, true);
   }
 }
 window.createPost = createPost;
 
-async function deletePost(postId){
-  const r = await sb.from("posts").select("user_id").eq("id", postId).single();
-  if(r.data && (r.data.user_id !== currentUser.id && !isAdmin())) {
-    return toast("❌ Unauthorized: Only the author or an admin can delete this post.");
-  }
-  if(!confirm("Are you sure you want to delete this post?")) return;
-  const element = $(`post_${postId}`);
-  if(element) element.remove();
-  const delRes = await sb.from("posts").delete().eq("id", postId);
-  if(delRes.error) toast("❌ Delete failed: " + delRes.error.message);
-  else toast("🗑️ Post deleted!");
-}
-window.deletePost = deletePost;
-
-async function deleteMessage(messageId){
-  const r = await sb.from("messages").select("sender_id, receiver_id").eq("id", messageId).single();
-  if(r.data && (r.data.sender_id !== currentUser.id && r.data.receiver_id !== currentUser.id && !isAdmin())) {
-    return toast("❌ Unauthorized: You cannot delete this message.");
-  }
-  if(!confirm("Are you sure you want to delete this message?")) return;
-  const element = $(`message_${messageId}`);
-  if(element) element.remove();
-  const delRes = await sb.from("messages").delete().eq("id", messageId);
-  if(delRes.error) toast("❌ Delete failed: " + delRes.error.message);
-  else toast("🗑️ Message deleted!");
-}
-window.deleteMessage = deleteMessage;
-
 async function loadFeed(){
-  const r = await sb.from("posts").select("*, profiles(*), post_reactions(*), comments(*, profiles(*))").order("created_at",{ascending:false}).limit(20);
-  if(!r.data) return;
+  const feedEl = $("feed");
+  const { data: posts, error } = await sb.from("posts")
+    .select(`*, profiles(username, avatar, avatar_url, is_verified), comments(*, profiles(username, avatar, avatar_url)), post_reactions(*)`)
+    .order("created_at", { ascending: false });
 
-  $("feed").innerHTML = r.data.map(p => {
-    const author = p.profiles || {};
-    const avatarMarkup = author.avatar_url ? `<img src="${esc(author.avatar_url)}">` : esc(author.avatar||"👾");
-    const verifiedBadge = author.is_verified ? ' ✅' : '';
-    const reactions = p.post_reactions || [];
-    const counts = { '❤️':0, '🔥':0, '😂':0, '👍':0 };
-    const myReactions = new Set();
-    reactions.forEach(react => {
-      counts[react.emoji] = (counts[react.emoji] || 0) + 1;
-      if(react.user_id === currentUser.id) myReactions.add(react.emoji);
+  if(error || !posts) {
+    feedEl.innerHTML = `<div class="card" style="padding:20px;text-align:center">Could not load feed.</div>`;
+    return;
+  }
+
+  if(posts.length === 0){
+    feedEl.innerHTML = `<div class="card" style="padding:20px;text-align:center;margin-top:16px">No posts yet. Be the first to share something!</div>`;
+    return;
+  }
+
+  feedEl.innerHTML = posts.map(post => {
+    const p = post.profiles || {};
+    const avatarHtml = p.avatar_url ? `<img src="${esc(p.avatar_url)}">` : esc(p.avatar || "👾");
+    const verifiedMark = p.is_verified ? ' ✅' : '';
+
+    let mediaHtml = '';
+    if(post.image_url) mediaHtml += `<img src="${esc(post.image_url)}" class="post-media-img">`;
+    if(post.video_url) mediaHtml += `<video src="${esc(post.video_url)}" controls class="post-media-img"></video>`;
+    if(post.audio_url) mediaHtml += `<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>`;
+
+    const reactions = post.post_reactions || [];
+    const reactionCounts = {};
+    const userReactedEmojis = new Set();
+    reactions.forEach(r => {
+      reactionCounts[r.emoji] = (reactionCounts[r.emoji] || 0) + 1;
+      if(r.user_id === currentUser.id) userReactedEmojis.add(r.emoji);
     });
 
-    const comments = p.comments || [];
-    const canDeletePost = p.user_id === currentUser.id || isAdmin();
+    const commonEmojis = ['❤️', '🔥', '👍', '🚀', '👾'];
+    const reactionsHtml = commonEmojis.map(emoji => {
+      const count = reactionCounts[emoji] || 0;
+      const isActive = userReactedEmojis.has(emoji) ? ' active' : '';
+      return `<button class="react-btn${isActive}" onclick="togglePostReaction('${post.id}', '${emoji}')">${emoji} ${count > 0 ? count : ''}</button>`;
+    }).join('');
 
-    return `
-    <div id="post_${p.id}" class="post-card">
-      <div class="post-header">
-        <div class="post-author">
-          <div class="user-avatar">${avatarMarkup}</div>
-          <div>
-            <strong>${esc(author.username||'Player')}${verifiedBadge}</strong>
-            <div class="tiny">${new Date(p.created_at).toLocaleString()}</div>
+    const comments = post.comments || [];
+    comments.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+    const commentsHtml = comments.map(c => {
+      const cp = c.profiles || {};
+      const cAvatar = cp.avatar_url ? `<img src="${esc(cp.avatar_url)}">` : esc(cp.avatar || "👾");
+      return `
+        <div class="comment-item">
+          <div class="user-avatar" style="width:28px;height:28px;font-size:14px">${cAvatar}</div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between">
+              <strong style="font-size:14px;color:var(--cyan)">${esc(cp.username)}</strong>
+              <span class="tiny" style="font-size:12px">${new Date(c.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            </div>
+            <div style="font-size:16px;word-break:break-word">${esc(c.content)}</div>
           </div>
         </div>
-        ${canDeletePost ? `<button class="danger" style="padding:2px 6px;font-size:12px" onclick="deletePost('${p.id}')">🗑️ DELETE</button>` : ''}
-      </div>
-      ${p.content ? `<p style="white-space:pre-wrap;margin:8px 0">${esc(p.content)}</p>` : ''}
-      ${p.image_url ? `<img class="post-media-img" src="${esc(p.image_url)}">` : ''}
-      ${p.video_url ? `<video class="post-media-video" controls src="${esc(p.video_url)}"></video>` : ''}
-      ${p.audio_url ? `<audio class="post-audio" controls src="${esc(p.audio_url)}"></audio>` : ''}
-      <div class="post-actions">
-        ${['❤️','🔥','😂','👍'].map(e => `
-          <button class="react-btn ${myReactions.has(e)?'active':''}" onclick="toggleReaction('${p.id}', '${e}')">
-            ${e} ${counts[e] || 0}
-          </button>
-        `).join('')}
-      </div>
-      <div class="comment-section">
-        <strong>💬 COMMENTS (${comments.length})</strong>
-        <div style="margin-top:8px">
-          ${comments.map(c => `
-            <div class="comment-item">
-              <strong style="color:var(--cyan)">${esc(c.profiles?.username||'User')}${c.profiles?.is_verified?' ✅':''}:</strong>
-              <span>${esc(c.content)}</span>
+      `;
+    }).join('');
+
+    const canDelete = post.user_id === currentUser.id || isAdmin();
+
+    return `
+      <div class="post-card" id="post-${post.id}">
+        <div class="post-header">
+          <div class="post-author">
+            <div class="user-avatar">${avatarHtml}</div>
+            <div>
+              <strong>${esc(p.username)}${verifiedMark}</strong>
+              <div class="tiny">${new Date(post.created_at).toLocaleString()}</div>
             </div>
-          `).join('')}
+          </div>
+          ${canDelete ? `<button class="danger" style="padding:4px 8px;font-size:12px" onclick="deletePost('${post.id}')">🗑️</button>` : ''}
         </div>
-        <div style="display:flex;gap:6px;margin-top:10px">
-          <input id="commentInput_${p.id}" placeholder="Write a comment..." style="margin:0" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
-          <button class="secondary" style="padding:6px 12px;font-size:15px" onclick="addComment('${p.id}')">SEND</button>
+        <div style="font-size:18px;word-break:break-word;margin-bottom:8px">${esc(post.content)}</div>
+        ${mediaHtml}
+        <div class="post-actions">
+          ${reactionsHtml}
+        </div>
+        <div class="comment-section">
+          <div style="max-height:160px;overflow-y:auto;margin-bottom:8px">${commentsHtml.length ? commentsHtml : '<div class="tiny">No comments yet. Be the first!</div>'}</div>
+          <div style="display:flex;gap:6px">
+            <input id="comment-input-${post.id}" placeholder="Write a comment..." onkeydown="if(event.key==='Enter')addComment('${post.id}')" style="margin:0;font-size:16px;padding:8px">
+            <button class="primary" style="padding:8px 12px;font-size:14px" onclick="addComment('${post.id}')">REPLY</button>
+          </div>
         </div>
       </div>
-    </div>
     `;
   }).join('');
 }
+window.loadFeed = loadFeed;
 
-async function toggleReaction(postId, emoji){
-  const existing = await sb.from("post_reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
-  if(existing.data){
-    await sb.from("post_reactions").delete().eq("id", existing.data.id);
+async function togglePostReaction(postId, emoji){
+  const { data: existing } = await sb.from("post_reactions")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", currentUser.id)
+    .eq("emoji", emoji)
+    .maybeSingle();
+
+  if(existing) {
+    await sb.from("post_reactions").delete().eq("id", existing.id);
   } else {
-    await sb.from("post_reactions").insert({ post_id: postId, user_id: currentUser.id, emoji: emoji });
+    await sb.from("post_reactions").insert({ post_id: postId, user_id: currentUser.id, emoji });
   }
   loadFeed();
 }
-window.toggleReaction = toggleReaction;
+window.togglePostReaction = togglePostReaction;
+
+async function deletePost(postId){
+  if(!confirm("Are you sure you want to delete this post?")) return;
+  const { error } = await sb.from("posts").delete().eq("id", postId);
+  if(error) return toast("❌ Error deleting post");
+  toast("🗑️ Post deleted");
+  loadFeed();
+}
+window.deletePost = deletePost;
 
 async function addComment(postId){
-  const input = $(`commentInput_${postId}`);
+  const input = $(`comment-input-${postId}`);
   const content = input.value.trim();
   if(!content) return;
-  const r = await sb.from("comments").insert({ post_id: postId, user_id: currentUser.id, content });
-  if(r.error) toast("❌ Comment error");
-  else { input.value = ""; loadFeed(); }
+
+  const { error } = await sb.from("comments").insert({
+    post_id: postId,
+    user_id: currentUser.id,
+    content
+  });
+
+  if(error) return toast("❌ Error posting comment");
+  input.value = "";
+  playRetroSound('click');
+  loadFeed();
 }
 window.addComment = addComment;
 
-// --- FRIENDS & LEADERBOARD ---
-async function loadFriends(){
-  const r = await sb.from("profiles").select("*").neq("id", currentUser.id).limit(20);
-  if(!r.data) return;
-  $("friendsList").innerHTML = r.data.map(u => {
+// --- FRIENDS & USERS ---
+async function searchUsers(isGlobal){
+  const query = isGlobal ? $("globalSearch").value.trim() : $("friendSearch").value.trim();
+  
+  const { data: users, error } = await sb.from("profiles")
+    .select("*")
+    .neq("id", currentUser.id)
+    .ilike("username", `%${query}%`)
+    .limit(20);
+
+  if(error || !users) return;
+
+  const html = users.map(u => {
+    const av = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
+    const verified = u.is_verified ? ' ✅' : '';
     return `
-      <div class="user-card">
-        <div class="row" style="margin-bottom:8px">
-          <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-          <strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong>
+      <div class="user-card card" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="user-avatar">${av}</div>
+          <div>
+            <strong>${esc(u.username)}${verified}</strong>
+            <div class="tiny">${esc(u.bio || "Pixel Explorer")}</div>
+          </div>
         </div>
-        <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
+        <button class="primary" style="padding:6px 12px;font-size:14px" onclick="openChatWith('${u.id}')">💬 CHAT</button>
+      </div>
+    `;
+  }).join('');
+
+  if(!isGlobal) {
+    $("searchResults").innerHTML = html || '<div class="tiny">No users found.</div>';
+  }
+}
+window.searchUsers = searchUsers;
+
+async function loadFriends(){
+  const { data: users } = await sb.from("profiles")
+    .select("*")
+    .neq("id", currentUser.id)
+    .limit(12);
+
+  if(!users) return;
+  $("friendsList").innerHTML = users.map(u => {
+    const av = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
+    const verified = u.is_verified ? ' ✅' : '';
+    return `
+      <div class="user-card card" style="display:flex;flex-direction:column;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="user-avatar">${av}</div>
+          <div>
+            <strong>${esc(u.username)}${verified}</strong>
+            <div class="tiny">Level ${Math.floor((u.xp || 0)/100)+1}</div>
+          </div>
+        </div>
+        <button class="primary" style="width:100%;font-size:14px" onclick="openChatWith('${u.id}')">💬 CHAT</button>
       </div>
     `;
   }).join('');
 }
 window.loadFriends = loadFriends;
 
-async function searchUsers(isGlobal){
-  const q = $(isGlobal ? "globalSearch" : "friendSearch").value.trim().toLowerCase();
-  if(!q){ if(!isGlobal) loadFriends(); return; }
-  const r = await sb.from("profiles").select("*").ilike("username", `%${q}%`).limit(10);
-  if(!r.data) return;
-  const html = r.data.map(u => {
-    return `
-      <div class="user-card">
-        <div class="row" style="margin-bottom:8px">
-          <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-          <strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong>
-        </div>
-        <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
-      </div>
-    `;
-  }).join('');
-  if(isGlobal && q.length > 0){
-    page("friends");
-    $("searchResults").innerHTML = html;
-  } else {
-    $("searchResults").innerHTML = html;
-  }
-}
-window.searchUsers = searchUsers;
-
-async function loadLeaderboard(){
-  const r = await sb.from("profiles").select("*").order("xp", {ascending:false}).limit(10);
-  if(!r.data) return;
-  $("leaders").innerHTML = r.data.map((u, i) => {
-    return `
-      <div class="card" style="padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-        <div class="row">
-          <strong>#${i+1}</strong> 
-          <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div> 
-          <span>${esc(u.username)}${u.is_verified?' ✅':''}</span>
-        </div>
-        <div>XP: <strong>${u.xp||0}</strong></div>
-      </div>
-    `;
-  }).join('');
-}
-window.loadLeaderboard = loadLeaderboard;
-
-// --- MESSAGING WITH REPLY, REACTS, AND STICKERS ---
+// --- MESSAGING SYSTEM ---
 async function loadMessageUsers(){
-  const r = await sb.from("profiles").select("*").neq("id", currentUser.id);
-  if(!r.data) return;
-  $("messageUsers").innerHTML = r.data.map(u => {
+  const { data: users } = await sb.from("profiles").select("*").neq("id", currentUser.id);
+  if(!users) return;
+
+  $("messageUsers").innerHTML = users.map(u => {
+    const av = u.avatar_url ? `<img src="${esc(u.avatar_url)}"><span class="online"></span>` : `${esc(u.avatar || "👾")}<span class="online"></span>`;
+    const verified = u.is_verified ? ' ✅' : '';
     return `
-      <div id="chatUser_${u.id}" class="chat-user" onclick="selectChatUser('${u.id}', '${esc(u.username)}')">
-        <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}<span class="online"></span></div>
-        <div><strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong><div class="tiny">Online</div></div>
+      <div class="chat-user" id="chat-user-${u.id}" onclick="selectChatUser('${u.id}', '${esc(u.username)}', '${u.avatar_url || ''}', '${esc(u.avatar || '👾')}')">
+        <div class="user-avatar">${av}</div>
+        <div style="min-width:0;flex:1">
+          <strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u.username)}${verified}</strong>
+          <span class="tiny">Click to chat</span>
+        </div>
       </div>
     `;
   }).join('');
@@ -933,103 +954,170 @@ async function loadMessageUsers(){
 window.loadMessageUsers = loadMessageUsers;
 
 async function openChatWith(userId){
-  page("messages");
-  const r = await sb.from("profiles").select("*").eq("id", userId).single();
-  if(r.data) selectChatUser(userId, r.data.username);
-  updateNotificationBadge();
+  const { data: u } = await sb.from("profiles").select("*").eq("id", userId).single();
+  if(!u) return;
+  page('messages');
+  selectChatUser(u.id, u.username, u.avatar_url, u.avatar);
 }
 window.openChatWith = openChatWith;
 
-async function selectChatUser(userId, username){
-  selectedUser = userId;
-  $("chatTitle").textContent = username;
-  $("reachIndicator").classList.remove("hidden");
-  document.querySelectorAll(".chat-user").forEach(el=>el.classList.remove("active"));
-  const activeEl = $(`chatUser_${userId}`);
+async function selectChatUser(id, username, avatarUrl, avatarEmoji){
+  selectedUser = { id, username, avatarUrl, avatarEmoji };
+  document.querySelectorAll(".chat-user").forEach(el => el.classList.remove("active"));
+  const activeEl = $(`chat-user-${id}`);
   if(activeEl) activeEl.classList.add("active");
 
-  ["messageInput","sendButton","voiceRecordBtn","btnImg","btnVid","btnSticker"].forEach(id => $(id).removeAttribute("disabled"));
+  $("chatTitle").textContent = `💬 CHAT WITH ${username}`;
+  $("reachIndicator").classList.remove("hidden");
+
+  $("messageInput").disabled = false;
+  $("sendButton").disabled = false;
+  $("btnImg").disabled = false;
+  $("btnVid").disabled = false;
+  $("btnSticker").disabled = false;
+  $("voiceRecordBtn").disabled = false;
+
   await loadMessages();
-  await sb.from("messages").update({ is_read: true }).eq("sender_id", userId).eq("receiver_id", currentUser.id);
-  updateNotificationBadge();
 }
 window.selectChatUser = selectChatUser;
 
 async function loadMessages(){
   if(!selectedUser) return;
-  const r = await sb.from("messages").select("*, reply_to_msg:messages!messages_reply_to_fkey(id, content, sender_id), message_reactions(*)").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", {ascending:true});
-  if(!r.data) return;
+  const { data: msgs, error } = await sb.from("messages")
+    .select(`*, message_reactions(*)`)
+    .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`)
+    .order("created_at", { ascending: true });
 
-  const messagesMap = {};
-  r.data.forEach(m => messagesMap[m.id] = m);
+  if(error || !msgs) return;
 
-  $("messagesList").innerHTML = r.data.map(m => {
-    const mine = m.sender_id === currentUser.id;
-    const canDeleteMsg = mine || isAdmin();
+  const list = $("messagesList");
+  list.innerHTML = msgs.length === 0 ? '<div class="empty">No messages yet. Say hello! 👋</div>' : msgs.map(m => {
+    const isMine = m.sender_id === currentUser.id;
+    let mediaHtml = '';
+    if(m.image_url) mediaHtml += `<img src="${esc(m.image_url)}" class="msg-media-img">`;
+    if(m.video_url) mediaHtml += `<video src="${esc(m.video_url)}" controls class="msg-media-video"></video>`;
+    if(m.audio_url) mediaHtml += `<audio src="${esc(m.audio_url)}" controls class="msg-audio"></audio>`;
+
     const reactions = m.message_reactions || [];
-    
-    // Group reactions
-    const reactCounts = {};
+    const rCounts = {};
     const myReactions = new Set();
-    reactions.forEach(rx => {
-      reactCounts[rx.emoji] = (reactCounts[rx.emoji] || 0) + 1;
-      if(rx.user_id === currentUser.id) myReactions.add(rx.emoji);
+    reactions.forEach(r => {
+      rCounts[r.emoji] = (rCounts[r.emoji] || 0) + 1;
+      if(r.user_id === currentUser.id) myReactions.add(r.emoji);
     });
 
-    let replyHtml = '';
-    if(m.reply_to && messagesMap[m.reply_to]){
-      const rep = messagesMap[m.reply_to];
-      replyHtml = `<div class="reply-preview-box">↳ Replying to: ${esc(rep.content || 'Media/Sticker')}</div>`;
-    }
+    const reactionPills = ['❤️', '🔥', '👍', '🚀', '👾'].map(emoji => {
+      const count = rCounts[emoji] || 0;
+      if(count === 0) return '';
+      const mineClass = myReactions.has(emoji) ? ' mine' : '';
+      return `<div class="msg-react-pill${mineClass}" onclick="toggleMsgReaction('${m.id}', '${emoji}')">${emoji} ${count}</div>`;
+    }).join('');
 
     return `
-      <div id="message_${m.id}" class="message-wrap ${mine?'mine':''}">
-        <!-- Hover actions -->
+      <div class="message-wrap ${isMine ? 'mine' : ''}">
         <div class="message-hover-actions">
-          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="setReplyTo('${m.id}', '${esc(m.content || 'Media/Sticker')}')" title="Reply">💬</button>
-          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="toggleMsgReactPicker('${m.id}')" title="React">⭐</button>
+          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="setReplyTo('${m.id}', '${esc(m.content || 'Media attachment')}')">↩️</button>
+          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="toggleMsgReactPicker('${m.id}')">😊</button>
+          ${isMine ? `<button class="danger" style="padding:2px 6px;font-size:12px" onclick="deleteMessage('${m.id}')">🗑️</button>` : ''}
         </div>
 
-        <!-- React picker popover -->
-        <div id="msgReactPicker_${m.id}" class="msg-react-picker">
-          ${['❤️','🔥','😂','👍','👾','⭐'].map(e => `
-            <span style="cursor:pointer;font-size:16px" onclick="toggleMsgReaction('${m.id}', '${e}')">${e}</span>
-          `).join('')}
+        <div id="msg-react-picker-${m.id}" class="msg-react-picker">
+          <span style="cursor:pointer" onclick="addMsgReaction('${m.id}', '❤️')">❤️</span>
+          <span style="cursor:pointer" onclick="addMsgReaction('${m.id}', '🔥')">🔥</span>
+          <span style="cursor:pointer" onclick="addMsgReaction('${m.id}', '👍')">👍</span>
+          <span style="cursor:pointer" onclick="addMsgReaction('${m.id}', '🚀')">🚀</span>
+          <span style="cursor:pointer" onclick="addMsgReaction('${m.id}', '👾')">👾</span>
         </div>
 
-        <div class="message ${mine?'mine':''}">
-          ${replyHtml}
-          ${m.content ? `<span>${esc(m.content)}</span>` : ''}
-          ${m.image_url ? `<img class="msg-media-img" src="${esc(m.image_url)}">` : ''}
-          ${m.video_url ? `<video class="msg-media-video" controls src="${esc(m.video_url)}"></video>` : ''}
-          ${m.audio_url ? `<audio class="msg-audio" controls src="${esc(m.audio_url)}"></audio>` : ''}
+        <div class="message ${isMine ? 'mine' : ''}">
+          ${m.content ? `<div style="font-size:17px">${esc(m.content)}</div>` : ''}
+          ${mediaHtml}
+          <div class="message-footer">
+            <span>${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          </div>
         </div>
-
-        <!-- Reactions list pill display -->
-        <div class="msg-reactions-display">
-          ${Object.entries(reactCounts).map(([emoji, count]) => `
-            <div class="msg-react-pill ${myReactions.has(emoji)?'mine':''}" onclick="toggleMsgReaction('${m.id}', '${emoji}')">
-              <span>${emoji}</span> <span>${count}</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="message-footer">
-          <span>${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
-          ${canDeleteMsg ? `<button class="danger" style="padding:1px 4px;font-size:10px;margin-left:6px" onclick="deleteMessage('${m.id}')">🗑️</button>` : ''}
-        </div>
+        <div class="msg-reactions-display">${reactionPills}</div>
       </div>
     `;
   }).join('');
-  const list = $("messagesList");
+
   list.scrollTop = list.scrollHeight;
 }
+window.loadMessages = loadMessages;
 
-function setReplyTo(msgId, contentSnippet){
-  replyingToMessageId = msgId;
-  $("replyBarText").textContent = `↳ Replying to: "${contentSnippet.substring(0, 30)}..."`;
+async function sendMessage(){
+  if(!selectedUser) return;
+  const content = $("messageInput").value.trim();
+  if(!content && !chatAttachmentFile) return;
+
+  try {
+    let image_url = null, video_url = null, audio_url = null;
+    if(chatAttachmentFile) {
+      const ext = chatAttachmentFile.name.split('.').pop();
+      const path = `${currentUser.id}/chat_${Date.now()}.${ext}`;
+      const u = await sb.storage.from("posts_media").upload(path, chatAttachmentFile);
+      if(u.error) throw u.error;
+      const url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+      if(chatAttachmentType === 'image') image_url = url;
+      if(chatAttachmentType === 'video') video_url = url;
+      if(chatAttachmentType === 'audio') audio_url = url;
+    }
+
+    const { error } = await sb.from("messages").insert({
+      sender_id: currentUser.id,
+      receiver_id: selectedUser.id,
+      content,
+      image_url,
+      video_url,
+      audio_url,
+      reply_to: replyingToMessageId
+    });
+
+    if(error) throw error;
+
+    $("messageInput").value = "";
+    clearChatAttachment();
+    cancelReply();
+    playRetroSound('message');
+    loadMessages();
+  } catch(err) {
+    toast("❌ Error sending message: " + err.message);
+  }
+}
+window.sendMessage = sendMessage;
+
+function selectChatMedia(type){
+  const file = $(`chat${type.charAt(0).toUpperCase() + type.slice(1)}Input`).files[0];
+  if(!file) return;
+  chatAttachmentFile = file;
+  chatAttachmentType = type;
+  $("chatAttachmentPill").textContent = `${type.toUpperCase()}: ${file.name}`;
+  $("chatAttachmentBar").classList.remove("hidden");
+}
+window.selectChatMedia = selectChatMedia;
+
+function clearChatAttachment(){
+  chatAttachmentFile = null;
+  chatAttachmentType = null;
+  $("chatAttachmentBar").classList.add("hidden");
+}
+window.clearChatAttachment = clearChatAttachment;
+
+function toggleStickerPicker(){
+  $("stickerPicker").classList.toggle("show");
+}
+window.toggleStickerPicker = toggleStickerPicker;
+
+function sendSticker(emoji){
+  $("messageInput").value += emoji;
+  $("stickerPicker").classList.remove("show");
+}
+window.sendSticker = sendSticker;
+
+function setReplyTo(id, text){
+  replyingToMessageId = id;
+  $("replyBarText").textContent = `Replying to: "${text}"`;
   $("replyBar").classList.remove("hidden");
-  $("messageInput").focus();
 }
 window.setReplyTo = setReplyTo;
 
@@ -1039,149 +1127,138 @@ function cancelReply(){
 }
 window.cancelReply = cancelReply;
 
-function toggleMsgReactPicker(msgId){
-  const p = $(`msgReactPicker_${msgId}`);
-  if(p) p.classList.toggle("show");
+function toggleMsgReactPicker(id){
+  const el = $(`msg-react-picker-${id}`);
+  document.querySelectorAll(".msg-react-picker").forEach(p => { if(p !== el) p.classList.remove("show"); });
+  el.classList.toggle("show");
 }
 window.toggleMsgReactPicker = toggleMsgReactPicker;
 
+async function addMsgReaction(messageId, emoji){
+  $(`msg-react-picker-${messageId}`).classList.remove("show");
+  await sb.from("message_reactions").insert({ message_id: messageId, user_id: currentUser.id, emoji });
+  loadMessages();
+}
+window.addMsgReaction = addMsgReaction;
+
 async function toggleMsgReaction(messageId, emoji){
-  const existing = await sb.from("message_reactions").select("*").eq("message_id", messageId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
-  if(existing.data){
-    await sb.from("message_reactions").delete().eq("id", existing.data.id);
+  const { data: existing } = await sb.from("message_reactions")
+    .select("id")
+    .eq("message_id", messageId)
+    .eq("user_id", currentUser.id)
+    .eq("emoji", emoji)
+    .maybeSingle();
+
+  if(existing) {
+    await sb.from("message_reactions").delete().eq("id", existing.id);
   } else {
-    await sb.from("message_reactions").insert({ message_id: messageId, user_id: currentUser.id, emoji: emoji });
+    await sb.from("message_reactions").insert({ message_id: messageId, user_id: currentUser.id, emoji });
   }
   loadMessages();
 }
 window.toggleMsgReaction = toggleMsgReaction;
 
-function toggleStickerPicker(){
-  $("stickerPicker").classList.toggle("show");
+async function deleteMessage(id){
+  if(!confirm("Delete this message?")) return;
+  await sb.from("messages").delete().eq("id", id);
+  loadMessages();
 }
-window.toggleStickerPicker = toggleStickerPicker;
+window.deleteMessage = deleteMessage;
 
-async function sendSticker(stickerEmoji){
-  if(!selectedUser) return;
-  $("stickerPicker").classList.remove("show");
-  const payload = {
-    sender_id: currentUser.id,
-    receiver_id: selectedUser,
-    content: `[STICKER: ${stickerEmoji}]`,
-    is_read: false
-  };
-  if(replyingToMessageId) payload.reply_to = replyingToMessageId;
-
-  const r = await sb.from("messages").insert(payload);
-  if(!r.error){
-    cancelReply();
-    loadMessages();
-    playRetroSound('success');
-  }
-}
-window.sendSticker = sendSticker;
-
-function selectChatMedia(type){
-  const input = $(type==='image'?'chatImageInput':'chatVideoInput');
-  chatAttachmentFile = input.files[0];
-  if(chatAttachmentFile){
-    chatAttachmentType = type;
-    $("chatAttachmentPill").textContent = (type==='image'?'🖼️ ':'📹 ') + chatAttachmentFile.name;
-    $("chatAttachmentBar").classList.remove("hidden");
-  }
-}
-window.selectChatMedia = selectChatMedia;
-
-function clearChatAttachment(){
-  chatAttachmentFile = null;
-  chatAttachmentType = null;
-  $("chatAttachmentBar").classList.add("hidden");
-  $("chatImageInput").value = "";
-  $("chatVideoInput").value = "";
-}
-window.clearChatAttachment = clearChatAttachment;
-
-async function sendMessage(){
-  const text = $("messageInput").value.trim();
-  if(!text && !chatAttachmentFile) return;
-  if(!selectedUser) return;
-
-  let image_url = null, video_url = null;
-
-  try {
-    if(chatAttachmentFile){
-      const ext = chatAttachmentFile.name.split('.').pop();
-      const path = `${currentUser.id}/chat_${Date.now()}.${ext}`;
-      const u = await sb.storage.from("posts_media").upload(path, chatAttachmentFile);
-      if(u.data){
-        const pubUrl = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
-        if(chatAttachmentType==='image') image_url = pubUrl;
-        if(chatAttachmentType==='video') video_url = pubUrl;
-      }
-    }
-  } catch(e){ console.warn(e); }
-
-  const payload = { sender_id: currentUser.id, receiver_id: selectedUser, content: text || "", is_read: false };
-  if(image_url) payload.image_url = image_url;
-  if(video_url) payload.video_url = video_url;
-  if(replyingToMessageId) payload.reply_to = replyingToMessageId;
-
-  const r = await sb.from("messages").insert(payload);
-  if(!r.error){
-    $("messageInput").value = "";
-    clearChatAttachment();
-    cancelReply();
-    loadMessages();
-  }
-}
-window.sendMessage = sendMessage;
-
-function toggleVoiceRecord(){
-  if(!isRecording){
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+// --- VOICE RECORDING ---
+async function toggleVoiceRecord(){
+  if(!isRecording) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorder = new MediaRecorder(stream);
       audioChunks = [];
       mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = async () => {
+      mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-        const path = `${currentUser.id}/voice_${Date.now()}.webm`;
-        const u = await sb.storage.from("posts_media").upload(path, audioBlob);
-        if(u.data){
-          const audio_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
-          const payload = { sender_id: currentUser.id, receiver_id: selectedUser, content: "🎤 Voice Message", audio_url, is_read: false };
-          if(replyingToMessageId) payload.reply_to = replyingToMessageId;
-          await sb.from("messages").insert(payload);
-          cancelReply();
-          loadMessages();
-        }
+        chatAttachmentFile = new File([audioBlob], `voice_${Date.now()}.webm`, { type: 'audio/webm' });
+        chatAttachmentType = 'audio';
+        $("chatAttachmentPill").textContent = `AUDIO: Voice Message`;
+        $("chatAttachmentBar").classList.remove("hidden");
       };
       mediaRecorder.start();
       isRecording = true;
+      $("voiceRecordBtn").textContent = "🛑 STOP";
       $("voiceRecordBtn").classList.add("recording-active");
-      $("voiceRecordBtn").textContent = "⏹️ STOP";
-    }).catch(e => toast("❌ Microphone access denied"));
+    } catch(err) {
+      toast("❌ Microphone access denied or unavailable");
+    }
   } else {
     mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
     isRecording = false;
-    $("voiceRecordBtn").classList.remove("recording-active");
     $("voiceRecordBtn").textContent = "🎤 VOICE";
+    $("voiceRecordBtn").classList.remove("recording-active");
   }
 }
 window.toggleVoiceRecord = toggleVoiceRecord;
 
-function setupRealtime(){
-  sb.channel('realtime_all').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-    if(payload.new.receiver_id === currentUser.id){
-      playRetroSound('message');
-      updateNotificationBadge();
-      if(selectedUser === payload.new.sender_id) loadMessages();
-      else toast(`💬 New message from player`);
-    }
-  }).subscribe();
+// --- LEADERBOARD & REALTIME ---
+async function loadLeaderboard(){
+  const { data: users } = await sb.from("profiles").select("*").order("xp", { ascending: false }).limit(20);
+  if(!users) return;
+
+  $("leaders").innerHTML = users.map((u, i) => {
+    const av = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
+    const verified = u.is_verified ? ' ✅' : '';
+    const medals = ['🥇', '🥈', '🥉'];
+    const rankBadge = medals[i] || `#${i+1}`;
+    return `
+      <div class="card" style="padding:12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <strong style="font-size:20px;width:30px;text-align:center">${rankBadge}</strong>
+          <div class="user-avatar" style="width:40px;height:40px">${av}</div>
+          <div>
+            <strong>${esc(u.username)}${verified}</strong>
+            <div class="tiny">Level ${Math.floor((u.xp || 0)/100)+1}</div>
+          </div>
+        </div>
+        <strong style="color:var(--yellow);font-size:18px">${u.xp || 0} XP</strong>
+      </div>
+    `;
+  }).join('');
+}
+window.loadLeaderboard = loadLeaderboard;
+
+async function updateNotificationBadge(){
+  const { count } = await sb.from("messages").select("*", { count: 'exact', head: true }).eq("receiver_id", currentUser.id).eq("is_read", false);
+  const badge = $("notifBadge");
+  if(count > 0) {
+    badge.textContent = count;
+    badge.style.display = "inline-block";
+  } else {
+    badge.style.display = "none";
+  }
 }
 
-async function logout(){
-  await sb.auth.signOut();
+function setupRealtime(){
+  sb.channel('public-db-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+      if(payload.new && (payload.new.receiver_id === currentUser.id || payload.new.sender_id === currentUser.id)) {
+        if(selectedUser && (payload.new.sender_id === selectedUser.id || payload.new.receiver_id === selectedUser.id)) {
+          loadMessages();
+        }
+        updateNotificationBadge();
+      }
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+      loadFeed();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => {
+      loadFeed();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'post_reactions' }, () => {
+      loadFeed();
+    })
+    .subscribe();
+}
+
+function logout(){
+  sb.auth.signOut();
   location.reload();
 }
 window.logout = logout;
