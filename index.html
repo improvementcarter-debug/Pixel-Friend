@@ -108,7 +108,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}
 .user-avatar{width:50px;height:50px;font-size:26px}
 
-/* Post Card Styles */
+/* Post & Chat Card Styles */
 .post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}
 .post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .post-author{display:flex;align-items:center;gap:12px}
@@ -121,7 +121,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}
 .comment-item:last-child{border-bottom:0}
 
-/* Chat Styles */
+/* Chat Layout & Enhancements */
 .messages-layout{display:grid;grid-template-columns:270px 1fr;min-height:620px}
 .chat-users{border-right:2px solid var(--border);padding-right:15px}
 .chat-user{padding:12px;border:1px solid transparent;margin-bottom:5px;cursor:pointer;display:flex;align-items:center;gap:10px}
@@ -129,14 +129,24 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}
 .chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}
 .messages-list{flex:1;min-height:360px;max-height:510px;overflow:auto;padding:15px 4px;scrollbar-color:#36557c #08101d}
-.message-wrap{margin:8px 0;display:flex;flex-direction:column;align-items:flex-start}
+.message-wrap{margin:10px 0;display:flex;flex-direction:column;align-items:flex-start}
 .message-wrap.mine{align-items:flex-end}
-.message{position:relative;max-width:min(78%,620px);border:2px solid #304362;background:#17263d;padding:10px 13px;border-radius:2px;word-break:break-word}
+.message{position:relative;max-width:min(82%,620px);border:2px solid #304362;background:#17263d;padding:10px 13px;border-radius:2px;word-break:break-word}
 .message.mine{background:#245a9a;border-color:#4ea1ff}
 .message img{max-width:100%;border-radius:2px;margin-top:6px}
-.delete-btn{padding:2px 6px;font-size:12px;margin-left:8px;vertical-align:middle}
-.chat-input{display:flex;gap:7px;align-items:center;margin-top:8px}
-.chat-input input{margin:0}
+
+/* Reach Status & Quote Reply Styling */
+.quoted-box{background:#091221;border-left:4px solid var(--cyan);padding:6px 10px;margin-bottom:8px;font-size:15px;border-radius:2px;color:#a8caef}
+.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:12px;font-size:14px}
+.reach-status{font-weight:bold;font-size:15px;display:inline-flex;align-items:center;gap:3px}
+.reach-status.read{color:var(--cyan)}
+.reach-status.sent{color:var(--muted)}
+.reply-btn,.delete-btn{padding:2px 6px;font-size:12px;background:#0d182b;border:1px solid #2d456b;color:#d0e2ff;border-radius:2px}
+.reply-preview{background:#0d1a2d;border:2px dashed var(--cyan);padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+
+.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.chat-controls{display:flex;gap:7px;align-items:center}
+.chat-controls input{margin:0}
 .file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}
 .toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}
 @media(max-width:850px){
@@ -243,12 +253,23 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
       <div class="chat-main">
         <div class="chat-header">
           <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2><span id="chatSubtitle" class="tiny">REAL-TIME CHAT</span></div>
+          <div id="reachIndicator" class="tiny hidden">📡 REACH STATUS: <strong style="color:var(--green)">ONLINE</strong></div>
         </div>
         <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A USER TO START CHATTING</div></div>
-        <div class="chat-input">
-          <input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter')sendMessage()" disabled>
-          <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+        
+        <div class="chat-input-bar">
+          <div id="replyBox" class="reply-preview hidden">
+            <span>↩️ Replying to <strong id="replyUser" style="color:var(--cyan)">User</strong>: <span id="replyText">...</span></span>
+            <button class="danger reply-btn" onclick="cancelReply()">✕ CANCEL</button>
+          </div>
+
+          <div class="chat-controls">
+            <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>
+            <input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter')sendMessage()" disabled>
+            <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+          </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -287,13 +308,17 @@ let currentUser=null, currentProfile=null, selectedUser=null;
 let postImageFile=null, postAudioFile=null;
 let soundEnabled=true, audioCtx=null;
 
+// Voice Recording & Reply States
+let mediaRecorder=null, audioChunks=[], isRecording=false;
+let replyingToMsg=null;
+
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 
 function toast(m){const e=$("toast");e.textContent=m;e.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.add("hidden"),4000)}
 function status(id,m,err=false){if($(id)){ $(id).textContent=m;$(id).style.color=err?"#ff7795":"var(--green)"}}
 
-// --- ADVANCED RETRO SYNTH AUDIO ALERTS ---
+// --- AUDIO SYNTH ALERTS ---
 function unlockAudio(){
   if(!audioCtx){
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -324,13 +349,8 @@ function playToneSequence(freqs, noteDuration = 0.08, type = 'square'){
   } catch(e){}
 }
 
-// Sound Alert 1: Incoming Message (Chime)
 function playMessageSound(){ playToneSequence([523.25, 659.25, 783.99], 0.08, 'square'); }
-
-// Sound Alert 2: Reaction / Like Sound (Fast Arpeggio Pulse)
 function playReactSound(){ playToneSequence([587.33, 880.00], 0.06, 'triangle'); }
-
-// Sound Alert 3: Comment Sound (Pop Tone)
 function playCommentSound(){ playToneSequence([440.00, 554.37, 659.25], 0.06, 'sine'); }
 
 function testSound(){
@@ -440,7 +460,7 @@ async function removeAvatar(){
   }
 }
 
-// --- CREATE & DELETE POSTS ---
+// --- POST CREATION & FEED ---
 function previewPostFile(type){
   if(type==='image'){
     postImageFile = $("postImageInput").files[0];
@@ -505,7 +525,6 @@ async function deletePost(postId){
   }
 }
 
-// --- FEED, COMMENTS & REACTIONS ---
 async function loadFeed(){
   const r=await sb.from("posts").select("*, profiles(*), post_reactions(*), comments(*, profiles(*))").order("created_at",{ascending:false}).limit(20);
   if(!r.data) return;
@@ -573,7 +592,7 @@ async function loadFeed(){
 }
 
 async function toggleReaction(postId, emoji){
-  playReactSound(); // Instant audio feedback
+  playReactSound();
   const existing = await sb.from("post_reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
   if(existing.data){
     await sb.from("post_reactions").delete().eq("id", existing.data.id);
@@ -588,12 +607,12 @@ async function addComment(postId){
   const text = input.value.trim();
   if(!text) return;
   input.value = "";
-  playCommentSound(); // Instant audio feedback
+  playCommentSound();
   await sb.from("comments").insert({ post_id: postId, user_id: currentUser.id, content: text });
   loadFeed();
 }
 
-// --- MESSAGES SYSTEM ---
+// --- MESSAGES (REACH, VOICE & REPLY ENHANCEMENTS) ---
 async function loadMessageUsers(){
   const r=await sb.from("profiles").select("*").neq("id",currentUser.id).limit(20);
   if(!r.data) return;
@@ -615,11 +634,23 @@ async function openChat(userId){
   $("chatTitle").textContent = selectedUser.username;
   $("messageInput").disabled = false;
   $("sendButton").disabled = false;
+  $("voiceRecordBtn").disabled = false;
+  $("reachIndicator").classList.remove("hidden");
+
+  cancelReply();
   await loadMessages();
 }
 
 async function loadMessages(){
   if(!selectedUser) return;
+
+  // Mark incoming unread messages as read (Reach Status update)
+  await sb.from("messages")
+    .update({ is_read: true })
+    .eq("sender_id", selectedUser.id)
+    .eq("receiver_id", currentUser.id)
+    .eq("is_read", false);
+
   const r=await sb.from("messages").select("*")
     .or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser.id}),and(sender_id.eq.${selectedUser.id},receiver_id.eq.${currentUser.id})`)
     .order("created_at",{ascending:true});
@@ -628,23 +659,123 @@ async function loadMessages(){
   
   const list = $("messagesList");
   if(!r.data.length){ list.innerHTML = `<div class="empty">No messages yet with ${esc(selectedUser.username)}. Say hi! 👋</div>`; return; }
+
+  // Map messages into dictionary for fast lookup when rendering quoted replies
+  const msgMap = {};
+  r.data.forEach(m => msgMap[m.id] = m);
   
   list.innerHTML = r.data.map(m => {
     const isMine = m.sender_id === currentUser.id;
+    const parentMsg = m.reply_to_id ? msgMap[m.reply_to_id] : null;
+
+    // Reach Status: Read vs Delivered/Sent
+    const reachStatusMarkup = isMine 
+      ? (m.is_read ? `<span class="reach-status read" title="Read by recipient">✓✓ Read</span>` : `<span class="reach-status sent" title="Delivered to network">✓ Sent</span>`) 
+      : '';
+
     return `
     <div id="msg_${m.id}" class="message-wrap ${isMine?'mine':''}">
       <div class="message ${isMine?'mine':''}">
+        
+        ${parentMsg ? `
+          <div class="quoted-box">
+            <strong>↪ Replying to ${parentMsg.sender_id === currentUser.id ? 'yourself' : esc(selectedUser.username)}:</strong>
+            <div>${esc(parentMsg.content || '🎤 Voice Message')}</div>
+          </div>
+        ` : ''}
+
+        ${m.content ? `<div>${esc(m.content)}</div>` : ''}
         ${m.image_url ? `<img src="${esc(m.image_url)}"><br>` : ''}
-        ${esc(m.content)}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px;gap:10px">
+        ${m.audio_url ? `<audio controls style="width:100%;max-width:240px;margin-top:6px" src="${esc(m.audio_url)}"></audio>` : ''}
+
+        <div class="message-footer">
           <small style="opacity:.65">${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small>
-          ${isMine ? `<button class="danger delete-btn" onclick="deleteMessage('${m.id}')">❌</button>` : ''}
+          
+          <div style="display:flex;gap:6px;align-items:center">
+            ${reachStatusMarkup}
+            <button class="reply-btn" onclick="setReply('${m.id}', '${isMine ? 'Yourself' : esc(selectedUser.username)}', '${esc(m.content||'Voice Message')}')">↩️</button>
+            ${isMine ? `<button class="danger delete-btn" onclick="deleteMessage('${m.id}')">❌</button>` : ''}
+          </div>
         </div>
+
       </div>
     </div>
     `;
   }).join('');
   list.scrollTop = list.scrollHeight;
+}
+
+// Voice Recorder Functionality
+async function toggleVoiceRecord(){
+  const btn = $("voiceRecordBtn");
+  if(!isRecording){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+      
+      mediaRecorder.ondataavailable = e => { if(e.data.size > 0) audioChunks.push(e.data); };
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        await sendVoiceMessage(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      isRecording = true;
+      btn.textContent = "🛑 STOP & SEND";
+      btn.classList.add("danger");
+      toast("🎙️ Recording voice message...");
+    } catch(err){
+      toast("❌ Microphone access denied or not supported");
+    }
+  } else {
+    mediaRecorder.stop();
+    isRecording = false;
+    btn.textContent = "🎤 VOICE";
+    btn.classList.remove("danger");
+  }
+}
+
+async function sendVoiceMessage(blob){
+  if(!selectedUser) return;
+  toast("📤 Uploading voice message...");
+  
+  const path = `${currentUser.id}/voice_${Date.now()}.webm`;
+  const u = await sb.storage.from("posts_media").upload(path, blob, { contentType: 'audio/webm' });
+  if(u.error) return toast("❌ Voice upload failed: " + u.error.message);
+
+  const audio_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+  
+  const payload = { 
+    sender_id: currentUser.id, 
+    receiver_id: selectedUser.id, 
+    content: "🎤 Voice Message",
+    audio_url: audio_url
+  };
+  
+  if(replyingToMsg) {
+    payload.reply_to_id = replyingToMsg.id;
+    cancelReply();
+  }
+
+  const r = await sb.from("messages").insert(payload);
+  if(r.error) toast("❌ Send Failed: " + r.error.message);
+  else loadMessages();
+}
+
+// Quote Reply Functions
+function setReply(msgId, username, text){
+  replyingToMsg = { id: msgId, username, text };
+  $("replyBox").classList.remove("hidden");
+  $("replyUser").textContent = username;
+  $("replyText").textContent = text.length > 35 ? text.substring(0,35) + "..." : text;
+  $("messageInput").focus();
+}
+
+function cancelReply(){
+  replyingToMsg = null;
+  $("replyBox").classList.add("hidden");
 }
 
 async function sendMessage(){
@@ -654,7 +785,13 @@ async function sendMessage(){
   if(!text || !selectedUser) return;
   input.value = "";
 
-  const r = await sb.from("messages").insert({ sender_id: currentUser.id, receiver_id: selectedUser.id, content: text });
+  const payload = { sender_id: currentUser.id, receiver_id: selectedUser.id, content: text };
+  if(replyingToMsg){
+    payload.reply_to_id = replyingToMsg.id;
+    cancelReply();
+  }
+
+  const r = await sb.from("messages").insert(payload);
   if(r.error) toast("❌ Send Failed: " + r.error.message);
   else loadMessages();
 }
@@ -672,20 +809,17 @@ async function deleteMessage(messageId){
   }
 }
 
-// --- REALTIME LISTENERS (FOR SOUND ALERTS) ---
+// --- REALTIME LISTENERS ---
 function setupRealtime(){
   sb.channel('public_pixel_events')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-      if(payload.new.receiver_id === currentUser.id){
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+      // Reload on new incoming or read status update
+      if(selectedUser && (payload.new?.sender_id === selectedUser.id || payload.new?.receiver_id === selectedUser.id)){
+        loadMessages();
+      }
+      if(payload.eventType === 'INSERT' && payload.new.receiver_id === currentUser.id){
         playMessageSound();
         toast("💬 New message received!");
-        if(selectedUser && payload.new.sender_id === selectedUser.id) loadMessages();
-      }
-    })
-    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
-      if(payload.old?.id){
-        const el = $(`msg_${payload.old.id}`);
-        if(el) el.remove();
       }
     })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post_reactions' }, async payload => {
@@ -711,7 +845,7 @@ function setupRealtime(){
     .subscribe();
 }
 
-// --- FIXED SEARCH FRIENDS FUNCTION ---
+// --- SEARCH FRIENDS ---
 async function searchUsers(fromGlobal = false){
   let term = "";
   if(fromGlobal) {
