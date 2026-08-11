@@ -195,8 +195,6 @@
     .post-actions{display:flex;gap:8px;margin-top:12px;border-top:1px dashed #2b3d5d;padding-top:10px}
     .gift-badge{background:var(--yellow);color:#000;font-weight:bold;padding:4px 8px;border-radius:2px;display:inline-block;margin-top:5px}
     .toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;border-radius:2px;z-index:200;box-shadow:5px 5px 0 #02050b;max-width:min(460px,calc(100vw - 40px))}
-
-    /* RACING GAME STYLES */
     .game-container{position:relative;width:100%;max-width:800px;margin:auto;background:#000;border:3px solid var(--border);box-shadow:6px 6px 0 var(--shadow)}
     #raceCanvas{width:100%;height:auto;display:block;background:#000;image-rendering:pixelated}
     .game-hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;font-family:'Press Start 2P',monospace;font-size:12px;color:#fff;text-shadow:2px 2px #000}
@@ -298,7 +296,6 @@
         <div id="feed"></div>
       </section>
 
-      <!-- RACING GAME PAGE -->
       <section id="racing" class="page">
         <div class="card" style="padding:20px;text-align:center">
           <h1>🏎️ PIXEL TURBO RACER</h1>
@@ -316,7 +313,6 @@
               <button class="primary" style="font-size:16px;padding:12px 24px" onclick="startRacingGame()">🏎️ START RACE</button>
             </div>
           </div>
-          <!-- Mobile / Touch controls -->
           <div class="touch-controls">
             <div></div>
             <div class="touch-btn" id="btnUp">▲</div>
@@ -437,12 +433,8 @@
             <div class="card" style="padding:16px;margin:0;background:#111a31">
               <h3>🔐 PERMANENT ADMIN SETUP</h3>
               <p class="tiny">Run this SQL in Supabase SQL Editor to grant admin access to your account:</p>
-              <pre id="adminSql" class="sql">ALTER TABLE public.profiles
-ADD COLUMN IF NOT EXISTS role text NOT NULL DEFAULT 'user';
-
-UPDATE public.profiles
-SET role = 'admin'
-WHERE id = auth.uid();</pre>
+              <pre id="adminSql" class="sql">ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role text NOT NULL DEFAULT 'user';
+UPDATE public.profiles SET role = 'admin' WHERE id = auth.uid();</pre>
               <button class="secondary copy-btn" onclick="copyAdminSQL()">📋 COPY SQL</button>
             </div>
             <div class="card" style="padding:16px;margin:0;background:#111a31">
@@ -472,8 +464,8 @@ WHERE id = auth.uid();</pre>
 <div id="toast" class="toast hidden"></div>
 
 <script>
-const SUPABASE_URL="https://vvfkfpsyxipnypaltixq.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
+const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
 });
@@ -489,10 +481,85 @@ let mediaRecorder = null, voiceChunks = [], recording = false;
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
+// --- WEB AUDIO SOUND ENGINE ---
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  return audioCtx;
+}
+
+// Unlock Web Audio Context on first interaction
+['click', 'keydown', 'touchstart'].forEach(evt => {
+  window.addEventListener(evt, () => {
+    getAudioContext();
+  }, { once: true });
+});
+
+function playMessageSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(587.33, now);       // D5
+    osc.frequency.setValueAtTime(880.00, now + 0.08); // A5
+
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.25);
+  } catch (e) {
+    console.warn('Audio play error:', e);
+  }
+}
+
+function playNotificationSound() {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523.25, now);        // C5
+    osc.frequency.setValueAtTime(659.25, now + 0.07);  // E5
+    osc.frequency.setValueAtTime(783.99, now + 0.14);  // G5
+
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.35);
+  } catch (e) {
+    console.warn('Audio play error:', e);
+  }
+}
+
 function toast(m) {
   const e = $("toast");
   e.textContent = m;
   e.classList.remove("hidden");
+  playNotificationSound();
   clearTimeout(window.__toast);
   window.__toast = setTimeout(() => e.classList.add("hidden"), 3500);
 }
@@ -601,273 +668,25 @@ function putAvatar(el, p) {
 
 function renderProfile() {
   if (!currentProfile) return;
-  const xp = +currentProfile.xp || 0;
-  const level = Math.floor(xp / 100) + 1;
-  const xpCurrent = xp % 100;
-
-  if ($("sideName")) $("sideName").textContent = currentProfile.username || "PLAYER";
-  if ($("sideLevel")) $("sideLevel").textContent = level;
-  if ($("sideBio")) $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  if ($("xpText")) $("xpText").textContent = `${xpCurrent} / 100 XP`;
-  if ($("xpBar")) $("xpBar").style.width = `${xpCurrent}%`;
-  
-  if ($("profileName")) $("profileName").textContent = currentProfile.username || "PLAYER";
-  if ($("profileBio")) $("profileBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  if ($("statLevel")) $("statLevel").textContent = level;
-  if ($("statXP")) $("statXP").textContent = xp;
-
   putAvatar($("sideAvatar"), currentProfile);
-  putAvatar($("headAvatar"), currentProfile);
   putAvatar($("profileAvatar"), currentProfile);
+  if ($("headAvatar")) $("headAvatar").textContent = currentProfile.avatar || "👾";
+
+  $("sideName").textContent = currentProfile.username || "PLAYER";
+  $("profileName").textContent = currentProfile.username || "PLAYER";
+  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("profileBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+
+  const xp = currentProfile.xp || 0;
+  const level = Math.floor(xp / 100) + 1;
+  const nextXp = xp % 100;
+
+  $("sideLevel").textContent = level;
+  $("statLevel").textContent = level;
+  $("statXP").textContent = xp;
+  $("xpText").textContent = `${nextXp} / 100 XP`;
+  $("xpBar").style.width = `${nextXp}%`;
 }
-
-function page(name, btn) {
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const p = $(name);
-  if (p) p.classList.add("active");
-
-  if (btn) {
-    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-  }
-}
-
-function buildThemes() {
-  const container = $("themeGrid");
-  if (!container) return;
-  const themes = [
-    { name: "Default Dark", bg: "#070b14" },
-    { name: "Cyberpunk", bg: "#120024" },
-    { name: "Retro Green", bg: "#021a0e" },
-    { name: "Deep Space", bg: "#000511" }
-  ];
-  container.innerHTML = themes.map(t => `
-    <div class="theme-card" onclick="document.body.style.background='${t.bg}'">
-      <div class="theme-swatch" style="background:${t.bg}"></div>
-      <strong>${t.name}</strong>
-    </div>
-  `).join('');
-}
-
-function loadLocalNotifications() {}
-async function loadNotifications() {}
-async function loadFriends() {}
-async function loadMessageUsers() {}
-async function loadFeed() {}
-async function loadLeaderboard() {}
-function setupRealtime() {}
-function startPolling() {}
-async function checkAdminDatabase() {}
-function toggleNotifications() { $("notificationPanel")?.classList.toggle("hidden"); }
-function toggleThemeMode() { document.body.classList.toggle("light-mode"); }
-function markAllNotificationsRead() {}
-function searchUsers() {}
-function createPost() { toast("Published! +10 XP"); }
-function openProfile() { $("profileEditor")?.classList.remove("hidden"); }
-function closeProfile() { $("profileEditor")?.classList.add("hidden"); }
-function previewProfileImage() {}
-function saveProfile() { closeProfile(); toast("Profile Saved!"); }
-function copyAdminSQL() {
-  navigator.clipboard.writeText($("adminSql").innerText);
-  toast("SQL Copied to Clipboard!");
-}
-function loadAdminUsers() {}
-function prepareChatImage() {}
-function toggleVoiceRecording() {}
-function sendGift() {}
-function quickEmoji(e) { if($("messageInput")) $("messageInput").value += e; }
-function sendMessage() {}
-
-// ==========================================
-// RACING GAME ENGINE IMPLEMENTATION
-// ==========================================
-let raceGameRunning = false;
-let raceLoopId = null;
-
-function startRacingGame() {
-  const canvas = $("raceCanvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-
-  $("raceOverlay").style.display = "none";
-  raceGameRunning = true;
-
-  let score = 0;
-  let speed = 120;
-  let timeLeft = 60;
-  let roadOffset = 0;
-
-  const player = { x: canvas.width / 2 - 20, y: canvas.height - 90, width: 40, height: 70, speed: 6 };
-  const enemies = [];
-  const keys = { left: false, right: false, up: false, down: false };
-
-  // Key Listeners
-  window.onkeydown = e => {
-    if (e.key === "ArrowLeft" || e.key === "a") keys.left = true;
-    if (e.key === "ArrowRight" || e.key === "d") keys.right = true;
-    if (e.key === "ArrowUp" || e.key === "w") keys.up = true;
-    if (e.key === "ArrowDown" || e.key === "s") keys.down = true;
-  };
-  window.onkeyup = e => {
-    if (e.key === "ArrowLeft" || e.key === "a") keys.left = false;
-    if (e.key === "ArrowRight" || e.key === "d") keys.right = false;
-    if (e.key === "ArrowUp" || e.key === "w") keys.up = false;
-    if (e.key === "ArrowDown" || e.key === "s") keys.down = false;
-  };
-
-  // Touch Controls
-  const bindTouch = (id, key) => {
-    const btn = $(id);
-    if (!btn) return;
-    btn.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; };
-    btn.ontouchend = (e) => { e.preventDefault(); keys[key] = false; };
-    btn.onmousedown = () => keys[key] = true;
-    btn.onmouseup = () => keys[key] = false;
-  };
-  bindTouch("btnUp", "up");
-  bindTouch("btnDown", "down");
-  bindTouch("btnLeft", "left");
-  bindTouch("btnRight", "right");
-
-  // Timer Countdown
-  const timerInterval = setInterval(() => {
-    if (!raceGameRunning) return clearInterval(timerInterval);
-    timeLeft--;
-    $("hudTime").textContent = timeLeft;
-    if (timeLeft <= 0) {
-      endRace("TIME'S UP! YOU SURVIVED!", true);
-      clearInterval(timerInterval);
-    }
-  }, 1000);
-
-  function spawnEnemy() {
-    const lanes = [180, 280, 380, 480];
-    const lane = lanes[Math.floor(Math.random() * lanes.length)];
-    const colors = ["#ff4f91", "#ffd34e", "#55f39a", "#9b6cff"];
-    enemies.push({
-      x: lane - 20,
-      y: -80,
-      width: 40,
-      height: 70,
-      speed: Math.random() * 3 + 4,
-      color: colors[Math.floor(Math.random() * colors.length)]
-    });
-  }
-
-  let spawnTimer = 0;
-
-  function gameLoop() {
-    if (!raceGameRunning) return;
-
-    // Movement
-    if (keys.left && player.x > 140) player.x -= player.speed;
-    if (keys.right && player.x < canvas.width - 180) player.x += player.speed;
-    if (keys.up && player.y > 50) player.y -= player.speed;
-    if (keys.down && player.y < canvas.height - 80) player.y += player.speed;
-
-    // Road scroll
-    roadOffset = (roadOffset + 8) % 40;
-
-    // Clear Screen
-    ctx.fillStyle = "#1e293b";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw Grass Sides
-    ctx.fillStyle = "#0f172a";
-    ctx.fillRect(0, 0, 130, canvas.height);
-    ctx.fillRect(canvas.width - 130, 0, 130, canvas.height);
-
-    // Draw Track Borders
-    ctx.fillStyle = "#ff4f91";
-    ctx.fillRect(125, 0, 10, canvas.height);
-    ctx.fillRect(canvas.width - 135, 0, 10, canvas.height);
-
-    // Draw Lane Lines
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 4;
-    ctx.setLineDash([20, 20]);
-    ctx.lineDashOffset = -roadOffset;
-
-    [240, 340, 440].forEach(laneX => {
-      ctx.beginPath();
-      ctx.moveTo(laneX, 0);
-      ctx.lineTo(laneX, canvas.height);
-      ctx.stroke();
-    });
-
-    // Draw Player Car
-    ctx.fillStyle = "#43e7ff";
-    ctx.fillRect(player.x, player.y, player.width, player.height);
-    ctx.fillStyle = "#000";
-    ctx.fillRect(player.x + 5, player.y + 15, player.width - 10, 15); // Windshield
-
-    // Enemy Spawning & Logic
-    spawnTimer++;
-    if (spawnTimer > 45) {
-      spawnEnemy();
-      spawnTimer = 0;
-    }
-
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      let e = enemies[i];
-      e.y += e.speed + 2;
-
-      // Draw Enemy Car
-      ctx.fillStyle = e.color;
-      ctx.fillRect(e.x, e.y, e.width, e.height);
-      ctx.fillStyle = "#000";
-      ctx.fillRect(e.x + 5, e.y + 15, e.width - 10, 15);
-
-      // Collision Detection
-      if (
-        player.x < e.x + e.width &&
-        player.x + player.width > e.x &&
-        player.y < e.y + e.height &&
-        player.y + player.height > e.y
-      ) {
-        endRace("CRASHED! GAME OVER", false);
-        clearInterval(timerInterval);
-        return;
-      }
-
-      // Passed enemy
-      if (e.y > canvas.height) {
-        enemies.splice(i, 1);
-        score += 50;
-        $("hudScore").textContent = score;
-      }
-    }
-
-    score += 1;
-    $("hudScore").textContent = score;
-    $("hudSpeed").textContent = Math.floor(speed + Math.random() * 5);
-
-    raceLoopId = requestAnimationFrame(gameLoop);
-  }
-
-  function endRace(message, win) {
-    raceGameRunning = false;
-    cancelAnimationFrame(raceLoopId);
-    const overlay = $("raceOverlay");
-    overlay.style.display = "flex";
-    overlay.innerHTML = `
-      <h2 style="color:${win ? 'var(--green)' : 'var(--pink)'}">${message}</h2>
-      <p>FINAL SCORE: <strong>${score}</strong></p>
-      <button class="primary" style="font-size:16px;padding:12px 24px;margin-top:15px" onclick="startRacingGame()">🏎️ PLAY AGAIN</button>
-    `;
-    if (win) toast("Race Complete! +50 XP");
-  }
-
-  gameLoop();
-}
-
-// Auto-start check session
-(async () => {
-  const { data } = await sb.auth.getSession();
-  if (data?.session?.user) {
-    await startApp(data.session.user);
-  }
-})();
 </script>
 </body>
 </html>
