@@ -1,6 +1,4 @@
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -285,7 +283,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 <section id="adminPanel" class="page">
   <div class="card" style="padding:20px">
     <h1>🛡️ ADMIN CONTROL PANEL</h1>
-    <p class="tiny">Manage user administrator and role permissions.</p>
+    <p class="tiny">Manage user administrator and account verification statuses.</p>
     <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
   </div>
 </section>
@@ -433,7 +431,7 @@ function page(name, btn){
 }
 window.page = page;
 
-// --- AUTHENTICATION ---
+// --- AUTHENTICATION (EMAIL/PASSWORD ONLY) ---
 function authTab(t){
   const l = t === "login";
   $("loginPane").classList.toggle("hidden", !l);
@@ -450,10 +448,17 @@ async function register(){
   const avatar = $("regAvatar").value;
   if(username.length < 2 || !email.includes("@") || password.length < 6) return status("authStatus","Check input fields.",true);
   status("authStatus","Creating account...");
+  
   const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});
   if(r.error) return status("authStatus", r.error.message, true);
-  if(r.data.session) await startApp(r.data.user);
-  else status("authStatus","Check email to confirm.");
+  
+  const loginRes = await sb.auth.signInWithPassword({email, password});
+  if(loginRes.error){
+    status("authStatus", "Account created! Please log in.");
+    authTab('login');
+  } else {
+    await startApp(loginRes.data.user);
+  }
 }
 window.register = register;
 
@@ -475,7 +480,6 @@ async function startApp(user){
   playRetroSound('success');
   await loadProfile();
 
-  // Automatically make your account an admin if email matches ADMIN_EMAIL
   if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
     await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);
     currentProfile.is_admin = true;
@@ -493,13 +497,14 @@ async function startApp(user){
 async function loadProfile(){
   let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
   if(!r.data){
-    const fallback = {id: currentUser.id, username: currentUser.user_metadata?.username || "PLAYER", avatar: currentUser.user_metadata?.avatar || "👾", xp: 0};
+    const fallback = {id: currentUser.id, username: currentUser.user_metadata?.username || "PLAYER", avatar: currentUser.user_metadata?.avatar || "👾", xp: 0, is_verified: false};
     r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
   }
   currentProfile = r.data;
-  $("sideName").textContent = currentProfile.username;
+  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
+  $("sideName").textContent = currentProfile.username + verifiedBadge;
   $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = currentProfile.username;
+  $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
   $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
@@ -529,9 +534,10 @@ async function saveProfileInfo(){
   
   currentProfile.username = username;
   currentProfile.bio = bio;
-  $("sideName").textContent = username;
+  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
+  $("sideName").textContent = username + verifiedBadge;
   $("sideBio").textContent = bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = username;
+  $("profileNameDisplay").textContent = username + verifiedBadge;
   $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
   playRetroSound('success');
   toast("✅ Profile details updated!");
@@ -571,7 +577,7 @@ async function removeAvatar(){
 }
 window.removeAvatar = removeAvatar;
 
-// --- ADMIN PANEL FUNCTIONS (ADMIN ROLE MANAGEMENT ONLY) ---
+// --- ADMIN PANEL FUNCTIONS (ROLES & ACCOUNT VERIFICATION) ---
 async function loadAdminUsers(){
   if(!isAdmin()) return toast("❌ Unauthorized access");
   const r = await sb.from("profiles").select("*").order("username", {ascending: true});
@@ -579,16 +585,22 @@ async function loadAdminUsers(){
 
   $("adminUserList").innerHTML = r.data.map(u => {
     const isUserAdmin = u.is_admin === true;
+    const isVerified = u.is_verified === true;
     return `
-      <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center;">
+      <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div class="row" style="gap:12px; align-items:center;">
           <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
           <div>
-            <strong>${esc(u.username)}</strong> ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
+            <strong>${esc(u.username)}</strong> 
+            ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
+            ${isVerified ? '<span style="color:var(--green);font-size:14px;">✅ [VERIFIED]</span>' : ''}
             <div class="tiny">ID: ${u.id}</div>
           </div>
         </div>
-        <div>
+        <div style="display:flex; gap:6px;">
+          <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">
+            ${isVerified ? '❌ Unverify' : '✅ Verify Account'}
+          </button>
           <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">
             ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}
           </button>
@@ -612,6 +624,20 @@ async function toggleUserAdmin(targetUserId, currentStatus){
   }
 }
 window.toggleUserAdmin = toggleUserAdmin;
+
+async function toggleUserVerify(targetUserId, currentStatus){
+  if(!isAdmin()) return toast("❌ Admin privileges required.");
+  const newStatus = !currentStatus;
+  const r = await sb.from("profiles").update({ is_verified: newStatus }).eq("id", targetUserId);
+  if(r.error){
+    toast("❌ Error: " + r.error.message);
+  } else {
+    toast(newStatus ? "✅ Account verified successfully!" : "ℹ️ Account verification removed.");
+    playRetroSound('success');
+    loadAdminUsers();
+  }
+}
+window.toggleUserVerify = toggleUserVerify;
 
 // --- NOTIFICATIONS ---
 async function updateNotificationBadge(){
@@ -723,6 +749,7 @@ async function loadFeed(){
   $("feed").innerHTML = r.data.map(p => {
     const author = p.profiles || {};
     const avatarMarkup = author.avatar_url ? `<img src="${esc(author.avatar_url)}">` : esc(author.avatar||"👾");
+    const verifiedBadge = author.is_verified ? ' ✅' : '';
     const reactions = p.post_reactions || [];
     const counts = { '❤️':0, '🔥':0, '😂':0, '👍':0 };
     const myReactions = new Set();
@@ -740,7 +767,7 @@ async function loadFeed(){
         <div class="post-author">
           <div class="user-avatar">${avatarMarkup}</div>
           <div>
-            <strong>${esc(author.username||'Player')}</strong>
+            <strong>${esc(author.username||'Player')}${verifiedBadge}</strong>
             <div class="tiny">${new Date(p.created_at).toLocaleString()}</div>
           </div>
         </div>
@@ -762,7 +789,7 @@ async function loadFeed(){
         <div style="margin-top:8px">
           ${comments.map(c => `
             <div class="comment-item">
-              <strong style="color:var(--cyan)">${esc(c.profiles?.username||'User')}:</strong>
+              <strong style="color:var(--cyan)">${esc(c.profiles?.username||'User')}${c.profiles?.is_verified?' ✅':''}:</strong>
               <span>${esc(c.content)}</span>
             </div>
           `).join('')}
@@ -807,7 +834,7 @@ async function loadFriends(){
       <div class="user-card">
         <div class="row" style="margin-bottom:8px">
           <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-          <strong>${esc(u.username)}</strong>
+          <strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong>
         </div>
         <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
       </div>
@@ -826,7 +853,7 @@ async function searchUsers(isGlobal){
       <div class="user-card">
         <div class="row" style="margin-bottom:8px">
           <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-          <strong>${esc(u.username)}</strong>
+          <strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong>
         </div>
         <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
       </div>
@@ -850,7 +877,7 @@ async function loadLeaderboard(){
         <div class="row">
           <strong>#${i+1}</strong> 
           <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div> 
-          <span>${esc(u.username)}</span>
+          <span>${esc(u.username)}${u.is_verified?' ✅':''}</span>
         </div>
         <div>XP: <strong>${u.xp||0}</strong></div>
       </div>
@@ -867,7 +894,7 @@ async function loadMessageUsers(){
     return `
       <div id="chatUser_${u.id}" class="chat-user" onclick="selectChatUser('${u.id}', '${esc(u.username)}')">
         <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}<span class="online"></span></div>
-        <div><strong>${esc(u.username)}</strong><div class="tiny">Online</div></div>
+        <div><strong>${esc(u.username)}${u.is_verified?' ✅':''}</strong><div class="tiny">Online</div></div>
       </div>
     `;
   }).join('');
