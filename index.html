@@ -1,88 +1,159 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Friend - Chat</title>
     <style>
-        /* Dark Theme Styles */
-        body { background: #0a0e14; color: #fff; font-family: monospace; }
-        .chat-container { border: 1px solid #333; padding: 20px; width: 600px; }
-        
+        body { 
+            background: #0a0e14; 
+            color: #fff; 
+            font-family: monospace; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .chat-container { 
+            border: 1px solid #333; 
+            padding: 20px; 
+            width: 500px; 
+            background: #10151d;
+            border-radius: 4px;
+        }
+        /* Message Item Styling */
+        .message-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a222d;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .reply-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
         /* Reply Banner */
         #reply-banner { 
-            background: #1a222d; 
-            padding: 10px; 
+            background: #162a36; 
+            padding: 8px 12px; 
             margin-bottom: 10px; 
             display: none; /* Hidden by default */
-            border-left: 3px solid #00ffcc;
+            border-left: 3px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
         }
-        
+        .cancel-btn {
+            background: transparent;
+            color: #ff5c5c;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
         /* Input Area */
-        .input-area { margin-top: 20px; }
-        input { background: #050505; color: white; padding: 10px; width: 400px; border: 1px solid #444; }
-        button { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+        .input-area { 
+            display: flex;
+            gap: 10px;
+            margin-top: 15px; 
+        }
+        input { 
+            background: #050505; 
+            color: white; 
+            padding: 10px; 
+            flex-grow: 1; 
+            border: 1px solid #444; 
+            outline: none;
+        }
+        .send-btn { 
+            background: #3498db; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <div class="chat-container">
-    <!-- Replying UI -->
+    <!-- Message 1 Sample -->
+    <div class="message-row">
+        <span>Message 1</span>
+        <button class="reply-btn" onclick="setReply('1')">Reply</button>
+    </div>
+
+    <!-- Replying Banner UI -->
     <div id="reply-banner">
-        <span id="reply-label">Replying to: "..."</span>
-        <button onclick="cancelReply()">X CANCEL</button>
+        <span id="reply-label">Replying to: "1"</span>
+        <button class="cancel-btn" onclick="cancelReply()">X CANCEL</button>
     </div>
 
-    <!-- Message List (Example) -->
-    <div id="chat-messages">
-        <p>Message 1 <button onclick="setReply('1')">Reply</button></p>
-    </div>
-
-    <!-- Controls -->
+    <!-- Controls / Input Section -->
     <div class="input-area">
         <input type="text" id="message-input" placeholder="Type a message...">
-        <button onclick="sendMessage()">SEND</button>
+        <button class="send-btn" onclick="sendMessage()">SEND</button>
     </div>
 </div>
 
 <script>
-    // 1. GLOBAL STATE: This variable tracks what you are replying to
+    // 1. STATE VARIABLE: Tracks the ID of the message being replied to
     let activeReplyId = null;
 
-    // 2. FUNCTION: Called when you click "Reply" on a message
+    // 2. TRIGGER REPLY: Sets the active ID and shows the banner
     function setReply(messageId) {
         activeReplyId = messageId;
         document.getElementById('reply-label').innerText = `Replying to: "${messageId}"`;
-        document.getElementById('reply-banner').style.display = 'block';
+        document.getElementById('reply-banner').style.display = 'flex';
     }
 
-    // 3. FUNCTION: Called when you click "Cancel"
+    // 3. CANCEL REPLY: Clears the state and hides the banner
     function cancelReply() {
         activeReplyId = null;
         document.getElementById('reply-banner').style.display = 'none';
     }
 
-    // 4. FUNCTION: Called when you click "Send"
+    // 4. SEND MESSAGE: Packages the input and active reply ID together
     function sendMessage() {
         const input = document.getElementById('message-input');
         
-        // Construct the data payload
+        // Build the payload object matching standard backend requirements
         const payload = {
             text: input.value,
-            // CRITICAL FIX: Include the reply ID only if it exists
-            reply_to: activeReplyId 
+            reply_to: activeReplyId // Sends the ID ("1") if replying, or null if a normal message
         };
 
-        console.log("Sending Payload:", payload); // Debugging
+        // Fully expandable object display in your Console tab
+        console.log("Sending Payload:", JSON.stringify(payload, null, 2));
 
-        // Perform your fetch/API call here
-        /*
-        fetch('/your-api-endpoint', {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
+        /* 
+           Uncomment and adjust this fetch block when connecting to your actual server endpoint:
+           
+           fetch('/api/send-message', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify(payload)
+           }).then(response => {
+               if (response.ok) {
+                   input.value = '';
+                   cancelReply();
+               }
+           });
         */
 
-        // Reset UI after sending
+        // Reset UI elements locally for testing purposes
         input.value = '';
-        cancelReply(); 
+        cancelReply();
     }
 </script>
 
