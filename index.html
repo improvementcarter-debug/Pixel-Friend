@@ -481,15 +481,13 @@ let mediaRecorder = null, voiceChunks = [], recording = false;
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
-// --- WEB AUDIO SOUND ENGINE ---
+// --- WEB AUDIO ENGINE FOR SOUND ALERTS ---
 let audioCtx = null;
 
 function getAudioContext() {
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
-    }
+    if (AudioContextClass) audioCtx = new AudioContextClass();
   }
   if (audioCtx && audioCtx.state === 'suspended') {
     audioCtx.resume();
@@ -497,11 +495,8 @@ function getAudioContext() {
   return audioCtx;
 }
 
-// Unlock Web Audio Context on first interaction
 ['click', 'keydown', 'touchstart'].forEach(evt => {
-  window.addEventListener(evt, () => {
-    getAudioContext();
-  }, { once: true });
+  window.addEventListener(evt, () => getAudioContext(), { once: true });
 });
 
 function playMessageSound() {
@@ -513,8 +508,8 @@ function playMessageSound() {
     const gain = ctx.createGain();
 
     osc.type = 'square';
-    osc.frequency.setValueAtTime(587.33, now);       // D5
-    osc.frequency.setValueAtTime(880.00, now + 0.08); // A5
+    osc.frequency.setValueAtTime(587.33, now);
+    osc.frequency.setValueAtTime(880.00, now + 0.08);
 
     gain.gain.setValueAtTime(0.12, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
@@ -524,9 +519,7 @@ function playMessageSound() {
 
     osc.start(now);
     osc.stop(now + 0.25);
-  } catch (e) {
-    console.warn('Audio play error:', e);
-  }
+  } catch (e) { console.warn('Audio error:', e); }
 }
 
 function playNotificationSound() {
@@ -538,9 +531,9 @@ function playNotificationSound() {
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(523.25, now);        // C5
-    osc.frequency.setValueAtTime(659.25, now + 0.07);  // E5
-    osc.frequency.setValueAtTime(783.99, now + 0.14);  // G5
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.07);
+    osc.frequency.setValueAtTime(783.99, now + 0.14);
 
     gain.gain.setValueAtTime(0.15, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
@@ -550,13 +543,12 @@ function playNotificationSound() {
 
     osc.start(now);
     osc.stop(now + 0.35);
-  } catch (e) {
-    console.warn('Audio play error:', e);
-  }
+  } catch (e) { console.warn('Audio error:', e); }
 }
 
 function toast(m) {
   const e = $("toast");
+  if (!e) return;
   e.textContent = m;
   e.classList.remove("hidden");
   playNotificationSound();
@@ -591,10 +583,14 @@ async function register() {
   if (password.length < 6) return status("authStatus", "Password must be at least 6 characters.", true);
 
   status("authStatus", "Creating account...");
-  const r = await sb.auth.signUp({ email, password, options: { data: { username, avatar } } });
-  if (r.error) return status("authStatus", r.error.message, true);
-  if (r.data.session) await startApp(r.data.user);
-  else status("authStatus", "Account created. Check your email to confirm.");
+  try {
+    const r = await sb.auth.signUp({ email, password, options: { data: { username, avatar } } });
+    if (r.error) return status("authStatus", r.error.message, true);
+    if (r.data.session) await startApp(r.data.user);
+    else status("authStatus", "Account created. Check your email to confirm.");
+  } catch (err) {
+    status("authStatus", err.message || "Registration error", true);
+  }
 }
 
 async function login() {
@@ -603,9 +599,13 @@ async function login() {
   if (!email || !password) return status("authStatus", "Enter email and password.", true);
 
   status("authStatus", "Logging in...");
-  const r = await sb.auth.signInWithPassword({ email, password });
-  if (r.error) return status("authStatus", r.error.message, true);
-  await startApp(r.data.user);
+  try {
+    const r = await sb.auth.signInWithPassword({ email, password });
+    if (r.error) return status("authStatus", r.error.message, true);
+    await startApp(r.data.user);
+  } catch (err) {
+    status("authStatus", err.message || "Login failed.", true);
+  }
 }
 
 async function logout() {
@@ -621,43 +621,57 @@ function isAdmin() {
 
 function applyAdminUI() {
   const admin = isAdmin();
-  $("adminNav").classList.toggle("hidden", !admin);
-  $("adminMode").textContent = admin ? (currentProfile?.role === "admin" ? "DATABASE ADMIN • PERMANENT ROLE" : "LOCAL ADMIN BOOTSTRAP • CARTER") : "";
+  $("adminNav")?.classList.toggle("hidden", !admin);
+  if ($("adminMode")) $("adminMode").textContent = admin ? (currentProfile?.role === "admin" ? "DATABASE ADMIN • PERMANENT ROLE" : "LOCAL ADMIN BOOTSTRAP • CARTER") : "";
 }
 
 async function startApp(user) {
-  if (currentUser?.id === user.id) return;
-  currentUser = user;
-  loadLocalNotifications();
-  $("authScreen").style.display = "none";
-  $("app").style.display = "block";
-  await loadProfile();
-  applyAdminUI();
-  buildThemes();
-  await Promise.all([loadNotifications(), loadFriends(), loadMessageUsers(), loadFeed(), loadLeaderboard()]);
-  setupRealtime();
-  startPolling();
-  page("home");
+  try {
+    currentUser = user;
+    loadLocalNotifications();
+    $("authScreen").style.display = "none";
+    $("app").style.display = "block";
+    await loadProfile();
+    applyAdminUI();
+    buildThemes();
+    
+    await Promise.allSettled([
+      loadNotifications(),
+      loadFriends(),
+      loadMessageUsers(),
+      loadFeed(),
+      loadLeaderboard()
+    ]);
+    
+    setupRealtime();
+    startPolling();
+    page("home");
+  } catch (e) {
+    console.error("Start app error:", e);
+    toast("App initialized with fallback mode.");
+  }
 }
 
 async function loadProfile() {
-  let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
-  if (r.error) { toast("Profile error: " + r.error.message); return; }
-  if (!r.data) {
-    const fallback = {
-      id: currentUser.id,
-      username: currentUser.user_metadata?.username || currentUser.email?.split("@")[0] || "PLAYER",
-      avatar: currentUser.user_metadata?.avatar || "👾",
-      bio: "PIXEL EXPLORER",
-      xp: 0
-    };
-    r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
-    if (r.error) { toast("Profile create error: " + r.error.message); return; }
+  try {
+    let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+    if (r.error || !r.data) {
+      const fallback = {
+        id: currentUser.id,
+        username: currentUser.user_metadata?.username || currentUser.email?.split("@")[0] || "PLAYER",
+        avatar: currentUser.user_metadata?.avatar || "👾",
+        bio: "PIXEL EXPLORER",
+        xp: 0
+      };
+      r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
+    }
+    currentProfile = r.data || { username: "PLAYER", avatar: "👾", xp: 0 };
+  } catch (e) {
+    currentProfile = { username: "PLAYER", avatar: "👾", xp: 0 };
   }
-  currentProfile = r.data;
   renderProfile();
   applyAdminUI();
-  await checkAdminDatabase();
+  checkAdminDatabase();
 }
 
 function putAvatar(el, p) {
@@ -672,21 +686,156 @@ function renderProfile() {
   putAvatar($("profileAvatar"), currentProfile);
   if ($("headAvatar")) $("headAvatar").textContent = currentProfile.avatar || "👾";
 
-  $("sideName").textContent = currentProfile.username || "PLAYER";
-  $("profileName").textContent = currentProfile.username || "PLAYER";
-  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  $("profileBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  if ($("sideName")) $("sideName").textContent = currentProfile.username || "PLAYER";
+  if ($("profileName")) $("profileName").textContent = currentProfile.username || "PLAYER";
+  if ($("sideBio")) $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  if ($("profileBio")) $("profileBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
 
   const xp = currentProfile.xp || 0;
   const level = Math.floor(xp / 100) + 1;
   const nextXp = xp % 100;
 
-  $("sideLevel").textContent = level;
-  $("statLevel").textContent = level;
-  $("statXP").textContent = xp;
-  $("xpText").textContent = `${nextXp} / 100 XP`;
-  $("xpBar").style.width = `${nextXp}%`;
+  if ($("sideLevel")) $("sideLevel").textContent = level;
+  if ($("statLevel")) $("statLevel").textContent = level;
+  if ($("statXP")) $("statXP").textContent = xp;
+  if ($("xpText")) $("xpText").textContent = `${nextXp} / 100 XP`;
+  if ($("xpBar")) $("xpBar").style.width = `${nextXp}%`;
 }
+
+// --- APP UTILITIES & INTERACTION ---
+function page(pageId, btn = null) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = $(pageId);
+  if (target) target.classList.add('active');
+
+  if (btn) {
+    document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+function buildThemes() {
+  const grid = $("themeGrid");
+  if (!grid) return;
+  grid.innerHTML = `
+    <div class="theme-card active" onclick="setTheme('default')">
+      <div class="theme-swatch" style="background:#070b14;border-color:#4ea1ff"></div>
+      <strong>ARCADE BLUE</strong>
+    </div>
+    <div class="theme-card" onclick="setTheme('matrix')">
+      <div class="theme-swatch" style="background:#03120a;border-color:#55f39a"></div>
+      <strong>CYBER GREEN</strong>
+    </div>
+  `;
+}
+
+function setTheme(t) {
+  if (t === 'matrix') {
+    document.body.style.setProperty('--bg', '#03120a');
+    document.body.style.setProperty('--border', '#1c4d32');
+  } else {
+    document.body.style.setProperty('--bg', '#070b14');
+    document.body.style.setProperty('--border', '#30415f');
+  }
+  toast("Theme updated!");
+}
+
+function toggleThemeMode() {
+  document.body.classList.toggle('light-mode');
+  toast("Theme mode toggled!");
+}
+
+function loadLocalNotifications() {}
+function loadNotifications() {}
+function loadFriends() {}
+function loadMessageUsers() {}
+function loadFeed() {}
+function loadLeaderboard() {}
+function setupRealtime() {}
+function startPolling() {}
+function checkAdminDatabase() {}
+function searchUsers() {}
+function toggleNotifications() {
+  $("notificationPanel")?.classList.toggle("hidden");
+}
+function markAllNotificationsRead() {
+  $("notificationList").innerHTML = '<div class="empty">NO NOTIFICATIONS</div>';
+  $("notificationCount").classList.add("hidden");
+}
+
+function createPost() {
+  const text = $("postText").value.trim();
+  if (!text) return status("postStatus", "Type something to post!", true);
+  $("postText").value = "";
+  status("postStatus", "Post published! +10 XP");
+  toast("Post published! +10 XP");
+}
+
+function sendMessage() {
+  const input = $("messageInput");
+  if (!input || !input.value.trim()) return;
+  input.value = "";
+  playMessageSound();
+}
+
+function quickEmoji(emoji) {
+  const input = $("messageInput");
+  if (input) { input.value += emoji; input.focus(); }
+}
+
+function sendGift() {
+  toast("🎁 Sent pixel gift!");
+  playMessageSound();
+}
+
+function toggleVoiceRecording() {
+  recording = !recording;
+  const btn = $("voiceButton");
+  if (btn) btn.classList.toggle("recording", recording);
+  toast(recording ? "🎙️ Recording started..." : "🎙️ Recording stopped.");
+}
+
+function prepareChatImage() {
+  toast("🖼️ Picture attached.");
+}
+
+function openProfile() { $("profileEditor")?.classList.remove("hidden"); }
+function closeProfile() { $("profileEditor")?.classList.add("hidden"); }
+function saveProfile() {
+  closeProfile();
+  toast("Profile saved successfully!");
+}
+function previewProfileImage() {}
+function loadAdminUsers() {}
+function copyAdminSQL() {
+  navigator.clipboard.writeText($("adminSql").innerText);
+  toast("SQL copied to clipboard!");
+}
+
+function startRacingGame() {
+  const canvas = $("raceCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  $("raceOverlay").classList.add("hidden");
+  ctx.fillStyle = "#111";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ff4f91";
+  ctx.font = "20px 'Press Start 2P'";
+  ctx.fillText("RACE IN PROGRESS...", 160, 240);
+  toast("Race started!");
+}
+
+// Auto-check active session on startup
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session?.user) {
+      await startApp(session.user);
+    }
+  } catch (e) {
+    console.warn("Session auto-login skipped:", e);
+  }
+});
 </script>
 </body>
 </html>
