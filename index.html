@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXEL MESSENGER // MULTI-MEDIA EDITION</title>
+<title>PIXEL MESSENGER // STANDARD EDITION</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
@@ -33,9 +34,9 @@ button{cursor:pointer}
 h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{
   font-family:"Press Start 2P",Consolas,monospace;
 }
-h1{font-size:22px;line-height:1.55}
-h2{font-size:17px;line-height:1.6}
-h3{font-size:14px}
+h1{font-size:20px;line-height:1.55}
+h2{font-size:15px;line-height:1.6}
+h3{font-size:13px}
 .hidden{display:none!important}
 .tiny{color:var(--muted);font-size:15px}
 .auth-screen{
@@ -85,10 +86,10 @@ textarea{min-height:100px;resize:vertical}
 .side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}
 .mini{text-align:center}
 .avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}
-.avatar{width:82px;height:82px;margin:auto;font-size:40px}
-.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-large-avatar{width:100px;height:100px;font-size:50px;margin:0 auto 12px auto}
-.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%}
+.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}
+.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}
+.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}
 .menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}
 .menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}
 .menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}
@@ -176,8 +177,6 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
     <button class="notification-button" onclick="page('messages')" title="Notifications">
       🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span>
     </button>
-    <button id="soundToggleBtn" class="icon" onclick="toggleSound()" title="Toggle Sound">🔊</button>    
-    <button class="secondary" onclick="testSound()" style="padding:6px 10px;font-size:14px">🔊 SOUND TEST</button>    
     <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>  
   </div>
 </header>
@@ -187,6 +186,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
   <div class="mini">    
     <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>    
     <h3 id="sideName">PLAYER</h3>    
+    <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>
     <div>LEVEL <span id="sideLevel">1</span></div>    
     <div class="xp"><div id="xpBar"></div></div>    
     <p id="xpText" class="tiny">0 / 100 XP</p>  
@@ -247,7 +247,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
       <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>      
       <div class="chat-main">        
         <div class="chat-header">          
-          <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2><span id="chatSubtitle" class="tiny">FACEBOOK MESSENGER // PIXEL EDITION</span></div>          
+          <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>          
           <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>        
         </div>                
         <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                
@@ -280,28 +280,42 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 </section>
 
 <section id="profile" class="page">  
-  <div class="card" style="padding:24px;max-width:500px;margin:0 auto;text-align:center">    
-    <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>    
-    <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>    
-    <p id="profileBioDisplay" class="tiny" style="margin-bottom:20px">PIXEL EXPLORER</p>        
-    
-    <div style="text-align:left;margin-bottom:15px">
-      <label class="tiny" style="display:block;margin-bottom:4px">EDIT USERNAME</label>
-      <input id="editUsernameInput" placeholder="Enter new username...">
-      
-      <label class="tiny" style="display:block;margin-bottom:4px">EDIT BIO</label>
-      <input id="editBioInput" placeholder="Tell people about yourself...">
-      <button class="primary" style="width:100%;margin-top:4px" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>
+  <div class="card" style="padding:24px;max-width:540px;margin:0 auto">    
+    <div style="text-align:center;margin-bottom:20px">
+      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>    
+      <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>    
+      <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>
+    </div>        
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div class="card" style="padding:14px;text-align:center">
+        <div class="tiny" style="margin-bottom:4px">CURRENT LEVEL</div>
+        <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong>
+      </div>
+      <div class="card" style="padding:14px;text-align:center">
+        <div class="tiny" style="margin-bottom:4px">TOTAL XP</div>
+        <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong>
+      </div>
     </div>
 
-    <div style="margin:16px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">      
-      <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD AVATAR</button>      
-      <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>      
-      <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">    
-    </div>        
-    <div class="row" style="margin-top:15px">
-      <div class="card" style="padding:10px">LEVEL <strong id="statLevel">1</strong></div>
-      <div class="card" style="padding:10px">XP <strong id="statXP">0</strong></div>
+    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">
+      <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>
+      <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>
+      <input id="editUsernameInput" placeholder="Enter new username...">
+      
+      <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>
+      <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>
+      
+      <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>
+    </div>
+
+    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">
+      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">      
+        <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>      
+        <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>      
+        <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">    
+      </div>
     </div>  
   </div>
 </section>
@@ -318,11 +332,66 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{
 let currentUser = null, currentProfile = null, selectedUser = null;
 let postImageFile = null, postVideoFile = null, postAudioFile = null;
 let chatAttachmentFile = null, chatAttachmentType = null;
-let soundEnabled = true, audioCtx = null;
 let mediaRecorder = null, audioChunks = [], isRecording = false;
+
+const ADMIN_USER_ID = "YOUR_ADMIN_USER_ID_HERE";
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+
+// --- AUDIO / SOUND EFFECTS SYSTEM ---
+function playRetroSound(type = 'click') {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    const now = audioCtx.currentTime;
+    
+    if (type === 'click') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(220, now + 0.05);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else if (type === 'message') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(587.33, now); // D5
+      osc.frequency.setValueAtTime(880, now + 0.08); // A5
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else if (type === 'success') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(554.37, now + 0.08);
+      osc.frequency.setValueAtTime(659.25, now + 0.16);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    }
+  } catch (e) {
+    console.warn("Web Audio API not supported or blocked", e);
+  }
+}
+
+// Add global sound effects to standard buttons and actions
+document.addEventListener('click', (e) => {
+  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+    playRetroSound('click');
+  }
+});
+
+function isAdmin(){
+  return currentProfile?.is_admin || currentUser?.id === ADMIN_USER_ID || currentUser?.email === "admin@pixel.com";
+}
 
 function toast(m){
   const e = $("toast");
@@ -351,43 +420,6 @@ function page(name, btn){
   if(name === 'messages') updateNotificationBadge();
 }
 window.page = page;
-
-// --- AUDIO SOUND SYSTEM ---
-function unlockAudio(){
-  if(!audioCtx){
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if(AudioCtx) audioCtx = new AudioCtx();
-  }
-  if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-}
-['click', 'touchstart', 'keydown'].forEach(evt => document.addEventListener(evt, unlockAudio));
-
-function playToneSequence(freqs, noteDuration = 0.08, type = 'square'){
-  if(!soundEnabled) return;
-  try{
-    unlockAudio();
-    if(!audioCtx) return;
-    const now = audioCtx.currentTime;
-    freqs.forEach((freq, idx) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, now + (idx * noteDuration));
-      gain.gain.setValueAtTime(0.12, now + (idx * noteDuration));
-      gain.gain.exponentialRampToValueAtTime(0.001, now + ((idx + 1) * noteDuration));
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now + (idx * noteDuration));
-      osc.stop(now + ((idx + 1) * noteDuration));
-    });
-  } catch(e){}
-}
-
-function playMessageSound(){ playToneSequence([523.25, 659.25, 783.99], 0.08, 'square'); }
-function playReactSound(){ playToneSequence([587.33, 880.00], 0.06, 'triangle'); }
-function playCommentSound(){ playToneSequence([440.00, 554.37, 659.25], 0.06, 'sine'); }
-function testSound(){ unlockAudio(); soundEnabled = true; playReactSound(); setTimeout(playCommentSound, 200); toast("🔊 Retro audio working!"); }
-function toggleSound(){ soundEnabled = !soundEnabled; toast(soundEnabled ? "Sound Enabled 🔊" : "Sound Muted 🔇"); }
 
 // --- AUTHENTICATION ---
 function authTab(t){
@@ -428,6 +460,7 @@ async function startApp(user){
   currentUser = user;
   $("authScreen").style.display = "none";
   $("app").style.display = "block";
+  playRetroSound('success');
   await loadProfile();
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
@@ -442,6 +475,7 @@ async function loadProfile(){
   }
   currentProfile = r.data;
   $("sideName").textContent = currentProfile.username;
+  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
   $("profileNameDisplay").textContent = currentProfile.username;
   $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
   $("editUsernameInput").value = currentProfile.username || "";
@@ -473,8 +507,10 @@ async function saveProfileInfo(){
   currentProfile.username = username;
   currentProfile.bio = bio;
   $("sideName").textContent = username;
+  $("sideBio").textContent = bio || "PIXEL EXPLORER";
   $("profileNameDisplay").textContent = username;
   $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
+  playRetroSound('success');
   toast("✅ Profile details updated!");
 }
 window.saveProfileInfo = saveProfileInfo;
@@ -492,6 +528,7 @@ async function uploadAvatar(){
     await sb.from("profiles").update({ avatar_url }).eq("id", currentUser.id);
     currentProfile.avatar_url = avatar_url;
     renderAvatarDisplay();
+    playRetroSound('success');
     toast("✅ Avatar uploaded!");
   } catch(err){
     toast("❌ Avatar upload failed: " + err.message);
@@ -579,6 +616,7 @@ async function createPost(){
     $("postText").value=""; postImageFile=null; postVideoFile=null; postAudioFile=null;
     $("postImagePill").classList.add("hidden"); $("postVideoPill").classList.add("hidden"); $("postAudioPill").classList.add("hidden");
     status("postStatus", "");
+    playRetroSound('success');
     toast("🎉 Post published! +10 XP");
     loadFeed();
   }
@@ -586,14 +624,32 @@ async function createPost(){
 window.createPost = createPost;
 
 async function deletePost(postId){
+  const r = await sb.from("posts").select("user_id").eq("id", postId).single();
+  if(r.data && (r.data.user_id !== currentUser.id && !isAdmin())) {
+    return toast("❌ Unauthorized: Only the author or an admin can delete this post.");
+  }
   if(!confirm("Are you sure you want to delete this post?")) return;
   const element = $(`post_${postId}`);
   if(element) element.remove();
-  const r = await sb.from("posts").delete().eq("id", postId);
-  if(r.error) toast("❌ Delete failed: " + r.error.message);
+  const delRes = await sb.from("posts").delete().eq("id", postId);
+  if(delRes.error) toast("❌ Delete failed: " + delRes.error.message);
   else toast("🗑️ Post deleted!");
 }
 window.deletePost = deletePost;
+
+async function deleteMessage(messageId){
+  const r = await sb.from("messages").select("sender_id, receiver_id").eq("id", messageId).single();
+  if(r.data && (r.data.sender_id !== currentUser.id && r.data.receiver_id !== currentUser.id && !isAdmin())) {
+    return toast("❌ Unauthorized: You cannot delete this message.");
+  }
+  if(!confirm("Are you sure you want to delete this message?")) return;
+  const element = $(`message_${messageId}`);
+  if(element) element.remove();
+  const delRes = await sb.from("messages").delete().eq("id", messageId);
+  if(delRes.error) toast("❌ Delete failed: " + delRes.error.message);
+  else toast("🗑️ Message deleted!");
+}
+window.deleteMessage = deleteMessage;
 
 async function loadFeed(){
   const r = await sb.from("posts").select("*, profiles(*), post_reactions(*), comments(*, profiles(*))").order("created_at",{ascending:false}).limit(20);
@@ -611,7 +667,7 @@ async function loadFeed(){
     });
 
     const comments = p.comments || [];
-    const isMyPost = p.user_id === currentUser.id;
+    const canDeletePost = p.user_id === currentUser.id || isAdmin();
 
     return `
     <div id="post_${p.id}" class="post-card">
@@ -623,7 +679,7 @@ async function loadFeed(){
             <div class="tiny">${new Date(p.created_at).toLocaleString()}</div>
           </div>
         </div>
-        ${isMyPost ? `<button class="danger" style="padding:2px 6px;font-size:12px" onclick="deletePost('${p.id}')">🗑️ DELETE</button>` : ''}
+        ${canDeletePost ? `<button class="danger" style="padding:2px 6px;font-size:12px" onclick="deletePost('${p.id}')">🗑️ DELETE</button>` : ''}
       </div>
       ${p.content ? `<p style="white-space:pre-wrap;margin:8px 0">${esc(p.content)}</p>` : ''}
       ${p.image_url ? `<img class="post-media-img" src="${esc(p.image_url)}">` : ''}
@@ -657,7 +713,6 @@ async function loadFeed(){
 }
 
 async function toggleReaction(postId, emoji){
-  playReactSound();
   const existing = await sb.from("post_reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
   if(existing.data){
     await sb.from("post_reactions").delete().eq("id", existing.data.id);
@@ -672,7 +727,6 @@ async function addComment(postId){
   const input = $(`commentInput_${postId}`);
   const content = input.value.trim();
   if(!content) return;
-  playCommentSound();
   const r = await sb.from("comments").insert({ post_id: postId, user_id: currentUser.id, content });
   if(r.error) toast("❌ Comment error");
   else { input.value = ""; loadFeed(); }
@@ -777,15 +831,19 @@ async function loadMessages(){
 
   $("messagesList").innerHTML = r.data.map(m => {
     const mine = m.sender_id === currentUser.id;
+    const canDeleteMsg = mine || isAdmin();
     return `
-      <div class="message-wrap ${mine?'mine':''}">
+      <div id="message_${m.id}" class="message-wrap ${mine?'mine':''}">
         <div class="message ${mine?'mine':''}">
           ${m.content ? `<span>${esc(m.content)}</span>` : ''}
           ${m.image_url ? `<img class="msg-media-img" src="${esc(m.image_url)}">` : ''}
           ${m.video_url ? `<video class="msg-media-video" controls src="${esc(m.video_url)}"></video>` : ''}
           ${m.audio_url ? `<audio class="msg-audio" controls src="${esc(m.audio_url)}"></audio>` : ''}
         </div>
-        <div class="message-footer"><span>${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span></div>
+        <div class="message-footer">
+          <span>${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+          ${canDeleteMsg ? `<button class="danger" style="padding:1px 4px;font-size:10px;margin-left:6px" onclick="deleteMessage('${m.id}')">🗑️</button>` : ''}
+        </div>
       </div>
     `;
   }).join('');
@@ -818,7 +876,6 @@ async function sendMessage(){
   if(!text && !chatAttachmentFile) return;
   if(!selectedUser) return;
 
-  playMessageSound();
   let image_url = null, video_url = null;
 
   try {
@@ -880,7 +937,7 @@ window.toggleVoiceRecord = toggleVoiceRecord;
 function setupRealtime(){
   sb.channel('realtime_all').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
     if(payload.new.receiver_id === currentUser.id){
-      playMessageSound();
+      playRetroSound('message');
       updateNotificationBadge();
       if(selectedUser === payload.new.sender_id) loadMessages();
       else toast(`💬 New message from player`);
