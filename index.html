@@ -161,6 +161,15 @@ aside{
   border:2px solid #43e8ff;padding:13px 16px;border-radius:6px;
   max-width:420px;box-shadow:5px 5px 0 #03050d
 }
+.count{position:absolute;right:-6px;top:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:20px;background:#ff5278;border:2px solid #081124;display:grid;place-items:center;font-size:10px;font-weight:900}
+.panel{position:absolute;right:0;top:51px;width:360px;max-height:480px;overflow:auto;background:#10192c;border:2px solid #304a77;border-radius:8px;box-shadow:0 20px 50px #000b;z-index:100}
+.panelHead{padding:12px;border-bottom:2px solid #263b61;display:flex;justify-content:space-between}
+.panelHead button{background:none;border:0;color:#55d9ff;font-weight:900;cursor:pointer}
+.note{padding:12px;border-bottom:1px solid #263b61}
+.note.unread{background:#182b4b}
+.notificationButton{position:relative}
+.notificationFlash{animation:notificationFlash .55s steps(2,end) 3}
+@keyframes notificationFlash{50%{filter:brightness(1.8);transform:translate(-1px,-1px)}}
 @media(max-width:800px){
   .layout{grid-template-columns:1fr} aside{display:none}
   .search{display:none}
@@ -212,8 +221,13 @@ aside{
   <div class="brand" onclick="go('home')">🎮 PIXEL FRIEND</div>
   <div class="actions">
     <input id="globalSearch" class="field search" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
+    <button class="icon notificationButton" onclick="toggleNotifications()" id="notificationButton">🔔<span id="notificationCount" class="count hidden">0</span></button>
     <button class="icon" onclick="go('messages')">💬</button>
     <button class="icon" onclick="toggleSound()" id="soundButton">🔊</button>
+    <div id="notificationPanel" class="panel hidden">
+      <div class="panelHead"><b>🔔 NOTIFICATIONS</b><button onclick="markAllRead()">READ ALL</button></div>
+      <div id="notificationList"><div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div></div>
+    </div>
     <button class="icon" onclick="go('profile')" id="headAvatar">👾</button>
   </div>
 </header>
@@ -385,7 +399,6 @@ let currentUser = null;
 let currentProfile = null;
 let selectedUser = null;
 let messageChannel = null;
-let soundEnabled = true;
 let searchTimer = null;
 
 /* ---------- helpers ---------- */
@@ -417,28 +430,77 @@ function toast(msg){
   window.__toastTimer=setTimeout(()=>el.classList.add('hidden'),3500);
 }
 
-function beep(){
-  if(!soundEnabled)return;
+let audioContext=null;
+let soundEnabled=true;
+let audioUnlocked=false;
+let browserNotificationsEnabled=false;
+
+function unlockAudio(){
   try{
     const C=window.AudioContext||window.webkitAudioContext;
-    if(!C)return;
-    const c=new C();
-    const o=c.createOscillator();
-    const g=c.createGain();
-    o.frequency.value=720;
-    g.gain.setValueAtTime(.001,c.currentTime);
-    g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.01);
-    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.16);
-    o.connect(g);g.connect(c.destination);
-    o.start();o.stop(c.currentTime+.17);
+    if(!C)return false;
+    if(!audioContext)audioContext=new C();
+    if(audioContext.state==='suspended')audioContext.resume();
+    audioUnlocked=true;
+    return true;
+  }catch(e){
+    console.warn('Audio unlock failed:',e);
+    return false;
+  }
+}
+
+function beep(kind='message'){
+  if(!soundEnabled)return;
+  try{
+    if(!unlockAudio())return;
+    const now=audioContext.currentTime;
+    const o=audioContext.createOscillator();
+    const g=audioContext.createGain();
+    o.type='square';
+    o.frequency.setValueAtTime(kind==='notification'?880:720,now);
+    o.frequency.exponentialRampToValueAtTime(kind==='notification'?1180:900,now+.12);
+    g.gain.setValueAtTime(.0001,now);
+    g.gain.exponentialRampToValueAtTime(.14,now+.015);
+    g.gain.exponentialRampToValueAtTime(.0001,now+.22);
+    o.connect(g);g.connect(audioContext.destination);
+    o.start(now);o.stop(now+.23);
+  }catch(e){console.warn('beep failed:',e)}
+}
+
+async function enableBrowserNotifications(){
+  if(!('Notification' in window))return;
+  try{
+    if(Notification.permission==='granted'){
+      browserNotificationsEnabled=true;
+      return;
+    }
+    if(Notification.permission==='default'){
+      const p=await Notification.requestPermission();
+      browserNotificationsEnabled=p==='granted';
+    }
   }catch(e){}
 }
 
 function toggleSound(){
   soundEnabled=!soundEnabled;
   $('soundButton').textContent=soundEnabled?'🔊':'🔇';
-  if(soundEnabled)beep();
+  if(soundEnabled){
+    unlockAudio();
+    beep('notification');
+    enableBrowserNotifications();
+    toast('🔊 Sound alerts ON');
+  }else{
+    toast('🔇 Sound alerts OFF');
+  }
 }
+
+document.addEventListener('pointerdown',()=>{
+  if(!audioUnlocked)unlockAudio();
+},{passive:true});
+
+document.addEventListener('keydown',()=>{
+  if(!audioUnlocked)unlockAudio();
+},{passive:true});
 
 /* ---------- auth ---------- */
 
@@ -984,13 +1046,14 @@ async function sendMessage(){
 
     input.value='';
     status('messageStatus','✓ Message sent.');
-    beep();
+    beep('message');
 
     /*
       Add the message immediately so the user sees it even
       if Realtime is not enabled.
     */
     addMessageToChat(r.data);
+    createMessageNotification(selectedUser.id,text);
 
     setTimeout(()=>status('messageStatus',''),1800);
 
@@ -1061,22 +1124,154 @@ async function deleteMessage(id){
   toast('🗑 Message deleted.');
 }
 
+/* ---------- notifications ---------- */
+
+let localNotifications=[];
+let notificationUnread=0;
+
+function updateNotificationBadge(){
+  const el=$('notificationCount');
+  if(!el)return;
+  if(notificationUnread>0){
+    el.textContent=notificationUnread>99?'99+':String(notificationUnread);
+    el.classList.remove('hidden');
+  }else{
+    el.classList.add('hidden');
+  }
+}
+
+function renderNotifications(){
+  const box=$('notificationList');
+  if(!box)return;
+  if(!localNotifications.length){
+    box.innerHTML='<div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div>';
+    return;
+  }
+  box.innerHTML=localNotifications.slice(0,50).map(n=>`
+    <div class="note ${n.is_read?'':'unread'}">
+      <b>${esc(n.title||'NEW MESSAGE')}</b>
+      <div>${esc(n.message||'')}</div>
+      <div class="muted">${n.created_at?new Date(n.created_at).toLocaleString():''}</div>
+    </div>
+  `).join('');
+}
+
+function addLocalNotification(n){
+  const fingerprint=(n.title||'')+'|'+(n.message||'')+'|'+(n.created_at||'');
+  if(localNotifications.some(x=>x.__fingerprint===fingerprint))return;
+
+  const item={
+    id:n.id||('local-'+Date.now()+'-'+Math.random()),
+    title:n.title||'💬 New Message',
+    message:n.message||'You received a new message.',
+    created_at:n.created_at||new Date().toISOString(),
+    is_read:false,
+    __fingerprint:fingerprint
+  };
+
+  localNotifications.unshift(item);
+  notificationUnread++;
+  updateNotificationBadge();
+  renderNotifications();
+
+  const btn=$('notificationButton');
+  if(btn){
+    btn.classList.remove('notificationFlash');
+    void btn.offsetWidth;
+    btn.classList.add('notificationFlash');
+  }
+
+  beep('notification');
+
+  if(document.hidden && browserNotificationsEnabled && 'Notification' in window){
+    try{
+      new Notification(item.title,{body:item.message,tag:'pixel-friend-message'});
+    }catch(e){}
+  }
+}
+
+function toggleNotifications(){
+  $('notificationPanel')?.classList.toggle('hidden');
+  if(!$('notificationPanel')?.classList.contains('hidden'))renderNotifications();
+}
+
+async function loadNotifications(){
+  localNotifications=[];
+  notificationUnread=0;
+
+  try{
+    const r=await db.from('notifications')
+      .select('id,title,message,created_at,is_read')
+      .eq('user_id',currentUser.id)
+      .order('created_at',{ascending:false})
+      .limit(50);
+
+    if(r.error){
+      console.warn('Notifications table unavailable:',r.error.message);
+      renderNotifications();
+      return;
+    }
+
+    localNotifications=r.data||[];
+    localNotifications.forEach(n=>{
+      n.__fingerprint=(n.title||'')+'|'+(n.message||'')+'|'+(n.created_at||'');
+    });
+    notificationUnread=localNotifications.filter(x=>!x.is_read).length;
+    updateNotificationBadge();
+    renderNotifications();
+  }catch(e){
+    console.warn('loadNotifications:',e);
+    renderNotifications();
+  }
+}
+
+async function markAllRead(){
+  notificationUnread=0;
+  localNotifications=localNotifications.map(n=>({...n,is_read:true}));
+  updateNotificationBadge();
+  renderNotifications();
+
+  try{
+    await db.from('notifications')
+      .update({is_read:true})
+      .eq('user_id',currentUser.id)
+      .eq('is_read',false);
+  }catch(e){}
+}
+
+async function createMessageNotification(receiverId,messageText){
+  try{
+    await db.from('notifications').insert({
+      user_id:receiverId,
+      sender_id:currentUser.id,
+      type:'message',
+      title:'💬 New Message',
+      message:(currentProfile?.username||'Someone')+': '+messageText.slice(0,120),
+      is_read:false
+    });
+  }catch(e){
+    // Notification insertion must never prevent message sending.
+    console.warn('Notification insert skipped:',e.message||e);
+  }
+}
+
 /* ---------- realtime chat ---------- */
 
 function subscribeChat(){
-  if(!selectedUser||!currentUser)return;
+  // A single global realtime subscription handles all incoming messages.
+  // This prevents duplicate sound alerts.
+}
 
-  if(messageChannel){
-    try{db.removeChannel(messageChannel)}catch(e){}
-    messageChannel=null;
+function setupRealtime(){
+  if(!currentUser)return;
+
+  if(globalMessageChannel){
+    try{db.removeChannel(globalMessageChannel)}catch(e){}
+    globalMessageChannel=null;
   }
 
-  const channelName=
-    'pixel-chat-'+
-    [currentUser.id,selectedUser.id].sort().join('-');
-
-  messageChannel=db
-    .channel(channelName)
+  globalMessageChannel=db
+    .channel('pixel-global-messages-'+currentUser.id)
     .on(
       'postgres_changes',
       {
@@ -1085,29 +1280,50 @@ function subscribeChat(){
         table:'messages',
         filter:'receiver_id=eq.'+currentUser.id
       },
-      payload=>{
+      async payload=>{
         const m=payload.new;
+        if(!m || m.receiver_id!==currentUser.id)return;
 
-        if(
-          m.sender_id===selectedUser.id &&
-          m.receiver_id===currentUser.id
-        ){
+        if(selectedUser && m.sender_id===selectedUser.id){
           addMessageToChat(m);
-          beep();
         }
+
+        let senderName='PIXEL FRIEND';
+        try{
+          const p=await db.from('profiles')
+            .select('username,avatar')
+            .eq('id',m.sender_id)
+            .maybeSingle();
+          if(p.data)senderName=(p.data.avatar||'💬')+' '+(p.data.username||'PIXEL FRIEND');
+        }catch(e){}
+
+        addLocalNotification({
+          title:'💬 NEW MESSAGE',
+          message:senderName+': '+(m.content||'New message').slice(0,120),
+          created_at:m.created_at
+        });
       }
     )
-    .subscribe(status=>{
-      console.log('Chat realtime:',status);
-    });
-}
+    .subscribe(s=>console.log('Global message realtime:',s));
 
-function setupRealtime(){
-  /*
-    Realtime is optional for sending.
-    Sending works through normal Supabase INSERT.
-  */
-  console.log('PIXEL FRIEND ready.');
+  // Optional persistent notifications table realtime.
+  const notificationChannel=db
+    .channel('pixel-notifications-'+currentUser.id)
+    .on(
+      'postgres_changes',
+      {
+        event:'INSERT',
+        schema:'public',
+        table:'notifications',
+        filter:'user_id=eq.'+currentUser.id
+      },
+      payload=>{
+        if(payload.new)addLocalNotification(payload.new);
+      }
+    )
+    .subscribe(s=>console.log('Notification realtime:',s));
+
+  window.__notificationChannel=notificationChannel;
 }
 
 /* ---------- posts ---------- */
