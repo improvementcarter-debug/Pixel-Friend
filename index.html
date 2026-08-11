@@ -87,6 +87,7 @@ textarea{min-height:100px;resize:vertical}
 .avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}
 .avatar{width:82px;height:82px;margin:auto;font-size:40px}
 .avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-large-avatar{width:100px;height:100px;font-size:50px;margin:0 auto 12px auto}
 .online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%}
 .menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}
 .menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}
@@ -279,10 +280,20 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 </section>
 
 <section id="profile" class="page">  
-  <div class="card" style="padding:20px;text-align:center">    
-    <div id="profileAvatar" class="avatar">👾<span class="online"></span></div>    
-    <h1 id="profileName">PLAYER</h1>    
-    <p id="profileBio">PIXEL EXPLORER</p>        
+  <div class="card" style="padding:24px;max-width:500px;margin:0 auto;text-align:center">    
+    <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>    
+    <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>    
+    <p id="profileBioDisplay" class="tiny" style="margin-bottom:20px">PIXEL EXPLORER</p>        
+    
+    <div style="text-align:left;margin-bottom:15px">
+      <label class="tiny" style="display:block;margin-bottom:4px">EDIT USERNAME</label>
+      <input id="editUsernameInput" placeholder="Enter new username...">
+      
+      <label class="tiny" style="display:block;margin-bottom:4px">EDIT BIO</label>
+      <input id="editBioInput" placeholder="Tell people about yourself...">
+      <button class="primary" style="width:100%;margin-top:4px" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>
+    </div>
+
     <div style="margin:16px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">      
       <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD AVATAR</button>      
       <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>      
@@ -431,7 +442,10 @@ async function loadProfile(){
   }
   currentProfile = r.data;
   $("sideName").textContent = currentProfile.username;
-  $("profileName").textContent = currentProfile.username;
+  $("profileNameDisplay").textContent = currentProfile.username;
+  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("editUsernameInput").value = currentProfile.username || "";
+  $("editBioInput").value = currentProfile.bio || "";
   $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
   $("statXP").textContent = currentProfile.xp || 0;
   renderAvatarDisplay();
@@ -447,6 +461,23 @@ function renderAvatarDisplay(){
     ? `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover">` 
     : esc(currentProfile.avatar||"👾");
 }
+
+async function saveProfileInfo(){
+  const username = $("editUsernameInput").value.trim();
+  const bio = $("editBioInput").value.trim();
+  if(!username) return toast("Username cannot be empty");
+  
+  const r = await sb.from("profiles").update({ username, bio }).eq("id", currentUser.id);
+  if(r.error) return toast("❌ Error updating profile: " + r.error.message);
+  
+  currentProfile.username = username;
+  currentProfile.bio = bio;
+  $("sideName").textContent = username;
+  $("profileNameDisplay").textContent = username;
+  $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
+  toast("✅ Profile details updated!");
+}
+window.saveProfileInfo = saveProfileInfo;
 
 async function uploadAvatar(){
   const file = $("avatarUploadInput").files[0];
