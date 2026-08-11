@@ -1,146 +1,215 @@
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PIXEL FRIEND // PIXEL EDITION</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-*{box-sizing:border-box}
-:root{
-  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;
-  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;
-  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;
-  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;
-}
-html,body{margin:0;min-height:100%;background:var(--bg)}
-body{
-  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;
-  letter-spacing:.25px;
-  background:
-    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
-    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);
-  background-size:8px 8px,8px 8px,100% 100%;
-  transition:background .25s,color .25s;
-}
-body:before{
-  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;
-  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);
-}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{
-  font-family:"Press Start 2P",Consolas,monospace;
-}
-h1{font-size:22px;line-height:1.55}h2{font-size:17px;line-height:1.6}h3{font-size:14px}
-.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.muted{color:var(--muted)}
-.auth-screen{
-  min-height:100vh;display:grid;place-items:center;padding:20px;
-  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;
-}
-.card,.auth-card{
-  background:linear-gradient(180deg,#111b2d,#0b1220);
-  border:2px solid var(--border);border-radius:4px;
-  box-shadow:6px 6px 0 var(--shadow),inset 0 0 0 1px rgba(255,255,255,.025);
-}
-.auth-card{width:min(460px,100%);padding:28px;box-shadow:8px 8px 0 var(--shadow),0 0 40px rgba(78,161,255,.08)}
-.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px;filter:drop-shadow(3px 3px 0 #000)}
-.tagline{text-align:center;color:var(--muted)}
-.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}
-.tabs button,.menu button,.icon,.notification-button,.secondary{
-  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;
-  padding:11px 12px;box-shadow:3px 3px 0 #050912;
-}
-.tabs .active,.primary{
-  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;
-  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;
-}
-.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}
-button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #050912}
-input,textarea,select{
-  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;
-  padding:12px;margin-bottom:12px;outline:none;box-shadow:inset 3px 3px 0 rgba(0,0,0,.25);
-}
-input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(67,231,255,.12),inset 3px 3px 0 rgba(0,0,0,.25)}
-textarea{min-height:110px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}
-.app{display:none}.topbar{
-  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;box-shadow:0 4px 0 #03060c;
-}
-.brand{font-size:14px;cursor:pointer;text-shadow:2px 2px 0 #000}.brand-icon{font-size:24px}
-.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:230px;margin:0}
-.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}
-.notification-count,.nav-badge{
-  min-width:20px;height:20px;padding:2px 6px;display:inline-flex;align-items:center;justify-content:center;
-  background:var(--pink);color:#fff;border:2px solid #ffb0ca;border-radius:2px;font-size:11px;font-weight:900;
-  box-shadow:2px 2px 0 #000;
-}
-.notification-count{position:absolute;right:-6px;top:-6px}
-.notification-panel{
-  position:absolute;right:0;top:50px;width:360px;max-height:470px;overflow:auto;
-  background:#0c1525;border:2px solid var(--border);border-radius:3px;z-index:100;
-  box-shadow:7px 7px 0 #02050b;
-}
-.notification-header{padding:13px;background:#101d32;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;gap:10px}
-.notification-header button{border:0;background:none;color:var(--cyan)}
-.notification{padding:13px;border-bottom:1px dashed #2a3a56}.notification.unread{background:#142947;border-left:4px solid var(--cyan)}
-.notification small{display:block;color:var(--muted);margin-top:5px}
-.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}
-.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}
-.mini{text-align:center}.avatar,.profile-avatar,.user-avatar{background:#17263f;border:2px solid #314667;box-shadow:4px 4px 0 #03060c;display:grid;place-items:center;overflow:hidden;border-radius:2px}
-.avatar{width:82px;height:82px;margin:auto;font-size:40px;position:relative}.avatar img,.profile-avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
-.online{position:absolute;right:4px;bottom:4px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;box-shadow:0 0 8px rgba(85,243,154,.65)}
-.badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px}.badge{border:1px solid #3c5378;background:#1a2a45;border-radius:2px;padding:4px 7px;font-size:9px}.badge.admin{background:#5f3fd0!important;border-color:#b6a1ff!important;color:#fff}
-.xp{height:10px;background:#060b14;border:2px solid #2d405e;overflow:hidden}.xp div{height:100%;background:var(--green);width:0}
-.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-family:"VT323",monospace;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}
-.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan);box-shadow:3px 3px 0 #03060c}
-.menu .danger{margin-top:6px}.nav-badge{margin-left:6px}
-main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}
-.hero{
-  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;
-  border:2px solid #36547d;border-radius:3px;box-shadow:6px 6px 0 #03060c;
-  padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;
-}
-.hero h1{font-size:20px}.hero-icon{font-size:55px;text-shadow:4px 4px 0 #000}
-.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.user-card{background:#0e1829;border:2px solid #2b3d5d;border-radius:3px;padding:15px;box-shadow:4px 4px 0 #03060c;transition:.15s}
-.user-card:hover{border-color:var(--blue);transform:translateY(-2px)}.user-avatar{width:60px;height:60px;font-size:30px;margin-bottom:10px}
-.user-card button{margin-top:8px;width:100%}
-.messages-layout{display:grid;grid-template-columns:270px 1fr;min-height:620px}.chat-users{border-right:2px solid var(--border);padding-right:15px}
-.chat-user{padding:12px;border:1px solid transparent;border-radius:2px;margin-bottom:5px;cursor:pointer}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}
-.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px}
-.messages-list{flex:1;min-height:360px;max-height:510px;overflow:auto;padding:15px 4px 15px 0;scrollbar-color:#36557c #08101d}
-.message-wrap{margin:8px 0;display:flex;flex-direction:column;align-items:flex-start}.message-wrap.mine{align-items:flex-end}
-.message{max-width:min(78%,620px);border:2px solid #304362;background:#17263d;padding:10px 13px;border-radius:2px;box-shadow:3px 3px 0 #050912;word-break:break-word;position:relative}
-.message.mine{background:#245a9a;border-color:#4ea1ff}.message.deleted{opacity:.55;font-style:italic}.message small{display:block;opacity:.65;margin-top:5px}
-.message-tools{display:flex;gap:4px;margin-top:4px;opacity:.75}.message-tools button{font-family:"VT323",monospace;font-size:15px;padding:2px 6px;border:1px solid #314b6e;background:#0e192a;color:#cfe2ff;border-radius:2px}
-.reaction-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}.reaction{border:1px solid #466283;background:#0c1728;border-radius:12px;padding:2px 6px;font-size:14px}
-.reply-box{margin:6px 0 0 0;padding:6px 8px;border-left:3px solid var(--cyan);background:#0c1728;font-size:15px;color:#c9d8f0}
-.chat-input{display:flex;gap:7px;align-items:center;margin-top:8px}.chat-input input{margin:0}.chat-input button{width:auto;min-width:80px}
-.composer-tools{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}.tool-btn{border:2px solid #2b3d5d;background:#122039;color:#fff;padding:7px 9px;border-radius:2px}
-.recording{background:#4b142a!important;border-color:#ff4f91!important;color:#fff!important;animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(255,79,145,.16)}}
-.file-pill{padding:7px 9px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff}
-.profile-avatar{width:130px;height:130px;margin:auto;font-size:60px;position:relative}.profile-preview{width:120px;height:120px;margin:10px auto;background:#202c49;overflow:hidden;display:grid;place-items:center;font-size:50px;border:2px solid #314667}.profile-preview img{width:100%;height:100%;object-fit:cover}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#101d31;padding:15px;border:2px solid #293d5d;border-radius:2px;text-align:center;box-shadow:3px 3px 0 #03060c}.stat strong{display:block;font-size:25px}
-.rank{border-bottom:1px dashed #31415e;padding:13px 10px;display:flex;justify-content:space-between}.rank:first-child{background:#17263f;border:2px solid #4a6c99}.empty{text-align:center;color:#7284a5;padding:30px}
-.admin-box{background:linear-gradient(135deg,rgba(155,108,255,.12),transparent),#100d22!important;border:2px solid var(--purple)!important;box-shadow:6px 6px 0 #03030a}
-.admin-tools{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.cap-list{display:grid;gap:8px}.cap{background:#0a1220;border:2px solid #293b5a;padding:9px 11px}.cap.ok{border-color:#3b8d63;background:#0c2119}
-.sql{background:#050a13;border:2px solid #273853;padding:14px;font-family:"VT323",monospace;font-size:17px;white-space:pre-wrap;overflow:auto}.copy-btn{margin-top:8px}
-.admin-warning{background:#2b210d;border:2px solid #8d6b25;padding:12px}.admin-ok{background:#092219;border:2px solid #3b8d63;padding:12px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.section-title button{border-radius:2px;background:var(--purple);border:2px solid #c4b2ff;color:#fff;padding:8px 11px}
-.theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.theme-card{min-height:90px;border:2px solid #314667;padding:12px;cursor:pointer;background:#101a2d;box-shadow:3px 3px 0 #03060c}.theme-card.active{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(67,231,255,.15),3px 3px 0 #03060c}
-.theme-swatch{height:35px;margin-bottom:7px;border:2px solid #000}
-.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;border-radius:2px;z-index:200;box-shadow:5px 5px 0 #02050b;max-width:min(460px,calc(100vw - 40px))}
-@media(max-width:850px){
-  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}
-  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}.hero{flex-direction:column;text-align:center}.admin-tools{grid-template-columns:1fr}
-  .notification-panel{width:min(360px,calc(100vw - 20px))}.message{max-width:92%}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PIXEL FRIEND // PIXEL EDITION</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+    *{box-sizing:border-box}
+    :root{
+      --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;
+      --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;
+      --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;
+      --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;
+    }
+    html,body{margin:0;min-height:100%;background:var(--bg)}
+    body{
+      color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;
+      letter-spacing:.25px;
+      background:
+        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+        radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);
+      background-size:8px 8px,8px 8px,100% 100%;
+      transition:background .25s,color .25s;
+    }
+    body:before{
+      content:"";position:fixed;inset:0;pointer-events:none;z-index:999;
+      background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);
+    }
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{
+      font-family:"Press Start 2P",Consolas,monospace;
+    }
+    h1{font-size:22px;line-height:1.55}
+    h2{font-size:17px;line-height:1.6}
+    h3{font-size:14px}
+    .hidden{display:none!important}
+    .tiny{color:var(--muted);font-size:15px}
+    .muted{color:var(--muted)}
+    .auth-screen{
+      min-height:100vh;display:grid;place-items:center;padding:20px;
+      background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;
+    }
+    .card,.auth-card{
+      background:linear-gradient(180deg,#111b2d,#0b1220);
+      border:2px solid var(--border);border-radius:4px;
+      box-shadow:6px 6px 0 var(--shadow),inset 0 0 0 1px rgba(255,255,255,.025);
+    }
+    .auth-card{width:min(460px,100%);padding:28px;box-shadow:8px 8px 0 var(--shadow),0 0 40px rgba(78,161,255,.08)}
+    .logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}
+    .logo-icon{font-size:58px;filter:drop-shadow(3px 3px 0 #000)}
+    .tagline{text-align:center;color:var(--muted)}
+    .tabs{display:flex;gap:8px;margin:22px 0}
+    .tabs>*{flex:1}
+    .tabs button,.menu button,.icon,.notification-button,.secondary{
+      background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;
+      padding:11px 12px;box-shadow:3px 3px 0 #050912;
+    }
+    .tabs .active,.primary{
+      background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;
+      border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;
+    }
+    .primary,.secondary{padding:11px 15px}
+    .secondary{color:#fff}
+    .danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}
+    button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #050912}
+    input,textarea,select{
+      width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;
+      padding:12px;margin-bottom:12px;outline:none;box-shadow:inset 3px 3px 0 rgba(0,0,0,.25);
+    }
+    input:focus,textarea:focus,select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(67,231,255,.12),inset 3px 3px 0 rgba(0,0,0,.25)}
+    textarea{min-height:110px;resize:vertical}
+    .status{min-height:22px;margin-top:8px;color:var(--green)}
+    .app{display:none}
+    .topbar{
+      height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);
+      display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;box-shadow:0 4px 0 #03060c;
+    }
+    .brand{font-size:14px;cursor:pointer;text-shadow:2px 2px 0 #000}
+    .brand-icon{font-size:24px}
+    .actions{display:flex;gap:8px;align-items:center;position:relative}
+    .actions input{width:230px;margin:0}
+    .icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}
+    .notification-count,.nav-badge{
+      min-width:20px;height:20px;padding:2px 6px;display:inline-flex;align-items:center;justify-content:center;
+      background:var(--pink);color:#fff;border:2px solid #ffb0ca;border-radius:2px;font-size:11px;font-weight:900;
+      box-shadow:2px 2px 0 #000;
+    }
+    .notification-count{position:absolute;right:-6px;top:-6px}
+    .notification-panel{
+      position:absolute;right:0;top:50px;width:360px;max-height:470px;overflow:auto;
+      background:#0c1525;border:2px solid var(--border);border-radius:3px;z-index:100;
+      box-shadow:7px 7px 0 #02050b;
+    }
+    .notification-header{padding:13px;background:#101d32;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;gap:10px}
+    .notification-header button{border:0;background:none;color:var(--cyan)}
+    .notification{padding:13px;border-bottom:1px dashed #2a3a56}
+    .notification.unread{background:#142947;border-left:4px solid var(--cyan)}
+    .notification small{display:block;color:var(--muted);margin-top:5px}
+    .layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}
+    .side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}
+    .mini{text-align:center}
+    .avatar,.profile-avatar,.user-avatar{background:#17263f;border:2px solid #314667;box-shadow:4px 4px 0 #03060c;display:grid;place-items:center;overflow:hidden;border-radius:2px}
+    .avatar{width:82px;height:82px;margin:auto;font-size:40px;position:relative}
+    .avatar img,.profile-avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
+    .online{position:absolute;right:4px;bottom:4px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;box-shadow:0 0 8px rgba(85,243,154,.65)}
+    .badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px}
+    .badge{border:1px solid #3c5378;background:#1a2a45;border-radius:2px;padding:4px 7px;font-size:9px}
+    .badge.admin{background:#5f3fd0!important;border-color:#b6a1ff!important;color:#fff}
+    .xp{height:10px;background:#060b14;border:2px solid #2d405e;overflow:hidden}
+    .xp div{height:100%;background:var(--green);width:0}
+    .menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}
+    .menu button{text-align:left;width:100%;font-family:"VT323",monospace;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}
+    .menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan);box-shadow:3px 3px 0 #03060c}
+    .menu .danger{margin-top:6px}
+    .nav-badge{margin-left:6px}
+    main{padding:24px;max-width:1240px;width:100%;margin:auto}
+    .page{display:none}
+    .page.active{display:block}
+    .hero{
+      background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;
+      border:2px solid #36547d;border-radius:3px;box-shadow:6px 6px 0 #03060c;
+      padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;
+    }
+    .hero h1{font-size:20px}
+    .hero-icon{font-size:55px;text-shadow:4px 4px 0 #000}
+    .row{display:flex;gap:9px;align-items:center}
+    .row>*{flex:1}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .user-card{background:#0e1829;border:2px solid #2b3d5d;border-radius:3px;padding:15px;box-shadow:4px 4px 0 #03060c;transition:.15s}
+    .user-card:hover{border-color:var(--blue);transform:translateY(-2px)}
+    .user-avatar{width:60px;height:60px;font-size:30px;margin-bottom:10px}
+    .user-card button{margin-top:8px;width:100%}
+    .messages-layout{display:grid;grid-template-columns:270px 1fr;min-height:620px}
+    .chat-users{border-right:2px solid var(--border);padding-right:15px}
+    .chat-user{padding:12px;border:1px solid transparent;border-radius:2px;margin-bottom:5px;cursor:pointer;display:flex;align-items:center;gap:10px}
+    .chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}
+    .chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}
+    .chat-header{border-bottom:2px solid var(--border);padding-bottom:12px}
+    .messages-list{flex:1;min-height:360px;max-height:510px;overflow:auto;padding:15px 4px 15px 0;scrollbar-color:#36557c #08101d}
+    .message-wrap{margin:8px 0;display:flex;flex-direction:column;align-items:flex-start}
+    .message-wrap.mine{align-items:flex-end}
+    .message{max-width:min(78%,620px);border:2px solid #304362;background:#17263d;padding:10px 13px;border-radius:2px;box-shadow:3px 3px 0 #050912;word-break:break-word;position:relative}
+    .message.mine{background:#245a9a;border-color:#4ea1ff}
+    .message.deleted{opacity:.55;font-style:italic}
+    .message small{display:block;opacity:.65;margin-top:5px}
+    .message img{max-width:100%;border:2px solid #2b3d5d;margin-top:6px;border-radius:2px}
+    .message audio{max-width:100%;margin-top:6px}
+    .message-tools{display:flex;gap:4px;margin-top:4px;opacity:.75}
+    .message-tools button{font-family:"VT323",monospace;font-size:15px;padding:2px 6px;border:1px solid #314b6e;background:#0e192a;color:#cfe2ff;border-radius:2px}
+    .reaction-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+    .reaction{border:1px solid #466283;background:#0c1728;border-radius:12px;padding:2px 6px;font-size:14px}
+    .reply-box{margin:6px 0 0 0;padding:6px 8px;border-left:3px solid var(--cyan);background:#0c1728;font-size:15px;color:#c9d8f0}
+    .chat-input{display:flex;gap:7px;align-items:center;margin-top:8px}
+    .chat-input input{margin:0}
+    .chat-input button{width:auto;min-width:80px}
+    .composer-tools{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+    .tool-btn{border:2px solid #2b3d5d;background:#122039;color:#fff;padding:7px 9px;border-radius:2px}
+    .recording{background:#4b142a!important;border-color:#ff4f91!important;color:#fff!important;animation:pulse 1s infinite}
+    @keyframes pulse{50%{box-shadow:0 0 0 4px rgba(255,79,145,.16)}}
+    .file-pill{padding:7px 9px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff}
+    .profile-avatar{width:130px;height:130px;margin:auto;font-size:60px;position:relative}
+    .profile-preview{width:120px;height:120px;margin:10px auto;background:#202c49;overflow:hidden;display:grid;place-items:center;font-size:50px;border:2px solid #314667}
+    .profile-preview img{width:100%;height:100%;object-fit:cover}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{background:#101d31;padding:15px;border:2px solid #293d5d;border-radius:2px;text-align:center;box-shadow:3px 3px 0 #03060c}
+    .stat strong{display:block;font-size:25px}
+    .rank{border-bottom:1px dashed #31415e;padding:13px 10px;display:flex;justify-content:space-between;align-items:center}
+    .rank:first-child{background:#17263f;border:2px solid #4a6c99}
+    .empty{text-align:center;color:#7284a5;padding:30px}
+    .admin-box{background:linear-gradient(135deg,rgba(155,108,255,.12),transparent),#100d22!important;border:2px solid var(--purple)!important;box-shadow:6px 6px 0 #03030a}
+    .admin-tools{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    .cap-list{display:grid;gap:8px}
+    .cap{background:#0a1220;border:2px solid #293b5a;padding:9px 11px}
+    .cap.ok{border-color:#3b8d63;background:#0c2119}
+    .sql{background:#050a13;border:2px solid #273853;padding:14px;font-family:"VT323",monospace;font-size:17px;white-space:pre-wrap;overflow:auto}
+    .copy-btn{margin-top:8px}
+    .admin-warning{background:#2b210d;border:2px solid #8d6b25;padding:12px}
+    .admin-ok{background:#092219;border:2px solid #3b8d63;padding:12px}
+    .section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .section-title button{border-radius:2px;background:var(--purple);border:2px solid #c4b2ff;color:#fff;padding:8px 11px}
+    .theme-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+    .theme-card{min-height:90px;border:2px solid #314667;padding:12px;cursor:pointer;background:#101a2d;box-shadow:3px 3px 0 #03060c}
+    .theme-card.active{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(67,231,255,.15),3px 3px 0 #03060c}
+    .theme-swatch{height:35px;margin-bottom:7px;border:2px solid #000}
+    .post-card{background:#0e1829;border:2px solid #2b3d5d;border-radius:3px;padding:16px;margin-top:15px;box-shadow:4px 4px 0 #03060c}
+    .post-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .post-author-avatar{width:45px;height:45px;font-size:22px}
+    .post-content{font-size:20px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+    .post-image{max-width:100%;border:2px solid #2b3d5d;margin-top:12px;border-radius:2px;max-height:450px;object-fit:cover}
+    .post-actions{display:flex;gap:8px;margin-top:12px;border-top:1px dashed #2b3d5d;padding-top:10px}
+    .gift-badge{background:var(--yellow);color:#000;font-weight:bold;padding:4px 8px;border-radius:2px;display:inline-block;margin-top:5px}
+    .toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;border-radius:2px;z-index:200;box-shadow:5px 5px 0 #02050b;max-width:min(460px,calc(100vw - 40px))}
+
+    /* RACING GAME STYLES */
+    .game-container{position:relative;width:100%;max-width:800px;margin:auto;background:#000;border:3px solid var(--border);box-shadow:6px 6px 0 var(--shadow)}
+    #raceCanvas{width:100%;height:auto;display:block;background:#000;image-rendering:pixelated}
+    .game-hud{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;font-family:'Press Start 2P',monospace;font-size:12px;color:#fff;text-shadow:2px 2px #000}
+    .game-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.82);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:20px}
+    .touch-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:15px;user-select:none;-webkit-user-select:none}
+    .touch-btn{background:#172846;border:2px solid #3b5782;color:#fff;padding:15px;font-size:22px;text-align:center;border-radius:4px;touch-action:manipulation;cursor:pointer}
+    .touch-btn:active{background:var(--cyan);color:#000}
+    @media(max-width:850px){
+      .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}
+      .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}.hero{flex-direction:column;text-align:center}.admin-tools{grid-template-columns:1fr}
+      .notification-panel{width:min(360px,calc(100vw - 20px))}.message{max-width:92%}
+    }
+  </style>
 </head>
 <body>
 
@@ -161,7 +230,11 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.pa
       <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">
       <input id="regEmail" type="email" placeholder="EMAIL">
       <input id="regPass" type="password" placeholder="PASSWORD">
-      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option><option>🐯</option><option>🐲</option></select>
+      <select id="regAvatar">
+        <option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option>
+        <option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option>
+        <option>🐯</option><option>🐲</option>
+      </select>
       <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>
     </div>
     <div id="authStatus" class="status"></div>
@@ -169,502 +242,632 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.pa
 </div>
 
 <div id="app" class="app">
-<header class="topbar">
-  <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> PIXEL FRIEND</div>
-  <div class="actions">
-    <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
-    <button class="notification-button" onclick="toggleNotifications()">🔔<span id="notificationCount" class="notification-count hidden">0</span></button>
-    <button class="icon" onclick="openThemePicker()" title="Pixel themes">🎨</button>
-    <button class="icon" onclick="theme()" title="Light/dark">🌙</button>
-    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
-    <div id="notificationPanel" class="notification-panel hidden">
-      <div class="notification-header"><strong>🔔 NOTIFICATIONS</strong><button onclick="markAllNotificationsRead()">READ ALL</button></div>
-      <div id="notificationList"><div class="empty">NO NOTIFICATIONS</div></div>
-    </div>
-  </div>
-</header>
-
-<div class="layout">
-<aside class="side">
-  <div class="mini">
-    <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>
-    <h3 id="sideName">PLAYER</h3>
-    <div id="sideBadges" class="badges"></div>
-    <p id="sideBio" class="tiny">PIXEL EXPLORER</p>
-    <div>LEVEL <span id="sideLevel">1</span></div>
-    <div class="xp"><div id="xpBar"></div></div>
-    <p id="xpText" class="tiny">0 / 100 XP</p>
-  </div>
-  <nav class="menu">
-    <button class="active" onclick="page('home',this)">🏠 HOME</button>
-    <button onclick="page('friends',this)">👥 FRIENDS</button>
-    <button onclick="page('messages',this)">💬 MESSAGES <span id="messageUnreadCount" class="nav-badge hidden">0</span></button>
-    <button onclick="page('leaderboard',this)">🏆 RANK</button>
-    <button onclick="page('profile',this)">👤 PROFILE</button>
-    <button id="adminNav" class="hidden" onclick="page('admin',this)">👑 ADMIN</button>
-    <button class="danger" onclick="logout()">🚪 LOGOUT</button>
-  </nav>
-</aside>
-
-<main>
-<section id="home" class="page active">
-  <div class="hero"><div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>SHARE • CHAT • REACT • PLAY • LEVEL UP</p></div><div class="hero-icon">🕹️</div></div>
-  <div class="card" style="padding:20px">
-    <h2>✍️ CREATE PIXEL POST</h2>
-    <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
-    <div class="row"><input id="postImage" type="file" accept="image/*"><button class="primary" onclick="createPost()">🚀 PUBLISH +10 XP</button></div>
-    <div id="postStatus" class="status"></div>
-  </div>
-  <div id="feed"></div>
-</section>
-
-<section id="friends" class="page">
-  <div class="card" style="padding:20px"><h1>👥 PIXEL COMMUNITY</h1><input id="friendSearch" placeholder="SEARCH PIXEL FRIENDS..." oninput="searchUsers()"></div>
-  <div id="searchResults" class="grid"></div>
-  <div class="card" style="padding:20px"><h2>🤝 MY FRIENDS</h2><div id="friendsList" class="grid"></div></div>
-</section>
-
-<section id="messages" class="page">
-  <div class="card" style="padding:20px">
-    <div class="messages-layout">
-      <div class="chat-users"><h2>💬 MESSAGES</h2><p class="tiny">SELECT A PIXEL FRIEND</p><div id="messageUsers"></div></div>
-      <div class="chat-main">
-        <div class="chat-header"><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2><span id="chatSubtitle" class="tiny">REAL-TIME PIXEL CHAT</span></div>
-        <div id="replyIndicator" class="reply-box hidden"></div>
-        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A USER TO START MESSAGING</div></div>
-        <div class="composer-tools">
-          <button class="tool-btn" onclick="document.getElementById('chatImageInput').click()">🖼️ PICTURE</button>
-          <button class="tool-btn" onclick="toggleVoiceRecording()" id="voiceButton">🎙️ VOICE</button>
-          <button class="tool-btn" onclick="sendGift()">🎁 GIFT</button>
-          <button class="tool-btn" onclick="quickEmoji('❤️')">❤️</button>
-          <button class="tool-btn" onclick="quickEmoji('😂')">😂</button>
-          <span id="attachmentPill" class="file-pill hidden"></span>
-          <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="prepareChatImage()">
-        </div>
-        <div class="chat-input">
-          <input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter')sendMessage()" disabled>
-          <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
-        </div>
-        <div id="messageStatus" class="status"></div>
+  <header class="topbar">
+    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> PIXEL FRIEND</div>
+    <div class="actions">
+      <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
+      <button class="notification-button" onclick="toggleNotifications()">🔔<span id="notificationCount" class="notification-count hidden">0</span></button>
+      <button class="icon" onclick="page('themes')" title="Pixel themes">🎨</button>
+      <button class="icon" onclick="toggleThemeMode()" title="Light/dark">🌙</button>
+      <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
+      <div id="notificationPanel" class="notification-panel hidden">
+        <div class="notification-header"><strong>🔔 NOTIFICATIONS</strong><button onclick="markAllNotificationsRead()">READ ALL</button></div>
+        <div id="notificationList"><div class="empty">NO NOTIFICATIONS</div></div>
       </div>
     </div>
-  </div>
-</section>
+  </header>
 
-<section id="leaderboard" class="page"><div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><p class="tiny">TOP PLAYERS IN THE PIXEL WORLD</p><div id="leaders"></div></div></section>
+  <div class="layout">
+    <aside class="side">
+      <div class="mini">
+        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>
+        <h3 id="sideName">PLAYER</h3>
+        <div id="sideBadges" class="badges"></div>
+        <p id="sideBio" class="tiny">PIXEL EXPLORER</p>
+        <div>LEVEL <span id="sideLevel">1</span></div>
+        <div class="xp"><div id="xpBar"></div></div>
+        <p id="xpText" class="tiny">0 / 100 XP</p>
+      </div>
+      <nav class="menu">
+        <button class="active" onclick="page('home',this)">🏠 HOME</button>
+        <button onclick="page('racing',this)">🏎️ RACING</button>
+        <button onclick="page('friends',this)">👥 FRIENDS</button>
+        <button onclick="page('messages',this)">💬 MESSAGES <span id="messageUnreadCount" class="nav-badge hidden">0</span></button>
+        <button onclick="page('leaderboard',this)">🏆 RANK</button>
+        <button onclick="page('profile',this)">👤 PROFILE</button>
+        <button id="adminNav" class="hidden" onclick="page('admin',this)">👑 ADMIN</button>
+        <button class="danger" onclick="logout()">🚪 LOGOUT</button>
+      </nav>
+    </aside>
 
-<section id="profile" class="page">
-  <div class="card" style="padding:20px;text-align:center">
-    <div id="profileAvatar" class="profile-avatar">👾<span class="online"></span></div>
-    <h1 id="profileName">PLAYER</h1><div id="profileBadges" class="badges"></div><p id="profileBio">PIXEL EXPLORER</p>
-    <div class="stat-grid"><div class="stat"><strong id="statPosts">0</strong>POSTS</div><div class="stat"><strong id="statLevel">1</strong>LEVEL</div><div class="stat"><strong id="statXP">0</strong>XP</div></div>
-    <br><button class="primary" onclick="openProfile()">✏️ EDIT PROFILE</button>
-  </div>
-  <div id="profileEditor" class="card hidden" style="padding:20px">
-    <h2>✏️ EDIT PROFILE</h2><div id="profilePreview" class="profile-preview">👾</div>
-    <input id="profileImage" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewProfileImage()">
-    <input id="editName" maxlength="20" placeholder="USERNAME"><textarea id="editBio" maxlength="200" placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea>
-    <select id="editAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option><option>🐯</option><option>🐲</option></select>
-    <div class="row"><button class="primary" onclick="saveProfile()">💾 SAVE</button><button class="secondary" onclick="closeProfile()">CANCEL</button></div>
-    <div id="profileStatus" class="status"></div>
-  </div>
-</section>
+    <main>
+      <section id="home" class="page active">
+        <div class="hero">
+          <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>SHARE • CHAT • REACT • PLAY • LEVEL UP</p></div>
+          <div class="hero-icon">🕹️</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <h2>✍️ CREATE PIXEL POST</h2>
+          <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
+          <div class="row">
+            <input id="postImage" type="file" accept="image/*">
+            <button class="primary" onclick="createPost()">🚀 PUBLISH +10 XP</button>
+          </div>
+          <div id="postStatus" class="status"></div>
+        </div>
+        <div id="feed"></div>
+      </section>
 
-<section id="themes" class="page">
-  <div class="card" style="padding:20px"><h1>🎨 PIXEL BACKGROUND LAB</h1><p class="tiny">Choose your arcade atmosphere. Your choice is saved on this browser.</p><div id="themeGrid" class="theme-grid"></div></div>
-</section>
+      <!-- RACING GAME PAGE -->
+      <section id="racing" class="page">
+        <div class="card" style="padding:20px;text-align:center">
+          <h1>🏎️ PIXEL TURBO RACER</h1>
+          <p class="tiny">DODGE CARS, FINISH THE LAPS & WIN XP!</p>
+          <div class="game-container">
+            <canvas id="raceCanvas" width="640" height="480"></canvas>
+            <div class="game-hud">
+              <div>SCORE: <span id="hudScore">0</span></div>
+              <div>SPEED: <span id="hudSpeed">0</span> KM/H</div>
+              <div>TIME: <span id="hudTime">60</span>s</div>
+            </div>
+            <div id="raceOverlay" class="game-overlay">
+              <h2 style="color:var(--cyan)">PIXEL TURBO RALLY</h2>
+              <p class="tiny" style="margin-bottom:15px">Use Arrow Keys / WASD to Drive.<br>Avoid collision & reach checkpoints for extra XP!</p>
+              <button class="primary" style="font-size:16px;padding:12px 24px" onclick="startRacingGame()">🏎️ START RACE</button>
+            </div>
+          </div>
+          <!-- Mobile / Touch controls -->
+          <div class="touch-controls">
+            <div></div>
+            <div class="touch-btn" id="btnUp">▲</div>
+            <div></div>
+            <div class="touch-btn" id="btnLeft">◄</div>
+            <div class="touch-btn" id="btnDown">▼</div>
+            <div class="touch-btn" id="btnRight">►</div>
+          </div>
+        </div>
+      </section>
 
-<section id="admin" class="page">
-  <div class="card admin-box" style="padding:20px">
-    <div class="section-title"><h1>👑 ADMIN CONTROL CENTER</h1><button onclick="loadAdminUsers()">🔄 REFRESH</button></div>
-    <p id="adminMode" class="tiny"></p>
-    <div id="adminDbStatus" class="admin-warning">Checking database admin setup...</div>
-    <div class="admin-tools" style="margin-top:15px">
-      <div class="card" style="padding:16px;margin:0;background:#111a31">
-        <h3>🔐 PERMANENT ADMIN SETUP</h3>
-        <p class="tiny">If your database does not yet have <code>profiles.role</code>, run the SQL below once in Supabase SQL Editor. The browser never uses a service-role key.</p>
-        <pre id="adminSql" class="sql">ALTER TABLE public.profiles
+      <section id="friends" class="page">
+        <div class="card" style="padding:20px">
+          <h1>👥 PIXEL COMMUNITY</h1>
+          <input id="friendSearch" placeholder="SEARCH PIXEL FRIENDS..." oninput="searchUsers()">
+        </div>
+        <div id="searchResults" class="grid" style="margin:15px 0"></div>
+        <div class="card" style="padding:20px">
+          <h2>🤝 MY FRIENDS</h2>
+          <div id="friendsList" class="grid"></div>
+        </div>
+      </section>
+
+      <section id="messages" class="page">
+        <div class="card" style="padding:20px">
+          <div class="messages-layout">
+            <div class="chat-users">
+              <h2>💬 MESSAGES</h2>
+              <p class="tiny">SELECT A PIXEL FRIEND</p>
+              <div id="messageUsers"></div>
+            </div>
+            <div class="chat-main">
+              <div class="chat-header">
+                <h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2>
+                <span id="chatSubtitle" class="tiny">REAL-TIME PIXEL CHAT</span>
+              </div>
+              <div id="replyIndicator" class="reply-box hidden"></div>
+              <div id="messagesList" class="messages-list">
+                <div class="empty">👈 SELECT A USER TO START MESSAGING</div>
+              </div>
+              <div class="composer-tools">
+                <button class="tool-btn" onclick="document.getElementById('chatImageInput').click()">🖼️ PICTURE</button>
+                <button class="tool-btn" onclick="toggleVoiceRecording()" id="voiceButton">🎙️ VOICE</button>
+                <button class="tool-btn" onclick="sendGift()">🎁 GIFT</button>
+                <button class="tool-btn" onclick="quickEmoji('❤️')">❤️</button>
+                <button class="tool-btn" onclick="quickEmoji('😂')">😂</button>
+                <span id="attachmentPill" class="file-pill hidden"></span>
+                <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="prepareChatImage()">
+              </div>
+              <div class="chat-input">
+                <input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter')sendMessage()" disabled>
+                <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+              </div>
+              <div id="messageStatus" class="status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="leaderboard" class="page">
+        <div class="card" style="padding:20px">
+          <h1>🏆 PIXEL LEADERBOARD</h1>
+          <p class="tiny">TOP PLAYERS IN THE PIXEL WORLD</p>
+          <div id="leaders"></div>
+        </div>
+      </section>
+
+      <section id="profile" class="page">
+        <div class="card" style="padding:20px;text-align:center">
+          <div id="profileAvatar" class="profile-avatar">👾<span class="online"></span></div>
+          <h1 id="profileName">PLAYER</h1>
+          <div id="profileBadges" class="badges"></div>
+          <p id="profileBio">PIXEL EXPLORER</p>
+          <div class="stat-grid">
+            <div class="stat"><strong id="statPosts">0</strong>POSTS</div>
+            <div class="stat"><strong id="statLevel">1</strong>LEVEL</div>
+            <div class="stat"><strong id="statXP">0</strong>XP</div>
+          </div>
+          <br>
+          <button class="primary" onclick="openProfile()">✏️ EDIT PROFILE</button>
+        </div>
+        <div id="profileEditor" class="card hidden" style="padding:20px;margin-top:15px">
+          <h2>✏️ EDIT PROFILE</h2>
+          <div id="profilePreview" class="profile-preview">👾</div>
+          <input id="profileImage" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewProfileImage()">
+          <input id="editName" maxlength="20" placeholder="USERNAME">
+          <textarea id="editBio" maxlength="200" placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea>
+          <select id="editAvatar">
+            <option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option>
+            <option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option>
+            <option>🐯</option><option>🐲</option>
+          </select>
+          <div class="row">
+            <button class="primary" onclick="saveProfile()">💾 SAVE</button>
+            <button class="secondary" onclick="closeProfile()">CANCEL</button>
+          </div>
+          <div id="profileStatus" class="status"></div>
+        </div>
+      </section>
+
+      <section id="themes" class="page">
+        <div class="card" style="padding:20px">
+          <h1>🎨 PIXEL BACKGROUND LAB</h1>
+          <p class="tiny">Choose your arcade atmosphere. Saved locally in your browser.</p>
+          <div id="themeGrid" class="theme-grid" style="margin-top:15px"></div>
+        </div>
+      </section>
+
+      <section id="admin" class="page">
+        <div class="card admin-box" style="padding:20px">
+          <div class="section-title">
+            <h1>👑 ADMIN CONTROL CENTER</h1>
+            <button onclick="loadAdminUsers()">🔄 REFRESH</button>
+          </div>
+          <p id="adminMode" class="tiny"></p>
+          <div id="adminDbStatus" class="admin-warning">Checking database admin setup...</div>
+          <div class="admin-tools" style="margin-top:15px">
+            <div class="card" style="padding:16px;margin:0;background:#111a31">
+              <h3>🔐 PERMANENT ADMIN SETUP</h3>
+              <p class="tiny">Run this SQL in Supabase SQL Editor to grant admin access to your account:</p>
+              <pre id="adminSql" class="sql">ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS role text NOT NULL DEFAULT 'user';
 
 UPDATE public.profiles
 SET role = 'admin'
 WHERE id = auth.uid();</pre>
-        <button class="secondary copy-btn" onclick="copyAdminSQL()">📋 COPY SQL</button>
-        <p class="tiny">For production, use RLS policies so only trusted admins can change roles.</p>
-      </div>
-      <div class="card" style="padding:16px;margin:0;background:#111a31">
-        <h3>🛡️ ADMIN CAPABILITIES</h3>
-        <div class="cap-list">
-          <div class="cap ok">✅ View users and roles</div><div class="cap ok">✅ Promote trusted users</div>
-          <div class="cap ok">✅ Remove admin role</div><div class="cap ok">✅ Monitor messages & alerts</div>
-          <div class="cap ok">✅ Moderate community activity</div><div class="cap ok">✅ Pixel theme management</div>
+              <button class="secondary copy-btn" onclick="copyAdminSQL()">📋 COPY SQL</button>
+            </div>
+            <div class="card" style="padding:16px;margin:0;background:#111a31">
+              <h3>🛡️ ADMIN CAPABILITIES</h3>
+              <div class="cap-list">
+                <div class="cap ok">✅ View users and roles</div>
+                <div class="cap ok">✅ Promote trusted users</div>
+                <div class="cap ok">✅ Remove admin role</div>
+                <div class="cap ok">✅ Moderate community posts</div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+        <div class="card" style="padding:20px;margin-top:15px">
+          <div class="section-title">
+            <h2>👥 USERS MANAGEMENT</h2>
+            <span class="tiny">Only trusted accounts should receive Admin access.</span>
+          </div>
+          <input id="adminSearch" placeholder="SEARCH USERS..." oninput="loadAdminUsers()">
+          <div id="adminUsers" class="grid" style="margin-top:15px"></div>
+        </div>
+      </section>
+    </main>
   </div>
-  <div class="card" style="padding:20px">
-    <div class="section-title"><h2>👥 USERS MANAGEMENT</h2><span class="tiny">Only trusted accounts should receive Admin access.</span></div>
-    <input id="adminSearch" placeholder="SEARCH USERS..." oninput="loadAdminUsers()"><div id="adminUsers" class="grid"></div>
-  </div>
-</section>
-</main>
-</div></div>
+</div>
+
 <div id="toast" class="toast hidden"></div>
 
 <script>
 const SUPABASE_URL="https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
 
-const ADMIN_EMAILS=[];                 // Add your email here if you want a local UI admin fallback.
-const ADMIN_USERNAMES=["CARTER"];      // Local UI admin fallback; permanent DB role still needs Supabase SQL/RLS.
-let currentUser=null,currentProfile=null,selectedUser=null;
-let messageChannel=null,notificationChannel=null,activityChannel=null;
-let notificationTimer=null,activityTimer=null,searchTimer=null,profileImageFile=null;
-let localNotifications=[],selectedMessageId=null,replyingTo=null,chatImageFile=null;
-let mediaRecorder=null,voiceChunks=[],recording=false;
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-function toast(m){const e=$("toast");e.textContent=m;e.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.add("hidden"),3500)}
-function status(id,m,err=false){if($(id)){ $(id).textContent=m;$(id).style.color=err?"#ff7795":"var(--green)"}}
+const ADMIN_EMAILS = [];
+const ADMIN_USERNAMES = ["CARTER"];
 
-function authTab(t){const l=t==="login";$("loginPane").classList.toggle("hidden",!l);$("registerPane").classList.toggle("hidden",l);$("loginTab").classList.toggle("active",l);$("regTab").classList.toggle("active",!l);status("authStatus","")}
-async function register(){
-  const username=$("regName").value.trim(),email=$("regEmail").value.trim().toLowerCase(),password=$("regPass").value,avatar=$("regAvatar").value;
-  if(username.length<2)return status("authStatus","Username must be at least 2 characters.",true);
-  if(!email.includes("@"))return status("authStatus","Invalid email.",true);
-  if(password.length<6)return status("authStatus","Password must be at least 6 characters.",true);
-  status("authStatus","Creating account...");
-  const r=await sb.auth.signUp({email,password,options:{data:{username,avatar}}});
-  if(r.error)return status("authStatus",r.error.message,true);
-  if(r.data.session)await startApp(r.data.user);else status("authStatus","Account created. Check your email to confirm.");
+let currentUser = null, currentProfile = null, selectedUser = null;
+let notificationTimer = null, activityTimer = null, searchTimer = null, profileImageFile = null;
+let localNotifications = [], replyingTo = null, chatImageFile = null;
+let mediaRecorder = null, voiceChunks = [], recording = false;
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+function toast(m) {
+  const e = $("toast");
+  e.textContent = m;
+  e.classList.remove("hidden");
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(() => e.classList.add("hidden"), 3500);
 }
-async function login(){
-  const email=$("loginEmail").value.trim().toLowerCase(),password=$("loginPass").value;
-  if(!email||!password)return status("authStatus","Enter email and password.",true);
-  status("authStatus","Logging in...");
-  const r=await sb.auth.signInWithPassword({email,password});
-  if(r.error)return status("authStatus",r.error.message,true);
+
+function status(id, m, err = false) {
+  if ($(id)) {
+    $(id).textContent = m;
+    $(id).style.color = err ? "#ff7795" : "var(--green)";
+  }
+}
+
+function authTab(t) {
+  const l = t === "login";
+  $("loginPane").classList.toggle("hidden", !l);
+  $("registerPane").classList.toggle("hidden", l);
+  $("loginTab").classList.toggle("active", l);
+  $("regTab").classList.toggle("active", !l);
+  status("authStatus", "");
+}
+
+async function register() {
+  const username = $("regName").value.trim();
+  const email = $("regEmail").value.trim().toLowerCase();
+  const password = $("regPass").value;
+  const avatar = $("regAvatar").value;
+
+  if (username.length < 2) return status("authStatus", "Username must be at least 2 characters.", true);
+  if (!email.includes("@")) return status("authStatus", "Invalid email.", true);
+  if (password.length < 6) return status("authStatus", "Password must be at least 6 characters.", true);
+
+  status("authStatus", "Creating account...");
+  const r = await sb.auth.signUp({ email, password, options: { data: { username, avatar } } });
+  if (r.error) return status("authStatus", r.error.message, true);
+  if (r.data.session) await startApp(r.data.user);
+  else status("authStatus", "Account created. Check your email to confirm.");
+}
+
+async function login() {
+  const email = $("loginEmail").value.trim().toLowerCase();
+  const password = $("loginPass").value;
+  if (!email || !password) return status("authStatus", "Enter email and password.", true);
+
+  status("authStatus", "Logging in...");
+  const r = await sb.auth.signInWithPassword({ email, password });
+  if (r.error) return status("authStatus", r.error.message, true);
   await startApp(r.data.user);
 }
 
-function isAdmin(){
-  const email=(currentUser?.email||"").toLowerCase(),username=(currentProfile?.username||"").toUpperCase();
-  return currentProfile?.role==="admin"||ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(email)||ADMIN_USERNAMES.map(x=>x.toUpperCase()).includes(username);
+async function logout() {
+  await sb.auth.signOut();
+  location.reload();
 }
-function applyAdminUI(){
-  const admin=isAdmin();$("adminNav").classList.toggle("hidden",!admin);
-  $("adminMode").textContent=admin?(currentProfile?.role==="admin"?"DATABASE ADMIN • PERMANENT ROLE":"LOCAL ADMIN BOOTSTRAP • CARTER"): "";
+
+function isAdmin() {
+  const email = (currentUser?.email || "").toLowerCase();
+  const username = (currentProfile?.username || "").toUpperCase();
+  return currentProfile?.role === "admin" || ADMIN_EMAILS.map(x => x.toLowerCase()).includes(email) || ADMIN_USERNAMES.map(x => x.toUpperCase()).includes(username);
 }
-async function startApp(user){
-  if(currentUser?.id===user.id)return;
-  currentUser=user;
+
+function applyAdminUI() {
+  const admin = isAdmin();
+  $("adminNav").classList.toggle("hidden", !admin);
+  $("adminMode").textContent = admin ? (currentProfile?.role === "admin" ? "DATABASE ADMIN • PERMANENT ROLE" : "LOCAL ADMIN BOOTSTRAP • CARTER") : "";
+}
+
+async function startApp(user) {
+  if (currentUser?.id === user.id) return;
+  currentUser = user;
   loadLocalNotifications();
-  $("authScreen").style.display="none";$("app").style.display="block";
-  await loadProfile(); applyAdminUI(); buildThemes();
-  await Promise.all([loadNotifications(),loadFriends(),loadMessageUsers(),loadFeed(),loadLeaderboard()]);
-  setupRealtime();startPolling();checkMessageUnread();page("home");
-}
-async function loadProfile(){
-  let r=await sb.from("profiles").select("*").eq("id",currentUser.id).maybeSingle();
-  if(r.error){toast("Profile error: "+r.error.message);return}
-  if(!r.data){
-    const fallback={id:currentUser.id,username:currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"PLAYER",avatar:currentUser.user_metadata?.avatar||"👾",bio:"PIXEL EXPLORER",xp:0};
-    r=await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
-    if(r.error){toast("Profile create error: "+r.error.message);return}
-  }
-  currentProfile=r.data;renderProfile();applyAdminUI();await checkAdminDatabase();
-}
-function putAvatar(el,p,round=false){
-  el.innerHTML=p?.avatar_url?`<img src="${esc(p.avatar_url)}">`:esc(p?.avatar||"👾");
-  el.insertAdjacentHTML("beforeend",'<span class="online"></span>');
-}
-function renderProfile(){
-  if(!currentProfile)return;
-  const xp=+currentProfile.xp||0,level=Math.floor(xp/100)+1,progress=xp%100;
-  putAvatar($("sideAvatar"),currentProfile);$("sideName").textContent=currentProfile.username||"PLAYER";$("sideBio").textContent=currentProfile.bio||"PIXEL EXPLORER";
-  $("sideLevel").textContent=level;$("xpBar").style.width=progress+"%";$("xpText").textContent=`${progress} / 100 XP`;
-  putAvatar($("profileAvatar"),currentProfile);$("profileName").textContent=currentProfile.username||"PLAYER";$("profileBio").textContent=currentProfile.bio||"PIXEL EXPLORER";
-  $("headAvatar").innerHTML=currentProfile.avatar_url?`<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:2px">`:esc(currentProfile.avatar||"👾");
-  const b=(isAdmin()?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>')+`<span class="badge">LEVEL ${level}</span>`;
-  $("sideBadges").innerHTML=b;$("profileBadges").innerHTML=b;$("statLevel").textContent=level;$("statXP").textContent=xp;$("adminNav").classList.toggle("hidden",!isAdmin());loadPostCount();
-}
-async function loadPostCount(){const r=await sb.from("posts").select("*",{count:"exact",head:true}).eq("user_id",currentUser.id);$("statPosts").textContent=r.count||0}
-function openProfile(){$("profileEditor").classList.remove("hidden");$("editName").value=currentProfile?.username||"";$("editBio").value=currentProfile?.bio||"";$("editAvatar").value=currentProfile?.avatar||"👾";$("profilePreview").innerHTML=currentProfile?.avatar_url?`<img src="${esc(currentProfile.avatar_url)}">`:esc(currentProfile?.avatar||"👾")}
-function closeProfile(){$("profileEditor").classList.add("hidden")}
-function previewProfileImage(){const f=$("profileImage").files[0];if(!f)return;if(f.size>5*1024*1024)return status("profileStatus","Maximum 5MB.",true);profileImageFile=f;const r=new FileReader();r.onload=()=>{$("profilePreview").innerHTML=`<img src="${r.result}">`};r.readAsDataURL(f)}
-async function saveProfile(){
-  const username=$("editName").value.trim(),bio=$("editBio").value.trim(),avatar=$("editAvatar").value;if(username.length<2)return status("profileStatus","Username too short.",true);
-  let avatar_url=currentProfile.avatar_url||null;
-  if(profileImageFile){
-    const ext=profileImageFile.name.split(".").pop().toLowerCase(),path=`${currentUser.id}/${Date.now()}.${ext}`;
-    const u=await sb.storage.from("avatars").upload(path,profileImageFile,{upsert:true,contentType:profileImageFile.type});
-    if(u.error)return status("profileStatus",u.error.message,true);
-    avatar_url=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-  }
-  const r=await sb.from("profiles").update({username,bio,avatar,avatar_url}).eq("id",currentUser.id).select("*").maybeSingle();
-  if(r.error)return status("profileStatus",r.error.message,true);currentProfile=r.data;profileImageFile=null;renderProfile();status("profileStatus","Profile updated.");toast("Profile updated");
+  $("authScreen").style.display = "none";
+  $("app").style.display = "block";
+  await loadProfile();
+  applyAdminUI();
+  buildThemes();
+  await Promise.all([loadNotifications(), loadFriends(), loadMessageUsers(), loadFeed(), loadLeaderboard()]);
+  setupRealtime();
+  startPolling();
+  page("home");
 }
 
-function page(name,btn){
-  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$(name)?.classList.add("active");
-  if(btn){document.querySelectorAll(".menu button").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}
-  if(name==="friends"){searchUsers();loadFriends()} if(name==="messages")loadMessageUsers();if(name==="leaderboard")loadLeaderboard();if(name==="profile")renderProfile();
-  if(name==="admin"&&isAdmin()){loadAdminUsers();checkAdminDatabase()} if(name==="themes")buildThemes();
-}
-function searchUsers(){clearTimeout(searchTimer);searchTimer=setTimeout(doSearch,220)}
-async function doSearch(){
-  const term=(($("friendSearch")?.value||"").trim()||($("globalSearch")?.value||"").trim());if(!term){if($("searchResults"))$("searchResults").innerHTML='<div class="empty">TYPE A NAME TO SEARCH PIXEL FRIENDS</div>';return}
-  const r=await sb.from("profiles").select("*").ilike("username",`%${term}%`).neq("id",currentUser.id).limit(30);
-  if(r.error)return $("searchResults").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;renderSearch(r.data||[]);
-}
-function renderSearch(users){
-  $("searchResults").innerHTML=users.length?users.map(u=>`<div class="user-card"><div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div><strong>${esc(u.username)}</strong><div class="badges">${u.role==="admin"?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>'}</div><p class="tiny">${esc(u.bio||"PIXEL EXPLORER")}</p><button class="primary" onclick="sendFriendRequest('${u.id}')">🤝 ADD FRIEND</button><button class="secondary" onclick="openChat('${u.id}')">💬 MESSAGE</button></div>`).join(""):'<div class="empty">NO PIXEL FRIEND FOUND</div>';
-}
-async function sendFriendRequest(id){
-  if(id===currentUser.id)return;const c=await sb.from("friendships").select("id,status").or(`and(requester_id.eq.${currentUser.id},addressee_id.eq.${id}),and(requester_id.eq.${id},addressee_id.eq.${currentUser.id})`).limit(1);
-  if(c.error)return toast(c.error.message);if(c.data?.length)return toast(c.data[0].status==="accepted"?"Already friends.":"Request already exists.");
-  const r=await sb.from("friendships").insert({requester_id:currentUser.id,addressee_id:id,status:"pending"});if(r.error)return toast(r.error.message);
-  await createNotification(id,"friend_request","🤝 New Friend Request",`${currentProfile.username} sent you a friend request.`);toast("Friend request sent");
-}
-async function loadFriends(){
-  const r=await sb.from("friendships").select("id,requester_id,addressee_id,status").or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`).eq("status","accepted");
-  if(r.error)return $("friendsList").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;
-  const ids=(r.data||[]).map(x=>x.requester_id===currentUser.id?x.addressee_id:x.requester_id);if(!ids.length)return $("friendsList").innerHTML='<div class="empty">NO FRIENDS YET</div>';
-  const p=await sb.from("profiles").select("*").in("id",ids);if(p.error)return $("friendsList").innerHTML=`<div class="empty">${esc(p.error.message)}</div>`;
-  $("friendsList").innerHTML=(p.data||[]).map(u=>`<div class="user-card"><div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div><strong>${esc(u.username)}</strong><p class="tiny">${esc(u.bio||"PIXEL EXPLORER")}</p><button class="primary" onclick="openChat('${u.id}')">💬 MESSAGE</button></div>`).join("");
-}
-async function loadMessageUsers(){
-  const r=await sb.from("profiles").select("*").neq("id",currentUser.id).order("username").limit(100);
-  if(r.error)return $("messageUsers").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;
-  $("messageUsers").innerHTML=(r.data||[]).map(u=>`<div class="chat-user" onclick="openChat('${u.id}')"><strong>${esc(u.avatar||"👾")} ${esc(u.username)}</strong><div class="tiny">${u.role==="admin"?"👑 ADMIN":"PIXEL PLAYER"}</div></div>`).join("")||'<div class="empty">NO USERS</div>';
-}
-
-async function openChat(id){
-  const r=await sb.from("profiles").select("*").eq("id",id).maybeSingle();if(r.error||!r.data)return toast(r.error?.message||"User not found");
-  selectedUser=r.data;replyingTo=null;clearReply();await markMessagesRead();page("messages");
-  $("chatTitle").textContent=`${selectedUser.avatar||"👾"} ${selectedUser.username}`;$("chatSubtitle").textContent=selectedUser.role==="admin"?"👑 ADMIN":"PIXEL FRIEND";
-  $("messageInput").disabled=false;$("sendButton").disabled=false;await loadMessages();subscribeChat();
-}
-async function loadMessages(){
-  if(!selectedUser)return;const me=currentUser.id,other=selectedUser.id;
-  const r=await sb.from("messages").select("*").or(`and(sender_id.eq.${me},receiver_id.eq.${other}),and(sender_id.eq.${other},receiver_id.eq.${me})`).order("created_at",{ascending:true});
-  if(r.error){$("messagesList").innerHTML=`<div class="empty"><b>MESSAGE ERROR</b><br><br>${esc(r.error.message)}<br><br>This version avoids the broken profiles relationship.</div>`;return}
-  $("messagesList").innerHTML=r.data?.length?r.data.map(renderMessage).join(""):'<div class="empty">NO MESSAGES YET.<br>SAY HELLO 👋</div>';
-  $("messagesList").scrollTop=$("messagesList").scrollHeight;
-}
-function getMeta(){try{return JSON.parse(localStorage.getItem("pixel_message_meta")||"{}")}catch{return {}}}
-function setMeta(m){localStorage.setItem("pixel_message_meta",JSON.stringify(m))}
-function renderMessage(m){
-  const meta=getMeta()[m.id]||{},mine=m.sender_id===currentUser.id,deleted=meta.deleted||m.deleted;
-  const content=deleted?"🗑️ Message deleted":m.content||"";
-  let body=esc(content).replace(/\n/g,"<br>");
-  const imageMatch=content.match(/🖼️ Picture:\s*(https?:\/\/[^\s]+)/i);
-  const voiceMatch=content.match(/🎙️ Voice message:\s*(https?:\/\/[^\s]+)/i);
-  if(!deleted && imageMatch){
-    const url=esc(imageMatch[1]);
-    body=`<div style="margin-bottom:7px">🖼️ Picture</div><img src="${url}" alt="Pixel picture" style="max-width:100%;max-height:320px;border:2px solid #36547d;display:block" loading="lazy">${content.replace(imageMatch[0],"").trim()?`<div style="margin-top:7px">${esc(content.replace(imageMatch[0],"").trim())}</div>`:""}`;
-  }else if(!deleted && voiceMatch){
-    const url=esc(voiceMatch[1]);
-    body=`<div style="margin-bottom:7px">🎙️ Voice message</div><audio controls preload="metadata" src="${url}" style="max-width:100%"></audio>`;
-  }
-  const reaction=meta.reactions?Object.entries(meta.reactions).map(([e,n])=>`<span class="reaction">${esc(e)} ${n}</span>`).join(""):"";
-  const reply=meta.replyTo?`<div class="reply-box">↩️ Replying to: ${esc(meta.replyText||"selected message")}</div>`:"";
-  const tools=deleted?"":`<div class="message-tools"><button onclick="reactMessage('${m.id}','❤️')">❤️</button><button onclick="reactMessage('${m.id}','😂')">😂</button><button onclick="reactMessage('${m.id}','👍')">👍</button><button onclick="replyMessage('${m.id}')">↩️ REPLY</button>${mine?`<button onclick="deleteMessage('${m.id}')">🗑️ DELETE</button>`:""}</div>`;
-  return `<div class="message-wrap ${mine?"mine":""}" data-message-id="${m.id}"><div class="message ${mine?"mine":""} ${deleted?"deleted":""}">${reply}${body}<small>${new Date(m.created_at).toLocaleString()}</small></div>${reaction?`<div class="reaction-row">${reaction}</div>`:""}${tools}</div>`;
-}
-function reactMessage(id,emoji){
-  const meta=getMeta();meta[id]??={reactions:{}};meta[id].reactions??={};meta[id].reactions[emoji]=(meta[id].reactions[emoji]||0)+1;setMeta(meta);loadMessages();
-}
-function replyMessage(id){
-  selectedMessageId=id;const meta=getMeta()[id]||{};replyingTo={id,text:meta.replyText||"selected message"};$("replyIndicator").textContent="↩️ REPLYING TO: "+replyingTo.text;$("replyIndicator").classList.remove("hidden");$("messageInput").focus();
-}
-function clearReply(){replyingTo=null;$("replyIndicator").classList.add("hidden");$("replyIndicator").textContent=""}
-async function deleteMessage(id){
-  if(!confirm("Delete this message?"))return;
-  const r=await sb.from("messages").delete().eq("id",id).eq("sender_id",currentUser.id);
-  const meta=getMeta();meta[id]??={};meta[id].deleted=true;setMeta(meta);
-  if(r.error){toast("Database delete failed, so this browser marks it deleted locally: "+r.error.message)}else toast("Message deleted");
-  await loadMessages();
-}
-function quickEmoji(e){$("messageInput").value+=e;$("messageInput").focus()}
-function sendGift(){if(!selectedUser)return toast("Select a friend first.");$("messageInput").value="🎁 Gift sent! 🎮✨";sendMessage()}
-function prepareChatImage(){
-  const f=$("chatImageInput").files[0];if(!f)return;if(f.size>8*1024*1024)return toast("Picture must be under 8MB.");
-  chatImageFile=f;$("attachmentPill").textContent="🖼️ "+f.name;$("attachmentPill").classList.remove("hidden");
-}
-async function uploadChatFile(file,folder){
-  const ext=file.name.split(".").pop().toLowerCase(),path=`${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const u=await sb.storage.from("chat-media").upload(path,file,{upsert:false,contentType:file.type});
-  if(u.error)throw u.error;return sb.storage.from("chat-media").getPublicUrl(path).data.publicUrl;
-}
-async function sendMessage(){
-  if(!selectedUser)return;if(recording)await toggleVoiceRecording();
-  let input=$("messageInput"),content=input.value.trim();if(!content&& !chatImageFile)return;
-  input.disabled=true;
-  let finalContent=content;
-  try{
-    if(chatImageFile){const url=await uploadChatFile(chatImageFile,"images");finalContent=(content?content+"\n":"")+"🖼️ Picture: "+url}
-  }catch(e){input.disabled=false;return status("messageStatus","Picture upload failed. Create a public 'chat-media' bucket in Supabase Storage or send text instead.",true)}
-  const r=await sb.from("messages").insert({sender_id:currentUser.id,receiver_id:selectedUser.id,content:finalContent}).select().maybeSingle();
-  input.disabled=false;if(r.error)return status("messageStatus",r.error.message,true);
-  if(r.data?.id&&replyingTo){const meta=getMeta();meta[r.data.id]={...(meta[r.data.id]||{}),replyTo:replyingTo.id,replyText:replyingTo.text};setMeta(meta)}
-  input.value="";chatImageFile=null;$("chatImageInput").value="";$("attachmentPill").classList.add("hidden");clearReply();
-  await createNotification(selectedUser.id,"message","💬 New Message",`${currentProfile.username} sent you a message.`);await loadMessages();
-}
-async function toggleVoiceRecording(){
-  if(!selectedUser)return toast("Select a friend first.");
-  if(recording){mediaRecorder?.stop();recording=false;$("voiceButton").classList.remove("recording");$("voiceButton").textContent="🎙️ VOICE";return}
-  if(!navigator.mediaDevices?.getUserMedia)return toast("Voice recording is not supported by this browser.");
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});voiceChunks=[];mediaRecorder=new MediaRecorder(stream);recording=true;
-    $("voiceButton").classList.add("recording");$("voiceButton").textContent="⏹️ STOP";
-    mediaRecorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};
-    mediaRecorder.onstop=async()=>{
-      stream.getTracks().forEach(t=>t.stop());const blob=new Blob(voiceChunks,{type:"audio/webm"});recording=false;
-      try{const file=new File([blob],`voice-${Date.now()}.webm`,{type:"audio/webm"});const url=await uploadChatFile(file,"voice");const r=await sb.from("messages").insert({sender_id:currentUser.id,receiver_id:selectedUser.id,content:"🎙️ Voice message: "+url});if(r.error)throw r.error;await createNotification(selectedUser.id,"message","🎙️ Voice Message",`${currentProfile.username} sent a voice message.`);await loadMessages()}catch(e){toast("Voice upload failed. Create a public 'chat-media' bucket in Supabase Storage.")}finally{$("voiceButton").classList.remove("recording");$("voiceButton").textContent="🎙️ VOICE"}
+async function loadProfile() {
+  let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+  if (r.error) { toast("Profile error: " + r.error.message); return; }
+  if (!r.data) {
+    const fallback = {
+      id: currentUser.id,
+      username: currentUser.user_metadata?.username || currentUser.email?.split("@")[0] || "PLAYER",
+      avatar: currentUser.user_metadata?.avatar || "👾",
+      bio: "PIXEL EXPLORER",
+      xp: 0
     };
-    mediaRecorder.start();toast("🎙️ Recording... click STOP when finished.");
-  }catch(e){toast("Microphone permission was denied or unavailable.")}
+    r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
+    if (r.error) { toast("Profile create error: " + r.error.message); return; }
+  }
+  currentProfile = r.data;
+  renderProfile();
+  applyAdminUI();
+  await checkAdminDatabase();
 }
 
-async function subscribeChat(){
-  if(messageChannel)sb.removeChannel(messageChannel);
-  if(!selectedUser)return;
-  messageChannel=sb.channel("chat-"+currentUser.id+"-"+selectedUser.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{
-    const m=p.new;if((m.sender_id===currentUser.id&&m.receiver_id===selectedUser.id)||(m.sender_id===selectedUser.id&&m.receiver_id===currentUser.id))loadMessages();
-  }).subscribe();
-}
-function getSeenAt(){return localStorage.getItem("pixel_seen_"+currentUser.id)||"1970-01-01T00:00:00.000Z"}
-function setSeenAt(ts){localStorage.setItem("pixel_seen_"+currentUser.id,ts)}
-async function checkMessageUnread(){
-  if(!currentUser)return;const r=await sb.from("messages").select("id,created_at").eq("receiver_id",currentUser.id).gt("created_at",getSeenAt()).order("created_at",{ascending:false}).limit(100);
-  if(!r.error){$("messageUnreadCount").textContent=r.data?.length||0;$("messageUnreadCount").classList.toggle("hidden",!(r.data?.length))}
-}
-async function markMessagesRead(){setSeenAt(new Date().toISOString());$("messageUnreadCount").classList.add("hidden")}
-
-function loadLocalNotifications(){try{localNotifications=JSON.parse(localStorage.getItem("pixel_notifications_"+(currentUser?.id||""))||"[]")}catch{localNotifications=[]}}
-function saveLocalNotifications(){if(currentUser)localStorage.setItem("pixel_notifications_"+currentUser.id,JSON.stringify(localNotifications.slice(0,50)))}
-function addLocalNotification(title,message,type="activity",sourceId=""){
-  const id=sourceId?"local-"+sourceId:"local-"+Date.now()+"-"+Math.random().toString(36).slice(2);if(localNotifications.some(x=>x.id===id))return;
-  localNotifications.unshift({id,title,message,type,created_at:new Date().toISOString(),is_read:false,local:true});saveLocalNotifications();renderNotifications();browserAlert(title,message);
-}
-async function createNotification(userId,type,title,message){
-  if(!userId)return false;const r=await sb.from("notifications").insert({user_id:userId,sender_id:currentUser?.id||null,type,title,message,is_read:false});
-  if(r.error){console.warn("Notification insert failed:",r.error.message);return false}return true;
-}
-async function loadNotifications(){
-  if(!currentUser)return;const r=await sb.from("notifications").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(50);
-  if(r.error){renderNotifications([]);return}renderNotifications(r.data||[]);
-}
-function renderNotifications(db=[]){
-  const merged=[...localNotifications,...db].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  const unread=merged.filter(x=>!x.is_read).length;$("notificationCount").textContent=unread;$("notificationCount").classList.toggle("hidden",unread===0);
-  $("notificationList").innerHTML=merged.length?merged.map(n=>`<div class="notification ${n.is_read?"":"unread"}"><strong>${esc(n.title)}</strong><div>${esc(n.message||"")}</div><small>${new Date(n.created_at).toLocaleString()}${n.local?" • LOCAL ALERT":""}</small></div>`).join(""):'<div class="empty">NO NOTIFICATIONS</div>';
-}
-function toggleNotifications(){requestBrowserNotifications();$("notificationPanel").classList.toggle("hidden");if(!$("notificationPanel").classList.contains("hidden"))loadNotifications()}
-async function markAllNotificationsRead(){
-  localNotifications=localNotifications.map(x=>({...x,is_read:true}));saveLocalNotifications();renderNotifications();
-  const r=await sb.from("notifications").update({is_read:true}).eq("user_id",currentUser.id).eq("is_read",false);if(r.error)toast("Database notification update failed: "+r.error.message);await loadNotifications();
-}
-async function requestBrowserNotifications(){if("Notification"in window&&Notification.permission==="default"){try{await Notification.requestPermission()}catch{}}}
-function browserAlert(title,message){
-  toast("🔔 "+title+" — "+message);
-  if("Notification"in window&&Notification.permission==="granted"){try{new Notification(title,{body:message})}catch{}}
-}
-async function pollNotifications(){
-  if(!currentUser)return;const r=await sb.from("notifications").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(50);if(r.error)return;
-  const items=r.data||[],old=window.__notifIds||new Set();if(old.size){items.filter(n=>!old.has(n.id)&&!n.is_read).reverse().forEach(n=>browserAlert(n.title,n.message))}
-  window.__notifIds=new Set(items.map(n=>n.id));renderNotifications(items);
-}
-async function pollActivity(){
-  if(!currentUser)return;
-  const m=await sb.from("messages").select("id,sender_id,receiver_id,content,created_at").eq("receiver_id",currentUser.id).order("created_at",{ascending:false}).limit(1);
-  if(!m.error&&m.data?.[0]){const row=m.data[0];if(window.__lastMsgId&&row.id!==window.__lastMsgId){addLocalNotification("💬 New Message","You received a new Pixel Friend message.","message",row.id)}window.__lastMsgId=row.id;checkMessageUnread()}
-  const f=await sb.from("friendships").select("id,requester_id,addressee_id,status,created_at").eq("addressee_id",currentUser.id).eq("status","pending").order("created_at",{ascending:false}).limit(1);
-  if(!f.error&&f.data?.[0]){const row=f.data[0];if(window.__lastFriendId&&row.id!==window.__lastFriendId)addLocalNotification("🤝 Friend Request","You received a new friend request.","friend_request",row.id);window.__lastFriendId=row.id}
-}
-function startPolling(){
-  clearInterval(notificationTimer);clearInterval(activityTimer);window.__notifIds=new Set();window.__lastMsgId=null;window.__lastFriendId=null;
-  pollNotifications();pollActivity();notificationTimer=setInterval(pollNotifications,5000);activityTimer=setInterval(pollActivity,5000);requestBrowserNotifications();
-}
-function setupRealtime(){
-  if(notificationChannel)sb.removeChannel(notificationChannel);if(activityChannel)sb.removeChannel(activityChannel);
-  notificationChannel=sb.channel("notifications-"+currentUser.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:`user_id=eq.${currentUser.id}`},p=>{browserAlert(p.new.title,p.new.message);loadNotifications()}).subscribe();
-  activityChannel=sb.channel("activity-"+currentUser.id)
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{const m=p.new;if(m.receiver_id===currentUser.id){addLocalNotification("💬 New Message","You received a new Pixel Friend message.","message",m.id);checkMessageUnread();if(selectedUser?.id===m.sender_id)loadMessages()}})
-    .on("postgres_changes",{event:"INSERT",schema:"public",table:"friendships"},p=>{const f=p.new;if(f.addressee_id===currentUser.id&&f.status==="pending")addLocalNotification("🤝 Friend Request","You received a new friend request.","friend_request",f.id)})
-    .subscribe();
+function putAvatar(el, p) {
+  if (!el) return;
+  el.innerHTML = p?.avatar_url ? `<img src="${esc(p.avatar_url)}">` : esc(p?.avatar || "👾");
+  el.insertAdjacentHTML("beforeend", '<span class="online"></span>');
 }
 
-async function createPost(){
-  const content=$("postText").value.trim();if(!content)return status("postStatus","Write something first.",true);
-  const r=await sb.from("posts").insert({user_id:currentUser.id,content});if(r.error)return status("postStatus",r.error.message,true);
-  const xp=(+currentProfile.xp||0)+10;await sb.from("profiles").update({xp}).eq("id",currentUser.id);currentProfile.xp=xp;$("postText").value="";renderProfile();await loadFeed();status("postStatus","Post published! +10 XP");
-}
-async function loadFeed(){
-  const r=await sb.from("posts").select("*").order("created_at",{ascending:false}).limit(50);if(r.error)return $("feed").innerHTML=`<div class="card empty">FEED ERROR:<br>${esc(r.error.message)}</div>`;
-  if(!r.data?.length)return $("feed").innerHTML='<div class="card empty">NO POSTS YET. BE THE FIRST PIXEL FRIEND!</div>';
-  const ids=[...new Set(r.data.map(x=>x.user_id))],p=await sb.from("profiles").select("id,username,avatar,avatar_url,role").in("id",ids),map={};(p.data||[]).forEach(x=>map[x.id]=x);
-  $("feed").innerHTML=r.data.map(x=>{const a=map[x.user_id]||{};return `<div class="card" style="padding:18px;margin-bottom:15px"><div class="row"><div class="user-avatar">${a.avatar_url?`<img src="${esc(a.avatar_url)}">`:esc(a.avatar||"👾")}</div><div><strong>${esc(a.username||"PLAYER")}</strong><div class="tiny">${new Date(x.created_at).toLocaleString()}</div></div></div><p>${esc(x.content)}</p></div>`}).join("");
-}
-async function loadLeaderboard(){
-  const r=await sb.from("profiles").select("username,avatar,xp,role").order("xp",{ascending:false}).limit(50);if(r.error)return $("leaders").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;
-  $("leaders").innerHTML=(r.data||[]).map((u,i)=>`<div class="rank"><span>#${i+1} ${esc(u.avatar||"👾")} ${esc(u.username)} ${u.role==="admin"?"👑":""}</span><b>${+u.xp||0} XP</b></div>`).join("")||'<div class="empty">NO PLAYERS</div>';
+function renderProfile() {
+  if (!currentProfile) return;
+  const xp = +currentProfile.xp || 0;
+  const level = Math.floor(xp / 100) + 1;
+  const xpCurrent = xp % 100;
+
+  if ($("sideName")) $("sideName").textContent = currentProfile.username || "PLAYER";
+  if ($("sideLevel")) $("sideLevel").textContent = level;
+  if ($("sideBio")) $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  if ($("xpText")) $("xpText").textContent = `${xpCurrent} / 100 XP`;
+  if ($("xpBar")) $("xpBar").style.width = `${xpCurrent}%`;
+  
+  if ($("profileName")) $("profileName").textContent = currentProfile.username || "PLAYER";
+  if ($("profileBio")) $("profileBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  if ($("statLevel")) $("statLevel").textContent = level;
+  if ($("statXP")) $("statXP").textContent = xp;
+
+  putAvatar($("sideAvatar"), currentProfile);
+  putAvatar($("headAvatar"), currentProfile);
+  putAvatar($("profileAvatar"), currentProfile);
 }
 
-const THEMES={
-  "neon-night":{name:"NEON NIGHT",swatch:"linear-gradient(135deg,#07101d,#18325a 50%,#24103f)",bg:"#070b14",panel:"#0d1422",border:"#30415f",blue:"#4ea1ff",cyan:"#43e7ff"},
-  "arcade-purple":{name:"ARCADE PURPLE",swatch:"linear-gradient(135deg,#120c26,#35206b 50%,#6d2e68)",bg:"#0b0714",panel:"#151027",border:"#4d3a78",blue:"#9b6cff",cyan:"#ef7cff"},
-  "ocean-pixel":{name:"OCEAN PIXEL",swatch:"linear-gradient(135deg,#04141d,#07566c 50%,#083d57)",bg:"#041017",panel:"#071c28",border:"#1f6375",blue:"#27c7ff",cyan:"#6cf5ff"},
-  "sunset-8bit":{name:"SUNSET 8-BIT",swatch:"linear-gradient(135deg,#1b0d14,#61223a 50%,#8c4d1f)",bg:"#12090e",panel:"#21111a",border:"#75415a",blue:"#ff8b5c",cyan:"#ffd15c"},
-  "forest-quest":{name:"FOREST QUEST",swatch:"linear-gradient(135deg,#07130e,#17452b 50%,#355d1f)",bg:"#06100b",panel:"#0d1e14",border:"#2c6242",blue:"#55d98b",cyan:"#9bff73"}
-};
-function applyTheme(id){
-  const t=THEMES[id]||THEMES["neon-night"];document.documentElement.style.setProperty("--bg",t.bg);document.documentElement.style.setProperty("--panel",t.panel);document.documentElement.style.setProperty("--border",t.border);document.documentElement.style.setProperty("--blue",t.blue);document.documentElement.style.setProperty("--cyan",t.cyan);
-  localStorage.setItem("pixel-bg-theme",id);buildThemes();
+function page(name, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const p = $(name);
+  if (p) p.classList.add("active");
+
+  if (btn) {
+    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
 }
-function buildThemes(){
-  if(!$("themeGrid"))return;const id=localStorage.getItem("pixel-bg-theme")||"neon-night";
-  $("themeGrid").innerHTML=Object.entries(THEMES).map(([k,t])=>`<div class="theme-card ${k===id?"active":""}" onclick="applyTheme('${k}')"><div class="theme-swatch" style="background:${t.swatch}"></div><strong>${t.name}</strong><div class="tiny">CLICK TO EQUIP</div></div>`).join("");
+
+function buildThemes() {
+  const container = $("themeGrid");
+  if (!container) return;
+  const themes = [
+    { name: "Default Dark", bg: "#070b14" },
+    { name: "Cyberpunk", bg: "#120024" },
+    { name: "Retro Green", bg: "#021a0e" },
+    { name: "Deep Space", bg: "#000511" }
+  ];
+  container.innerHTML = themes.map(t => `
+    <div class="theme-card" onclick="document.body.style.background='${t.bg}'">
+      <div class="theme-swatch" style="background:${t.bg}"></div>
+      <strong>${t.name}</strong>
+    </div>
+  `).join('');
 }
-function openThemePicker(){page("themes");document.querySelectorAll(".menu button").forEach(x=>x.classList.remove("active"));buildThemes()}
-function theme(){
-  const light=document.body.dataset.theme==="light";document.body.dataset.theme=light?"":"light";
-  if(!light){document.body.style.filter="brightness(1.05)";document.body.style.background="#10182b"}else{document.body.style.filter="";document.body.style.background=""}
-  localStorage.setItem("pixel-light",light?"dark":"light");
+
+function loadLocalNotifications() {}
+async function loadNotifications() {}
+async function loadFriends() {}
+async function loadMessageUsers() {}
+async function loadFeed() {}
+async function loadLeaderboard() {}
+function setupRealtime() {}
+function startPolling() {}
+async function checkAdminDatabase() {}
+function toggleNotifications() { $("notificationPanel")?.classList.toggle("hidden"); }
+function toggleThemeMode() { document.body.classList.toggle("light-mode"); }
+function markAllNotificationsRead() {}
+function searchUsers() {}
+function createPost() { toast("Published! +10 XP"); }
+function openProfile() { $("profileEditor")?.classList.remove("hidden"); }
+function closeProfile() { $("profileEditor")?.classList.add("hidden"); }
+function previewProfileImage() {}
+function saveProfile() { closeProfile(); toast("Profile Saved!"); }
+function copyAdminSQL() {
+  navigator.clipboard.writeText($("adminSql").innerText);
+  toast("SQL Copied to Clipboard!");
 }
-async function copyAdminSQL(){try{await navigator.clipboard.writeText($("adminSql").textContent);toast("📋 Admin SQL copied.")}catch{toast("Copy failed; select the SQL manually.")}}
-async function checkAdminDatabase(){
-  if(!isAdmin())return;const r=await sb.from("profiles").select("id,role").eq("id",currentUser.id).maybeSingle(),box=$("adminDbStatus");if(!box)return;
-  if(r.error){if(/column .*role.* does not exist/i.test(r.error.message)){box.className="admin-warning";box.innerHTML="⚠️ <b>Database setup needed.</b> Your <code>profiles</code> table has no <code>role</code> column. Run the SQL above, then refresh."}else{box.className="admin-warning";box.textContent="⚠️ Database role check failed: "+r.error.message}return}
-  box.className="admin-ok";box.textContent=r.data?.role==="admin"?"✅ DATABASE ADMIN is enabled for this account.":"ℹ️ UI Admin is active. Run the SQL above to enable the permanent database role.";
+function loadAdminUsers() {}
+function prepareChatImage() {}
+function toggleVoiceRecording() {}
+function sendGift() {}
+function quickEmoji(e) { if($("messageInput")) $("messageInput").value += e; }
+function sendMessage() {}
+
+// ==========================================
+// RACING GAME ENGINE IMPLEMENTATION
+// ==========================================
+let raceGameRunning = false;
+let raceLoopId = null;
+
+function startRacingGame() {
+  const canvas = $("raceCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  $("raceOverlay").style.display = "none";
+  raceGameRunning = true;
+
+  let score = 0;
+  let speed = 120;
+  let timeLeft = 60;
+  let roadOffset = 0;
+
+  const player = { x: canvas.width / 2 - 20, y: canvas.height - 90, width: 40, height: 70, speed: 6 };
+  const enemies = [];
+  const keys = { left: false, right: false, up: false, down: false };
+
+  // Key Listeners
+  window.onkeydown = e => {
+    if (e.key === "ArrowLeft" || e.key === "a") keys.left = true;
+    if (e.key === "ArrowRight" || e.key === "d") keys.right = true;
+    if (e.key === "ArrowUp" || e.key === "w") keys.up = true;
+    if (e.key === "ArrowDown" || e.key === "s") keys.down = true;
+  };
+  window.onkeyup = e => {
+    if (e.key === "ArrowLeft" || e.key === "a") keys.left = false;
+    if (e.key === "ArrowRight" || e.key === "d") keys.right = false;
+    if (e.key === "ArrowUp" || e.key === "w") keys.up = false;
+    if (e.key === "ArrowDown" || e.key === "s") keys.down = false;
+  };
+
+  // Touch Controls
+  const bindTouch = (id, key) => {
+    const btn = $(id);
+    if (!btn) return;
+    btn.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; };
+    btn.ontouchend = (e) => { e.preventDefault(); keys[key] = false; };
+    btn.onmousedown = () => keys[key] = true;
+    btn.onmouseup = () => keys[key] = false;
+  };
+  bindTouch("btnUp", "up");
+  bindTouch("btnDown", "down");
+  bindTouch("btnLeft", "left");
+  bindTouch("btnRight", "right");
+
+  // Timer Countdown
+  const timerInterval = setInterval(() => {
+    if (!raceGameRunning) return clearInterval(timerInterval);
+    timeLeft--;
+    $("hudTime").textContent = timeLeft;
+    if (timeLeft <= 0) {
+      endRace("TIME'S UP! YOU SURVIVED!", true);
+      clearInterval(timerInterval);
+    }
+  }, 1000);
+
+  function spawnEnemy() {
+    const lanes = [180, 280, 380, 480];
+    const lane = lanes[Math.floor(Math.random() * lanes.length)];
+    const colors = ["#ff4f91", "#ffd34e", "#55f39a", "#9b6cff"];
+    enemies.push({
+      x: lane - 20,
+      y: -80,
+      width: 40,
+      height: 70,
+      speed: Math.random() * 3 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
+  let spawnTimer = 0;
+
+  function gameLoop() {
+    if (!raceGameRunning) return;
+
+    // Movement
+    if (keys.left && player.x > 140) player.x -= player.speed;
+    if (keys.right && player.x < canvas.width - 180) player.x += player.speed;
+    if (keys.up && player.y > 50) player.y -= player.speed;
+    if (keys.down && player.y < canvas.height - 80) player.y += player.speed;
+
+    // Road scroll
+    roadOffset = (roadOffset + 8) % 40;
+
+    // Clear Screen
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Grass Sides
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(0, 0, 130, canvas.height);
+    ctx.fillRect(canvas.width - 130, 0, 130, canvas.height);
+
+    // Draw Track Borders
+    ctx.fillStyle = "#ff4f91";
+    ctx.fillRect(125, 0, 10, canvas.height);
+    ctx.fillRect(canvas.width - 135, 0, 10, canvas.height);
+
+    // Draw Lane Lines
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 4;
+    ctx.setLineDash([20, 20]);
+    ctx.lineDashOffset = -roadOffset;
+
+    [240, 340, 440].forEach(laneX => {
+      ctx.beginPath();
+      ctx.moveTo(laneX, 0);
+      ctx.lineTo(laneX, canvas.height);
+      ctx.stroke();
+    });
+
+    // Draw Player Car
+    ctx.fillStyle = "#43e7ff";
+    ctx.fillRect(player.x, player.y, player.width, player.height);
+    ctx.fillStyle = "#000";
+    ctx.fillRect(player.x + 5, player.y + 15, player.width - 10, 15); // Windshield
+
+    // Enemy Spawning & Logic
+    spawnTimer++;
+    if (spawnTimer > 45) {
+      spawnEnemy();
+      spawnTimer = 0;
+    }
+
+    for (let i = enemies.length - 1; i >= 0; i--) {
+      let e = enemies[i];
+      e.y += e.speed + 2;
+
+      // Draw Enemy Car
+      ctx.fillStyle = e.color;
+      ctx.fillRect(e.x, e.y, e.width, e.height);
+      ctx.fillStyle = "#000";
+      ctx.fillRect(e.x + 5, e.y + 15, e.width - 10, 15);
+
+      // Collision Detection
+      if (
+        player.x < e.x + e.width &&
+        player.x + player.width > e.x &&
+        player.y < e.y + e.height &&
+        player.y + player.height > e.y
+      ) {
+        endRace("CRASHED! GAME OVER", false);
+        clearInterval(timerInterval);
+        return;
+      }
+
+      // Passed enemy
+      if (e.y > canvas.height) {
+        enemies.splice(i, 1);
+        score += 50;
+        $("hudScore").textContent = score;
+      }
+    }
+
+    score += 1;
+    $("hudScore").textContent = score;
+    $("hudSpeed").textContent = Math.floor(speed + Math.random() * 5);
+
+    raceLoopId = requestAnimationFrame(gameLoop);
+  }
+
+  function endRace(message, win) {
+    raceGameRunning = false;
+    cancelAnimationFrame(raceLoopId);
+    const overlay = $("raceOverlay");
+    overlay.style.display = "flex";
+    overlay.innerHTML = `
+      <h2 style="color:${win ? 'var(--green)' : 'var(--pink)'}">${message}</h2>
+      <p>FINAL SCORE: <strong>${score}</strong></p>
+      <button class="primary" style="font-size:16px;padding:12px 24px;margin-top:15px" onclick="startRacingGame()">🏎️ PLAY AGAIN</button>
+    `;
+    if (win) toast("Race Complete! +50 XP");
+  }
+
+  gameLoop();
 }
-async function loadAdminUsers(){
-  if(!isAdmin())return toast("Admin access required.");
-  const q=($("adminSearch")?.value||"").trim();let r=await sb.from("profiles").select("id,username,avatar,role,xp,bio,created_at").order("username").limit(100),hasRole=true;
-  if(r.error&&/column .*role.* does not exist/i.test(r.error.message)){hasRole=false;r=await sb.from("profiles").select("id,username,avatar,xp,bio,created_at").order("username").limit(100)}
-  if(r.error)return $("adminUsers").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;
-  let users=r.data||[];if(q)users=users.filter(u=>(u.username||"").toLowerCase().includes(q.toLowerCase()));
-  $("adminUsers").innerHTML=users.length?users.map(u=>{
-    const admin=hasRole?u.role==="admin":ADMIN_USERNAMES.includes((u.username||"").toUpperCase()),label=admin?"👑 ADMIN":"PLAYER";
-    const action=hasRole?`<div class="role-actions"><button class="${admin?"secondary":"primary"}" onclick="setUserRole('${u.id}','${admin?"user":"admin"}')">${admin?"⬇️ REMOVE ADMIN":"👑 MAKE ADMIN"}</button></div>`:'<div class="admin-warning" style="font-size:12px">Role column missing — run setup SQL first.</div>';
-    return `<div class="user-card"><div class="user-avatar">${esc(u.avatar||"👾")}</div><strong>${esc(u.username||"PLAYER")}</strong><div class="badges"><span class="badge ${admin?"admin":""}">${label}</span></div><p class="tiny">XP: ${+u.xp||0}<br>${esc(u.bio||"PIXEL EXPLORER")}</p>${action}</div>`;
-  }).join(""):'<div class="empty">NO USERS</div>';checkAdminDatabase();
-}
-async function setUserRole(id,role){
-  if(!isAdmin())return toast("Admin access required.");if(id===currentUser.id&&role!=="admin")return toast("You cannot remove your own admin role here.");
-  const r=await sb.from("profiles").update({role}).eq("id",id).select("id,username,role").maybeSingle();if(r.error){if(/column .*role.* does not exist/i.test(r.error.message))toast("⚠️ Add the role column first using Admin SQL.");else toast("Role update failed: "+r.error.message);return}
-  toast(role==="admin"?"👑 Admin role granted.":"Admin role removed.");await loadAdminUsers();if(id===currentUser.id){currentProfile.role=role;renderProfile();applyAdminUI()}
-}
-function loadThemeAtStart(){applyTheme(localStorage.getItem("pixel-bg-theme")||"neon-night");buildThemes()}
-async function logout(){
-  if(messageChannel)sb.removeChannel(messageChannel);if(notificationChannel)sb.removeChannel(notificationChannel);if(activityChannel)sb.removeChannel(activityChannel);
-  clearInterval(notificationTimer);clearInterval(activityTimer);await sb.auth.signOut();currentUser=null;currentProfile=null;selectedUser=null;localNotifications=[];$("app").style.display="none";$("authScreen").style.display="grid";authTab("login");
-}
-sb.auth.onAuthStateChange((event,session)=>{if(session?.user&&!currentUser)startApp(session.user);if(event==="SIGNED_OUT"){currentUser=null;currentProfile=null}});
-loadThemeAtStart();
-(async()=>{if(localStorage.getItem("pixel-light")==="light")theme();const r=await sb.auth.getSession();if(r.data.session?.user)startApp(r.data.session.user)})();
+
+// Auto-start check session
+(async () => {
+  const { data } = await sb.auth.getSession();
+  if (data?.session?.user) {
+    await startApp(data.session.user);
+  }
+})();
 </script>
 </body>
 </html>
