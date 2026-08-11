@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PIXEL MESSENGER // ULTIMATE EDITION</title>
+<title>PIXEL MESSENGER // MULTI-MEDIA EDITION</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
@@ -88,9 +88,6 @@ textarea{min-height:100px;resize:vertical}
 .avatar{width:82px;height:82px;margin:auto;font-size:40px}
 .avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
 .online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%}
-.badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:8px}
-.xp{height:10px;background:#060b14;border:2px solid #2d405e;overflow:hidden}
-.xp div{height:100%;background:var(--green);width:0}
 .menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}
 .menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}
 .menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}
@@ -111,8 +108,10 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}
 .post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .post-author{display:flex;align-items:center;gap:12px}
-.post-media-img{max-width:100%;max-height:420px;border-radius:3px;border:1px solid #35537d;margin-top:10px;object-fit:contain}
-.post-audio{width:100%;margin-top:10px}
+.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}
+.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}
+.post-audio,.msg-audio{width:100%;margin-top:8px}
+.file-attachment-box{display:flex;align-items:center;gap:10px;background:#09101d;border:1px solid #2a4163;padding:10px;border-radius:4px;margin-top:8px}
 .post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}
 .react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}
 .react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}
@@ -126,7 +125,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}
 .chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}
 .chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.messages-list{flex:1;min-height:380px;max-height:510px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}
+.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}
 
 /* Messenger Bubble Styling */
 .message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}
@@ -135,18 +134,15 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}
 .message:not(.mine){border-bottom-left-radius:2px}
 
-/* Facebook mini avatar "Seen" indicator */
 .seen-receipt{width:18px;height:18px;border-radius:50%;overflow:hidden;border:1.5px solid var(--cyan);display:inline-block;margin-top:2px;box-shadow:0 0 4px var(--cyan)}
 .seen-receipt img{width:100%;height:100%;object-fit:cover}
 
-/* FB Style Message Reaction Bar */
 .msg-reactions-list{display:flex;gap:4px;margin-top:-6px;z-index:2;background:#08101d;border:1px solid #2d456b;padding:2px 6px;border-radius:10px;font-size:13px}
 .msg-hover-actions{display:none;position:absolute;top:-28px;right:0;background:#0d182b;border:1px solid #385880;padding:2px 6px;border-radius:14px;gap:6px;z-index:10}
 .message-wrap:hover .msg-hover-actions{display:flex}
 .reaction-opt{cursor:pointer;transition:transform .1s}
 .reaction-opt:hover{transform:scale(1.3)}
 
-/* Quoted Messages & Audio */
 .quoted-box{background:#08101d;border-left:4px solid var(--cyan);padding:6px 10px;margin-bottom:8px;font-size:15px;border-radius:2px;color:#a8caef}
 .message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}
 .typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}
@@ -157,7 +153,6 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}
 .toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}
 
-/* Pulse effect for Voice Recording */
 .recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}
 @keyframes pulse{from{opacity:1}to{opacity:0.5}}
 
@@ -232,10 +227,18 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
     
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;">
       <button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PICTURE</button>
+      <button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button>
+      <button class="secondary" onclick="document.getElementById('postFileInput').click()">📁 FILE</button>
       <button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button>
+
       <span id="postImagePill" class="file-pill hidden"></span>
+      <span id="postVideoPill" class="file-pill hidden"></span>
+      <span id="postFilePill" class="file-pill hidden"></span>
       <span id="postAudioPill" class="file-pill hidden"></span>
+
       <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')">
+      <input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')">
+      <input id="postFileInput" type="file" class="hidden" onchange="previewPostFile('file')">
       <input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">
     </div>
 
@@ -277,9 +280,23 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
             <button class="danger" style="padding:2px 6px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button>
           </div>
 
-          <div class="chat-controls">
+          <!-- Chat Attachment Preview Pill Bar -->
+          <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">
+            <span id="chatAttachmentPill" class="file-pill"></span>
+            <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE ATTACHMENT</button>
+          </div>
+
+          <div class="chat-controls" style="flex-wrap:wrap">
             <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>
-            <input id="messageInput" placeholder="Type a message..." oninput="handleTypingSignal()" onkeydown="if(event.key==='Enter')sendMessage()" disabled>
+            <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>
+            <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>
+            <button class="secondary" onclick="document.getElementById('chatFileInput').click()" title="Send File" disabled id="btnFile">📁</button>
+
+            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="selectChatMedia('image')">
+            <input id="chatVideoInput" type="file" accept="video/*" class="hidden" onchange="selectChatMedia('video')">
+            <input id="chatFileInput" type="file" class="hidden" onchange="selectChatMedia('file')">
+
+            <input id="messageInput" placeholder="Type a message..." oninput="handleTypingSignal()" onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">
             <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
           </div>
         </div>
@@ -319,10 +336,10 @@ const SUPABASE_PUBLISHABLE_KEY="sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 
 let currentUser=null, currentProfile=null, selectedUser=null;
-let postImageFile=null, postAudioFile=null;
+let postImageFile=null, postVideoFile=null, postFileObj=null, postAudioFile=null;
+let chatAttachmentFile=null, chatAttachmentType=null;
 let soundEnabled=true, audioCtx=null;
 
-// Voice Recording & Messenger state
 let mediaRecorder=null, audioChunks=[], isRecording=false, recordTimerInterval=null, recordSeconds=0;
 let replyingToMsg=null;
 let typingTimeout=null;
@@ -443,7 +460,6 @@ function renderAvatarDisplay(){
     : esc(currentProfile.avatar||"👾");
 }
 
-// --- AVATAR MANAGEMENT ---
 async function uploadAvatar(){
   const file = $("avatarUploadInput").files[0];
   if(!file) return;
@@ -479,7 +495,13 @@ async function removeAvatar(){
 function previewPostFile(type){
   if(type==='image'){
     postImageFile = $("postImageInput").files[0];
-    if(postImageFile){ $("postImagePill").textContent = "📷 " + postImageFile.name; $("postImagePill").classList.remove("hidden"); }
+    if(postImageFile){ $("postImagePill").textContent = "🖼️ " + postImageFile.name; $("postImagePill").classList.remove("hidden"); }
+  } else if(type==='video'){
+    postVideoFile = $("postVideoInput").files[0];
+    if(postVideoFile){ $("postVideoPill").textContent = "📹 " + postVideoFile.name; $("postVideoPill").classList.remove("hidden"); }
+  } else if(type==='file'){
+    postFileObj = $("postFileInput").files[0];
+    if(postFileObj){ $("postFilePill").textContent = "📁 " + postFileObj.name; $("postFilePill").classList.remove("hidden"); }
   } else if(type==='audio'){
     postAudioFile = $("postAudioInput").files[0];
     if(postAudioFile){ $("postAudioPill").textContent = "🎵 " + postAudioFile.name; $("postAudioPill").classList.remove("hidden"); }
@@ -488,16 +510,26 @@ function previewPostFile(type){
 
 async function createPost(){
   const text=$("postText").value.trim();
-  if(!text && !postImageFile && !postAudioFile) return toast("Write a text message or attach media to post.");
+  if(!text && !postImageFile && !postVideoFile && !postFileObj && !postAudioFile) return toast("Write content or attach media to post.");
   
   status("postStatus", "Publishing post...");
-  let image_url = null, audio_url = null;
+  let image_url = null, video_url = null, file_url = null, audio_url = null;
 
   try {
     if(postImageFile){
       const path = `${currentUser.id}/img_${Date.now()}.${postImageFile.name.split('.').pop()}`;
       const u = await sb.storage.from("posts_media").upload(path, postImageFile);
       if(u.data) image_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+    }
+    if(postVideoFile){
+      const path = `${currentUser.id}/vid_${Date.now()}.${postVideoFile.name.split('.').pop()}`;
+      const u = await sb.storage.from("posts_media").upload(path, postVideoFile);
+      if(u.data) video_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+    }
+    if(postFileObj){
+      const path = `${currentUser.id}/file_${Date.now()}.${postFileObj.name.split('.').pop()}`;
+      const u = await sb.storage.from("posts_media").upload(path, postFileObj);
+      if(u.data) file_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
     }
     if(postAudioFile){
       const path = `${currentUser.id}/audio_${Date.now()}.${postAudioFile.name.split('.').pop()}`;
@@ -508,6 +540,8 @@ async function createPost(){
 
   const payload = { user_id: currentUser.id, content: text || "" };
   if(image_url) payload.image_url = image_url;
+  if(video_url) payload.video_url = video_url;
+  if(file_url) payload.file_url = file_url;
   if(audio_url) payload.audio_url = audio_url;
 
   const r = await sb.from("posts").insert(payload);
@@ -518,8 +552,8 @@ async function createPost(){
     await sb.from("profiles").update({ xp: currentProfile.xp }).eq("id", currentUser.id);
     loadProfile();
 
-    $("postText").value=""; postImageFile=null; postAudioFile=null;
-    $("postImagePill").classList.add("hidden"); $("postAudioPill").classList.add("hidden");
+    $("postText").value=""; postImageFile=null; postVideoFile=null; postFileObj=null; postAudioFile=null;
+    $("postImagePill").classList.add("hidden"); $("postVideoPill").classList.add("hidden"); $("postFilePill").classList.add("hidden"); $("postAudioPill").classList.add("hidden");
     status("postStatus", "");
     toast("🎉 Post published! +10 XP");
     loadFeed();
@@ -532,23 +566,18 @@ async function deletePost(postId){
   if(element) element.remove();
 
   const r = await sb.from("posts").delete().eq("id", postId);
-  if(r.error){
-    toast("❌ Delete failed: " + r.error.message);
-    loadFeed();
-  } else {
-    toast("🗑️ Post deleted!");
-  }
+  if(r.error) toast("❌ Delete failed: " + r.error.message);
+  else toast("🗑️ Post deleted!");
 }
 
 async function loadFeed(){
+  // Check columns or select all
   const r=await sb.from("posts").select("*, profiles(*), post_reactions(*), comments(*, profiles(*))").order("created_at",{ascending:false}).limit(20);
   if(!r.data) return;
 
   $("feed").innerHTML=r.data.map(p => {
     const author = p.profiles || {};
-    const avatarMarkup = author.avatar_url 
-      ? `<img src="${esc(author.avatar_url)}">` 
-      : esc(author.avatar||"👾");
+    const avatarMarkup = author.avatar_url ? `<img src="${esc(author.avatar_url)}">` : esc(author.avatar||"👾");
 
     const reactions = p.post_reactions || [];
     const counts = { '❤️':0, '🔥':0, '😂':0, '👍':0 };
@@ -576,6 +605,13 @@ async function loadFeed(){
 
       ${p.content ? `<p style="white-space:pre-wrap;margin:8px 0">${esc(p.content)}</p>` : ''}
       ${p.image_url ? `<img class="post-media-img" src="${esc(p.image_url)}">` : ''}
+      ${p.video_url ? `<video class="post-media-video" controls src="${esc(p.video_url)}"></video>` : ''}
+      ${p.file_url ? `
+        <div class="file-attachment-box">
+          <span>📁 Attached File:</span>
+          <a href="${esc(p.file_url)}" target="_blank" download style="color:var(--cyan);word-break:break-all">${p.file_url.split('/').pop()}</a>
+        </div>
+      ` : ''}
       ${p.audio_url ? `<audio class="post-audio" controls src="${esc(p.audio_url)}"></audio>` : ''}
 
       <div class="post-actions">
@@ -647,19 +683,24 @@ async function openChat(userId){
   if(r.error) return toast("Failed to load user profile.");
   selectedUser=r.data;
   $("chatTitle").textContent = selectedUser.username;
+  
+  // Enable chat inputs & controls
   $("messageInput").disabled = false;
   $("sendButton").disabled = false;
   $("voiceRecordBtn").disabled = false;
+  $("btnImg").disabled = false;
+  $("btnVid").disabled = false;
+  $("btnFile").disabled = false;
   $("reachIndicator").classList.remove("hidden");
 
   cancelReply();
+  clearChatAttachment();
   await loadMessages();
 }
 
 async function loadMessages(){
   if(!selectedUser) return;
 
-  // Mark unseen messages as READ (Messenger Reach status)
   await sb.from("messages")
     .update({ is_read: true })
     .eq("sender_id", selectedUser.id)
@@ -678,7 +719,6 @@ async function loadMessages(){
   const msgMap = {};
   r.data.forEach(m => msgMap[m.id] = m);
 
-  // Find the last message sent by current user that was read by selectedUser
   let lastSeenMsgId = null;
   for(let i = r.data.length - 1; i >= 0; i--){
     if(r.data[i].sender_id === currentUser.id && r.data[i].is_read){
@@ -687,26 +727,21 @@ async function loadMessages(){
     }
   }
 
-  const friendAvatarHtml = selectedUser.avatar_url 
-    ? `<img src="${esc(selectedUser.avatar_url)}">` 
-    : esc(selectedUser.avatar || "👾");
+  const friendAvatarHtml = selectedUser.avatar_url ? `<img src="${esc(selectedUser.avatar_url)}">` : esc(selectedUser.avatar || "👾");
 
   list.innerHTML = r.data.map(m => {
     const isMine = m.sender_id === currentUser.id;
     const parentMsg = m.reply_to_id ? msgMap[m.reply_to_id] : null;
 
-    // Emojis on this message
     const reactions = m.message_reactions || [];
     const reactCounts = {};
     reactions.forEach(rx => reactCounts[rx.emoji] = (reactCounts[rx.emoji] || 0) + 1);
 
-    // FB Messenger Seen Indicator (Mini Avatar)
     const isLastSeen = isMine && m.id === lastSeenMsgId;
 
     return `
     <div id="msg_${m.id}" class="message-wrap ${isMine?'mine':''}">
       
-      <!-- Facebook Style Reaction Hover Menu -->
       <div class="msg-hover-actions">
         ${['❤️','🔥','😂','😮','😢','👍'].map(e => `
           <span class="reaction-opt" onclick="reactToMessage('${m.id}', '${e}')">${e}</span>
@@ -718,15 +753,22 @@ async function loadMessages(){
         ${parentMsg ? `
           <div class="quoted-box">
             <strong>↩️ Replying to ${parentMsg.sender_id === currentUser.id ? 'yourself' : esc(selectedUser.username)}:</strong>
-            <div>${esc(parentMsg.content || '🎤 Voice Message')}</div>
+            <div>${esc(parentMsg.content || 'Media Attachment')}</div>
           </div>
         ` : ''}
 
-        ${m.content ? `<div>${esc(m.content)}</div>` : ''}
-        ${m.image_url ? `<img src="${esc(m.image_url)}" style="max-width:100%;border-radius:4px;margin-top:6px"><br>` : ''}
+        ${m.content && m.content !== '🎤 Voice Message' ? `<div>${esc(m.content)}</div>` : ''}
+        ${m.image_url ? `<img class="msg-media-img" src="${esc(m.image_url)}"><br>` : ''}
+        ${m.video_url ? `<video class="msg-media-video" controls src="${esc(m.video_url)}"></video><br>` : ''}
+        ${m.file_url ? `
+          <div class="file-attachment-box">
+            <span>📁 File:</span>
+            <a href="${esc(m.file_url)}" target="_blank" download style="color:var(--cyan);word-break:break-all">${m.file_url.split('/').pop()}</a>
+          </div>
+        ` : ''}
         ${m.audio_url ? `
           <div style="margin-top:6px;background:#091220;padding:6px;border-radius:6px;border:1px solid #335178">
-            <audio controls style="max-width:230px;height:38px" src="${esc(m.audio_url)}"></audio>
+            <audio controls class="msg-audio" src="${esc(m.audio_url)}"></audio>
           </div>
         ` : ''}
 
@@ -734,21 +776,19 @@ async function loadMessages(){
           <small>${new Date(m.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small>
           
           <div style="display:flex;gap:6px;align-items:center">
-            <button class="secondary" style="padding:1px 5px;font-size:12px" onclick="setReply('${m.id}', '${isMine ? 'Yourself' : esc(selectedUser.username)}', '${esc(m.content||'Voice Message')}')">↩️ Reply</button>
+            <button class="secondary" style="padding:1px 5px;font-size:12px" onclick="setReply('${m.id}', '${isMine ? 'Yourself' : esc(selectedUser.username)}', '${esc(m.content||'Media Attachment')}')">↩️ Reply</button>
             ${isMine ? `<button class="danger" style="padding:1px 5px;font-size:12px" onclick="deleteMessage('${m.id}')">✕</button>` : ''}
           </div>
         </div>
 
       </div>
 
-      <!-- Applied Reactions Badge -->
       ${Object.keys(reactCounts).length ? `
         <div class="msg-reactions-list">
           ${Object.entries(reactCounts).map(([emoji, count]) => `${emoji} ${count > 1 ? count : ''}`).join(' ')}
         </div>
       ` : ''}
 
-      <!-- FB Messenger Mini Avatar Read Receipt -->
       ${isLastSeen ? `
         <div class="seen-receipt" title="Seen by ${esc(selectedUser.username)}">
           ${friendAvatarHtml}
@@ -762,22 +802,40 @@ async function loadMessages(){
   list.scrollTop = list.scrollHeight;
 }
 
-// --- VOICE MESSAGING (RELIABLE MULTI-BROWSER FIX) ---
+// --- CHAT MEDIA SELECTION ---
+function selectChatMedia(type){
+  let fileInput = null;
+  if(type === 'image') fileInput = $("chatImageInput");
+  if(type === 'video') fileInput = $("chatVideoInput");
+  if(type === 'file') fileInput = $("chatFileInput");
+
+  if(fileInput && fileInput.files[0]){
+    chatAttachmentFile = fileInput.files[0];
+    chatAttachmentType = type;
+    $("chatAttachmentPill").textContent = `${type === 'image' ? '🖼️' : type === 'video' ? '📹' : '📁'} ${chatAttachmentFile.name}`;
+    $("chatAttachmentBar").classList.remove("hidden");
+  }
+}
+
+function clearChatAttachment(){
+  chatAttachmentFile = null;
+  chatAttachmentType = null;
+  $("chatAttachmentBar").classList.add("hidden");
+  $("chatImageInput").value = "";
+  $("chatVideoInput").value = "";
+  $("chatFileInput").value = "";
+}
+
+// --- VOICE MESSAGING ---
 async function toggleVoiceRecord(){
   const btn = $("voiceRecordBtn");
   
   if(!isRecording){
     try{
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
       let options = {};
-      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-        options = { mimeType: 'audio/webm;codecs=opus' };
-      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        options = { mimeType: 'audio/mp4' };
-      } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
-        options = { mimeType: 'audio/ogg' };
-      }
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) options = { mimeType: 'audio/webm;codecs=opus' };
+      else if (MediaRecorder.isTypeSupported('audio/mp4')) options = { mimeType: 'audio/mp4' };
 
       mediaRecorder = new MediaRecorder(stream, options);
       audioChunks = [];
@@ -799,13 +857,11 @@ async function toggleVoiceRecord(){
         } else {
           toast("❌ Voice recording empty. Try again.");
         }
-
         stream.getTracks().forEach(track => track.stop());
       };
 
       mediaRecorder.start(200);
       isRecording = true;
-      
       btn.classList.add("recording-active");
       btn.classList.add("danger");
       
@@ -816,54 +872,33 @@ async function toggleVoiceRecord(){
         btn.textContent = `🛑 ${mins}:${secs}`;
       }, 1000);
 
-      toast("🎙️ Recording... Click Stop when finished.");
+      toast("🎙️ Recording voice message...");
     } catch(err){
       toast("❌ Mic access error: " + err.message);
     }
   } else {
     isRecording = false;
-    if(mediaRecorder && mediaRecorder.state !== 'inactive'){
-      mediaRecorder.stop();
-    }
+    if(mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
   }
 }
 
 async function uploadAndSendVoice(blob, mimeType){
   if(!selectedUser) return;
   toast("📤 Uploading voice message...");
-
-  const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
+  const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
   const fileName = `${currentUser.id}/voice_${Date.now()}.${ext}`;
 
-  const u = await sb.storage.from("posts_media").upload(fileName, blob, { 
-    contentType: mimeType,
-    upsert: true 
-  });
-
-  if(u.error){
-    return toast("❌ Storage upload failed. Check Supabase 'posts_media' bucket policies.");
-  }
+  const u = await sb.storage.from("posts_media").upload(fileName, blob, { contentType: mimeType, upsert: true });
+  if(u.error) return toast("❌ Storage upload failed.");
 
   const audio_url = sb.storage.from("posts_media").getPublicUrl(fileName).data.publicUrl;
+  const payload = { sender_id: currentUser.id, receiver_id: selectedUser.id, content: "🎤 Voice Message", audio_url };
 
-  const payload = { 
-    sender_id: currentUser.id, 
-    receiver_id: selectedUser.id, 
-    content: "🎤 Voice Message",
-    audio_url: audio_url
-  };
-
-  if(replyingToMsg){
-    payload.reply_to_id = replyingToMsg.id;
-    cancelReply();
-  }
+  if(replyingToMsg){ payload.reply_to_id = replyingToMsg.id; cancelReply(); }
 
   const r = await sb.from("messages").insert(payload);
   if(r.error) toast("❌ Send Failed: " + r.error.message);
-  else {
-    playMessageSound();
-    loadMessages();
-  }
+  else { playMessageSound(); loadMessages(); }
 }
 
 // --- MESSENGER REACTION & TYPING ACTIONS ---
@@ -887,7 +922,6 @@ function handleTypingSignal(){
   });
 }
 
-// --- QUOTE REPLIES & SEND MESSAGE ---
 function setReply(msgId, username, text){
   replyingToMsg = { id: msgId, username, text };
   $("replyBox").classList.remove("hidden");
@@ -905,10 +939,35 @@ async function sendMessage(){
   unlockAudio();
   const input = $("messageInput");
   const text = input.value.trim();
-  if(!text || !selectedUser) return;
-  input.value = "";
+  if(!text && !chatAttachmentFile && !selectedUser) return;
 
-  const payload = { sender_id: currentUser.id, receiver_id: selectedUser.id, content: text };
+  let image_url = null, video_url = null, file_url = null;
+
+  if(chatAttachmentFile){
+    toast("📤 Uploading attachment...");
+    try{
+      const ext = chatAttachmentFile.name.split('.').pop();
+      const path = `${currentUser.id}/chat_${chatAttachmentType}_${Date.now()}.${ext}`;
+      const u = await sb.storage.from("posts_media").upload(path, chatAttachmentFile, { upsert: true });
+      if(u.error) throw u.error;
+      const pubUrl = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
+
+      if(chatAttachmentType === 'image') image_url = pubUrl;
+      if(chatAttachmentType === 'video') video_url = pubUrl;
+      if(chatAttachmentType === 'file') file_url = pubUrl;
+    } catch(err){
+      return toast("❌ Failed to upload attachment: " + err.message);
+    }
+  }
+
+  input.value = "";
+  clearChatAttachment();
+
+  const payload = { sender_id: currentUser.id, receiver_id: selectedUser.id, content: text || "" };
+  if(image_url) payload.image_url = image_url;
+  if(video_url) payload.video_url = video_url;
+  if(file_url) payload.file_url = file_url;
+
   if(replyingToMsg){
     payload.reply_to_id = replyingToMsg.id;
     cancelReply();
@@ -961,7 +1020,6 @@ function setupRealtime(){
     .subscribe();
 }
 
-// --- SEARCH FRIENDS ---
 async function searchUsers(fromGlobal = false){
   let term = "";
   if(fromGlobal) {
@@ -977,13 +1035,7 @@ async function searchUsers(fromGlobal = false){
   if(!term){ container.innerHTML = ""; return; }
 
   container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1">🔍 Searching for "${esc(term)}"...</div>`;
-
   const r = await sb.from("profiles").select("*").ilike("username", `%${term}%`).neq("id", currentUser.id).limit(20);
-
-  if(r.error){
-    container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1;color:#ff7795">Search error: ${esc(r.error.message)}</div>`;
-    return;
-  }
 
   if(!r.data || r.data.length === 0){
     container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1">No pixel friends found matching "${esc(term)}"</div>`;
