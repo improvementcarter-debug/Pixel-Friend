@@ -3,621 +3,418 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PIXEL FRIEND — Classic Pixel v2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PIXEL FRIEND — Classic Pixel Real</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:"Courier New",monospace;background:#070b16;color:#d9e8ff}
-body{
-  background-color:#070b16;
-  background-image:
-    linear-gradient(rgba(60,90,160,.10) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(60,90,160,.10) 1px,transparent 1px),
-    linear-gradient(rgba(140,60,220,.05) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(140,60,220,.05) 1px,transparent 1px);
-  background-size:8px 8px,8px 8px,32px 32px,32px 32px;
-}
-button,input,textarea{font:inherit}
-button{cursor:pointer}
-.top{
-  height:58px;border-bottom:2px solid #263d75;background:#090d19;
-  display:flex;align-items:center;padding:0 14px;gap:12px;position:sticky;top:0;z-index:20;
-  box-shadow:0 3px 0 #02040a;
-}
-.logo{font-weight:bold;letter-spacing:2px;color:#fff;font-size:15px}
-.logo span{color:#73e8ff}
-.top-spacer{flex:1}
-.search{width:230px;background:#0c1325;color:#bcd2ff;border:1px solid #35528b;padding:10px}
-.iconbtn,.sendbtn,.navbtn,.tabbtn,.friendbtn,.attachbtn{
-  border:1px solid #3c5e9c;background:#14264b;color:#dceaff;padding:9px 11px;
-}
-.iconbtn:hover,.sendbtn:hover,.navbtn:hover,.tabbtn:hover,.friendbtn:hover,.attachbtn:hover{background:#1d3970}
-.badge{background:#ffcf33;color:#111;padding:2px 6px;font-size:11px;font-weight:bold}
-.layout{display:flex;min-height:calc(100vh - 58px)}
-.sidebar{
-  width:205px;border-right:2px solid #263d75;background:rgba(8,13,27,.94);padding:14px 10px;
-}
-.avatar{
-  width:74px;height:74px;border:2px solid #5076ae;margin:0 auto 8px;
-  display:flex;align-items:center;justify-content:center;font-size:30px;
-  background:linear-gradient(135deg,#18304d,#11182b);position:relative;
-}
-.online{position:absolute;right:2px;bottom:2px;width:10px;height:10px;background:#42ff9b;border:1px solid #06140d}
-.username{text-align:center;color:#fff;font-weight:bold;margin-bottom:12px}
-.role{text-align:center;font-size:10px;color:#aebfe1;margin-bottom:16px}
-.xp{font-size:10px;color:#8fa8d5;text-align:center}
-.xpbar{height:7px;border:1px solid #355184;margin:5px 0 16px}
-.xpbar i{display:block;width:25%;height:100%;background:#56e7b1}
-.navbtn{display:block;width:100%;margin:6px 0;text-align:left;background:transparent;border-color:transparent}
-.navbtn.active{background:#142c58;border-color:#3f63a3}
-.navbtn:hover{border-color:#3f63a3}
-.main{flex:1;padding:24px;min-width:0}
-.wrap{max-width:1100px;margin:0 auto}
-.panel{
-  border:1px solid #36588e;background:rgba(9,17,35,.92);box-shadow:0 0 0 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.35);
-}
-.panelhead{padding:15px;border-bottom:1px solid #2d4879;display:flex;align-items:center;gap:10px}
-.panelhead h1{font-size:18px;margin:0;color:#fff}
-.tabs{display:flex;border-bottom:1px solid #2d4879}
-.tabbtn{flex:1;border-width:0 1px 0 0;background:#0d1830}
-.tabbtn.active{background:#19345f;color:#fff}
-.content{padding:16px}
-.view{display:none}.view.active{display:block}
-.composer{
-  border:1px solid #2e4d80;background:#0b1428;padding:12px;margin-bottom:18px;
-}
-textarea,input[type=text]{
-  width:100%;background:#060b17;color:#e9f2ff;border:1px solid #36598f;
-  padding:11px;outline:none;
-}
-textarea:focus,input[type=text]:focus{border-color:#64b8ff;box-shadow:0 0 0 1px #64b8ff}
-.actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
-.attachbtn{font-size:12px}
-.file-name{font-size:10px;color:#8ea6ce;align-self:center}
-.sendbtn{background:#2a6bdc;border-color:#66a6ff;color:#fff;font-weight:bold}
-.post{
-  border:1px solid #2c4878;background:#0b1427;margin:12px 0;padding:12px;
-}
-.posthead{display:flex;gap:10px;align-items:center}
-.miniavatar{width:38px;height:38px;border:1px solid #5276a9;background:#172947;display:flex;align-items:center;justify-content:center}
-.postname{font-weight:bold;color:#fff}.time{font-size:10px;color:#728ab2}
-.postbody{padding:12px 0;color:#c8d7ee;white-space:pre-wrap;line-height:1.45}
-.postmedia{max-width:100%;max-height:420px;display:block;margin-top:8px;border:1px solid #345485}
-.postactions{display:flex;gap:7px;border-top:1px solid #223b68;padding-top:8px}
-.smallbtn{background:#101f3c;border:1px solid #34578d;color:#bfd3f4;padding:6px 9px;font-size:11px}
-.message-layout{display:grid;grid-template-columns:230px 1fr;min-height:530px}
-.friends{border-right:1px solid #2d4879;padding:10px}
-.friendbtn{display:block;width:100%;text-align:left;margin-bottom:8px}
-.friendbtn.active{background:#1a3768}
-.chat{display:flex;flex-direction:column;min-width:0}
-.chathead{padding:13px;border-bottom:1px solid #2d4879}
-.chatname{font-weight:bold;color:#fff}
-.chatmessages{flex:1;padding:12px;overflow:auto;min-height:330px}
-.empty{text-align:center;color:#657fae;padding:90px 10px}
-.msg{max-width:75%;margin:8px 0;padding:9px 11px;border:1px solid #35578d;background:#101e39;line-height:1.35}
-.msg.mine{margin-left:auto;background:#17366a;border-color:#477cc1}
-.msgmeta{font-size:9px;color:#8098bf;margin-top:5px}
-.msgmedia{max-width:100%;max-height:240px;display:block;margin-top:7px}
-.chatcomposer{border-top:1px solid #2d4879;padding:10px}
-.notify{
-  position:fixed;right:18px;bottom:18px;z-index:50;width:310px;
-  background:#101d37;border:1px solid #4d78b7;box-shadow:0 8px 25px #000;
-  padding:12px;display:none;
-}
-.notify.show{display:block;animation:pop .18s ease-out}
-@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
-.notify strong{color:#fff}.notify small{color:#91a9d0}
-.status{font-size:10px;color:#62f0b2;margin-left:auto}
-.modal{
- position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;
-}
-.modal.show{display:flex}
-.modalbox{width:min(500px,92vw);background:#0c152a;border:1px solid #4c72ae;padding:18px}
-.modalbox h2{margin-top:0;color:#fff;font-size:16px}
-.close{float:right;background:none;border:0;color:#fff;font-size:18px}
-.toast{position:fixed;top:70px;right:18px;background:#13294b;border:1px solid #4f78b8;padding:10px 14px;z-index:80;display:none}
-.toast.show{display:block}
-@media(max-width:760px){
- .sidebar{width:70px;padding:8px}.username,.role,.xp,.xpbar{display:none}
- .avatar{width:50px;height:50px;font-size:20px}
- .navbtn{font-size:0;text-align:center;padding:12px 4px}
- .navbtn:first-letter{font-size:18px}
- .search{width:130px}
- .main{padding:10px}
- .message-layout{grid-template-columns:1fr}
- .friends{border-right:0;border-bottom:1px solid #2d4879;display:flex;gap:6px;overflow:auto}
- .friendbtn{min-width:150px;margin:0}
-}
-
-/* ===== CLASSIC PIXEL SOCIAL EXTRAS ===== */
-.profile-card{border:1px solid #36588e;background:#0b1428;padding:14px;margin-bottom:16px}
-.profile-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.profile-avatar{width:92px;height:92px;border:2px solid #5a83bb;background:#101e38;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
-.profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-avatar .avatar-fallback{font-size:34px}
-.avatar-upload{font-size:10px;color:#91a9d0}
-.reactbar{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
-.reactbtn{background:#101f3c;border:1px solid #34578d;color:#d7e7ff;padding:5px 8px;font-size:11px}
-.reactbtn.active{background:#244b7d;border-color:#69a9ff}
-.reaction-count{font-size:10px;color:#91a9d0;margin-left:4px}
-.stickerbar{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
-.stickerbtn{background:#101f3c;border:1px solid #34578d;padding:6px 8px;font-size:18px}
-.voicebtn{background:#172d55;border:1px solid #4a74ac;color:#fff;padding:8px 10px;font-size:11px}
-.voicebtn.recording{background:#702a4b;border-color:#ff6f9d}
-.voice-preview{display:flex;align-items:center;gap:8px;margin-top:7px}
-.voice-preview audio{width:min(280px,100%);height:32px}
-.msg-reactions{margin-top:6px}
-.sticker-message{font-size:30px;line-height:1}
-.profile-name-big{font-size:18px;color:#fff;font-weight:bold}
-.profile-meta{font-size:10px;color:#8fa8d5;margin-top:3px}
-.hidden-input{display:none}
-
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:"Courier New",monospace;background:#070b16;color:#d9e8ff}
+body{background-color:#070b16;background-image:linear-gradient(rgba(60,90,160,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(60,90,160,.10) 1px,transparent 1px),linear-gradient(rgba(140,60,220,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(140,60,220,.05) 1px,transparent 1px);background-size:8px 8px,8px 8px,32px 32px,32px 32px}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.top{height:60px;border-bottom:2px solid #263d75;background:#090d19;display:flex;align-items:center;padding:0 14px;gap:10px;position:sticky;top:0;z-index:20;box-shadow:0 3px 0 #02040a}
+.logo{font-weight:bold;letter-spacing:2px;color:#fff}.logo span{color:#73e8ff}.spacer{flex:1}
+.search{width:220px;background:#0c1325;color:#bcd2ff;border:1px solid #35528b;padding:9px}
+.btn{border:1px solid #3c5e9c;background:#14264b;color:#dceaff;padding:8px 11px}.btn:hover{background:#1d3970}.primary{background:#2a6bdc;border-color:#66a6ff;color:#fff;font-weight:bold}.danger{background:#4b1e31;border-color:#a44d6e;color:#ffd7e5}
+.count{display:inline-grid;place-items:center;min-width:18px;height:18px;background:#ff5577;color:#fff;border-radius:50%;font-size:10px;font-weight:bold}
+.layout{display:flex;min-height:calc(100vh - 60px)}.sidebar{width:210px;border-right:2px solid #263d75;background:rgba(8,13,27,.95);padding:14px 10px}
+.avatar{width:76px;height:76px;border:2px solid #5076ae;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:30px;background:#111e38;position:relative;overflow:hidden}
+.avatar img,.miniavatar img,.profileAvatar img{width:100%;height:100%;object-fit:cover}.online{position:absolute;right:2px;bottom:2px;width:10px;height:10px;background:#42ff9b;border:1px solid #06140d}
+.username{text-align:center;color:#fff;font-weight:bold}.role{text-align:center;font-size:10px;color:#aebfe1;margin:5px 0 15px}.xp{font-size:10px;color:#8fa8d5;text-align:center}.xpbar{height:7px;border:1px solid #355184;margin:5px 0 16px}.xpbar i{display:block;height:100%;background:#56e7b1}
+.nav{display:block;width:100%;margin:6px 0;text-align:left;background:transparent;border:1px solid transparent}.nav.active,.nav:hover{background:#142c58;border-color:#3f63a3}
+.main{flex:1;padding:22px;min-width:0}.wrap{max-width:1120px;margin:auto}.panel{border:1px solid #36588e;background:rgba(9,17,35,.94);box-shadow:0 0 0 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.35)}
+.head{padding:14px;border-bottom:1px solid #2d4879;display:flex;align-items:center;gap:10px}.head h1{font-size:17px;margin:0}.status{margin-left:auto;font-size:10px;color:#62f0b2}
+.tabs{display:flex;border-bottom:1px solid #2d4879}.tab{flex:1;border:0;border-right:1px solid #2d4879;background:#0d1830;color:#dceaff;padding:10px}.tab.active{background:#19345f}
+.view{display:none}.view.active{display:block}.content{padding:16px}.card{border:1px solid #2e4d80;background:#0b1428;padding:12px;margin-bottom:14px}
+textarea,input,select{width:100%;background:#060b17;color:#e9f2ff;border:1px solid #36598f;padding:10px;outline:none}textarea:focus,input:focus,select:focus{border-color:#64b8ff}
+.row{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.row>*{flex:0 0 auto}.grow{flex:1!important}.muted{font-size:10px;color:#7893bd}
+.feedPost{border:1px solid #2c4878;background:#0b1427;margin:12px 0;padding:12px}.posthead{display:flex;gap:9px;align-items:center}.miniavatar{width:38px;height:38px;border:1px solid #5276a9;background:#172947;display:flex;align-items:center;justify-content:center;overflow:hidden}.postname{font-weight:bold;color:#fff}.time{font-size:10px;color:#728ab2}.postbody{padding:11px 0;white-space:pre-wrap;line-height:1.45}.media{max-width:100%;max-height:430px;display:block;border:1px solid #345485;margin:8px 0}.actions{display:flex;gap:6px;flex-wrap:wrap}.small{font-size:11px;padding:6px 8px}.react{background:#101f3c;border:1px solid #34578d;color:#bfd3f4}.react.active{background:#244b7d;border-color:#69a9ff}
+.messageLayout{display:grid;grid-template-columns:220px 1fr;min-height:550px}.users{border-right:1px solid #2d4879;padding:10px}.user{display:block;width:100%;text-align:left;margin-bottom:7px;background:#14264b;border:1px solid #3c5e9c;color:#dceaff;padding:9px}.user.active{background:#1a3768}
+.chat{display:flex;flex-direction:column;min-width:0}.chathead{padding:12px;border-bottom:1px solid #2d4879}.chatmessages{flex:1;padding:12px;overflow:auto;min-height:350px}.empty{text-align:center;color:#657fae;padding:80px 10px}
+.msgwrap{margin:8px 0}.msg{max-width:76%;padding:9px 11px;border:1px solid #35578d;background:#101e39;line-height:1.35}.msg.mine{margin-left:auto;background:#17366a;border-color:#477cc1}.msgmeta{font-size:9px;color:#8098bf;margin-top:5px}.msgactions{display:flex;gap:4px;margin-top:3px;opacity:.35}.msgwrap:hover .msgactions{opacity:1}
+.composer{border-top:1px solid #2d4879;padding:10px}.stickers{display:flex;gap:4px;flex-wrap:wrap;margin:7px 0}.sticker{background:#101f3c;border:1px solid #34578d;padding:5px 7px;font-size:18px}.voice.recording{background:#702a4b;border-color:#ff6f9d}.preview{font-size:10px;color:#91a9d0;margin:5px 0}
+.profileAvatar{width:100px;height:100px;border:2px solid #5a83bb;background:#101e38;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;font-size:35px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.adminStat{border:1px solid #5a4b8f;background:#16132a;padding:12px}.adminStat b{display:block;font-size:22px;color:#d5c8ff}
+.adminUser{display:grid;grid-template-columns:1fr 140px;gap:8px;align-items:center;border-bottom:1px solid #263b61;padding:8px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:20px}.authbox{width:min(420px,100%);background:#0b1428;border:2px solid #36588e;padding:22px}.authbox h1{text-align:center}
+.toast{position:fixed;right:18px;bottom:18px;z-index:100;background:#101d37;border:1px solid #4d78b7;padding:12px;display:none;max-width:360px}.toast.show{display:block}
+.notifyPanel{position:fixed;right:15px;top:65px;width:min(360px,calc(100vw - 30px));max-height:450px;overflow:auto;background:#0b1428;border:2px solid #36588e;z-index:90;display:none}.notifyPanel.show{display:block}.notice{padding:10px;border-bottom:1px solid #263d75}.notice.unread{background:#142c58;border-left:3px solid #73e8ff}
+@media(max-width:760px){.sidebar{width:70px}.sidebar .username,.sidebar .role,.sidebar .xp,.sidebar .xpbar{display:none}.nav{font-size:0;text-align:center;padding:12px 4px}.nav:first-letter{font-size:18px}.search{width:125px}.main{padding:8px}.messageLayout{grid-template-columns:1fr}.users{border-right:0;border-bottom:1px solid #2d4879;display:flex;gap:6px;overflow:auto}.user{min-width:145px}}
 </style>
 </head>
 <body>
 
+<div id="auth" class="auth">
+ <div class="authbox">
+  <h1>🎮 PIXEL FRIEND</h1>
+  <p class="muted" style="text-align:center">REAL SUPABASE SOCIAL PLATFORM</p>
+  <div class="tabs"><button class="tab active" id="loginTab" onclick="authMode('login')">LOGIN</button><button class="tab" id="regTab" onclick="authMode('register')">REGISTER</button></div>
+  <div id="loginBox" class="content">
+   <input id="loginEmail" type="email" placeholder="EMAIL"><br><br>
+   <input id="loginPass" type="password" placeholder="PASSWORD"><br><br>
+   <button class="btn primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button>
+  </div>
+  <div id="regBox" class="content hidden">
+   <input id="regName" maxlength="30" placeholder="PIXEL USERNAME"><br><br>
+   <input id="regEmail" type="email" placeholder="EMAIL"><br><br>
+   <input id="regPass" type="password" placeholder="PASSWORD"><br><br>
+   <select id="regAvatar"><option>👾</option><option>🤖</option><option>🐸</option><option>🦊</option><option>🐱</option><option>🐼</option><option>🐲</option></select><br><br>
+   <button class="btn primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>
+  </div>
+  <div id="authStatus" class="muted"></div>
+ </div>
+</div>
+
+<div id="app" class="hidden">
 <header class="top">
-  <div class="logo">🎮 PIXEL <span>FRIEND</span></div>
-  <div class="top-spacer"></div>
-  <input class="search" id="search" placeholder="SEARCH FRIENDS..." oninput="searchFriends(this.value)">
-  <button class="iconbtn" id="notifyBtn" title="Enable browser notifications">🔔 <span id="notifyDot"></span></button>
-  <button class="iconbtn" onclick="testSound()" title="Test notification sound">🔊</button>
+ <div class="logo">🎮 PIXEL <span>FRIEND</span></div><div class="spacer"></div>
+ <input id="search" class="search" placeholder="SEARCH FRIENDS..." oninput="searchUsers(this.value)">
+ <button class="btn" onclick="toggleNotifications()">🔔 <span id="notifCount" class="count hidden">0</span></button>
+ <button class="btn" onclick="unlockSound()">🔊</button>
+ <button class="btn" onclick="go('profile')">👤</button>
 </header>
+
+<div id="notifyPanel" class="notifyPanel"></div>
+<div id="toast" class="toast"></div>
 
 <div class="layout">
 <aside class="sidebar">
-  <div class="avatar" id="sideAvatar">👤<i class="online"></i></div>
-  <div class="username">CARTER</div>
-  <div class="role">👑 ADMIN &nbsp; LEVEL 1</div>
-  <div class="xp">PIXEL EXPLORER<br><br>LEVEL 1</div>
-  <div class="xpbar"><i></i></div>
-  <div class="xp">20 / 100 XP</div>
-  <hr style="border-color:#17294a;margin:18px 0">
-  <button class="navbtn active" data-tab="home">🏠 HOME</button>
-  <button class="navbtn" data-tab="friends">👥 FRIENDS</button>
-  <button class="navbtn" data-tab="messages">💬 MESSAGES</button>
-  <button class="navbtn" data-tab="profile">👤 PROFILE</button>
-  <button class="navbtn" data-tab="admin">👑 ADMIN CONTROL</button>
-  <button class="navbtn" onclick="resetDemo()">🚪 RESET DEMO</button>
+ <div class="avatar" id="sideAvatar">👤<i class="online"></i></div>
+ <div class="username" id="sideName">PLAYER</div>
+ <div class="role" id="sideRole">PLAYER</div>
+ <div class="xp">LEVEL <span id="level">1</span></div><div class="xpbar"><i id="xpbar"></i></div>
+ <div class="xp">XP <span id="xp">0</span></div><hr style="border-color:#17294a;margin:18px 0">
+ <button class="btn nav active" data-go="home">🏠 HOME</button>
+ <button class="btn nav" data-go="friends">👥 FRIENDS</button>
+ <button class="btn nav" data-go="messages">💬 MESSAGES</button>
+ <button class="btn nav" data-go="profile">👤 PROFILE</button>
+ <button class="btn nav hidden" id="adminNav" data-go="admin">👑 ADMIN</button>
+ <button class="btn danger" onclick="logout()">🚪 LOGOUT</button>
 </aside>
 
-<main class="main">
-<div class="wrap panel">
-  <div class="panelhead"><span>🟩</span><h1>CLASSIC PIXEL SOCIAL</h1><span class="status">● LOCAL ONLINE</span></div>
-  <div class="tabs">
-    <button class="tabbtn active" data-tab="home">POSTS</button>
-    <button class="tabbtn" data-tab="messages">MESSAGES</button>
-    <button class="tabbtn" data-tab="friends">FRIENDS</button>
-    <button class="tabbtn" data-tab="profile">PROFILE</button>
+<main class="main"><div class="wrap panel">
+<div class="head"><span>🟩</span><h1>CLASSIC PIXEL SOCIAL</h1><span class="status">● REAL ONLINE</span></div>
+<div class="tabs">
+ <button class="tab active" data-go="home">POSTS</button><button class="tab" data-go="messages">MESSAGES</button><button class="tab" data-go="friends">FRIENDS</button><button class="tab" data-go="profile">PROFILE</button>
+</div>
+
+<section id="home" class="view active"><div class="content">
+<div class="card">
+ <textarea id="postText" rows="3" placeholder="WHAT'S HAPPENING?"></textarea>
+ <div class="row" style="margin-top:8px">
+  <label class="btn">🖼️ PHOTO / VIDEO <input id="postMedia" type="file" accept="image/*,video/*" hidden></label>
+  <button id="postVoice" class="btn voice" onclick="recordPostVoice()">🎙 VOICE</button>
+  <span id="postFile" class="muted">NO MEDIA</span><button class="btn primary" onclick="createPost()">POST +10 XP</button>
+ </div>
+ <audio id="postVoicePreview" class="hidden" controls style="width:100%;margin-top:8px"></audio>
+</div>
+<div id="feed"></div>
+</div></section>
+
+<section id="friends" class="view"><div class="content">
+<div class="card"><h3>👥 PIXEL COMMUNITY</h3><input id="friendSearch" placeholder="SEARCH USERNAME..." oninput="searchUsers(this.value)"></div>
+<div id="usersGrid" class="grid"></div>
+</div></section>
+
+<section id="messages" class="view"><div class="messageLayout">
+<div class="users" id="messageUsers"></div>
+<div class="chat">
+ <div class="chathead">💬 <span id="chatTitle">SELECT A USER</span><div class="muted">REAL-TIME PIXEL CHAT</div></div>
+ <div id="chatMessages" class="chatmessages"><div class="empty">SELECT A USER TO START CHAT</div></div>
+ <div class="composer">
+  <textarea id="messageText" rows="2" placeholder="WRITE A MESSAGE..." disabled></textarea>
+  <div class="stickers">
+   <button class="sticker" onclick="sticker('😀')">😀</button><button class="sticker" onclick="sticker('😂')">😂</button><button class="sticker" onclick="sticker('❤️')">❤️</button><button class="sticker" onclick="sticker('🔥')">🔥</button><button class="sticker" onclick="sticker('🎮')">🎮</button><button class="sticker" onclick="sticker('🐸')">🐸</button><button class="sticker" onclick="sticker('⭐')">⭐</button>
   </div>
+  <div class="row">
+   <label class="btn">🖼️ MEDIA <input id="messageMedia" type="file" accept="image/*,video/*" hidden></label>
+   <span id="messageFile" class="muted">NO MEDIA</span>
+   <button id="voiceBtn" class="btn voice" onclick="recordMessageVoice()">🎙 VOICE</button>
+   <button class="btn primary" id="sendBtn" disabled onclick="sendMessage()">SEND</button>
+  </div>
+  <audio id="messageVoicePreview" class="hidden" controls style="width:100%;margin-top:8px"></audio>
+ </div>
+</div></div></section>
 
-  <section id="home" class="view active">
-    <div class="content">
-      <div class="composer">
-        <textarea id="postText" rows="3" placeholder="WHAT'S HAPPENING, CARTER?"></textarea>
-        <div class="actions">
-          <label class="attachbtn">🖼️ IMAGE / VIDEO
-            <input id="postMedia" type="file" accept="image/*,video/*" hidden>
-          </label>
-          <span id="postFile" class="file-name">NO MEDIA SELECTED</span>
-          <button class="sendbtn" onclick="createPost()">POST</button>
-        </div>
-      </div>
-      <div id="feed"></div>
-    </div>
-  </section>
-
-  <section id="messages" class="view">
-    <div class="message-layout">
-      <div class="friends" id="friendList"></div>
-      <div class="chat">
-        <div class="chathead">💬 <span id="chatTitle" class="chatname">pixel</span><div style="font-size:10px;color:#7893bd;margin-top:3px">PIXEL FRIEND</div></div>
-        <div id="chatMessages" class="chatmessages"></div>
-        <div class="chatcomposer">
-          <textarea id="messageText" rows="2" placeholder="WRITE A MESSAGE..."></textarea>
-          <div class="stickerbar" id="stickerBar">
-            <button class="stickerbtn" onclick="insertSticker('😀')">😀</button>
-            <button class="stickerbtn" onclick="insertSticker('😂')">😂</button>
-            <button class="stickerbtn" onclick="insertSticker('❤️')">❤️</button>
-            <button class="stickerbtn" onclick="insertSticker('🔥')">🔥</button>
-            <button class="stickerbtn" onclick="insertSticker('🎮')">🎮</button>
-            <button class="stickerbtn" onclick="insertSticker('🐸')">🐸</button>
-            <button class="stickerbtn" onclick="insertSticker('🌸')">🌸</button>
-            <button class="stickerbtn" onclick="insertSticker('⭐')">⭐</button>
-          </div>
-          <div class="actions">
-            <label class="attachbtn">🖼️ MEDIA
-              <input id="messageMedia" type="file" accept="image/*,video/*" hidden>
-            </label>
-            <span id="messageFile" class="file-name">NO MEDIA</span>
-            <button class="voicebtn" id="voiceBtn" onclick="toggleVoiceRecording()">🎙 VOICE</button>
-            <span id="voiceStatus" class="file-name">VOICE OFF</span>
-            <button class="sendbtn" onclick="sendMessage()">SEND</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="friends" class="view"><div class="content">
-    <h3>👥 PIXEL FRIENDS</h3>
-    <div id="friendsGrid"></div>
-  </div></section>
-
-  <section id="profile" class="view"><div class="content">
-    <div class="profile-card">
-      <div class="profile-row">
-        <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()">
-          <span class="avatar-fallback">👤</span>
-        </div>
-        <div>
-          <div class="profile-name-big">CARTER</div>
-          <div class="profile-meta">👑 ADMIN • LEVEL 1 • PIXEL EXPLORER</div>
-          <div class="profile-meta">Click your avatar to upload a profile picture.</div>
-          <input id="avatarInput" class="hidden-input" type="file" accept="image/*">
-        </div>
-      </div>
-    </div>
-    <h3>👤 CARTER PROFILE</h3>
-    <p style="color:#91a9d0">CLASSIC PIXEL FRIEND PROFILE</p>
-    <button class="sendbtn" onclick="enableNotifications()">🔔 ENABLE NOTIFICATIONS</button>
-    <button class="smallbtn" onclick="removeAvatar()">REMOVE AVATAR</button>
-  </div></section>
-
-  <section id="admin" class="view"><div class="content">
-    <h3>👑 ADMIN CONTROL</h3>
-    <p style="color:#91a9d0">Demo controls for this standalone HTML version.</p>
-    <button class="smallbtn" onclick="simulateIncoming()">SIMULATE NEW MESSAGE</button>
-    <button class="smallbtn" onclick="simulatePost()">SIMULATE NEW POST</button>
-  </div></section>
+<section id="profile" class="view"><div class="content">
+<div class="card">
+ <div class="row">
+  <div id="profileAvatar" class="profileAvatar">👤<i class="online"></i></div>
+  <div class="grow"><h2 id="profileName">PLAYER</h2><div id="profileMeta" class="muted"></div><p class="muted">Upload a real profile avatar.</p></div>
+ </div>
+ <br><input id="avatarInput" type="file" accept="image/*"><br><br>
+ <input id="editName" placeholder="USERNAME"><br><br><textarea id="editBio" rows="3" placeholder="BIO"></textarea><br><br>
+ <button class="btn primary" onclick="saveProfile()">SAVE PROFILE</button>
+ <button class="btn" onclick="enableNotifications()">🔔 ENABLE NOTIFICATIONS</button>
 </div>
-</main>
-</div>
+</div></section>
 
-<div id="notify" class="notify"></div>
-<div id="toast" class="toast"></div>
+<section id="admin" class="view"><div class="content">
+<div class="card"><h2>👑 ADMIN CONTROL CENTER</h2><p class="muted">Real database controls. RLS must permit the requested operation.</p>
+<div class="grid">
+ <div class="adminStat">USERS<b id="aUsers">0</b></div><div class="adminStat">POSTS<b id="aPosts">0</b></div><div class="adminStat">MESSAGES<b id="aMessages">0</b></div><div class="adminStat">NOTIFICATIONS<b id="aNotifs">0</b></div>
+</div></div>
+<div class="card"><input id="adminSearch" placeholder="SEARCH USERNAME..." oninput="loadAdminUsers()"><div id="adminUsers"></div></div>
+</div></section>
+</div></main></div></div>
 
 <script>
-/*
-  CLASSIC PIXEL FRIEND
-  --------------------
-  Standalone HTML:
-  - No external libraries
-  - No SQL required
-  - Posts/messages persist in localStorage
-  - Image/video attachments are stored locally as data URLs
-  - Notification sound uses Web Audio (no MP3 file needed)
-  - Browser notifications are optional and require permission
-*/
+const SUPABASE_URL="https://vvfkfpsyxipnypaltixq.supabase.co";
+const SUPABASE_KEY="sb_publishable_NrhHhUAFqknWsQki214NW1w_yb1mLoDP";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 
-const KEY = "pixel_friend_classic_v1";
-const friends = [
-  {id:"pixel",name:"pixel",icon:"🐸",role:"PIXEL PLAYER"},
-  {id:"shika",name:"鹿丸 SHIKA",icon:"🦌",role:"PIXEL NINJA"},
-  {id:"kevin",name:"凯文 KEVIN",icon:"😎",role:"PIXEL PLAYER"},
-  {id:"pinky",name:"PINKY",icon:"🌸",role:"PIXEL PLAYER"}
-];
+let me=null,profile=null,selected=null,msgChannel=null,notifyChannel=null,soundCtx=null;
+let postVoiceBlob=null,messageVoiceBlob=null;
 
-let state = JSON.parse(localStorage.getItem(KEY) || "null") || {
-  posts: [{
-    id:Date.now()-10000,user:"pixel",text:"WELCOME TO CLASSIC PIXEL FRIEND! 👋",media:null,time:new Date(Date.now()-10000).toISOString(),likes:0
-  }],
-  messages: {},
-  selected:"pixel",
-  avatar:null
-};
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toast=m=>{const x=$("toast");x.textContent=m;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2800)};
+function setStatus(m){$("authStatus").textContent=m}
+function beep(){try{soundCtx ||= new (AudioContext||webkitAudioContext)();if(soundCtx.state==="suspended")soundCtx.resume();let o=soundCtx.createOscillator(),g=soundCtx.createGain();o.type="square";o.frequency.value=720;g.gain.setValueAtTime(.001,soundCtx.currentTime);g.gain.exponentialRampToValueAtTime(.07,soundCtx.currentTime+.01);g.gain.exponentialRampToValueAtTime(.001,soundCtx.currentTime+.18);o.connect(g);g.connect(soundCtx.destination);o.start();o.stop(soundCtx.currentTime+.19)}catch(e){}}
+function unlockSound(){beep();toast("PIXEL SOUND READY")}
+document.addEventListener("click",()=>{try{soundCtx ||= new (AudioContext||webkitAudioContext)();soundCtx.resume()}catch(e){}},{once:true});
 
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-state.avatar = state.avatar || null;
-state.posts = (state.posts || []).map(p => ({...p, reactions:p.reactions||{}}));
-function esc(s){
-  return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function authMode(m){$("loginBox").classList.toggle("hidden",m!=="login");$("regBox").classList.toggle("hidden",m==="login");$("loginTab").classList.toggle("active",m==="login");$("regTab").classList.toggle("active",m==="register");setStatus("")}
+async function register(){
+ const username=$("regName").value.trim(),email=$("regEmail").value.trim(),password=$("regPass").value,avatar=$("regAvatar").value;
+ if(username.length<2)return setStatus("Username must be at least 2 characters.");
+ if(password.length<6)return setStatus("Password must be at least 6 characters.");
+ setStatus("Creating real account...");
+ const r=await db.auth.signUp({email,password,options:{data:{username,avatar}}});
+ if(r.error)return setStatus(r.error.message);
+ setStatus(r.data.session?"Account created.":"Check your email to confirm the account.");
+ if(r.data.session)start(r.data.user);
 }
-function fmt(t){
-  const d=new Date(t); return d.toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+async function login(){
+ const email=$("loginEmail").value.trim(),password=$("loginPass").value;
+ setStatus("Logging in...");
+ const r=await db.auth.signInWithPassword({email,password});
+ if(r.error)return setStatus(r.error.message);
+ start(r.data.user);
 }
-function toast(msg){
-  const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"),2200);
+async function start(user){
+ if(me)return;me=user;
+ $("auth").classList.add("hidden");$("app").classList.remove("hidden");
+ await ensureProfile();
+ await Promise.all([loadFeed(),loadUsers(),loadNotifications()]);
+ setupRealtime();go("home");
 }
+async function ensureProfile(){
+ let r=await db.from("profiles").select("*").eq("id",me.id).maybeSingle();
+ if(r.error){toast("PROFILE ERROR: "+r.error.message);return}
+ if(!r.data){
+  const p={id:me.id,username:me.user_metadata?.username||me.email.split("@")[0],avatar:me.user_metadata?.avatar||"👾",bio:"PIXEL EXPLORER",role:"user",xp:0};
+  r=await db.from("profiles").insert(p).select().single();
+  if(r.error){toast("PROFILE CREATE FAILED: "+r.error.message);return}
+ }
+ profile=r.data;renderProfile();
+}
+function avatarHTML(p,cls="miniavatar"){return p?.avatar_url?`<div class="${cls}"><img src="${esc(p.avatar_url)}"><i class="online"></i></div>`:`<div class="${cls}">${esc(p?.avatar||"👾")}<i class="online"></i></div>`}
+function renderProfile(){
+ if(!profile)return;
+ const xp=Number(profile.xp||0),lv=Math.floor(xp/100)+1;
+ $("sideName").textContent=profile.username||"PLAYER";$("sideRole").textContent=profile.role==="admin"?"👑 ADMIN":"PIXEL PLAYER";
+ $("level").textContent=lv;$("xp").textContent=xp;$("xpbar").style.width=(xp%100)+"%";
+ $("sideAvatar").outerHTML=avatarHTML(profile,"avatar");$("sideAvatar").id="sideAvatar";
+ $("profileName").textContent=profile.username||"PLAYER";$("profileMeta").textContent=(profile.role==="admin"?"👑 ADMIN":"PLAYER")+" • LEVEL "+lv+" • "+(profile.bio||"PIXEL EXPLORER");
+ $("profileAvatar").innerHTML=profile.avatar_url?`<img src="${esc(profile.avatar_url)}"><i class="online"></i>`:`${esc(profile.avatar||"👾")}<i class="online"></i>`;
+ $("editName").value=profile.username||"";$("editBio").value=profile.bio||"";
+ $("adminNav").classList.toggle("hidden",profile.role!=="admin");
+}
+async function saveProfile(){
+ const username=$("editName").value.trim(),bio=$("editBio").value.trim(),file=$("avatarInput").files[0];
+ if(username.length<2)return toast("USERNAME TOO SHORT");
+ let avatar_url=profile.avatar_url||null;
+ if(file){
+  if(file.size>5*1024*1024)return toast("AVATAR MAX 5MB");
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase(),path=`${me.id}/${Date.now()}.${ext}`;
+  const u=await db.storage.from("avatars").upload(path,file,{upsert:true,contentType:file.type});
+  if(u.error)return toast("AVATAR UPLOAD FAILED: "+u.error.message);
+  avatar_url=db.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+ }
+ const r=await db.from("profiles").update({username,bio,avatar_url}).eq("id",me.id).select().single();
+ if(r.error)return toast("PROFILE SAVE FAILED: "+r.error.message);
+ profile=r.data;renderProfile();toast("PROFILE SAVED");
+}
+function go(id){
+ document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
+ document.querySelectorAll("[data-go]").forEach(b=>b.classList.toggle("active",b.dataset.go===id));
+ if(id==="friends")loadUsers();if(id==="messages")loadUsers();if(id==="admin")loadAdmin();
+}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
 
-/* ---------- sound + notifications ---------- */
-let audioCtx=null;
-function beep(kind="message"){
-  try{
-    audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
-    if(audioCtx.state==="suspended") audioCtx.resume();
-    const now=audioCtx.currentTime;
-    const notes = kind==="post" ? [523.25,659.25,783.99] : [659.25,783.99];
-    notes.forEach((freq,i)=>{
-      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type="square"; o.frequency.value=freq;
-      g.gain.setValueAtTime(0,now+i*.11);
-      g.gain.linearRampToValueAtTime(.07,now+i*.11+.015);
-      g.gain.exponentialRampToValueAtTime(.001,now+i*.11+.09);
-      o.connect(g); g.connect(audioCtx.destination); o.start(now+i*.11); o.stop(now+i*.11+.1);
-    });
-  }catch(e){}
+async function loadFeed(){
+ const r=await db.from("posts").select("*,profiles:user_id(id,username,avatar,avatar_url,role)").order("created_at",{ascending:false}).limit(50);
+ if(r.error){$("feed").innerHTML=`<div class="card">${esc(r.error.message)}</div>`;return}
+ $("feed").innerHTML=(r.data||[]).map(postHTML).join("")||`<div class="empty">NO POSTS YET</div>`;
 }
-function testSound(){beep("message");toast("PIXEL SOUND TEST")}
-async function enableNotifications(){
-  beep();
-  if(!("Notification" in window)){toast("BROWSER NOTIFICATIONS NOT SUPPORTED");return}
-  try{
-    const p=await Notification.requestPermission();
-    updateNotifyDot();
-    toast(p==="granted"?"NOTIFICATIONS ENABLED":"NOTIFICATION PERMISSION NOT GRANTED");
-  }catch(e){toast("NOTIFICATION ERROR")}
+function postMedia(p){
+ if(!p.media_url)return "";
+ if((p.media_type||"").startsWith("video"))return `<video class="media" controls src="${esc(p.media_url)}"></video>`;
+ if((p.media_type||"").startsWith("voice"))return `<audio class="media" controls src="${esc(p.media_url)}"></audio>`;
+ return `<img class="media" src="${esc(p.media_url)}">`;
 }
-function updateNotifyDot(){
-  const d=document.getElementById("notifyDot");
-  if("Notification" in window && Notification.permission==="granted") d.textContent="●";
+function postHTML(p){
+ const owner=p.user_id===me.id, reactions=p.reactions||{};
+ return `<article class="feedPost" id="post-${esc(p.id)}">
+  <div class="posthead">${avatarHTML(p.profiles||{},'miniavatar')}<div><div class="postname">${esc(p.profiles?.username||"PLAYER")}</div><div class="time">${new Date(p.created_at).toLocaleString()}</div></div></div>
+  <div class="postbody">${esc(p.content||"")}</div>${postMedia(p)}
+  <div class="actions">${["❤️","👍","😂","🔥","🎮"].map(x=>`<button class="btn small react ${reactions[x]?"active":""}" onclick="reactPost('${p.id}','${x}')">${x} ${reactions[x]||0}</button>`).join("")}
+  ${owner||profile?.role==="admin"?`<button class="btn small danger" onclick="deletePost('${p.id}')">🗑 DELETE</button>`:""}</div>
+ </article>`;
 }
-function notify(title,body,kind="message"){
-  beep(kind);
-  const box=document.getElementById("notify");
-  box.innerHTML="<strong>🔔 "+esc(title)+"</strong><br><small>"+esc(body)+"</small>";
-  box.classList.add("show"); setTimeout(()=>box.classList.remove("show"),3500);
-  if("Notification" in window && Notification.permission==="granted"){
-    try{new Notification(title,{body:body})}catch(e){}
-  }
+async function createPost(){
+ const text=$("postText").value.trim(),file=$("postMedia").files[0];
+ if(!text&&!file&&!postVoiceBlob)return toast("ADD TEXT, MEDIA OR VOICE");
+ let media_url=null,media_type=null;
+ try{
+  if(file){({url:media_url}=await uploadMedia(file,"posts"));media_type=file.type}
+  else if(postVoiceBlob){({url:media_url}=await uploadMedia(postVoiceBlob,"posts"));media_type="voice"}
+  const r=await db.from("posts").insert({user_id:me.id,content:text,media_url,media_type});
+  if(r.error)throw r.error;
+  await db.from("profiles").update({xp:Number(profile.xp||0)+10}).eq("id",me.id);profile.xp=Number(profile.xp||0)+10;
+  $("postText").value="";$("postMedia").value="";postVoiceBlob=null;$("postVoicePreview").classList.add("hidden");
+  renderProfile();await loadFeed();toast("🚀 REAL PIXEL POST PUBLISHED");beep();
+ }catch(e){toast("POST FAILED: "+e.message)}
 }
-
-
-/* ---------- profile avatar ---------- */
-function renderAvatar(){
-  const side=document.getElementById("sideAvatar");
-  const profile=document.getElementById("profileAvatar");
-  const make = (el, sizeClass="")=>{
-    if(!el)return;
-    if(state.avatar){
-      el.innerHTML=`<img src="${state.avatar}" alt="CARTER avatar"><i class="online"></i>`;
-    }else{
-      el.innerHTML=`<span class="avatar-fallback">👤</span><i class="online"></i>`;
-    }
-  };
-  make(side); make(profile);
+async function uploadMedia(file,folder){
+ const ext=(file.name?.split(".").pop()||"webm").toLowerCase(),path=`${folder}/${me.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+ const r=await db.storage.from("message-media").upload(path,file,{upsert:false,contentType:file.type||"audio/webm"});
+ if(r.error)throw r.error;
+ return {url:db.storage.from("message-media").getPublicUrl(path).data.publicUrl};
 }
-function removeAvatar(){
-  state.avatar=null;save();renderAvatar();toast("AVATAR REMOVED");
+async function deletePost(id){
+ if(!confirm("Delete this post?"))return;
+ let q=db.from("posts").delete().eq("id",id);if(profile.role!=="admin")q=q.eq("user_id",me.id);
+ const r=await q;if(r.error)return toast("DELETE FAILED: "+r.error.message);await loadFeed();toast("POST DELETED");
 }
-document.getElementById("avatarInput")?.addEventListener("change",function(){
-  const file=this.files[0];
-  if(!file)return;
-  if(!file.type.startsWith("image/")){toast("PLEASE SELECT AN IMAGE");return}
-  if(file.size>3*1024*1024){toast("AVATAR MUST BE UNDER 3 MB");this.value="";return}
-  const r=new FileReader();
-  r.onload=()=>{state.avatar=r.result;save();renderAvatar();toast("AVATAR UPDATED");};
-  r.readAsDataURL(file);
-});
-
-/* ---------- tabs ---------- */
-function openTab(id){
-  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===id));
-  document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x.dataset.tab===id));
-  if(id==="messages") renderMessages();
-}
-document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>openTab(b.dataset.tab)));
-
-/* ---------- media ---------- */
-function readMedia(input, callback){
-  const file=input.files[0];
-  if(!file){callback(null);return}
-  if(file.size>4*1024*1024){toast("MEDIA MUST BE UNDER 4 MB");input.value="";callback(null);return}
-  const r=new FileReader();
-  r.onload=()=>callback({name:file.name,type:file.type,data:r.result});
-  r.readAsDataURL(file);
-}
-document.getElementById("postMedia").addEventListener("change",function(){
-  document.getElementById("postFile").textContent=this.files[0]?.name||"NO MEDIA SELECTED";
-});
-document.getElementById("messageMedia").addEventListener("change",function(){
-  document.getElementById("messageFile").textContent=this.files[0]?.name||"NO MEDIA";
-});
-
-function mediaHTML(m,cls){
-  if(!m)return "";
-  if(m.type.startsWith("video/")) return `<video class="${cls}" controls src="${m.data}"></video>`;
-  return `<img class="${cls}" src="${m.data}" alt="${esc(m.name)}">`;
+async function reactPost(id,emoji){
+ const p=await db.from("posts").select("reactions").eq("id",id).single();if(p.error)return toast(p.error.message);
+ const x=p.data.reactions||{};x[emoji]=(x[emoji]||0)+1;
+ const r=await db.from("posts").update({reactions:x}).eq("id",id);if(r.error)return toast("REACTION FAILED: "+r.error.message);loadFeed();
 }
 
-/* ---------- posts ---------- */
-function createPost(){
-  const text=document.getElementById("postText").value.trim();
-  const input=document.getElementById("postMedia");
-  if(!text && !input.files[0]){toast("WRITE SOMETHING OR ADD MEDIA");return}
-  readMedia(input,media=>{
-    state.posts.unshift({id:Date.now(),user:"CARTER",text,media,time:new Date().toISOString(),likes:0,reactions:{}});
-    save(); renderFeed();
-    document.getElementById("postText").value="";
-    input.value=""; document.getElementById("postFile").textContent="NO MEDIA SELECTED";
-    notify("NEW POST","Your pixel post was published.","post");
-  });
+async function loadUsers(){
+ const r=await db.from("profiles").select("id,username,avatar,avatar_url,role,bio").neq("id",me.id).order("username").limit(100);
+ if(r.error)return;
+ const users=r.data||[];$("usersGrid").innerHTML=users.map(u=>`<div class="card">${avatarHTML(u,'miniavatar')}<b>${esc(u.username)}</b><div class="muted">${u.role==="admin"?"👑 ADMIN":"PLAYER"}</div><p class="muted">${esc(u.bio||"PIXEL EXPLORER")}</p><button class="btn primary" onclick="openChat('${u.id}')">💬 MESSAGE</button></div>`).join("")||`<div class="empty">NO USERS</div>`;
+ $("messageUsers").innerHTML=users.map(u=>`<button class="user ${selected?.id===u.id?"active":""}" onclick="openChat('${u.id}')">${esc(u.avatar||"👾")} <b>${esc(u.username)}</b><br><small>${u.role==="admin"?"ADMIN":"PLAYER"}</small></button>`).join("");
 }
-function likePost(id){
-  const p=state.posts.find(x=>x.id===id); if(p){p.likes++;save();renderFeed()}
-}
-function deletePost(id){
-  state.posts=state.posts.filter(x=>x.id!==id);save();renderFeed();toast("POST DELETED");
-}
-function renderFeed(filter=""){
-  const feed=document.getElementById("feed");
-  const arr=state.posts.filter(p=>(p.text+" "+p.user).toLowerCase().includes(filter.toLowerCase()));
-  feed.innerHTML=arr.map(p=>`
-    <article class="post">
-      <div class="posthead"><div class="miniavatar">${p.user==="CARTER" && state.avatar ? `<img src="${state.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar">` : (p.user==="CARTER"?"👤":"🐸")}</div>
-      <div><div class="postname">${esc(p.user)}</div><div class="time">${fmt(p.time)}</div></div></div>
-      <div class="postbody">${esc(p.text)}</div>
-      ${mediaHTML(p.media,"postmedia")}
-      <div class="postactions">
-        <button class="smallbtn" onclick="likePost(${p.id})">❤️ ${p.likes||0}</button>
-        ${p.user==="CARTER"?`<button class="smallbtn" onclick="deletePost(${p.id})">🗑 DELETE</button>`:""}
-      </div>
-      <div class="reactbar">
-        ${["❤️","👍","😂","😮","😢","🔥","🎮"].map(r=>`<button class="reactbtn ${p.reactions?.[r]?"active":""}" onclick="reactPost(${p.id},'${r}')">${r} <span class="reaction-count">${p.reactions?.[r]||0}</span></button>`).join("")}
-      </div>
-    </article>`).join("") || `<div class="empty">NO POSTS FOUND</div>`;
+async function searchUsers(q){
+ if(!q.trim())return loadUsers();
+ const r=await db.from("profiles").select("id,username,avatar,avatar_url,role,bio").neq("id",me.id).ilike("username","%"+q.trim()+"%").limit(30);
+ if(r.error)return; $("usersGrid").innerHTML=(r.data||[]).map(u=>`<div class="card">${avatarHTML(u,'miniavatar')}<b>${esc(u.username)}</b><p class="muted">${esc(u.bio||"")}</p><button class="btn primary" onclick="openChat('${u.id}')">MESSAGE</button></div>`).join("")||`<div class="empty">NO USERS FOUND</div>`;
+ go("friends");
 }
 
+async function openChat(id){
+ const r=await db.from("profiles").select("*").eq("id",id).single();if(r.error)return toast(r.error.message);
+ selected=r.data;go("messages");$("chatTitle").textContent=(selected.avatar||"👾")+" "+selected.username;$("messageText").disabled=false;$("sendBtn").disabled=false;
+ await loadMessages();subscribeMessages();await markRead();
+}
+async function loadMessages(){
+ if(!selected)return;
+ const r=await db.from("messages").select("*").or(`and(sender_id.eq.${me.id},receiver_id.eq.${selected.id}),and(sender_id.eq.${selected.id},receiver_id.eq.${me.id})`).order("created_at",{ascending:true});
+ if(r.error){$("chatMessages").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;return}
+ $("chatMessages").innerHTML=(r.data||[]).map(messageHTML).join("")||`<div class="empty">NO MESSAGES YET — SAY HELLO 👋</div>`;$("chatMessages").scrollTop=$("chatMessages").scrollHeight;
+}
+function messageHTML(m){
+ const mine=m.sender_id===me.id,canDelete=mine||profile?.role==="admin";
+ let body="";
+ if(m.message_type==="image"&&m.media_url)body=`<img class="media" src="${esc(m.media_url)}">`;
+ else if(m.message_type==="video"&&m.media_url)body=`<video class="media" controls src="${esc(m.media_url)}"></video>`;
+ else if(m.message_type==="voice"&&m.media_url)body=`<audio class="media" controls src="${esc(m.media_url)}"></audio>`;
+ else body=esc(m.content||"");
+ if(m.message_type==="sticker")body=`<div style="font-size:34px">${esc(m.content||"🎮")}</div>`;
+ const rs=m.reactions||{};
+ return `<div class="msgwrap" id="msg-${esc(m.id)}"><div class="msg ${mine?"mine":""}">${body}<div class="msgmeta">${mine?"YOU":esc(selected?.username||"USER")} • ${new Date(m.created_at).toLocaleString()}</div>
+ <div class="actions">${["❤️","👍","😂","🔥","🎮"].map(x=>`<button class="btn small react ${rs[x]?"active":""}" onclick="reactMessage('${m.id}','${x}')">${x} ${rs[x]||0}</button>`).join("")}</div></div>
+ ${canDelete?`<div class="msgactions"><button class="btn small danger" onclick="deleteMessage('${m.id}')">🗑 DELETE</button></div>`:""}</div>`;
+}
+async function sendMessage(){
+ if(!selected)return toast("SELECT A USER");
+ const text=$("messageText").value.trim(),file=$("messageMedia").files[0];
+ if(!text&&!file&&!messageVoiceBlob)return toast("WRITE, ADD MEDIA OR RECORD VOICE");
+ try{
+  let media_url=null,message_type="text";
+  if(file){({url:media_url}=await uploadMedia(file,"messages"));message_type=file.type.startsWith("video")?"video":"image"}
+  else if(messageVoiceBlob){({url:media_url}=await uploadMedia(messageVoiceBlob,"messages"));message_type="voice"}
+  const stickerOnly=!file&&!messageVoiceBlob&&/^(😀|😂|❤️|🔥|🎮|🐸|⭐)+$/.test(text);if(stickerOnly)message_type="sticker";
+  const r=await db.from("messages").insert({sender_id:me.id,receiver_id:selected.id,content:text,media_url,message_type,is_read:false});
+  if(r.error)throw r.error;
+  await createNotification(selected.id,"message","💬 New Message",`${profile.username} sent you a message.`);
+  $("messageText").value="";$("messageMedia").value="";$("messageFile").textContent="NO MEDIA";messageVoiceBlob=null;$("messageVoicePreview").classList.add("hidden");
+  await loadMessages();beep();toast("MESSAGE SENT");
+ }catch(e){toast("SEND FAILED: "+e.message)}
+}
+async function deleteMessage(id){
+ if(!confirm("Delete this message?"))return;
+ let q=db.from("messages").delete().eq("id",id);if(profile.role!=="admin")q=q.eq("sender_id",me.id);
+ const r=await q;if(r.error)return toast("DELETE FAILED: "+r.error.message);await loadMessages();toast("MESSAGE DELETED");
+}
+async function reactMessage(id,emoji){
+ const p=await db.from("messages").select("reactions").eq("id",id).single();if(p.error)return toast(p.error.message);
+ const x=p.data.reactions||{};x[emoji]=(x[emoji]||0)+1;
+ const r=await db.from("messages").update({reactions:x}).eq("id",id);if(r.error)return toast("REACTION FAILED: "+r.error.message);loadMessages();
+}
+async function markRead(){if(!selected)return;await db.from("messages").update({is_read:true}).eq("sender_id",selected.id).eq("receiver_id",me.id).eq("is_read",false);loadNotifications()}
 
-/* ---------- reactions + stickers ---------- */
-function reactPost(id,reaction){
-  const p=state.posts.find(x=>x.id===id); if(!p)return;
-  p.reactions=p.reactions||{};
-  p.reactions[reaction]=(p.reactions[reaction]||0)+1;
-  save();renderFeed();beep("message");
-}
-function reactMessage(friend,id,reaction){
-  const msgs=ensureChat(friend), m=msgs.find(x=>x.id===id); if(!m)return;
-  m.reactions=m.reactions||{};
-  m.reactions[reaction]=(m.reactions[reaction]||0)+1;
-  save();renderMessages();beep("message");
-}
-function insertSticker(sticker){
-  const box=document.getElementById("messageText");
-  box.value += (box.value ? " " : "") + sticker;
-  box.focus();
-}
-function renderReactions(obj, friend, messageId){
-  const r=obj.reactions||{};
-  return `<div class="reactbar msg-reactions">
-    ${["❤️","👍","😂","🔥","🎮"].map(x=>`<button class="reactbtn ${r[x]?"active":""}" onclick="reactMessage('${friend}',${messageId},'${x}')">${x} <span class="reaction-count">${r[x]||0}</span></button>`).join("")}
-  </div>`;
-}
+function sticker(s){$("messageText").value+=($("messageText").value?" ":"")+s;$("messageText").focus()}
+function mediaPickerLabel(inputId,fileId){$(inputId).addEventListener("change",()=>$(fileId).textContent=$(inputId).files[0]?.name||"NO MEDIA")}
+mediaPickerLabel("postMedia","postFile");mediaPickerLabel("messageMedia","messageFile");
 
-/* ---------- voice messages ---------- */
-let mediaRecorder=null, voiceChunks=[], voiceBlob=null, voiceData=null;
-async function toggleVoiceRecording(){
-  const btn=document.getElementById("voiceBtn"), status=document.getElementById("voiceStatus");
-  if(mediaRecorder && mediaRecorder.state==="recording"){
-    mediaRecorder.stop(); return;
-  }
-  if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){
-    toast("VOICE RECORDING IS NOT SUPPORTED IN THIS BROWSER"); return;
-  }
-  try{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    voiceChunks=[];
-    mediaRecorder=new MediaRecorder(stream);
-    mediaRecorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};
-    mediaRecorder.onstop=()=>{
-      stream.getTracks().forEach(t=>t.stop());
-      const blob=new Blob(voiceChunks,{type:mediaRecorder.mimeType||"audio/webm"});
-      if(blob.size>2.5*1024*1024){toast("VOICE MESSAGE TOO LARGE");voiceBlob=null;voiceData=null;return}
-      const r=new FileReader();
-      r.onload=()=>{voiceData=r.result; status.textContent="VOICE READY"; btn.textContent="🎙 RECORD AGAIN"; toast("VOICE READY — PRESS SEND")};
-      r.readAsDataURL(blob);
-    };
-    mediaRecorder.start();
-    btn.classList.add("recording"); btn.textContent="⏹ STOP";
-    status.textContent="RECORDING...";
-  }catch(e){
-    toast("MICROPHONE ACCESS WAS BLOCKED");
-  }
+async function record(kind){
+ const isPost=kind==="post",btn=$(isPost?"postVoice":"voiceBtn"),preview=$(isPost?"postVoicePreview":"messageVoicePreview");
+ if(btn.dataset.recording==="1"){btn.dataset.recording="0";btn.textContent="🎙 VOICE";btn.classList.remove("recording");if(window._rec)window._rec.stop();return}
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder)return toast("VOICE NEEDS HTTPS OR LOCALHOST");
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:true}),chunks=[];const rec=new MediaRecorder(stream);window._rec=rec;btn.dataset.recording="1";btn.textContent="⏹ STOP";btn.classList.add("recording");
+  rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:rec.mimeType||"audio/webm"});if(blob.size>10*1024*1024)return toast("VOICE TOO LARGE");if(isPost)postVoiceBlob=new File([blob],"voice.webm",{type:blob.type});else messageVoiceBlob=new File([blob],"voice.webm",{type:blob.type});preview.src=URL.createObjectURL(blob);preview.classList.remove("hidden");btn.textContent="🎙 VOICE";btn.classList.remove("recording");toast("VOICE READY — PRESS SEND/POST")};
+  rec.start();
+ }catch(e){toast("MICROPHONE ACCESS DENIED")}
 }
-function clearVoice(){
-  voiceBlob=null;voiceData=null;
-  const btn=document.getElementById("voiceBtn"), status=document.getElementById("voiceStatus");
-  if(btn){btn.classList.remove("recording");btn.textContent="🎙 VOICE"}
-  if(status)status.textContent="VOICE OFF";
-}
-function voiceHTML(data){
-  return data ? `<div class="voice-preview">🎙 <audio controls src="${data}"></audio></div>` : "";
-}
+function recordPostVoice(){record("post")}function recordMessageVoice(){record("message")}
 
-/* ---------- messages ---------- */
-function ensureChat(id){
-  if(!state.messages[id]) state.messages[id]=[];
-  return state.messages[id];
+async function createNotification(userId,type,title,message){
+ const r=await db.from("notifications").insert({user_id:userId,sender_id:me.id,type,title,message,is_read:false});
+ if(r.error)console.warn("notification:",r.error.message);
 }
-function selectFriend(id){
-  state.selected=id;save();renderFriendList();renderMessages();
+async function loadNotifications(){
+ const r=await db.from("notifications").select("*").eq("user_id",me.id).order("created_at",{ascending:false}).limit(50);if(r.error)return;
+ const list=r.data||[],unread=list.filter(x=>!x.is_read).length;$("notifCount").textContent=unread;$("notifCount").classList.toggle("hidden",unread===0);
+ $("notifyPanel").innerHTML=list.map(n=>`<div class="notice ${n.is_read?"":"unread"}"><b>${esc(n.title||"NOTIFICATION")}</b><br><span class="muted">${esc(n.message||"")}</span></div>`).join("")||`<div class="notice muted">NO NOTIFICATIONS</div>`;
 }
-function renderFriendList(){
-  document.getElementById("friendList").innerHTML=friends.map(f=>`
-    <button class="friendbtn ${state.selected===f.id?"active":""}" onclick="selectFriend('${f.id}')">
-      ${f.icon} <strong>${esc(f.name)}</strong><br><small>${esc(f.role)}</small>
-    </button>`).join("");
+function toggleNotifications(){$("notifyPanel").classList.toggle("show");loadNotifications()}
+async function enableNotifications(){beep();if(!("Notification"in window))return toast("BROWSER NOTIFICATIONS NOT SUPPORTED");const p=await Notification.requestPermission();toast(p==="granted"?"NOTIFICATIONS ENABLED":"PERMISSION NOT GRANTED")}
+function setupRealtime(){
+ if(notifyChannel)db.removeChannel(notifyChannel);
+ notifyChannel=db.channel("pixel-notifications-"+me.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"notifications",filter:"user_id=eq."+me.id},payload=>{if(payload.new.sender_id!==me.id){beep();if(Notification.permission==="granted")try{new Notification(payload.new.title||"PIXEL FRIEND",{body:payload.new.message||""})}catch(e){}loadNotifications()}}).subscribe();
+ subscribeMessages();
 }
-function renderMessages(){
-  renderFriendList();
-  const f=friends.find(x=>x.id===state.selected)||friends[0];
-  document.getElementById("chatTitle").textContent=f.name;
-  const box=document.getElementById("chatMessages");
-  const msgs=ensureChat(f.id);
-  box.innerHTML=msgs.length?msgs.map(m=>`
-    <div class="msg ${m.mine?"mine":""}">
-      ${m.sticker ? `<div class="sticker-message">${esc(m.sticker)}</div>` : esc(m.text)}
-      ${mediaHTML(m.media,"msgmedia")}
-      ${voiceHTML(m.voice)}
-      <div class="msgmeta">${m.mine?"CARTER":esc(f.name)} • ${fmt(m.time)}</div>
-      ${renderReactions(m,f.id,m.id)}
-    </div>`).join(""):`<div class="empty">NO MESSAGES YET — SAY HELLO 👋</div>`;
-  box.scrollTop=box.scrollHeight;
+function subscribeMessages(){
+ if(msgChannel)db.removeChannel(msgChannel);if(!selected)return;
+ msgChannel=db.channel("pixel-chat-"+selected.id).on("postgres_changes",{event:"*",schema:"public",table:"messages",filter:"receiver_id=eq."+me.id},payload=>{if(payload.new?.sender_id===selected.id){beep();loadMessages();markRead()}}).subscribe();
 }
-function sendMessage(){
-  const text=document.getElementById("messageText").value.trim();
-  const input=document.getElementById("messageMedia");
-  if(!text && !input.files[0] && !voiceData){toast("WRITE A MESSAGE, ADD MEDIA, OR RECORD VOICE");return}
-  const friend=state.selected;
-  readMedia(input,media=>{
-    const isStickerOnly = /^[😀😂❤️🔥🎮🐸🌸⭐]+$/.test(text);
-    ensureChat(friend).push({
-      id:Date.now(),mine:true,text:isStickerOnly?"":text,sticker:isStickerOnly?text:null,
-      media,voice:voiceData||null,time:new Date().toISOString(),reactions:{}
-    });
-    save();renderMessages();
-    document.getElementById("messageText").value="";
-    input.value="";document.getElementById("messageFile").textContent="NO MEDIA";
-    clearVoice();
-    notify("MESSAGE SENT","Message sent to "+friend+".");
-    setTimeout(()=>incomingReply(friend),1000);
-  });
+async function loadAdmin(){
+ if(profile?.role!=="admin")return toast("ADMIN ACCESS REQUIRED");
+ for(const [t,id] of [["profiles","aUsers"],["posts","aPosts"],["messages","aMessages"],["notifications","aNotifs"]]){
+  const r=await db.from(t).select("id",{count:"exact",head:true});$(id).textContent=r.count||0;
+ }loadAdminUsers();
 }
-function incomingReply(friend){
-  const replies=["HELLO! 👋","NICE PIXEL! 🎮","MESSAGE RECEIVED!","THANK YOU! ⭐"];
-  ensureChat(friend).push({id:Date.now(),mine:false,text:replies[Math.floor(Math.random()*replies.length)],media:null,voice:null,reactions:{},time:new Date().toISOString()});
-  save();renderMessages();notify("NEW MESSAGE",friends.find(x=>x.id===friend)?.name+" sent you a message.");
+async function loadAdminUsers(){
+ if(profile?.role!=="admin")return;const term=$("adminSearch").value.trim();
+ let q=db.from("profiles").select("id,username,avatar,role,xp,disabled,verified").order("username").limit(100);if(term)q=q.ilike("username","%"+term+"%");
+ const r=await q;if(r.error)return $("adminUsers").innerHTML=`<div class="muted">${esc(r.error.message)}</div>`;
+ $("adminUsers").innerHTML=(r.data||[]).map(u=>`<div class="adminUser"><div><b>${esc(u.avatar||"👾")} ${esc(u.username)}</b><div class="muted">${u.verified?"✅ VERIFIED":"⚪ UNVERIFIED"} • ${u.disabled?"🚫 DISABLED":"🟢 ACTIVE"} • ${Number(u.xp||0)} XP</div></div>
+ <div><select onchange="changeRole('${u.id}',this.value)"><option value="user" ${u.role==="user"?"selected":""}>PLAYER</option><option value="admin" ${u.role==="admin"?"selected":""}>ADMIN</option></select>
+ <button class="btn small" onclick="setUserFlag('${u.id}','verified',${!u.verified})">${u.verified?"UNVERIFY":"VERIFY"}</button>
+ <button class="btn small danger" onclick="setUserFlag('${u.id}','disabled',${!u.disabled})">${u.disabled?"ENABLE":"DISABLE"}</button></div></div>`).join("");
 }
-function simulateIncoming(){
-  const f=state.selected;
-  incomingReply(f);
-  openTab("messages");
-}
-function simulatePost(){
-  state.posts.unshift({id:Date.now(),user:"pixel",text:"NEW PIXEL FRIEND POST! 🎮",media:null,time:new Date().toISOString(),likes:0,reactions:{}});
-  save();renderFeed();notify("NEW POST","pixel published a new post.","post");openTab("home");
-}
+async function changeRole(id,role){if(id===me.id)return toast("DO NOT CHANGE YOUR OWN ROLE");const r=await db.from("profiles").update({role}).eq("id",id);if(r.error)return toast("ROLE UPDATE FAILED: "+r.error.message);toast("ROLE UPDATED");loadAdminUsers()}
+async function setUserFlag(id,field,value){const r=await db.from("profiles").update({[field]:value}).eq("id",id);if(r.error)return toast("UPDATE FAILED: "+r.error.message);toast(field.toUpperCase()+" UPDATED");loadAdminUsers()}
 
-/* ---------- friends ---------- */
-function renderFriends(){
-  document.getElementById("friendsGrid").innerHTML=friends.map(f=>`
-    <div class="post" style="display:flex;align-items:center;gap:14px">
-      <div class="miniavatar" style="font-size:20px">${f.icon}</div>
-      <div><strong>${esc(f.name)}</strong><br><small>${esc(f.role)}</small></div>
-      <button class="smallbtn" style="margin-left:auto" onclick="selectFriend('${f.id}');openTab('messages')">MESSAGE</button>
-    </div>`).join("");
-}
-function searchFriends(q){
-  if(q.trim()){openTab("friends");document.getElementById("friendsGrid").innerHTML=friends.filter(f=>(f.name+" "+f.role).toLowerCase().includes(q.toLowerCase())).map(f=>`
-  <div class="post"><strong>${f.icon} ${esc(f.name)}</strong><br><small>${esc(f.role)}</small></div>`).join("")||`<div class="empty">NO FRIENDS FOUND</div>`}
-  else renderFriends();
-}
-function resetDemo(){
-  if(confirm("RESET ALL LOCAL PIXEL FRIEND DATA?")){
-    localStorage.removeItem(KEY);location.reload();
-  }
-}
-
-/* ---------- startup ---------- */
-document.getElementById("notifyBtn").addEventListener("click",enableNotifications);
-renderAvatar();renderFeed();renderFriendList();renderMessages();renderFriends();updateNotifyDot();
-
-// First click on the page unlocks Web Audio in browsers that require a user gesture.
-document.addEventListener("click",()=>{try{
-  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==="suspended") audioCtx.resume();
-}catch(e){}},{once:true});
+async function logout(){if(msgChannel)db.removeChannel(msgChannel);if(notifyChannel)db.removeChannel(notifyChannel);await db.auth.signOut();location.reload()}
+db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")location.reload();if(session?.user&&!me)start(session.user)});
+(async()=>{const r=await db.auth.getSession();if(r.data.session?.user)start(r.data.session.user)})();
 </script>
 </body>
 </html>
