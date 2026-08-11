@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,18 +122,30 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 .chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}
 .chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}
 .chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}
-.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}
+.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:14px}
+.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%;margin-bottom:4px}
 .message-wrap.mine{align-self:flex-end;align-items:flex-end}
+.reply-preview-box{font-size:14px;background:rgba(0,0,0,0.25);border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;border-radius:2px;color:var(--muted)}
 .message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}
 .message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}
 .message:not(.mine){border-bottom-left-radius:2px}
+.message-hover-actions{position:absolute;top:-14px;right:4px;display:none;background:#0d1626;border:1px solid var(--border);border-radius:2px;padding:2px 4px;z-index:5;gap:4px}
+.message-wrap:hover .message-hover-actions{display:flex}
+.msg-react-picker{position:absolute;bottom:100%;right:0;background:#0d1626;border:2px solid var(--cyan);padding:4px 8px;display:none;gap:6px;z-index:10;border-radius:2px}
+.msg-react-picker.show{display:flex}
+.msg-reactions-display{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.msg-react-pill{background:#111b2d;border:1px solid #2b3d5d;border-radius:10px;padding:1px 6px;font-size:13px;display:flex;align-items:center;gap:3px;cursor:pointer}
+.msg-react-pill.mine{border-color:var(--cyan);background:#162c4d}
 .message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}
 .typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}
 .chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .chat-controls{display:flex;gap:8px;align-items:center}
 .chat-controls input{margin:0}
 .file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}
+.sticker-picker{position:absolute;bottom:75px;left:10px;background:#0d1626;border:2px solid var(--cyan);padding:10px;display:none;grid-template-columns:repeat(4,1fr);gap:8px;z-index:25;border-radius:4px;box-shadow:4px 4px 0 #000}
+.sticker-picker.show{display:grid}
+.sticker-item{font-size:28px;background:#14233b;border:1px solid #2b3d5d;padding:6px;text-align:center;cursor:pointer;border-radius:2px}
+.sticker-item:hover{background:#2a4f80;border-color:var(--cyan)}
 .toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}
 .recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}
 @keyframes pulse{from{opacity:1}to{opacity:0.5}}
@@ -245,7 +258,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
   <div class="card" style="padding:20px">    
     <div class="messages-layout">      
       <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>      
-      <div class="chat-main">        
+      <div class="chat-main" style="position:relative">        
         <div class="chat-header">          
           <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>          
           <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>        
@@ -253,12 +266,32 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
         <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                
         <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
+        <!-- Cute Pixel Stickers Picker Drawer -->
+        <div id="stickerPicker" class="sticker-picker">
+          <div class="sticker-item" onclick="sendSticker('👾')">👾</div>
+          <div class="sticker-item" onclick="sendSticker('🕹️')">🕹️</div>
+          <div class="sticker-item" onclick="sendSticker('❤️')">❤️</div>
+          <div class="sticker-item" onclick="sendSticker('🔥')">🔥</div>
+          <div class="sticker-item" onclick="sendSticker('🚀')">🚀</div>
+          <div class="sticker-item" onclick="sendSticker('⭐')">⭐</div>
+          <div class="sticker-item" onclick="sendSticker('🐱')">🐱</div>
+          <div class="sticker-item" onclick="sendSticker('🦊')">🦊</div>
+        </div>
+
         <div class="chat-input-bar">          
+          <!-- Reply Bar Preview -->
+          <div id="replyBar" class="hidden" style="display:flex;justify-content:space-between;align-items:center;background:#09101d;border:1px solid var(--cyan);padding:6px 10px;border-radius:2px;margin-bottom:6px">
+            <span id="replyBarText" class="tiny" style="color:var(--cyan)">Replying to message</span>
+            <button class="danger" style="padding:2px 6px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button>
+          </div>
+
           <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">            
             <span id="chatAttachmentPill" class="file-pill"></span>            
             <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>          
           </div>
+
           <div class="chat-controls" style="flex-wrap:wrap">            
+            <button class="secondary" style="padding:10px 12px" onclick="toggleStickerPicker()" title="Cute Pixel Stickers" disabled id="btnSticker">🎨</button>
             <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>            
             <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>            
             <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>
@@ -341,8 +374,8 @@ let currentUser = null, currentProfile = null, selectedUser = null;
 let postImageFile = null, postVideoFile = null, postAudioFile = null;
 let chatAttachmentFile = null, chatAttachmentType = null;
 let mediaRecorder = null, audioChunks = [], isRecording = false;
+let replyingToMessageId = null;
 
-// Set your admin email here so your account automatically gets admin powers
 const ADMIN_EMAIL = "admin@pixel.com"; 
 
 const $ = id => document.getElementById(id);
@@ -370,8 +403,8 @@ function playRetroSound(type = 'click') {
       osc.stop(now + 0.05);
     } else if (type === 'message') {
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(587.33, now); // D5
-      osc.frequency.setValueAtTime(880, now + 0.08); // A5
+      osc.frequency.setValueAtTime(587.33, now); 
+      osc.frequency.setValueAtTime(880, now + 0.08); 
       gain.gain.setValueAtTime(0.1, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
       osc.start(now);
@@ -430,7 +463,7 @@ function page(name, btn){
 }
 window.page = page;
 
-// --- AUTHENTICATION (EMAIL/PASSWORD ONLY) ---
+// --- AUTHENTICATION ---
 function authTab(t){
   const l = t === "login";
   $("loginPane").classList.toggle("hidden", !l);
@@ -576,7 +609,7 @@ async function removeAvatar(){
 }
 window.removeAvatar = removeAvatar;
 
-// --- ADMIN PANEL FUNCTIONS (ROLES & ACCOUNT VERIFICATION) ---
+// --- ADMIN PANEL ---
 async function loadAdminUsers(){
   if(!isAdmin()) return toast("❌ Unauthorized access");
   const r = await sb.from("profiles").select("*").order("username", {ascending: true});
@@ -885,7 +918,7 @@ async function loadLeaderboard(){
 }
 window.loadLeaderboard = loadLeaderboard;
 
-// --- MESSAGING ---
+// --- MESSAGING WITH REPLY, REACTS, AND STICKERS ---
 async function loadMessageUsers(){
   const r = await sb.from("profiles").select("*").neq("id", currentUser.id);
   if(!r.data) return;
@@ -916,7 +949,7 @@ async function selectChatUser(userId, username){
   const activeEl = $(`chatUser_${userId}`);
   if(activeEl) activeEl.classList.add("active");
 
-  ["messageInput","sendButton","voiceRecordBtn","btnImg","btnVid"].forEach(id => $(id).removeAttribute("disabled"));
+  ["messageInput","sendButton","voiceRecordBtn","btnImg","btnVid","btnSticker"].forEach(id => $(id).removeAttribute("disabled"));
   await loadMessages();
   await sb.from("messages").update({ is_read: true }).eq("sender_id", userId).eq("receiver_id", currentUser.id);
   updateNotificationBadge();
@@ -925,20 +958,63 @@ window.selectChatUser = selectChatUser;
 
 async function loadMessages(){
   if(!selectedUser) return;
-  const r = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", {ascending:true});
+  const r = await sb.from("messages").select("*, reply_to_msg:messages!messages_reply_to_fkey(id, content, sender_id), message_reactions(*)").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", {ascending:true});
   if(!r.data) return;
+
+  const messagesMap = {};
+  r.data.forEach(m => messagesMap[m.id] = m);
 
   $("messagesList").innerHTML = r.data.map(m => {
     const mine = m.sender_id === currentUser.id;
     const canDeleteMsg = mine || isAdmin();
+    const reactions = m.message_reactions || [];
+    
+    // Group reactions
+    const reactCounts = {};
+    const myReactions = new Set();
+    reactions.forEach(rx => {
+      reactCounts[rx.emoji] = (reactCounts[rx.emoji] || 0) + 1;
+      if(rx.user_id === currentUser.id) myReactions.add(rx.emoji);
+    });
+
+    let replyHtml = '';
+    if(m.reply_to && messagesMap[m.reply_to]){
+      const rep = messagesMap[m.reply_to];
+      replyHtml = `<div class="reply-preview-box">↳ Replying to: ${esc(rep.content || 'Media/Sticker')}</div>`;
+    }
+
     return `
       <div id="message_${m.id}" class="message-wrap ${mine?'mine':''}">
+        <!-- Hover actions -->
+        <div class="message-hover-actions">
+          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="setReplyTo('${m.id}', '${esc(m.content || 'Media/Sticker')}')" title="Reply">💬</button>
+          <button class="secondary" style="padding:2px 6px;font-size:12px" onclick="toggleMsgReactPicker('${m.id}')" title="React">⭐</button>
+        </div>
+
+        <!-- React picker popover -->
+        <div id="msgReactPicker_${m.id}" class="msg-react-picker">
+          ${['❤️','🔥','😂','👍','👾','⭐'].map(e => `
+            <span style="cursor:pointer;font-size:16px" onclick="toggleMsgReaction('${m.id}', '${e}')">${e}</span>
+          `).join('')}
+        </div>
+
         <div class="message ${mine?'mine':''}">
+          ${replyHtml}
           ${m.content ? `<span>${esc(m.content)}</span>` : ''}
           ${m.image_url ? `<img class="msg-media-img" src="${esc(m.image_url)}">` : ''}
           ${m.video_url ? `<video class="msg-media-video" controls src="${esc(m.video_url)}"></video>` : ''}
           ${m.audio_url ? `<audio class="msg-audio" controls src="${esc(m.audio_url)}"></audio>` : ''}
         </div>
+
+        <!-- Reactions list pill display -->
+        <div class="msg-reactions-display">
+          ${Object.entries(reactCounts).map(([emoji, count]) => `
+            <div class="msg-react-pill ${myReactions.has(emoji)?'mine':''}" onclick="toggleMsgReaction('${m.id}', '${emoji}')">
+              <span>${emoji}</span> <span>${count}</span>
+            </div>
+          `).join('')}
+        </div>
+
         <div class="message-footer">
           <span>${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
           ${canDeleteMsg ? `<button class="danger" style="padding:1px 4px;font-size:10px;margin-left:6px" onclick="deleteMessage('${m.id}')">🗑️</button>` : ''}
@@ -949,6 +1025,62 @@ async function loadMessages(){
   const list = $("messagesList");
   list.scrollTop = list.scrollHeight;
 }
+
+function setReplyTo(msgId, contentSnippet){
+  replyingToMessageId = msgId;
+  $("replyBarText").textContent = `↳ Replying to: "${contentSnippet.substring(0, 30)}..."`;
+  $("replyBar").classList.remove("hidden");
+  $("messageInput").focus();
+}
+window.setReplyTo = setReplyTo;
+
+function cancelReply(){
+  replyingToMessageId = null;
+  $("replyBar").classList.add("hidden");
+}
+window.cancelReply = cancelReply;
+
+function toggleMsgReactPicker(msgId){
+  const p = $(`msgReactPicker_${msgId}`);
+  if(p) p.classList.toggle("show");
+}
+window.toggleMsgReactPicker = toggleMsgReactPicker;
+
+async function toggleMsgReaction(messageId, emoji){
+  const existing = await sb.from("message_reactions").select("*").eq("message_id", messageId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
+  if(existing.data){
+    await sb.from("message_reactions").delete().eq("id", existing.data.id);
+  } else {
+    await sb.from("message_reactions").insert({ message_id: messageId, user_id: currentUser.id, emoji: emoji });
+  }
+  loadMessages();
+}
+window.toggleMsgReaction = toggleMsgReaction;
+
+function toggleStickerPicker(){
+  $("stickerPicker").classList.toggle("show");
+}
+window.toggleStickerPicker = toggleStickerPicker;
+
+async function sendSticker(stickerEmoji){
+  if(!selectedUser) return;
+  $("stickerPicker").classList.remove("show");
+  const payload = {
+    sender_id: currentUser.id,
+    receiver_id: selectedUser,
+    content: `[STICKER: ${stickerEmoji}]`,
+    is_read: false
+  };
+  if(replyingToMessageId) payload.reply_to = replyingToMessageId;
+
+  const r = await sb.from("messages").insert(payload);
+  if(!r.error){
+    cancelReply();
+    loadMessages();
+    playRetroSound('success');
+  }
+}
+window.sendSticker = sendSticker;
 
 function selectChatMedia(type){
   const input = $(type==='image'?'chatImageInput':'chatVideoInput');
@@ -993,11 +1125,13 @@ async function sendMessage(){
   const payload = { sender_id: currentUser.id, receiver_id: selectedUser, content: text || "", is_read: false };
   if(image_url) payload.image_url = image_url;
   if(video_url) payload.video_url = video_url;
+  if(replyingToMessageId) payload.reply_to = replyingToMessageId;
 
   const r = await sb.from("messages").insert(payload);
   if(!r.error){
     $("messageInput").value = "";
     clearChatAttachment();
+    cancelReply();
     loadMessages();
   }
 }
@@ -1015,7 +1149,10 @@ function toggleVoiceRecord(){
         const u = await sb.storage.from("posts_media").upload(path, audioBlob);
         if(u.data){
           const audio_url = sb.storage.from("posts_media").getPublicUrl(path).data.publicUrl;
-          await sb.from("messages").insert({ sender_id: currentUser.id, receiver_id: selectedUser, content: "🎤 Voice Message", audio_url, is_read: false });
+          const payload = { sender_id: currentUser.id, receiver_id: selectedUser, content: "🎤 Voice Message", audio_url, is_read: false };
+          if(replyingToMessageId) payload.reply_to = replyingToMessageId;
+          await sb.from("messages").insert(payload);
+          cancelReply();
           loadMessages();
         }
       };
