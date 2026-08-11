@@ -1528,8 +1528,7 @@ async function sendMessage(){
       reply_to:replyTarget || null,
       reply_preview:replyTarget
         ? $('replyText').textContent.replace('↩ Replying to: ','').slice(0,120)
-        : null,
-      is_read:false
+        : null
     };
 
     const r = await db
@@ -1544,6 +1543,8 @@ async function sendMessage(){
     $('messageInput').value = '';
     clearMessageMedia();
     cancelReply();
+    await loadMessages();
+    status('messageStatus','Message sent.');
 
     status('messageStatus','');
     beep();
@@ -1941,24 +1942,11 @@ function toggleNotifications(){
 async function loadUnreadCount(){
   if(!currentUser) return;
 
-  const r = await db
-    .from('messages')
-    .select('id',{count:'exact',head:true})
-    .eq('receiver_id',currentUser.id)
-    .eq('is_read',false);
+  // The current Supabase messages table does NOT have an is_read column.
+  // Do not query messages.is_read, otherwise Supabase blocks message sending.
+  $('messageCount').classList.add('hidden');
 
-  if(!r.error){
-    const count = r.count || 0;
-
-    if(count > 0){
-      $('messageCount').textContent =
-        count > 99 ? '99+' : count;
-      $('messageCount').classList.remove('hidden');
-    }else{
-      $('messageCount').classList.add('hidden');
-    }
-  }
-
+  // Notifications still use is_read.
   const n = await db
     .from('notifications')
     .select('id',{count:'exact',head:true})
@@ -1970,15 +1958,8 @@ async function loadUnreadCount(){
 }
 
 async function markConversationRead(){
-  if(!selectedUser) return;
-
-  await db
-    .from('messages')
-    .update({is_read:true})
-    .eq('sender_id',selectedUser.id)
-    .eq('receiver_id',currentUser.id)
-    .eq('is_read',false);
-
+  // messages.is_read is not part of the current database schema.
+  // Keep this function for compatibility, but do not update messages.
   await loadUnreadCount();
 }
 
