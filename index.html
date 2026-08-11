@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,12 +19,24 @@
 <section id="messages" class="page"><div class="card"><div class="messages-layout"><div class="chat-users"><h2>💬 MESSAGES</h2><p class="tiny">SELECT A PIXEL FRIEND</p><div id="messageUsers"></div></div><div class="chat-main"><div class="chat-header"><h2 id="chatTitle">SELECT A FRIEND</h2><span id="chatSubtitle" class="tiny">REAL-TIME PIXEL CHAT</span></div><div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A USER TO START MESSAGING</div></div><div class="chat-input"><input id="messageInput" placeholder="TYPE A MESSAGE..." onkeydown="if(event.key==='Enter')sendMessage()" disabled><button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button></div><div id="messageStatus" class="status"></div></div></div></div></section>
 <section id="leaderboard" class="page"><div class="card"><h1>🏆 PIXEL LEADERBOARD</h1><p class="tiny">TOP PLAYERS IN THE PIXEL WORLD</p><div id="leaders"></div></div></section>
 <section id="profile" class="page"><div class="card" style="text-align:center"><div id="profileAvatar" class="profile-avatar">👾<span class="online"></span></div><h1 id="profileName">PLAYER</h1><div id="profileBadges" class="badges"></div><p id="profileBio">PIXEL EXPLORER</p><div class="stat-grid"><div class="stat"><strong id="statPosts">0</strong>POSTS</div><div class="stat"><strong id="statLevel">1</strong>LEVEL</div><div class="stat"><strong id="statXP">0</strong>XP</div></div><br><button class="primary" onclick="openProfile()">✏️ EDIT PROFILE</button></div><div id="profileEditor" class="card hidden"><h2>✏️ EDIT PROFILE</h2><div id="profilePreview" class="profile-preview">👾</div><input id="profileImage" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewProfileImage()"><p class="tiny">JPG, PNG or WEBP profile picture.</p><input id="editName" maxlength="20" placeholder="USERNAME"><textarea id="editBio" maxlength="200" placeholder="TELL PIXEL WORLD ABOUT YOURSELF..."></textarea><select id="editAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option><option>🐯</option><option>🐲</option></select><div class="row"><button class="primary" onclick="saveProfile()">💾 SAVE</button><button class="secondary" onclick="closeProfile()">CANCEL</button></div><div id="profileStatus" class="status"></div></div></section>
-<section id="admin" class="page"><div class="card admin-box"><h1>👑 ADMIN CONTROL CENTER</h1><p class="tiny">Visible only when profiles.role = admin.</p></div><div class="card"><h2>👥 USERS</h2><input id="adminSearch" placeholder="SEARCH USERS..." oninput="loadAdminUsers()"><div id="adminUsers" class="grid"></div></div></section>
+<section id="admin" class="page"><div class="card admin-box"><h1>👑 ADMIN CONTROL CENTER</h1><p id="adminMode" class="tiny"></p><p class="tiny">Your UI admin is based on the CARTER username. For permanent database admin, set the role in Supabase SQL.</p><details><summary>🔐 Permanent Admin Setup</summary><p class="tiny">Run this in Supabase SQL Editor after replacing the email:</p><pre style="white-space:pre-wrap;background:#0d1528;padding:12px;border-radius:10px;overflow:auto">UPDATE public.profiles p SET role = 'admin' FROM auth.users u WHERE p.id = u.id AND lower(u.email) = lower('YOUR_EMAIL_HERE');</pre><p class="tiny">If RLS blocks role changes, do this from the SQL Editor rather than the browser.</p></details></div><div class="card"><h2>👥 USERS</h2><input id="adminSearch" placeholder="SEARCH USERS..." oninput="loadAdminUsers()"><div id="adminUsers" class="grid"></div></div></section>
 </main></div></div><div id="toast" class="toast hidden"></div>
 <script>
 const SUPABASE_URL="https://vvfkfpsyxipnypaltixq.supabase.co",SUPABASE_PUBLISHABLE_KEY="sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-let currentUser=null,currentProfile=null,selectedUser=null,messageChannel=null,notificationChannel=null,profileImageFile=null,searchTimer=null;
+
+/* ADMIN BOOTSTRAP: change this to your real email for a UI admin bootstrap.
+   For production, set profiles.role='admin' in Supabase and use RLS. */
+const ADMIN_EMAILS=[''];
+const ADMIN_USERNAMES=['CARTER'];
+let notificationTimer=null;
+let activityPollTimer=null;
+let localNotifications=[];
+let localNotificationIds=new Set();
+let lastNotificationIds=new Set();
+let lastIncomingMessageId=null;
+let lastFriendRequestId=null;
+let currentUser=null,currentProfile=null,selectedUser=null,messageChannel=null,notificationChannel=null,activityChannel=null,profileImageFile=null,searchTimer=null;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 function toast(m){const e=$("toast");e.textContent=m;e.classList.remove("hidden");clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.add("hidden"),3000)}
@@ -33,16 +44,36 @@ function status(id,m,err=false){if($(id)){ $(id).textContent=m;$(id).style.color
 function authTab(t){let l=t==='login';$("loginPane").classList.toggle('hidden',!l);$("registerPane").classList.toggle('hidden',l);$("loginTab").classList.toggle('active',l);$("regTab").classList.toggle('active',!l);status('authStatus','')}
 async function register(){let username=$("regName").value.trim(),email=$("regEmail").value.trim().toLowerCase(),password=$("regPass").value,avatar=$("regAvatar").value;if(username.length<2)return status('authStatus','Username must be at least 2 characters.',true);if(!email.includes('@'))return status('authStatus','Invalid email.',true);if(password.length<6)return status('authStatus','Password must be at least 6 characters.',true);status('authStatus','Creating account...');let r=await sb.auth.signUp({email,password,options:{data:{username,avatar}}});if(r.error)return status('authStatus',r.error.message,true);if(r.data.session)startApp(r.data.user);else status('authStatus','Account created. Check your email to confirm.')}
 async function login(){let email=$("loginEmail").value.trim().toLowerCase(),password=$("loginPass").value;if(!email||!password)return status('authStatus','Enter email and password.',true);status('authStatus','Logging in...');let r=await sb.auth.signInWithPassword({email,password});if(r.error)return status('authStatus',r.error.message,true);startApp(r.data.user)}
-async function startApp(user){if(currentUser?.id===user.id)return;currentUser=user;$("authScreen").style.display='none';$("app").style.display='block';await loadProfile();await Promise.all([loadNotifications(),loadFriends(),loadMessageUsers(),loadFeed(),loadLeaderboard()]);setupRealtime();page('home')}
-async function loadProfile(){let r=await sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();if(r.error)return toast('Profile error: '+r.error.message);if(!r.data){let f={id:currentUser.id,username:currentUser.user_metadata?.username||currentUser.email?.split('@')[0]||'PLAYER',avatar:currentUser.user_metadata?.avatar||'👾',bio:'PIXEL EXPLORER',role:'user',xp:0};r=await sb.from('profiles').upsert(f).select().maybeSingle();if(r.error)return toast('Profile create error: '+r.error.message)}currentProfile=r.data;renderProfile()}
+async function startApp(user){if(currentUser?.id===user.id)return;currentUser=user;loadLocalNotifications();$("authScreen").style.display='none';$("app").style.display='block';await loadProfile();applyAdminUI();await Promise.all([loadNotifications(),loadFriends(),loadMessageUsers(),loadFeed(),loadLeaderboard()]);setupRealtime();startNotificationPolling();page('home')}
+function isAdmin(){
+  const email=(currentUser?.email||'').toLowerCase();
+  const username=(currentProfile?.username||'').toUpperCase();
+  return currentProfile?.role==='admin' || ADMIN_EMAILS.map(x=>x.toLowerCase()).includes(email) || ADMIN_USERNAMES.map(x=>x.toUpperCase()).includes(username);
+}
+
+function applyAdminUI(){
+  const admin=isAdmin();
+  const side=$('adminNav');
+  if(side) side.classList.toggle('hidden',!admin);
+  const note=$('adminMode');
+  if(note) note.textContent=admin ? (currentProfile?.role==='admin' ? 'DATABASE ADMIN' : 'LOCAL ADMIN BOOTSTRAP') : '';
+}
+
+async function tryBootstrapAdmin(){
+  if(!currentUser||!isAdmin()||currentProfile?.role==='admin')return;
+  const r=await sb.from('profiles').update({role:'admin'}).eq('id',currentUser.id).select().maybeSingle();
+  if(!r.error&&r.data){currentProfile=r.data;renderProfile();applyAdminUI();toast('👑 Admin role enabled in database.');}
+}
+
+async function loadProfile(){let r=await sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();if(r.error)return toast('Profile error: '+r.error.message);if(!r.data){let f={id:currentUser.id,username:currentUser.user_metadata?.username||currentUser.email?.split('@')[0]||'PLAYER',avatar:currentUser.user_metadata?.avatar||'👾',bio:'PIXEL EXPLORER',role:'user',xp:0};r=await sb.from('profiles').upsert(f).select().maybeSingle();if(r.error)return toast('Profile create error: '+r.error.message)}currentProfile=r.data;renderProfile();applyAdminUI();await tryBootstrapAdmin()}
 function putAvatar(el,p){el.innerHTML=p?.avatar_url?`<img src="${esc(p.avatar_url)}">`:esc(p?.avatar||'👾');el.insertAdjacentHTML('beforeend','<span class="online"></span>')}
-function renderProfile(){if(!currentProfile)return;let xp=+currentProfile.xp||0,level=Math.floor(xp/100)+1,progress=xp%100;putAvatar($("sideAvatar"),currentProfile);$("sideName").textContent=currentProfile.username||'PLAYER';$("sideBio").textContent=currentProfile.bio||'PIXEL EXPLORER';$("sideLevel").textContent=level;$("xpBar").style.width=progress+'%';$("xpText").textContent=`${progress} / 100 XP`;putAvatar($("profileAvatar"),currentProfile);$("profileName").textContent=currentProfile.username||'PLAYER';$("profileBio").textContent=currentProfile.bio||'PIXEL EXPLORER';$("headAvatar").innerHTML=currentProfile.avatar_url?`<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:esc(currentProfile.avatar||'👾');let b=(currentProfile.role==='admin'?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>')+`<span class="badge">LEVEL ${level}</span>`;$("sideBadges").innerHTML=b;$("profileBadges").innerHTML=b;$("statLevel").textContent=level;$("statXP").textContent=xp;$("adminNav").classList.toggle('hidden',currentProfile.role!=='admin');loadPostCount()}
+function renderProfile(){if(!currentProfile)return;let xp=+currentProfile.xp||0,level=Math.floor(xp/100)+1,progress=xp%100;putAvatar($("sideAvatar"),currentProfile);$("sideName").textContent=currentProfile.username||'PLAYER';$("sideBio").textContent=currentProfile.bio||'PIXEL EXPLORER';$("sideLevel").textContent=level;$("xpBar").style.width=progress+'%';$("xpText").textContent=`${progress} / 100 XP`;putAvatar($("profileAvatar"),currentProfile);$("profileName").textContent=currentProfile.username||'PLAYER';$("profileBio").textContent=currentProfile.bio||'PIXEL EXPLORER';$("headAvatar").innerHTML=currentProfile.avatar_url?`<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:esc(currentProfile.avatar||'👾');let b=(isAdmin()?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>')+`<span class="badge">LEVEL ${level}</span>`;$("sideBadges").innerHTML=b;$("profileBadges").innerHTML=b;$("statLevel").textContent=level;$("statXP").textContent=xp;$("adminNav").classList.toggle('hidden',!isAdmin());loadPostCount()}
 async function loadPostCount(){let r=await sb.from('posts').select('*',{count:'exact',head:true}).eq('user_id',currentUser.id);$("statPosts").textContent=r.count||0}
 function openProfile(){$("profileEditor").classList.remove('hidden');$("editName").value=currentProfile.username||'';$("editBio").value=currentProfile.bio||'';$("editAvatar").value=currentProfile.avatar||'👾';$("profilePreview").innerHTML=currentProfile.avatar_url?`<img src="${esc(currentProfile.avatar_url)}">`:esc(currentProfile.avatar||'👾')}
 function closeProfile(){$("profileEditor").classList.add('hidden')}
 function previewProfileImage(){let f=$("profileImage").files[0];if(!f)return;if(f.size>5*1024*1024){status('profileStatus','Maximum 5MB.',true);return}profileImageFile=f;let r=new FileReader();r.onload=()=>$("profilePreview").innerHTML=`<img src="${r.result}">`;r.readAsDataURL(f)}
 async function saveProfile(){let username=$("editName").value.trim(),bio=$("editBio").value.trim(),avatar=$("editAvatar").value;if(username.length<2)return status('profileStatus','Username too short.',true);let avatar_url=currentProfile.avatar_url||null;if(profileImageFile){let ext=profileImageFile.name.split('.').pop().toLowerCase(),path=`${currentUser.id}/${Date.now()}.${ext}`,u=await sb.storage.from('avatars').upload(path,profileImageFile,{upsert:true,contentType:profileImageFile.type});if(u.error)return status('profileStatus',u.error.message,true);avatar_url=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl}let r=await sb.from('profiles').update({username,bio,avatar,avatar_url}).eq('id',currentUser.id).select().maybeSingle();if(r.error)return status('profileStatus',r.error.message,true);currentProfile=r.data;profileImageFile=null;renderProfile();status('profileStatus','Profile updated.');toast('Profile updated')}
-function page(name,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(name)?.classList.add('active');if(btn){document.querySelectorAll('.menu button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}if(name==='friends'){searchUsers();loadFriends()}if(name==='messages')loadMessageUsers();if(name==='leaderboard')loadLeaderboard();if(name==='profile')renderProfile();if(name==='admin'&&currentProfile?.role==='admin')loadAdminUsers()}
+function page(name,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(name)?.classList.add('active');if(btn){document.querySelectorAll('.menu button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}if(name==='friends'){searchUsers();loadFriends()}if(name==='messages')loadMessageUsers();if(name==='leaderboard')loadLeaderboard();if(name==='profile')renderProfile();if(name==='admin'&&isAdmin())loadAdminUsers()}
 function searchUsers(){clearTimeout(searchTimer);searchTimer=setTimeout(doSearch,250)}
 async function doSearch(){let term=(($("friendSearch")?.value||'').trim()||($("globalSearch")?.value||'').trim());if(!term){if($("searchResults"))$("searchResults").innerHTML='<div class="empty">TYPE A NAME TO SEARCH PIXEL FRIENDS</div>';return}let r=await sb.from('profiles').select('*').ilike('username',`%${term}%`).neq('id',currentUser.id).limit(30);if(r.error)return $("searchResults").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;renderSearch(r.data||[])}
 function renderSearch(users){$("searchResults").innerHTML=users.length?users.map(u=>`<div class="user-card"><div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||'👾')}</div><strong>${esc(u.username)}</strong><div class="badges">${u.role==='admin'?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>'}</div><p class="tiny">${esc(u.bio||'PIXEL EXPLORER')}</p><button class="primary" onclick="sendFriendRequest('${u.id}')">🤝 ADD FRIEND</button><button class="secondary" onclick="openChat('${u.id}')">💬 MESSAGE</button></div>`).join(''):'<div class="empty">NO FRIEND FOUND</div>'}
@@ -53,18 +84,183 @@ async function openChat(id){let r=await sb.from('profiles').select('*').eq('id',
 async function loadMessages(){if(!selectedUser)return;let me=currentUser.id,other=selectedUser.id;let r=await sb.from('messages').select('*').or(`and(sender_id.eq.${me},receiver_id.eq.${other}),and(sender_id.eq.${other},receiver_id.eq.${me})`).order('created_at',{ascending:true});if(r.error){$("messagesList").innerHTML=`<div class="empty"><b>MESSAGE ERROR</b><br><br>${esc(r.error.message)}<br><br>This version does not use the broken profiles relationship.</div>`;return}$("messagesList").innerHTML=r.data?.length?r.data.map(m=>`<div class="message ${m.sender_id===me?'mine':''}">${esc(m.content)}<small>${new Date(m.created_at).toLocaleString()}</small></div>`).join(''):'<div class="empty">NO MESSAGES YET.<br>SAY HELLO 👋</div>';$('messagesList').scrollTop=$('messagesList').scrollHeight}
 async function sendMessage(){if(!selectedUser)return;let input=$("messageInput"),content=input.value.trim();if(!content)return;input.disabled=true;let r=await sb.from('messages').insert({sender_id:currentUser.id,receiver_id:selectedUser.id,content});input.disabled=false;if(r.error)return status('messageStatus',r.error.message,true);input.value='';await createNotification(selectedUser.id,'message','💬 New Message',`${currentProfile.username} sent you a message.`);await loadMessages()}
 function subscribeChat(){if(messageChannel)sb.removeChannel(messageChannel);messageChannel=sb.channel('chat-'+currentUser.id+'-'+selectedUser.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},p=>{let m=p.new;if((m.sender_id===currentUser.id&&m.receiver_id===selectedUser.id)||(m.sender_id===selectedUser.id&&m.receiver_id===currentUser.id))loadMessages()}).subscribe()}
-async function createNotification(userId,type,title,message){let r=await sb.from('notifications').insert({user_id:userId,sender_id:currentUser.id,type,title,message});if(r.error)console.error('Notification:',r.error.message)}
-async function loadNotifications(){let r=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);if(!r.error)renderNotifications(r.data||[])}
-function renderNotifications(a){let unread=a.filter(x=>!x.is_read).length;$("notificationCount").textContent=unread;$("notificationCount").classList.toggle('hidden',!unread);$("notificationList").innerHTML=a.length?a.map(n=>`<div class="notification ${n.is_read?'':'unread'}"><strong>${esc(n.title)}</strong><div>${esc(n.message)}</div><small>${new Date(n.created_at).toLocaleString()}</small></div>`).join(''):'<div class="empty">NO NOTIFICATIONS</div>'}
-function toggleNotifications(){$("notificationPanel").classList.toggle('hidden')}
-async function markAllNotificationsRead(){let r=await sb.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);if(r.error)return toast(r.error.message);loadNotifications()}
-function setupRealtime(){if(notificationChannel)sb.removeChannel(notificationChannel);notificationChannel=sb.channel('notifications-'+currentUser.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},p=>{loadNotifications();toast(p.new.title+': '+p.new.message)}).subscribe()}
+function loadLocalNotifications(){
+  try{ localNotifications=JSON.parse(localStorage.getItem('pixel_notifications_'+(currentUser?.id||''))||'[]'); }catch(e){ localNotifications=[]; }
+  localNotificationIds=new Set(localNotifications.map(x=>x.id));
+}
+function saveLocalNotifications(){
+  if(!currentUser)return;
+  localNotifications=localNotifications.slice(0,50);
+  localStorage.setItem('pixel_notifications_'+currentUser.id,JSON.stringify(localNotifications));
+}
+function addLocalNotification(title,message,type='activity'){
+  const id='local-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+  if(localNotificationIds.has(id))return;
+  localNotifications.unshift({id,title,message,type,created_at:new Date().toISOString(),is_read:false,local:true});
+  localNotificationIds.add(id);
+  saveLocalNotifications();
+  renderNotifications();
+  browserAlert(title,message);
+}
+async function createNotification(userId,type,title,message){
+  if(!userId)return false;
+  const r=await sb.from('notifications').insert({user_id:userId,sender_id:currentUser.id,type,title,message,is_read:false});
+  if(r.error){
+    console.error('Notification insert failed:',r.error);
+    toast('⚠️ Notification was not saved: '+r.error.message);
+    return false;
+  }
+  return true;
+}
+
+async function loadNotifications(silent=true){
+  if(!currentUser)return;
+  const r=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  if(r.error){
+    if(!silent)toast('Notification error: '+r.error.message);
+    console.error('Notification load:',r.error);
+    return;
+  }
+  renderNotifications(r.data||[]);
+}
+
+function renderNotifications(a=[]){
+  const merged=[...localNotifications,...a].sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));
+  const unread=merged.filter(x=>!x.is_read).length;
+  $('notificationCount').textContent=unread;
+  $('notificationCount').classList.toggle('hidden',unread===0);
+  $('notificationList').innerHTML=merged.length?merged.map(n=>`<div class="notification ${n.is_read?'':'unread'}"><strong>${esc(n.title)}</strong><div>${esc(n.message)}</div><small>${new Date(n.created_at).toLocaleString()}${n.local?' • LOCAL ALERT':''}</small></div>`).join(''):'<div class="empty">NO NOTIFICATIONS</div>';
+}
+
+function toggleNotifications(){
+  requestBrowserNotifications();
+  $('notificationPanel').classList.toggle('hidden');
+  if(!$('notificationPanel').classList.contains('hidden'))loadNotifications(false);
+}
+
+async function markAllNotificationsRead(){
+  if(!currentUser)return;
+  localNotifications=localNotifications.map(x=>({...x,is_read:true}));
+  saveLocalNotifications();
+  renderNotifications();
+  const r=await sb.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);
+  if(r.error)return toast('Could not mark notifications read: '+r.error.message);
+  loadNotifications(false);
+}
+
+async function requestBrowserNotifications(){
+  if('Notification' in window && Notification.permission==='default'){
+    try{await Notification.requestPermission()}catch(e){}
+  }
+}
+
+function browserAlert(title,message){
+  toast('🔔 '+title+' — '+message);
+  if('Notification' in window && Notification.permission==='granted'){
+    try{new Notification(title,{body:message})}catch(e){}
+  }
+}
+
+async function pollNotifications(){
+  if(!currentUser)return;
+  const r=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  if(r.error){console.error('Notification poll:',r.error);return;}
+  const items=r.data||[];
+  if(lastNotificationIds.size){
+    const fresh=items.filter(n=>!lastNotificationIds.has(n.id));
+    fresh.reverse().forEach(n=>{if(!n.is_read)browserAlert(n.title,n.message)});
+  }
+  lastNotificationIds=new Set(items.map(n=>n.id));
+  renderNotifications(items);
+}
+
+async function pollActivity(){
+  if(!currentUser)return;
+  const m=await sb.from('messages').select('id,sender_id,receiver_id,content,created_at').eq('receiver_id',currentUser.id).order('created_at',{ascending:false}).limit(1);
+  if(!m.error&&m.data?.[0]){
+    const row=m.data[0];
+    if(lastIncomingMessageId && row.id!==lastIncomingMessageId){
+      addLocalNotification('💬 New Message','You received a new Pixel Friend message.','message');
+    }
+    lastIncomingMessageId=row.id;
+  }
+  const f=await sb.from('friendships').select('id,requester_id,addressee_id,status,created_at').eq('addressee_id',currentUser.id).eq('status','pending').order('created_at',{ascending:false}).limit(1);
+  if(!f.error&&f.data?.[0]){
+    const row=f.data[0];
+    if(lastFriendRequestId && row.id!==lastFriendRequestId){
+      addLocalNotification('🤝 Friend Request','You received a new friend request.','friend_request');
+    }
+    lastFriendRequestId=row.id;
+  }
+}
+
+function startNotificationPolling(){
+  clearInterval(notificationTimer);
+  clearInterval(activityPollTimer);
+  lastNotificationIds=new Set();
+  lastIncomingMessageId=null;
+  lastFriendRequestId=null;
+  pollNotifications();
+  pollActivity();
+  notificationTimer=setInterval(pollNotifications,5000);
+  activityPollTimer=setInterval(pollActivity,5000);
+  requestBrowserNotifications();
+}
+
+function setupRealtime(){
+  if(notificationChannel)sb.removeChannel(notificationChannel);
+  if(activityChannel)sb.removeChannel(activityChannel);
+
+  notificationChannel=sb.channel('notifications-'+currentUser.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},p=>{
+      const n=p.new;
+      browserAlert(n.title,n.message);
+      loadNotifications(true);
+    })
+    .subscribe((status)=>console.log('Notification realtime:',status));
+
+  /* Direct activity alerts work even when the notifications table/RLS is unavailable. */
+  activityChannel=sb.channel('activity-'+currentUser.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},p=>{
+      const m=p.new;
+      if(m.receiver_id===currentUser.id){
+        addLocalNotification('💬 New Message','You received a new Pixel Friend message.','message');
+        if(selectedUser?.id===m.sender_id)loadMessages();
+      }
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'friendships'},p=>{
+      const f=p.new;
+      if(f.addressee_id===currentUser.id && f.status==='pending'){
+        addLocalNotification('🤝 Friend Request','You received a new friend request.','friend_request');
+        loadNotifications(true);
+      }
+    })
+    .subscribe((status)=>console.log('Activity realtime:',status));
+}
+
 async function createPost(){let content=$("postText").value.trim();if(!content)return status('postStatus','Write something first.',true);let r=await sb.from('posts').insert({user_id:currentUser.id,content});if(r.error)return status('postStatus',r.error.message,true);let xp=(+currentProfile.xp||0)+10;await sb.from('profiles').update({xp}).eq('id',currentUser.id);currentProfile.xp=xp;$("postText").value='';renderProfile();loadFeed();status('postStatus','Post published! +10 XP')}
 async function loadFeed(){let r=await sb.from('posts').select('*').order('created_at',{ascending:false}).limit(50);if(r.error)return $("feed").innerHTML=`<div class="card empty">FEED ERROR:<br>${esc(r.error.message)}</div>`;if(!r.data?.length)return $("feed").innerHTML='<div class="card empty">NO POSTS YET.</div>';let ids=[...new Set(r.data.map(x=>x.user_id))],p=await sb.from('profiles').select('id,username,avatar,avatar_url,role').in('id',ids),map={};(p.data||[]).forEach(x=>map[x.id]=x);$("feed").innerHTML=r.data.map(x=>{let a=map[x.user_id]||{};return `<div class="card"><div class="row"><div class="user-avatar">${a.avatar_url?`<img src="${esc(a.avatar_url)}">`:esc(a.avatar||'👾')}</div><div><strong>${esc(a.username||'PLAYER')}</strong><div class="tiny">${new Date(x.created_at).toLocaleString()}</div></div></div><p>${esc(x.content)}</p></div>`}).join('')}
 async function loadLeaderboard(){let r=await sb.from('profiles').select('username,avatar,xp,role').order('xp',{ascending:false}).limit(50);if(r.error)return $("leaders").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;$("leaders").innerHTML=(r.data||[]).map((u,i)=>`<div class="rank"><span>#${i+1} ${esc(u.avatar||'👾')} ${esc(u.username)} ${u.role==='admin'?'👑':''}</span><b>${+u.xp||0} XP</b></div>`).join('')}
-async function loadAdminUsers(){if(currentProfile?.role!=='admin')return;let q=($("adminSearch")?.value||'').trim(),s=sb.from('profiles').select('id,username,avatar,role,xp,bio').order('username').limit(100);if(q)s=s.ilike('username',`%${q}%`);let r=await s;if(r.error)return $("adminUsers").innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;$("adminUsers").innerHTML=(r.data||[]).map(u=>`<div class="user-card"><div class="user-avatar">${esc(u.avatar||'👾')}</div><strong>${esc(u.username)}</strong><div class="badges">${u.role==='admin'?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>'}</div><p class="tiny">XP: ${+u.xp||0}<br>${esc(u.bio||'PIXEL EXPLORER')}</p></div>`).join('')}
+async function loadAdminUsers(){
+  if(!isAdmin()){ toast('Admin access required.'); page('home'); return; }
+  let q=($('adminSearch')?.value||'').trim(),s=sb.from('profiles').select('id,username,avatar,role,xp,bio').order('username').limit(100);
+  if(q)s=s.ilike('username',`%${q}%`);
+  let r=await s;
+  if(r.error)return $('adminUsers').innerHTML=`<div class="empty">${esc(r.error.message)}</div>`;
+  $('adminUsers').innerHTML=(r.data||[]).map(u=>`<div class="user-card"><div class="user-avatar">${esc(u.avatar||'👾')}</div><strong>${esc(u.username)}</strong><div class="badges">${u.role==='admin'?'<span class="badge admin">👑 ADMIN</span>':'<span class="badge">PLAYER</span>'}</div><p class="tiny">XP: ${+u.xp||0}<br>${esc(u.bio||'PIXEL EXPLORER')}</p><button class="primary" onclick="setUserRole('${u.id}','${u.role==='admin'?'user':'admin'}')">${u.role==='admin'?'⬇️ REMOVE ADMIN':'👑 MAKE ADMIN'}</button></div>`).join('')||'<div class="empty">NO USERS</div>';
+}
+
+async function setUserRole(id,role){
+  if(!isAdmin())return toast('Admin access required.');
+  if(id===currentUser.id && role!=='admin')return toast('You cannot remove your own admin role here.');
+  const r=await sb.from('profiles').update({role}).eq('id',id).select().maybeSingle();
+  if(r.error){toast('Role update failed: '+r.error.message);return;}
+  toast(role==='admin'?'👑 Admin role granted.':'Admin role removed.');
+  loadAdminUsers();
+}
+
 function theme(){let light=document.body.dataset.theme==='light';document.body.dataset.theme=light?'':'light';document.body.style.background=light?'#080d1b':'#edf2ff';document.body.style.color=light?'#f4f7ff':'#17223d';localStorage.setItem('pixel-theme',light?'dark':'light')}
-async function logout(){if(messageChannel)sb.removeChannel(messageChannel);if(notificationChannel)sb.removeChannel(notificationChannel);await sb.auth.signOut();currentUser=currentProfile=selectedUser=null;$("app").style.display='none';$("authScreen").style.display='grid';authTab('login')}
+async function logout(){if(messageChannel)sb.removeChannel(messageChannel);if(notificationChannel)sb.removeChannel(notificationChannel);if(activityChannel)sb.removeChannel(activityChannel);clearInterval(notificationTimer);notificationTimer=null;clearInterval(activityPollTimer);activityPollTimer=null;await sb.auth.signOut();currentUser=currentProfile=selectedUser=null;localNotifications=[];localNotificationIds.clear();$("app").style.display='none';$("authScreen").style.display='grid';authTab('login')}
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user&&!currentUser)startApp(session.user);if(event==='SIGNED_OUT'){currentUser=null;currentProfile=null}});
 (async()=>{if(localStorage.getItem('pixel-theme')==='light')theme();let r=await sb.auth.getSession();if(r.data.session?.user)startApp(r.data.session.user)})();
 </script>
