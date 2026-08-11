@@ -197,6 +197,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
     <button onclick="page('messages',this)">💬 MESSAGES</button>    
     <button onclick="page('leaderboard',this)">🏆 RANK</button>    
     <button onclick="page('profile',this)">👤 PROFILE</button>    
+    <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>
     <button class="danger" onclick="logout()">🚪 LOGOUT</button>  
   </nav>
 </aside>
@@ -279,6 +280,14 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
   <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div>
 </section>
 
+<section id="adminPanel" class="page">
+  <div class="card" style="padding:20px">
+    <h1>🛡️ ADMIN CONTROL PANEL</h1>
+    <p class="tiny">Manage user administrator and role permissions.</p>
+    <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
+  </div>
+</section>
+
 <section id="profile" class="page">  
   <div class="card" style="padding:24px;max-width:540px;margin:0 auto">    
     <div style="text-align:center;margin-bottom:20px">
@@ -334,7 +343,8 @@ let postImageFile = null, postVideoFile = null, postAudioFile = null;
 let chatAttachmentFile = null, chatAttachmentType = null;
 let mediaRecorder = null, audioChunks = [], isRecording = false;
 
-const ADMIN_USER_ID = "YOUR_ADMIN_USER_ID_HERE";
+// Set your admin email here so your account automatically gets admin powers
+const ADMIN_EMAIL = "admin@pixel.com"; 
 
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -382,7 +392,6 @@ function playRetroSound(type = 'click') {
   }
 }
 
-// Add global sound effects to standard buttons and actions
 document.addEventListener('click', (e) => {
   if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
     playRetroSound('click');
@@ -390,7 +399,7 @@ document.addEventListener('click', (e) => {
 });
 
 function isAdmin(){
-  return currentProfile?.is_admin || currentUser?.id === ADMIN_USER_ID || currentUser?.email === "admin@pixel.com";
+  return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
 }
 
 function toast(m){
@@ -418,6 +427,7 @@ function page(name, btn){
     btn.classList.add("active");
   }
   if(name === 'messages') updateNotificationBadge();
+  if(name === 'adminPanel' && isAdmin()) loadAdminUsers();
 }
 window.page = page;
 
@@ -462,6 +472,17 @@ async function startApp(user){
   $("app").style.display = "block";
   playRetroSound('success');
   await loadProfile();
+
+  // Automatically make your account an admin if email matches ADMIN_EMAIL
+  if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
+    await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);
+    currentProfile.is_admin = true;
+  }
+
+  if(isAdmin()){
+    $("navAdmin").classList.remove("hidden");
+  }
+
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
   page("home");
@@ -547,6 +568,48 @@ async function removeAvatar(){
   }
 }
 window.removeAvatar = removeAvatar;
+
+// --- ADMIN PANEL FUNCTIONS (ADMIN ROLE MANAGEMENT ONLY) ---
+async function loadAdminUsers(){
+  if(!isAdmin()) return toast("❌ Unauthorized access");
+  const r = await sb.from("profiles").select("*").order("username", {ascending: true});
+  if(!r.data) return;
+
+  $("adminUserList").innerHTML = r.data.map(u => {
+    const isUserAdmin = u.is_admin === true;
+    return `
+      <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="row" style="gap:12px; align-items:center;">
+          <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+          <div>
+            <strong>${esc(u.username)}</strong> ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
+            <div class="tiny">ID: ${u.id}</div>
+          </div>
+        </div>
+        <div>
+          <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">
+            ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+window.loadAdminUsers = loadAdminUsers;
+
+async function toggleUserAdmin(targetUserId, currentStatus){
+  if(!isAdmin()) return toast("❌ Admin privileges required.");
+  const newStatus = !currentStatus;
+  const r = await sb.from("profiles").update({ is_admin: newStatus }).eq("id", targetUserId);
+  if(r.error){
+    toast("❌ Error: " + r.error.message);
+  } else {
+    toast(newStatus ? "✅ User promoted to Admin!" : "ℹ️ Admin role revoked.");
+    playRetroSound('success');
+    loadAdminUsers();
+  }
+}
+window.toggleUserAdmin = toggleUserAdmin;
 
 // --- NOTIFICATIONS ---
 async function updateNotificationBadge(){
@@ -737,15 +800,17 @@ window.addComment = addComment;
 async function loadFriends(){
   const r = await sb.from("profiles").select("*").neq("id", currentUser.id).limit(20);
   if(!r.data) return;
-  $("friendsList").innerHTML = r.data.map(u => `
-    <div class="user-card">
-      <div class="row" style="margin-bottom:8px">
-        <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-        <strong>${esc(u.username)}</strong>
+  $("friendsList").innerHTML = r.data.map(u => {
+    return `
+      <div class="user-card">
+        <div class="row" style="margin-bottom:8px">
+          <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+          <strong>${esc(u.username)}</strong>
+        </div>
+        <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
       </div>
-      <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 window.loadFriends = loadFriends;
 
@@ -754,15 +819,17 @@ async function searchUsers(isGlobal){
   if(!q){ if(!isGlobal) loadFriends(); return; }
   const r = await sb.from("profiles").select("*").ilike("username", `%${q}%`).limit(10);
   if(!r.data) return;
-  const html = r.data.map(u => `
-    <div class="user-card">
-      <div class="row" style="margin-bottom:8px">
-        <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-        <strong>${esc(u.username)}</strong>
+  const html = r.data.map(u => {
+    return `
+      <div class="user-card">
+        <div class="row" style="margin-bottom:8px">
+          <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+          <strong>${esc(u.username)}</strong>
+        </div>
+        <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
       </div>
-      <button class="primary" style="width:100%" onclick="openChatWith('${u.id}')">💬 MESSAGE</button>
-    </div>
-  `).join('');
+    `;
+  }).join('');
   if(isGlobal && q.length > 0){
     page("friends");
     $("searchResults").innerHTML = html;
@@ -775,16 +842,18 @@ window.searchUsers = searchUsers;
 async function loadLeaderboard(){
   const r = await sb.from("profiles").select("*").order("xp", {ascending:false}).limit(10);
   if(!r.data) return;
-  $("leaders").innerHTML = r.data.map((u, i) => `
-    <div class="card" style="padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
-      <div class="row">
-        <strong>#${i+1}</strong> 
-        <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div> 
-        <span>${esc(u.username)}</span>
+  $("leaders").innerHTML = r.data.map((u, i) => {
+    return `
+      <div class="card" style="padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+        <div class="row">
+          <strong>#${i+1}</strong> 
+          <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div> 
+          <span>${esc(u.username)}</span>
+        </div>
+        <div>XP: <strong>${u.xp||0}</strong></div>
       </div>
-      <div>XP: <strong>${u.xp||0}</strong></div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 window.loadLeaderboard = loadLeaderboard;
 
@@ -792,12 +861,14 @@ window.loadLeaderboard = loadLeaderboard;
 async function loadMessageUsers(){
   const r = await sb.from("profiles").select("*").neq("id", currentUser.id);
   if(!r.data) return;
-  $("messageUsers").innerHTML = r.data.map(u => `
-    <div id="chatUser_${u.id}" class="chat-user" onclick="selectChatUser('${u.id}', '${esc(u.username)}')">
-      <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}<span class="online"></span></div>
-      <div><strong>${esc(u.username)}</strong><div class="tiny">Online</div></div>
-    </div>
-  `).join('');
+  $("messageUsers").innerHTML = r.data.map(u => {
+    return `
+      <div id="chatUser_${u.id}" class="chat-user" onclick="selectChatUser('${u.id}', '${esc(u.username)}')">
+        <div class="user-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}<span class="online"></span></div>
+        <div><strong>${esc(u.username)}</strong><div class="tiny">Online</div></div>
+      </div>
+    `;
+  }).join('');
 }
 window.loadMessageUsers = loadMessageUsers;
 
