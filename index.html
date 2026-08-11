@@ -3,1384 +3,621 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PIXEL FRIEND — V4 MEDIA + SOUND NOTIFICATIONS</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIXEL FRIEND — Classic Pixel v2</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;font-family:monospace,Arial,sans-serif;background:#070b18;color:#f7fbff}
+html,body{margin:0;min-height:100%;font-family:"Courier New",monospace;background:#070b16;color:#d9e8ff}
 body{
-  background:
-    linear-gradient(rgba(67,232,255,.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(67,232,255,.035) 1px,transparent 1px),
-    radial-gradient(circle at 15% 15%,rgba(155,108,255,.16),transparent 28%),
-    radial-gradient(circle at 85% 75%,rgba(255,79,216,.10),transparent 30%),
-    linear-gradient(180deg,#050814,#0a1022 50%,#070b18);
-  background-size:16px 16px,16px 16px,auto,auto,auto;
+  background-color:#070b16;
+  background-image:
+    linear-gradient(rgba(60,90,160,.10) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(60,90,160,.10) 1px,transparent 1px),
+    linear-gradient(rgba(140,60,220,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(140,60,220,.05) 1px,transparent 1px);
+  background-size:8px 8px,8px 8px,32px 32px,32px 32px;
 }
-button,input,textarea,select{font:inherit}
+button,input,textarea{font:inherit}
 button{cursor:pointer}
-.hidden{display:none!important}
-.muted{color:#8fa2c5;font-size:12px}
-.status{min-height:20px;margin-top:8px;color:#52e89a;font-size:12px}
-.error{color:#ff6b8a}
-.card{
-  background:linear-gradient(145deg,#111a33,#0c1429);
-  border:2px solid #2c3d68;border-radius:8px;padding:18px;
-  box-shadow:6px 6px 0 #03050d,0 0 24px rgba(67,232,255,.06);
+.top{
+  height:58px;border-bottom:2px solid #263d75;background:#090d19;
+  display:flex;align-items:center;padding:0 14px;gap:12px;position:sticky;top:0;z-index:20;
+  box-shadow:0 3px 0 #02040a;
 }
-.auth{min-height:100vh;display:grid;place-items:center;padding:18px}
-.authBox{width:min(440px,100%);padding:28px}
-.logo{text-align:center;font-weight:900;font-size:28px;letter-spacing:3px;text-shadow:4px 4px 0 #03050d}
-.logoIcon{font-size:65px;display:block}
-.tag{text-align:center;color:#8fa2c5;font-size:11px;letter-spacing:2px}
-.tabs{display:flex;gap:8px;margin:22px 0 14px}
-.tabs button{flex:1;padding:11px;border:2px solid #30446f;background:#111c38;color:#fff;border-radius:6px}
-.tabs .active,.primary{background:linear-gradient(180deg,#5aa0ff,#356ee0);border-color:#9bc5ff;color:#fff}
-.primary,.secondary,.dangerBtn{
-  padding:10px 14px;border-radius:6px;border:2px solid #30446f;font-weight:900
+.logo{font-weight:bold;letter-spacing:2px;color:#fff;font-size:15px}
+.logo span{color:#73e8ff}
+.top-spacer{flex:1}
+.search{width:230px;background:#0c1325;color:#bcd2ff;border:1px solid #35528b;padding:10px}
+.iconbtn,.sendbtn,.navbtn,.tabbtn,.friendbtn,.attachbtn{
+  border:1px solid #3c5e9c;background:#14264b;color:#dceaff;padding:9px 11px;
 }
-.secondary{background:#111c38;color:#fff}
-.dangerBtn{background:#351526;color:#ff9eb0}
-.field{
-  width:100%;margin:7px 0;padding:12px;border:2px solid #273a65;
-  background:#080f22;color:#fff;border-radius:5px;outline:none
+.iconbtn:hover,.sendbtn:hover,.navbtn:hover,.tabbtn:hover,.friendbtn:hover,.attachbtn:hover{background:#1d3970}
+.badge{background:#ffcf33;color:#111;padding:2px 6px;font-size:11px;font-weight:bold}
+.layout{display:flex;min-height:calc(100vh - 58px)}
+.sidebar{
+  width:205px;border-right:2px solid #263d75;background:rgba(8,13,27,.94);padding:14px 10px;
 }
-.field:focus{border-color:#43e8ff}
-.app{display:none}
-.topbar{
-  height:60px;position:sticky;top:0;z-index:50;display:flex;
-  align-items:center;justify-content:space-between;padding:8px 12px;
-  background:rgba(7,11,24,.95);border-bottom:2px solid #9b6cff
+.avatar{
+  width:74px;height:74px;border:2px solid #5076ae;margin:0 auto 8px;
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  background:linear-gradient(135deg,#18304d,#11182b);position:relative;
 }
-.brand{font-size:16px;font-weight:900;letter-spacing:2px;cursor:pointer}
-.actions{display:flex;gap:7px;align-items:center}
-.search{width:220px;margin:0}
-.icon{
-  width:38px;height:38px;border:2px solid #30446f;background:#111c38;
-  color:#fff;border-radius:6px
+.online{position:absolute;right:2px;bottom:2px;width:10px;height:10px;background:#42ff9b;border:1px solid #06140d}
+.username{text-align:center;color:#fff;font-weight:bold;margin-bottom:12px}
+.role{text-align:center;font-size:10px;color:#aebfe1;margin-bottom:16px}
+.xp{font-size:10px;color:#8fa8d5;text-align:center}
+.xpbar{height:7px;border:1px solid #355184;margin:5px 0 16px}
+.xpbar i{display:block;width:25%;height:100%;background:#56e7b1}
+.navbtn{display:block;width:100%;margin:6px 0;text-align:left;background:transparent;border-color:transparent}
+.navbtn.active{background:#142c58;border-color:#3f63a3}
+.navbtn:hover{border-color:#3f63a3}
+.main{flex:1;padding:24px;min-width:0}
+.wrap{max-width:1100px;margin:0 auto}
+.panel{
+  border:1px solid #36588e;background:rgba(9,17,35,.92);box-shadow:0 0 0 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.35);
 }
-.layout{display:grid;grid-template-columns:180px 1fr;min-height:calc(100vh - 60px)}
-aside{
-  padding:12px;background:#080d1d;border-right:2px solid #26365e;
-  min-height:calc(100vh - 60px)
+.panelhead{padding:15px;border-bottom:1px solid #2d4879;display:flex;align-items:center;gap:10px}
+.panelhead h1{font-size:18px;margin:0;color:#fff}
+.tabs{display:flex;border-bottom:1px solid #2d4879}
+.tabbtn{flex:1;border-width:0 1px 0 0;background:#0d1830}
+.tabbtn.active{background:#19345f;color:#fff}
+.content{padding:16px}
+.view{display:none}.view.active{display:block}
+.composer{
+  border:1px solid #2e4d80;background:#0b1428;padding:12px;margin-bottom:18px;
 }
-.sideAvatar{
-  width:78px;height:78px;margin:auto;border-radius:8px;background:#1a2a49;
-  border:2px solid #385181;display:grid;place-items:center;font-size:38px;
-  overflow:hidden;position:relative
+textarea,input[type=text]{
+  width:100%;background:#060b17;color:#e9f2ff;border:1px solid #36598f;
+  padding:11px;outline:none;
 }
-.sideAvatar img,.profileAvatar img,.userAvatar img,.headImg{
-  width:100%;height:100%;object-fit:cover
+textarea:focus,input[type=text]:focus{border-color:#64b8ff;box-shadow:0 0 0 1px #64b8ff}
+.actions{display:flex;gap:7px;margin-top:8px;flex-wrap:wrap}
+.attachbtn{font-size:12px}
+.file-name{font-size:10px;color:#8ea6ce;align-self:center}
+.sendbtn{background:#2a6bdc;border-color:#66a6ff;color:#fff;font-weight:bold}
+.post{
+  border:1px solid #2c4878;background:#0b1427;margin:12px 0;padding:12px;
 }
-.online{
-  position:absolute;right:3px;bottom:3px;width:11px;height:11px;
-  background:#45e89a;border:2px solid #081124;border-radius:50%
+.posthead{display:flex;gap:10px;align-items:center}
+.miniavatar{width:38px;height:38px;border:1px solid #5276a9;background:#172947;display:flex;align-items:center;justify-content:center}
+.postname{font-weight:bold;color:#fff}.time{font-size:10px;color:#728ab2}
+.postbody{padding:12px 0;color:#c8d7ee;white-space:pre-wrap;line-height:1.45}
+.postmedia{max-width:100%;max-height:420px;display:block;margin-top:8px;border:1px solid #345485}
+.postactions{display:flex;gap:7px;border-top:1px solid #223b68;padding-top:8px}
+.smallbtn{background:#101f3c;border:1px solid #34578d;color:#bfd3f4;padding:6px 9px;font-size:11px}
+.message-layout{display:grid;grid-template-columns:230px 1fr;min-height:530px}
+.friends{border-right:1px solid #2d4879;padding:10px}
+.friendbtn{display:block;width:100%;text-align:left;margin-bottom:8px}
+.friendbtn.active{background:#1a3768}
+.chat{display:flex;flex-direction:column;min-width:0}
+.chathead{padding:13px;border-bottom:1px solid #2d4879}
+.chatname{font-weight:bold;color:#fff}
+.chatmessages{flex:1;padding:12px;overflow:auto;min-height:330px}
+.empty{text-align:center;color:#657fae;padding:90px 10px}
+.msg{max-width:75%;margin:8px 0;padding:9px 11px;border:1px solid #35578d;background:#101e39;line-height:1.35}
+.msg.mine{margin-left:auto;background:#17366a;border-color:#477cc1}
+.msgmeta{font-size:9px;color:#8098bf;margin-top:5px}
+.msgmedia{max-width:100%;max-height:240px;display:block;margin-top:7px}
+.chatcomposer{border-top:1px solid #2d4879;padding:10px}
+.notify{
+  position:fixed;right:18px;bottom:18px;z-index:50;width:310px;
+  background:#101d37;border:1px solid #4d78b7;box-shadow:0 8px 25px #000;
+  padding:12px;display:none;
 }
-.badges{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin:7px 0}
-.badge{background:#1a2a50;border:1px solid #3d5688;padding:4px 7px;border-radius:5px;font-size:10px}
-.badge.admin{background:#743fff;color:#fff}
-.xpTrack{height:7px;background:#070d1c;border:1px solid #2d416c;border-radius:9px;overflow:hidden}
-.xpFill{height:100%;width:0;background:#55f59b}
-.menu{display:grid;gap:6px;margin-top:20px}
-.menu button{
-  padding:10px;text-align:left;border:2px solid transparent;
-  background:transparent;color:#a9b6cf;border-radius:5px;font-weight:900
+.notify.show{display:block;animation:pop .18s ease-out}
+@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.notify strong{color:#fff}.notify small{color:#91a9d0}
+.status{font-size:10px;color:#62f0b2;margin-left:auto}
+.modal{
+ position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;
 }
-.menu button:hover,.menu button.active{background:#182a50;border-color:#34518a;color:#fff}
-.main{width:min(1200px,100%);margin:auto;padding:22px}
-.page{display:none}
-.page.active{display:block}
-.hero{
-  display:flex;align-items:center;justify-content:space-between;padding:23px;
-  border:2px solid #405a91;border-radius:8px;
-  background:linear-gradient(135deg,#172b58,#241b52);
-  margin-bottom:16px;box-shadow:8px 8px 0 #03050d
-}
-.heroIcon{font-size:58px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.userCard{padding:14px;background:#121f38;border:2px solid #263b61;border-radius:8px}
-.userAvatar{
-  width:58px;height:58px;border-radius:8px;background:#1a2a49;
-  border:2px solid #304a77;display:grid;place-items:center;font-size:28px;
-  overflow:hidden;margin-bottom:8px
-}
-.userCard button{width:100%;margin-top:7px}
-.messagesLayout{
-  display:grid;grid-template-columns:215px 1fr;min-height:600px
-}
-.chatUsers{border-right:2px solid #263b61;padding-right:12px}
-.chatUser{
-  padding:11px;border-radius:5px;margin:5px 0;background:#101a2e;
-  border:2px solid transparent;cursor:pointer
-}
-.chatUser:hover,.chatUser.active{border-color:#34518a;background:#182a50}
-.chat{padding-left:15px;display:flex;flex-direction:column;min-width:0}
-.chatList{
-  flex:1;min-height:360px;max-height:520px;overflow:auto;
-  padding:12px 3px;border:1px solid rgba(48,68,111,.35)
-}
-.messageWrap{margin:9px 0}
-.message{
-  max-width:78%;background:#1c2d4e;border:2px solid #31466f;
-  border-radius:5px;padding:10px 12px;box-shadow:3px 3px 0 #03050d;
-  white-space:pre-wrap;word-break:break-word
-}
-.message.mine{margin-left:auto;background:linear-gradient(135deg,#396fdc,#5a54c8);border-color:#91aaff}
-.message small{display:block;opacity:.55;margin-top:5px;font-size:10px}
-.messageActions{display:flex;gap:4px;margin-top:3px;opacity:.35}
-.messageWrap:hover .messageActions{opacity:1}
-.messageActions button{
-  font-size:10px;border:1px solid #263b61;background:#0e1729;color:#fff;
-  border-radius:5px;padding:3px 6px
-}
-.replyBox{
-  padding:8px;background:#182b4b;border-left:3px solid #55d9ff;margin-bottom:6px
-}
-.composer{display:flex;gap:6px;align-items:center;margin-top:8px}
-.composer .field{margin:0}
-.toolBtn{
-  padding:10px;border:2px solid #263b61;background:#182743;color:#fff;border-radius:6px
-}
-.toolBtn:disabled,.primary:disabled{opacity:.45;cursor:not-allowed}
-.profileAvatar{
-  width:125px;height:125px;margin:auto;border-radius:10px;background:#1a2a49;
-  border:3px solid #385181;display:grid;place-items:center;font-size:55px;
-  overflow:hidden;position:relative
-}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.stat{padding:14px;text-align:center;background:#182743;border-radius:8px}
-.stat b{display:block;font-size:24px}
-.rank{display:flex;justify-content:space-between;padding:11px;border-bottom:1px solid #263b61}
-.adminStats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.adminStat{padding:13px;background:#1a1733;border:1px solid #5a4b8f;border-radius:8px}
-.adminStat b{display:block;font-size:23px;color:#d5c8ff}
-.adminUser{display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center;padding:8px;border-bottom:1px solid #263b61}
-.toast{
-  position:fixed;right:18px;bottom:18px;z-index:200;background:#111d34;
-  border:2px solid #43e8ff;padding:13px 16px;border-radius:6px;
-  max-width:420px;box-shadow:5px 5px 0 #03050d
-}
-.count{position:absolute;right:-6px;top:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:20px;background:#ff5278;border:2px solid #081124;display:grid;place-items:center;font-size:10px;font-weight:900}
-.panel{position:absolute;right:0;top:51px;width:360px;max-height:480px;overflow:auto;background:#10192c;border:2px solid #304a77;border-radius:8px;box-shadow:0 20px 50px #000b;z-index:100}
-.panelHead{padding:12px;border-bottom:2px solid #263b61;display:flex;justify-content:space-between}
-.panelHead button{background:none;border:0;color:#55d9ff;font-weight:900;cursor:pointer}
-.note{padding:12px;border-bottom:1px solid #263b61}
-.note.unread{background:#182b4b}
-.notificationButton{position:relative}
-.notificationFlash{animation:notificationFlash .55s steps(2,end) 3}
-@keyframes notificationFlash{50%{filter:brightness(1.8);transform:translate(-1px,-1px)}}
-@media(max-width:800px){
-  .layout{grid-template-columns:1fr} aside{display:none}
-  .search{display:none}
-  .messagesLayout{grid-template-columns:1fr}
-  .chatUsers{border-right:0;border-bottom:2px solid #263b61;padding:0 0 12px}
-  .hero{flex-direction:column;text-align:center}
-  .adminStats{grid-template-columns:repeat(2,1fr)}
-  .composer{flex-wrap:wrap}
-  .composer .field{flex:1 1 100%}
+.modal.show{display:flex}
+.modalbox{width:min(500px,92vw);background:#0c152a;border:1px solid #4c72ae;padding:18px}
+.modalbox h2{margin-top:0;color:#fff;font-size:16px}
+.close{float:right;background:none;border:0;color:#fff;font-size:18px}
+.toast{position:fixed;top:70px;right:18px;background:#13294b;border:1px solid #4f78b8;padding:10px 14px;z-index:80;display:none}
+.toast.show{display:block}
+@media(max-width:760px){
+ .sidebar{width:70px;padding:8px}.username,.role,.xp,.xpbar{display:none}
+ .avatar{width:50px;height:50px;font-size:20px}
+ .navbtn{font-size:0;text-align:center;padding:12px 4px}
+ .navbtn:first-letter{font-size:18px}
+ .search{width:130px}
+ .main{padding:10px}
+ .message-layout{grid-template-columns:1fr}
+ .friends{border-right:0;border-bottom:1px solid #2d4879;display:flex;gap:6px;overflow:auto}
+ .friendbtn{min-width:150px;margin:0}
 }
 
-.mediaBar{display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap}
-.mediaPreview{display:none;margin-top:8px;padding:8px;border:2px dashed #34518a;background:#0b1428;border-radius:6px}
-.mediaPreview.show{display:block}
-.mediaPreview img,.mediaPreview video,.mediaPreview audio{max-width:100%;max-height:260px;border-radius:5px;border:1px solid #304a77}
-.mediaThumb{margin-top:8px;max-width:100%;max-height:300px;border-radius:6px;border:1px solid #304a77;display:block}
-.mediaCaption{font-size:10px;color:#9fb0d0;margin-top:5px;word-break:break-all}
-.attachBtn{padding:9px 11px;border:2px solid #263b61;background:#182743;color:#fff;border-radius:6px}
-.attachBtn:hover{border-color:#55d9ff}
-.composer{flex-wrap:wrap}
-.composer .field{flex:1 1 auto;min-width:160px}
-.composerTools{display:flex;gap:5px;align-items:center}
-.notificationHelp{font-size:10px;color:#8fa2c5;margin-top:4px}
+/* ===== CLASSIC PIXEL SOCIAL EXTRAS ===== */
+.profile-card{border:1px solid #36588e;background:#0b1428;padding:14px;margin-bottom:16px}
+.profile-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.profile-avatar{width:92px;height:92px;border:2px solid #5a83bb;background:#101e38;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-avatar .avatar-fallback{font-size:34px}
+.avatar-upload{font-size:10px;color:#91a9d0}
+.reactbar{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.reactbtn{background:#101f3c;border:1px solid #34578d;color:#d7e7ff;padding:5px 8px;font-size:11px}
+.reactbtn.active{background:#244b7d;border-color:#69a9ff}
+.reaction-count{font-size:10px;color:#91a9d0;margin-left:4px}
+.stickerbar{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.stickerbtn{background:#101f3c;border:1px solid #34578d;padding:6px 8px;font-size:18px}
+.voicebtn{background:#172d55;border:1px solid #4a74ac;color:#fff;padding:8px 10px;font-size:11px}
+.voicebtn.recording{background:#702a4b;border-color:#ff6f9d}
+.voice-preview{display:flex;align-items:center;gap:8px;margin-top:7px}
+.voice-preview audio{width:min(280px,100%);height:32px}
+.msg-reactions{margin-top:6px}
+.sticker-message{font-size:30px;line-height:1}
+.profile-name-big{font-size:18px;color:#fff;font-weight:bold}
+.profile-meta{font-size:10px;color:#8fa8d5;margin-top:3px}
+.hidden-input{display:none}
+
 </style>
 </head>
-
 <body>
 
-<div id="authScreen" class="auth">
-  <div class="authBox card">
-    <div class="logo"><span class="logoIcon">👾</span>PIXEL FRIEND</div>
-    <p class="tag">CONNECT • SHARE • PLAY • LEVEL UP</p>
-
-    <div class="tabs">
-      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>
-      <button id="registerTab" onclick="authTab('register')">REGISTER</button>
-    </div>
-
-    <div id="loginPane">
-      <input id="loginEmail" class="field" type="email" placeholder="EMAIL">
-      <input id="loginPassword" class="field" type="password" placeholder="PASSWORD">
-      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button>
-    </div>
-
-    <div id="registerPane" class="hidden">
-      <input id="registerName" class="field" maxlength="20" placeholder="PIXEL USERNAME">
-      <input id="registerEmail" class="field" type="email" placeholder="EMAIL">
-      <input id="registerPassword" class="field" type="password" placeholder="PASSWORD">
-      <select id="registerAvatar" class="field">
-        <option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option>
-        <option>🐱</option><option>🐼</option><option>🧙</option><option>🦁</option>
-        <option>🐯</option><option>🐲</option>
-      </select>
-      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>
-    </div>
-    <div id="authStatus" class="status"></div>
-  </div>
-</div>
-
-<div id="app" class="app">
-<header class="topbar">
-  <div class="brand" onclick="go('home')">🎮 PIXEL FRIEND</div>
-  <div class="actions">
-    <input id="globalSearch" class="field search" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
-    <button class="icon notificationButton" onclick="toggleNotifications()" id="notificationButton">🔔<span id="notificationCount" class="count hidden">0</span></button>
-    <button class="icon" onclick="go('messages')">💬</button>
-    <button class="icon" onclick="toggleSound()" id="soundButton">🔊</button>
-    <div id="notificationPanel" class="panel hidden">
-      <div class="panelHead"><b>🔔 NOTIFICATIONS</b><div><button onclick="enableBrowserNotifications()">ENABLE</button> <button onclick="markAllRead()">READ ALL</button></div></div>
-      <div id="notificationList"><div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div></div>
-    </div>
-    <button class="icon" onclick="go('profile')" id="headAvatar">👾</button>
-  </div>
+<header class="top">
+  <div class="logo">🎮 PIXEL <span>FRIEND</span></div>
+  <div class="top-spacer"></div>
+  <input class="search" id="search" placeholder="SEARCH FRIENDS..." oninput="searchFriends(this.value)">
+  <button class="iconbtn" id="notifyBtn" title="Enable browser notifications">🔔 <span id="notifyDot"></span></button>
+  <button class="iconbtn" onclick="testSound()" title="Test notification sound">🔊</button>
 </header>
 
 <div class="layout">
-<aside>
-  <div style="text-align:center">
-    <div id="sideAvatar" class="sideAvatar">👾<span class="online"></span></div>
-    <h3 id="sideName">PLAYER</h3>
-    <div id="sideBadges" class="badges"></div>
-    <p id="sideBio" class="muted">PIXEL EXPLORER</p>
-    LEVEL <span id="sideLevel">1</span>
-    <div class="xpTrack"><div id="xpFill" class="xpFill"></div></div>
-    <p id="xpText" class="muted">0 / 100 XP</p>
-  </div>
-
-  <nav class="menu">
-    <button class="active" onclick="go('home',this)">🏠 HOME</button>
-    <button onclick="go('friends',this)">👥 FRIENDS</button>
-    <button onclick="go('messages',this)">💬 MESSAGES</button>
-    <button onclick="go('rank',this)">🏆 RANK</button>
-    <button onclick="go('profile',this)">👤 PROFILE</button>
-    <button id="adminNav" class="hidden" onclick="go('admin',this)">👑 ADMIN CONTROL</button>
-    <button class="dangerBtn" onclick="logout()">🚪 LOGOUT</button>
-  </nav>
+<aside class="sidebar">
+  <div class="avatar" id="sideAvatar">👤<i class="online"></i></div>
+  <div class="username">CARTER</div>
+  <div class="role">👑 ADMIN &nbsp; LEVEL 1</div>
+  <div class="xp">PIXEL EXPLORER<br><br>LEVEL 1</div>
+  <div class="xpbar"><i></i></div>
+  <div class="xp">20 / 100 XP</div>
+  <hr style="border-color:#17294a;margin:18px 0">
+  <button class="navbtn active" data-tab="home">🏠 HOME</button>
+  <button class="navbtn" data-tab="friends">👥 FRIENDS</button>
+  <button class="navbtn" data-tab="messages">💬 MESSAGES</button>
+  <button class="navbtn" data-tab="profile">👤 PROFILE</button>
+  <button class="navbtn" data-tab="admin">👑 ADMIN CONTROL</button>
+  <button class="navbtn" onclick="resetDemo()">🚪 RESET DEMO</button>
 </aside>
 
 <main class="main">
-
-<section id="home" class="page active">
-  <div class="hero">
-    <div>
-      <h1>WELCOME TO PIXEL WORLD 👾</h1>
-      <p>SHARE POSTS • MAKE FRIENDS • EARN XP</p>
-    </div>
-    <div class="heroIcon">🕹️</div>
+<div class="wrap panel">
+  <div class="panelhead"><span>🟩</span><h1>CLASSIC PIXEL SOCIAL</h1><span class="status">● LOCAL ONLINE</span></div>
+  <div class="tabs">
+    <button class="tabbtn active" data-tab="home">POSTS</button>
+    <button class="tabbtn" data-tab="messages">MESSAGES</button>
+    <button class="tabbtn" data-tab="friends">FRIENDS</button>
+    <button class="tabbtn" data-tab="profile">PROFILE</button>
   </div>
 
-  <div class="card">
-    <h2>✍️ CREATE PIXEL POST</h2>
-    <textarea id="postText" class="field" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
-    <div class="mediaBar">
-      <input id="postMediaInput" type="file" accept="image/*,video/*,audio/*" class="hidden" onchange="preparePostMedia(this.files[0])">
-      <button class="attachBtn" onclick="document.getElementById('postMediaInput').click()">📎 MEDIA</button>
-      <button class="attachBtn" id="postMediaClear" onclick="clearPostMedia()" style="display:none">✕ REMOVE</button>
-    </div>
-    <div id="postMediaPreview" class="mediaPreview"></div>
-    <button class="primary" onclick="createPost()">🚀 PUBLISH +10 XP</button>
-    <div id="postStatus" class="status"></div>
-  </div>
-  <div id="feed"></div>
-</section>
-
-<section id="friends" class="page">
-  <div class="card">
-    <h1>👥 PIXEL COMMUNITY</h1>
-    <input id="friendSearch" class="field" placeholder="SEARCH PIXEL FRIENDS..." oninput="searchUsers()">
-  </div>
-  <div id="searchResults" class="grid"></div>
-  <div class="card">
-    <h2>🤝 MY FRIENDS</h2>
-    <div id="friendsList" class="grid"></div>
-  </div>
-</section>
-
-<section id="messages" class="page">
-  <div class="card">
-    <div class="messagesLayout">
-
-      <div class="chatUsers">
-        <h2>💬 MESSAGES</h2>
-        <p class="muted">SELECT A PIXEL FRIEND</p>
-        <div id="messageUsers"></div>
+  <section id="home" class="view active">
+    <div class="content">
+      <div class="composer">
+        <textarea id="postText" rows="3" placeholder="WHAT'S HAPPENING, CARTER?"></textarea>
+        <div class="actions">
+          <label class="attachbtn">🖼️ IMAGE / VIDEO
+            <input id="postMedia" type="file" accept="image/*,video/*" hidden>
+          </label>
+          <span id="postFile" class="file-name">NO MEDIA SELECTED</span>
+          <button class="sendbtn" onclick="createPost()">POST</button>
+        </div>
       </div>
+      <div id="feed"></div>
+    </div>
+  </section>
 
+  <section id="messages" class="view">
+    <div class="message-layout">
+      <div class="friends" id="friendList"></div>
       <div class="chat">
-        <h2 id="chatTitle">SELECT A FRIEND</h2>
-        <div id="chatSubtitle" class="muted">PIXEL CHAT</div>
-
-        <div id="chatList" class="chatList">
-          <div class="muted" style="text-align:center;padding:30px">
-            👈 SELECT A USER
+        <div class="chathead">💬 <span id="chatTitle" class="chatname">pixel</span><div style="font-size:10px;color:#7893bd;margin-top:3px">PIXEL FRIEND</div></div>
+        <div id="chatMessages" class="chatmessages"></div>
+        <div class="chatcomposer">
+          <textarea id="messageText" rows="2" placeholder="WRITE A MESSAGE..."></textarea>
+          <div class="stickerbar" id="stickerBar">
+            <button class="stickerbtn" onclick="insertSticker('😀')">😀</button>
+            <button class="stickerbtn" onclick="insertSticker('😂')">😂</button>
+            <button class="stickerbtn" onclick="insertSticker('❤️')">❤️</button>
+            <button class="stickerbtn" onclick="insertSticker('🔥')">🔥</button>
+            <button class="stickerbtn" onclick="insertSticker('🎮')">🎮</button>
+            <button class="stickerbtn" onclick="insertSticker('🐸')">🐸</button>
+            <button class="stickerbtn" onclick="insertSticker('🌸')">🌸</button>
+            <button class="stickerbtn" onclick="insertSticker('⭐')">⭐</button>
+          </div>
+          <div class="actions">
+            <label class="attachbtn">🖼️ MEDIA
+              <input id="messageMedia" type="file" accept="image/*,video/*" hidden>
+            </label>
+            <span id="messageFile" class="file-name">NO MEDIA</span>
+            <button class="voicebtn" id="voiceBtn" onclick="toggleVoiceRecording()">🎙 VOICE</button>
+            <span id="voiceStatus" class="file-name">VOICE OFF</span>
+            <button class="sendbtn" onclick="sendMessage()">SEND</button>
           </div>
         </div>
-
-        <div class="composer">
-          <input id="messageInput" class="field"
-                 placeholder="TYPE A MESSAGE..."
-                 disabled
-                 onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage()}">
-          <div class="composerTools">
-            <input id="messageMediaInput" type="file" accept="image/*,video/*,audio/*" class="hidden" onchange="prepareMessageMedia(this.files[0])">
-            <button class="attachBtn" id="messageMediaButton" onclick="document.getElementById('messageMediaInput').click()" disabled>📎</button>
-            <button class="attachBtn" id="messageMediaClear" onclick="clearMessageMedia()" style="display:none">✕</button>
-            <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
-          </div>
-        </div>
-        <div id="messageMediaPreview" class="mediaPreview"></div>
-
-        <div id="messageStatus" class="status"></div>
       </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<section id="rank" class="page">
-  <div class="card">
-    <h1>🏆 PIXEL LEADERBOARD</h1>
-    <div id="leaders"></div>
-  </div>
-</section>
+  <section id="friends" class="view"><div class="content">
+    <h3>👥 PIXEL FRIENDS</h3>
+    <div id="friendsGrid"></div>
+  </div></section>
 
-<section id="profile" class="page">
-  <div class="card" style="text-align:center">
-    <div id="profileAvatar" class="profileAvatar">👾<span class="online"></span></div>
-    <h1 id="profileName">PLAYER</h1>
-    <div id="profileBadges" class="badges"></div>
-    <p id="profileBio">PIXEL EXPLORER</p>
-
-    <div class="stats">
-      <div class="stat"><b id="statPosts">0</b>POSTS</div>
-      <div class="stat"><b id="statLevel">1</b>LEVEL</div>
-      <div class="stat"><b id="statXP">0</b>XP</div>
+  <section id="profile" class="view"><div class="content">
+    <div class="profile-card">
+      <div class="profile-row">
+        <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('avatarInput').click()">
+          <span class="avatar-fallback">👤</span>
+        </div>
+        <div>
+          <div class="profile-name-big">CARTER</div>
+          <div class="profile-meta">👑 ADMIN • LEVEL 1 • PIXEL EXPLORER</div>
+          <div class="profile-meta">Click your avatar to upload a profile picture.</div>
+          <input id="avatarInput" class="hidden-input" type="file" accept="image/*">
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+    <h3>👤 CARTER PROFILE</h3>
+    <p style="color:#91a9d0">CLASSIC PIXEL FRIEND PROFILE</p>
+    <button class="sendbtn" onclick="enableNotifications()">🔔 ENABLE NOTIFICATIONS</button>
+    <button class="smallbtn" onclick="removeAvatar()">REMOVE AVATAR</button>
+  </div></section>
 
-<section id="admin" class="page">
-  <div class="card">
-    <h1>👑 ADMIN CONTROL CENTER</h1>
-    <div class="adminStats">
-      <div class="adminStat">USERS<b id="adminUsersCount">0</b></div>
-      <div class="adminStat">POSTS<b id="adminPostsCount">0</b></div>
-      <div class="adminStat">MESSAGES<b id="adminMessagesCount">0</b></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>🛡️ USER ROLE MANAGEMENT</h2>
-    <input id="adminSearch" class="field" placeholder="SEARCH USERNAME..." oninput="loadAdminUsers()">
-    <div id="adminUsersList"></div>
-  </div>
-</section>
-
+  <section id="admin" class="view"><div class="content">
+    <h3>👑 ADMIN CONTROL</h3>
+    <p style="color:#91a9d0">Demo controls for this standalone HTML version.</p>
+    <button class="smallbtn" onclick="simulateIncoming()">SIMULATE NEW MESSAGE</button>
+    <button class="smallbtn" onclick="simulatePost()">SIMULATE NEW POST</button>
+  </div></section>
+</div>
 </main>
 </div>
-</div>
 
-<div id="toast" class="toast hidden"></div>
+<div id="notify" class="notify"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-/* =========================================================
-   PIXEL FRIEND — SIMPLE WORKING SUPABASE VERSION
-   IMPORTANT:
-   This version intentionally DOES NOT use messages.is_read.
-   Your screenshot showed that column is missing.
-   ========================================================= */
+/*
+  CLASSIC PIXEL FRIEND
+  --------------------
+  Standalone HTML:
+  - No external libraries
+  - No SQL required
+  - Posts/messages persist in localStorage
+  - Image/video attachments are stored locally as data URLs
+  - Notification sound uses Web Audio (no MP3 file needed)
+  - Browser notifications are optional and require permission
+*/
 
-const SUPABASE_URL = 'https://vvfkfpsyxipnypaltixq.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP';
+const KEY = "pixel_friend_classic_v1";
+const friends = [
+  {id:"pixel",name:"pixel",icon:"🐸",role:"PIXEL PLAYER"},
+  {id:"shika",name:"鹿丸 SHIKA",icon:"🦌",role:"PIXEL NINJA"},
+  {id:"kevin",name:"凯文 KEVIN",icon:"😎",role:"PIXEL PLAYER"},
+  {id:"pinky",name:"PINKY",icon:"🌸",role:"PIXEL PLAYER"}
+];
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY,
-  {
-    auth:{
-      persistSession:true,
-      autoRefreshToken:true,
-      detectSessionInUrl:true
-    }
-  }
-);
+let state = JSON.parse(localStorage.getItem(KEY) || "null") || {
+  posts: [{
+    id:Date.now()-10000,user:"pixel",text:"WELCOME TO CLASSIC PIXEL FRIEND! 👋",media:null,time:new Date(Date.now()-10000).toISOString(),likes:0
+  }],
+  messages: {},
+  selected:"pixel",
+  avatar:null
+};
 
-let currentUser = null;
-let currentProfile = null;
-let selectedUser = null;
-let messageChannel = null;
-let searchTimer = null;
-
-/* ---------- helpers ---------- */
-
-const $ = id => document.getElementById(id);
-
-function esc(v){
-  return String(v ?? '').replace(/[&<>'"]/g,c=>({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    "'":'&#39;',
-    '"':'&quot;'
-  }[c]));
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+state.avatar = state.avatar || null;
+state.posts = (state.posts || []).map(p => ({...p, reactions:p.reactions||{}}));
+function esc(s){
+  return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 }
-
-function status(id,msg,isError=false){
-  const el=$(id);
-  if(!el)return;
-  el.textContent=msg||'';
-  el.className=isError?'status error':'status';
+function fmt(t){
+  const d=new Date(t); return d.toLocaleString([], {month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"});
 }
-
 function toast(msg){
-  const el=$('toast');
-  el.textContent=msg;
-  el.classList.remove('hidden');
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer=setTimeout(()=>el.classList.add('hidden'),3500);
+  const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2200);
 }
 
-let audioContext=null;
-let soundEnabled=true;
-let audioUnlocked=false;
-let browserNotificationsEnabled=false;
-
-function unlockAudio(){
+/* ---------- sound + notifications ---------- */
+let audioCtx=null;
+function beep(kind="message"){
   try{
-    const C=window.AudioContext||window.webkitAudioContext;
-    if(!C)return false;
-    if(!audioContext)audioContext=new C();
-    if(audioContext.state==='suspended')audioContext.resume();
-    audioUnlocked=true;
-    return true;
-  }catch(e){
-    console.warn('Audio unlock failed:',e);
-    return false;
-  }
-}
-
-function beep(kind='message'){
-  if(!soundEnabled)return;
-  try{
-    if(!unlockAudio())return;
-    const now=audioContext.currentTime;
-    const o=audioContext.createOscillator();
-    const g=audioContext.createGain();
-    o.type='square';
-    o.frequency.setValueAtTime(kind==='notification'?880:720,now);
-    o.frequency.exponentialRampToValueAtTime(kind==='notification'?1180:900,now+.12);
-    g.gain.setValueAtTime(.0001,now);
-    g.gain.exponentialRampToValueAtTime(.14,now+.015);
-    g.gain.exponentialRampToValueAtTime(.0001,now+.22);
-    o.connect(g);g.connect(audioContext.destination);
-    o.start(now);o.stop(now+.23);
-  }catch(e){console.warn('beep failed:',e)}
-}
-
-function toggleSound(){
-  soundEnabled=!soundEnabled;
-  $('soundButton').textContent=soundEnabled?'🔊':'🔇';
-  if(soundEnabled){
-    unlockAudio();
-    beep('notification');
-    toast('🔊 Sound alerts ON');
-  }else{
-    toast('🔇 Sound alerts OFF');
-  }
-}
-
-document.addEventListener('pointerdown',()=>{
-  if(!audioUnlocked)unlockAudio();
-},{passive:true});
-
-document.addEventListener('keydown',()=>{
-  if(!audioUnlocked)unlockAudio();
-},{passive:true});
-
-/* ---------- auth ---------- */
-
-function authTab(type){
-  const login=type==='login';
-  $('loginPane').classList.toggle('hidden',!login);
-  $('registerPane').classList.toggle('hidden',login);
-  $('loginTab').classList.toggle('active',login);
-  $('registerTab').classList.toggle('active',!login);
-  status('authStatus','');
-}
-
-async function register(){
-  const username=$('registerName').value.trim();
-  const email=$('registerEmail').value.trim().toLowerCase();
-  const password=$('registerPassword').value;
-  const avatar=$('registerAvatar').value;
-
-  if(username.length<2)
-    return status('authStatus','Username must be at least 2 characters.',true);
-
-  if(!email)
-    return status('authStatus','Enter your email.',true);
-
-  if(password.length<6)
-    return status('authStatus','Password must be at least 6 characters.',true);
-
-  status('authStatus','Creating account...');
-
-  const r=await db.auth.signUp({
-    email,
-    password,
-    options:{
-      data:{username,avatar}
-    }
-  });
-
-  if(r.error)
-    return status('authStatus',r.error.message,true);
-
-  if(r.data.session){
-    await startApp(r.data.user);
-  }else{
-    status('authStatus','Account created. Check your email if confirmation is enabled.');
-  }
-}
-
-async function login(){
-  const email=$('loginEmail').value.trim().toLowerCase();
-  const password=$('loginPassword').value;
-
-  if(!email||!password)
-    return status('authStatus','Enter email and password.',true);
-
-  status('authStatus','Logging in...');
-
-  const r=await db.auth.signInWithPassword({email,password});
-
-  if(r.error)
-    return status('authStatus',r.error.message,true);
-
-  await startApp(r.data.user);
-}
-
-async function logout(){
-  try{
-    if(pollingTimer)clearInterval(pollingTimer);
-    if(window.__pixelRealtime)await db.removeChannel(window.__pixelRealtime);
-    if(messageChannel){
-      await db.removeChannel(messageChannel);
-      messageChannel=null;
-    }
+    audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+    const now=audioCtx.currentTime;
+    const notes = kind==="post" ? [523.25,659.25,783.99] : [659.25,783.99];
+    notes.forEach((freq,i)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type="square"; o.frequency.value=freq;
+      g.gain.setValueAtTime(0,now+i*.11);
+      g.gain.linearRampToValueAtTime(.07,now+i*.11+.015);
+      g.gain.exponentialRampToValueAtTime(.001,now+i*.11+.09);
+      o.connect(g); g.connect(audioCtx.destination); o.start(now+i*.11); o.stop(now+i*.11+.1);
+    });
   }catch(e){}
-
-  await db.auth.signOut();
-  location.reload();
 }
-
-/* ---------- app startup ---------- */
-
-async function startApp(user){
-  if(currentUser)return;
-
-  currentUser=user;
-  $('authScreen').style.display='none';
-  $('app').style.display='block';
-
-  const ok=await ensureProfile();
-  if(!ok)return;
-
-  await Promise.all([
-    loadMessageUsers(),
-    loadFeed(),
-    loadLeaderboard()
-  ]);
-
-  startNotificationPolling();
-  setupRealtime();
-  go('home');
-}
-
-async function ensureProfile(){
-  let r=await db
-    .from('profiles')
-    .select('*')
-    .eq('id',currentUser.id)
-    .maybeSingle();
-
-  if(r.error){
-    toast('PROFILE ERROR: '+r.error.message);
-    console.error(r.error);
-    return false;
-  }
-
-  if(!r.data){
-    const p={
-      id:currentUser.id,
-      username:currentUser.user_metadata?.username ||
-                currentUser.email?.split('@')[0] ||
-                'PLAYER',
-      avatar:currentUser.user_metadata?.avatar || '👾',
-      bio:'PIXEL EXPLORER',
-      role:'user',
-      xp:0
-    };
-
-    r=await db.from('profiles').insert(p).select().single();
-
-    if(r.error){
-      toast('CREATE PROFILE FAILED: '+r.error.message);
-      console.error(r.error);
-      return false;
-    }
-  }
-
-  currentProfile=r.data;
-  renderProfile();
-  return true;
-}
-
-/* ---------- navigation ---------- */
-
-function go(name,button){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-
-  const page=$(name);
-  if(!page)return;
-
-  page.classList.add('active');
-
-  if(button){
-    document.querySelectorAll('.menu button')
-      .forEach(x=>x.classList.remove('active'));
-    button.classList.add('active');
-  }
-
-  if(name==='friends'){
-    searchUsers();
-    loadFriends();
-  }
-
-  if(name==='messages'){
-    loadMessageUsers();
-    if(selectedUser)loadMessages();
-  }
-
-  if(name==='rank')loadLeaderboard();
-
-  if(name==='admin'){
-    if(currentProfile?.role!=='admin'){
-      toast('ADMIN ACCESS REQUIRED');
-      return go('home');
-    }
-    loadAdmin();
-  }
-}
-
-/* ---------- profile ---------- */
-
-function renderProfile(){
-  if(!currentProfile)return;
-
-  const xp=Number(currentProfile.xp||0);
-  const level=Math.floor(xp/100)+1;
-  const progress=xp%100;
-
-  const side=$('sideAvatar');
-
-  if(currentProfile.avatar_url){
-    side.innerHTML=
-      '<img src="'+esc(currentProfile.avatar_url)+'" alt="avatar">'+
-      '<span class="online"></span>';
-  }else{
-    side.innerHTML=
-      esc(currentProfile.avatar||'👾')+
-      '<span class="online"></span>';
-  }
-
-  $('sideName').textContent=currentProfile.username||'PLAYER';
-  $('sideBio').textContent=currentProfile.bio||'PIXEL EXPLORER';
-  $('sideLevel').textContent=level;
-  $('xpFill').style.width=progress+'%';
-  $('xpText').textContent=progress+' / 100 XP';
-
-  $('profileName').textContent=currentProfile.username||'PLAYER';
-  $('profileBio').textContent=currentProfile.bio||'PIXEL EXPLORER';
-  $('statLevel').textContent=level;
-  $('statXP').textContent=xp;
-
-  const badges=
-    (currentProfile.role==='admin'
-      ? '<span class="badge admin">👑 ADMIN</span>'
-      : '<span class="badge">PLAYER</span>')+
-    '<span class="badge">LEVEL '+level+'</span>';
-
-  $('sideBadges').innerHTML=badges;
-  $('profileBadges').innerHTML=badges;
-
-  if(currentProfile.avatar_url){
-    $('profileAvatar').innerHTML=
-      '<img src="'+esc(currentProfile.avatar_url)+'">'+
-      '<span class="online"></span>';
-    $('headAvatar').innerHTML=
-      '<img class="headImg" src="'+esc(currentProfile.avatar_url)+'">';
-  }else{
-    $('profileAvatar').innerHTML=
-      esc(currentProfile.avatar||'👾')+
-      '<span class="online"></span>';
-    $('headAvatar').textContent=currentProfile.avatar||'👾';
-  }
-
-  $('adminNav').classList.toggle(
-    'hidden',
-    currentProfile.role!=='admin'
-  );
-
-  loadPostCount();
-}
-
-async function loadPostCount(){
-  if(!currentUser)return;
-
-  const r=await db
-    .from('posts')
-    .select('*',{count:'exact',head:true})
-    .eq('user_id',currentUser.id);
-
-  if(!r.error)$('statPosts').textContent=r.count||0;
-}
-
-/* ---------- friends ---------- */
-
-async function searchUsers(){
-  clearTimeout(searchTimer);
-  searchTimer=setTimeout(doSearch,250);
-}
-
-async function doSearch(){
-  if(!currentUser)return;
-
-  const a=$('friendSearch')?.value?.trim()||'';
-  const b=$('globalSearch')?.value?.trim()||'';
-  const term=a||b;
-
-  const box=$('searchResults');
-  if(!box)return;
-
-  if(!term){
-    box.innerHTML='<div class="card muted">TYPE A NAME TO SEARCH PIXEL FRIENDS</div>';
-    return;
-  }
-
-  const r=await db
-    .from('profiles')
-    .select('id,username,avatar,avatar_url,bio,role,xp')
-    .ilike('username','%'+term+'%')
-    .neq('id',currentUser.id)
-    .limit(30);
-
-  if(r.error){
-    box.innerHTML='<div class="card error">'+esc(r.error.message)+'</div>';
-    return;
-  }
-
-  box.innerHTML=(r.data||[]).map(u=>`
-    <div class="userCard">
-      <div class="userAvatar">
-        ${u.avatar_url
-          ? `<img src="${esc(u.avatar_url)}">`
-          : esc(u.avatar||'👾')}
-      </div>
-      <b>${esc(u.username)}</b>
-      <div class="badges">
-        ${u.role==='admin'
-          ? '<span class="badge admin">👑 ADMIN</span>'
-          : '<span class="badge">PLAYER</span>'}
-      </div>
-      <p class="muted">${esc(u.bio||'PIXEL EXPLORER')}</p>
-      <button class="primary" onclick="openChat('${u.id}')">💬 MESSAGE</button>
-    </div>
-  `).join('')||'<div class="card muted">NO PIXEL FRIEND FOUND</div>';
-}
-
-async function loadFriends(){
-  if(!currentUser)return;
-
-  const box=$('friendsList');
-  if(!box)return;
-
-  const r=await db
-    .from('friendships')
-    .select('id,requester_id,addressee_id,status')
-    .or(
-      'requester_id.eq.'+currentUser.id+
-      ',addressee_id.eq.'+currentUser.id
-    )
-    .eq('status','accepted');
-
-  if(r.error){
-    box.innerHTML='<div class="error">'+esc(r.error.message)+'</div>';
-    return;
-  }
-
-  const ids=(r.data||[]).map(x=>
-    x.requester_id===currentUser.id
-      ? x.addressee_id
-      : x.requester_id
-  );
-
-  if(!ids.length){
-    box.innerHTML='<div class="muted">NO FRIENDS YET</div>';
-    return;
-  }
-
-  const p=await db
-    .from('profiles')
-    .select('id,username,avatar,avatar_url,bio,role')
-    .in('id',ids);
-
-  if(p.error){
-    box.innerHTML='<div class="error">'+esc(p.error.message)+'</div>';
-    return;
-  }
-
-  box.innerHTML=(p.data||[]).map(f=>`
-    <div class="userCard">
-      <div class="userAvatar">
-        ${f.avatar_url
-          ? `<img src="${esc(f.avatar_url)}">`
-          : esc(f.avatar||'👾')}
-      </div>
-      <b>${esc(f.username)}</b>
-      <p class="muted">${esc(f.bio||'PIXEL EXPLORER')}</p>
-      <button class="primary" onclick="openChat('${f.id}')">💬 MESSAGE</button>
-    </div>
-  `).join('');
-}
-
-/* ---------- media helpers ---------- */
-let pendingPostMedia=null;
-let pendingMessageMedia=null;
-
-function mediaKind(type){
-  if(/^image\//i.test(type))return 'image';
-  if(/^video\//i.test(type))return 'video';
-  if(/^audio\//i.test(type))return 'audio';
-  return 'file';
-}
-
-function safeFileName(name){
-  return String(name||'media').replace(/[^a-zA-Z0-9._-]/g,'_').slice(-80);
-}
-
-function fileToDataURL(file){
-  return new Promise((resolve,reject)=>{
-    const r=new FileReader();
-    r.onload=()=>resolve(r.result);
-    r.onerror=reject;
-    r.readAsDataURL(file);
-  });
-}
-
-async function compressImage(file){
-  if(!/^image\//i.test(file.type) || file.type==='image/gif'){
-    return fileToDataURL(file);
-  }
-  const src=await fileToDataURL(file);
-  return new Promise((resolve)=>{
-    const img=new Image();
-    img.onload=()=>{
-      const max=1200;
-      const scale=Math.min(1,max/Math.max(img.width,img.height));
-      const c=document.createElement('canvas');
-      c.width=Math.max(1,Math.round(img.width*scale));
-      c.height=Math.max(1,Math.round(img.height*scale));
-      const ctx=c.getContext('2d');
-      ctx.drawImage(img,0,0,c.width,c.height);
-      resolve(c.toDataURL('image/jpeg',.78));
-    };
-    img.onerror=()=>resolve(src);
-    img.src=src;
-  });
-}
-
-async function uploadToPixelStorage(file){
-  try{
-    const path=currentUser.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'-'+safeFileName(file.name);
-    const up=await db.storage.from('pixel-media').upload(path,file,{upsert:false,contentType:file.type||undefined});
-    if(up.error) return null;
-    const pub=db.storage.from('pixel-media').getPublicUrl(path);
-    return pub?.data?.publicUrl||null;
-  }catch(e){
-    console.warn('Storage upload skipped:',e);
-    return null;
-  }
-}
-
-async function prepareMedia(file){
-  if(!file)return null;
-  const kind=mediaKind(file.type);
-  const maxFallback=kind==='image'?2.5*1024*1024:5*1024*1024;
-  if(file.size>25*1024*1024){
-    toast('MEDIA TOO LARGE — MAX 25 MB');
-    return null;
-  }
-
-  let url=null;
-  // Prefer Supabase Storage for persistence. If the bucket is not configured,
-  // fall back to a schema-free data URL for smaller files.
-  url=await uploadToPixelStorage(file);
-  if(!url){
-    if(file.size>maxFallback){
-      throw new Error('Storage bucket "pixel-media" is unavailable and this file is too large for the database fallback.');
-    }
-    url=kind==='image'?await compressImage(file):await fileToDataURL(file);
-  }
-
-  return {kind,url,name:file.name,type:file.type,size:file.size};
-}
-
-function encodeMediaContent(text,media){
-  if(!media)return text;
-  return text+'\n\n[[PIXEL_MEDIA]]'+JSON.stringify(media);
-}
-
-function decodeMediaContent(raw){
-  const text=String(raw||'');
-  const marker='[[PIXEL_MEDIA]]';
-  const i=text.lastIndexOf(marker);
-  if(i<0)return {text,media:null};
-  const body=text.slice(i+marker.length).trim();
-  try{
-    const media=JSON.parse(body);
-    return {text:text.slice(0,i).trimEnd(),media};
-  }catch(e){
-    return {text,media:null};
-  }
-}
-
-function mediaHTML(media){
-  if(!media?.url)return '';
-  const url=esc(media.url);
-  const name=esc(media.name||'PIXEL MEDIA');
-  if(media.kind==='image')return `<img class="mediaThumb" src="${url}" alt="${name}" loading="lazy"><div class="mediaCaption">📷 ${name}</div>`;
-  if(media.kind==='video')return `<video class="mediaThumb" src="${url}" controls preload="metadata"></video><div class="mediaCaption">🎬 ${name}</div>`;
-  if(media.kind==='audio')return `<audio style="width:100%;margin-top:8px" src="${url}" controls></audio><div class="mediaCaption">🎵 ${name}</div>`;
-  return `<a class="primary" style="display:inline-block;margin-top:8px" href="${url}" target="_blank" rel="noopener">📎 OPEN ${name}</a>`;
-}
-
-function previewMedia(containerId,clearId,media){
-  const box=$(containerId), clear=$(clearId);
-  if(!box)return;
-  if(!media){
-    box.classList.remove('show'); box.innerHTML='';
-    if(clear)clear.style.display='none';
-    return;
-  }
-  box.innerHTML=mediaHTML(media)+'<div class="mediaCaption">READY TO SEND</div>';
-  box.classList.add('show');
-  if(clear)clear.style.display='inline-block';
-}
-
-async function preparePostMedia(file){
-  if(!file)return;
-  try{
-    pendingPostMedia=await prepareMedia(file);
-    previewMedia('postMediaPreview','postMediaClear',pendingPostMedia);
-    status('postStatus',pendingPostMedia?'✓ Media attached.':'');
-  }catch(e){
-    pendingPostMedia=null;
-    previewMedia('postMediaPreview','postMediaClear',null);
-    status('postStatus','MEDIA ERROR: '+(e.message||e),true);
-  }
-}
-function clearPostMedia(){
-  pendingPostMedia=null;
-  if($('postMediaInput'))$('postMediaInput').value='';
-  previewMedia('postMediaPreview','postMediaClear',null);
-  status('postStatus','');
-}
-async function prepareMessageMedia(file){
-  if(!file)return;
-  try{
-    pendingMessageMedia=await prepareMedia(file);
-    previewMedia('messageMediaPreview','messageMediaClear',pendingMessageMedia);
-    status('messageStatus',pendingMessageMedia?'✓ Media attached.':'');
-  }catch(e){
-    pendingMessageMedia=null;
-    previewMedia('messageMediaPreview','messageMediaClear',null);
-    status('messageStatus','MEDIA ERROR: '+(e.message||e),true);
-  }
-}
-function clearMessageMedia(){
-  pendingMessageMedia=null;
-  if($('messageMediaInput'))$('messageMediaInput').value='';
-  previewMedia('messageMediaPreview','messageMediaClear',null);
-  status('messageStatus','');
-}
-
-/* ---------- messages ---------- */
-async function loadMessageUsers(){
-  if(!currentUser)return;
-  const box=$('messageUsers');
-  const r=await db.from('profiles')
-    .select('id,username,avatar,avatar_url,role')
-    .neq('id',currentUser.id).order('username').limit(100);
-  if(r.error){box.innerHTML='<div class="error">'+esc(r.error.message)+'</div>';return;}
-  box.innerHTML=(r.data||[]).map(u=>`
-    <div class="chatUser ${selectedUser?.id===u.id?'active':''}" onclick="openChat('${u.id}')">
-      <b>${esc(u.avatar||'👾')} ${esc(u.username)}</b>
-      <div class="muted">${u.role==='admin'?'👑 ADMIN':'PIXEL PLAYER'}</div>
-    </div>`).join('')||'<div class="muted">NO USERS</div>';
-}
-
-async function openChat(id){
-  if(!id||!currentUser)return;
-  const r=await db.from('profiles').select('id,username,avatar,avatar_url,role').eq('id',id).single();
-  if(r.error){toast('OPEN CHAT FAILED: '+r.error.message);return;}
-  selectedUser=r.data;
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  $('messages').classList.add('active');
-  $('chatTitle').textContent=(selectedUser.avatar||'👾')+' '+selectedUser.username;
-  $('chatSubtitle').textContent=selectedUser.role==='admin'?'👑 ADMIN':'PIXEL FRIEND';
-  $('messageInput').disabled=false;
-  $('sendButton').disabled=false;
-  $('messageMediaButton').disabled=false;
-  status('messageStatus','');
-  clearMessageMedia();
-  await loadMessages();
-  loadMessageUsers();
-  $('messageInput').focus();
-}
-
-async function loadMessages(){
-  if(!selectedUser||!currentUser)return;
-  const r=await db.from('messages')
-    .select('id,sender_id,receiver_id,content,created_at')
-    .or('and(sender_id.eq.'+currentUser.id+',receiver_id.eq.'+selectedUser.id+'),and(sender_id.eq.'+selectedUser.id+',receiver_id.eq.'+currentUser.id+')')
-    .order('created_at',{ascending:true});
-  if(r.error){$('chatList').innerHTML='<div class="error" style="padding:20px">MESSAGE LOAD ERROR:<br>'+esc(r.error.message)+'</div>';return;}
-  const messages=r.data||[];
-  if(!messages.length){$('chatList').innerHTML='<div class="muted" style="text-align:center;padding:30px">NO MESSAGES YET — SAY HELLO 👋</div>';return;}
-  $('chatList').innerHTML=messages.map(renderMessageHTML).join('');
-  $('chatList').scrollTop=$('chatList').scrollHeight;
-}
-
-function renderMessageHTML(m){
-  const mine=m.sender_id===currentUser.id;
-  const d=decodeMediaContent(m.content);
-  return `<div class="messageWrap" id="message-${esc(m.id)}">
-    <div class="message ${mine?'mine':''}">
-      ${d.text?esc(d.text):''}
-      ${d.media?mediaHTML(d.media):''}
-      <small>${new Date(m.created_at).toLocaleString()}</small>
-    </div>
-    ${mine?`<div class="messageActions"><button onclick="deleteMessage('${esc(m.id)}')">🗑 Delete</button></div>`:''}
-  </div>`;
-}
-
-async function sendMessage(){
-  if(!currentUser)return status('messageStatus','You are not logged in.',true);
-  if(!selectedUser)return status('messageStatus','Select a user first.',true);
-  const input=$('messageInput');
-  const text=input.value.trim();
-  if(!text&&!pendingMessageMedia)return status('messageStatus','Type a message or attach media.',true);
-  const button=$('sendButton');
-  button.disabled=true; input.disabled=true; $('messageMediaButton').disabled=true;
-  status('messageStatus','Sending...');
-  try{
-    const content=encodeMediaContent(text,pendingMessageMedia);
-    const r=await db.from('messages').insert({sender_id:currentUser.id,receiver_id:selectedUser.id,content}).select('id,sender_id,receiver_id,content,created_at').single();
-    if(r.error){
-      let msg=r.error.message||'Unable to send message.';
-      if(/row-level security|policy/i.test(msg))msg='MESSAGE BLOCKED BY SUPABASE RLS. Allow INSERT where sender_id = auth.uid().';
-      status('messageStatus',msg,true);return;
-    }
-    input.value=''; clearMessageMedia(); addMessageToChat(r.data); beep('message');
-    toast('✓ MESSAGE SENT');
-    setTimeout(()=>status('messageStatus',''),1200);
-  }catch(e){status('messageStatus','SEND FAILED: '+(e.message||e),true);}
-  finally{button.disabled=false;input.disabled=false;$('messageMediaButton').disabled=false;input.focus();}
-}
-
-function addMessageToChat(m){
-  if(!m||$('message-'+m.id))return;
-  const empty=$('chatList').querySelector('.muted');
-  if(empty && $('chatList').children.length===1)$('chatList').innerHTML='';
-  const wrap=document.createElement('div');
-  wrap.innerHTML=renderMessageHTML(m);
-  $('chatList').appendChild(wrap.firstElementChild);
-  $('chatList').scrollTop=$('chatList').scrollHeight;
-}
-
-async function deleteMessage(id){
-  if(!id||!currentUser||!confirm('Delete this message?'))return;
-  const r=await db.from('messages').delete().eq('id',id).eq('sender_id',currentUser.id);
-  if(r.error){toast('DELETE FAILED: '+r.error.message);return;}
-  $('message-'+id)?.remove(); toast('🗑 MESSAGE DELETED');
-}
-
-/* ---------- notifications: realtime + polling fallback ---------- */
-let localNotifications=[];
-let notificationUnread=0;
-let seenIncomingMessages=new Set();
-let pollingTimer=null;
-let pollingBusy=false;
-
-function updateNotificationBadge(){
-  const el=$('notificationCount'); if(!el)return;
-  el.textContent=notificationUnread>99?'99+':String(notificationUnread);
-  el.classList.toggle('hidden',notificationUnread===0);
-}
-function renderNotifications(){
-  const box=$('notificationList'); if(!box)return;
-  if(!localNotifications.length){box.innerHTML='<div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div>';return;}
-  box.innerHTML=localNotifications.slice(0,50).map(n=>`<div class="note ${n.read?'':'unread'}"><b>${esc(n.title)}</b><div>${esc(n.message)}</div><div class="muted">${new Date(n.created_at).toLocaleString()}</div></div>`).join('');
-}
-function addLocalNotification(n){
-  const key=n.key||((n.message||'')+'|'+(n.created_at||''));
-  if(localNotifications.some(x=>x.key===key))return;
-  const item={key,title:n.title||'💬 NEW MESSAGE',message:n.message||'',created_at:n.created_at||new Date().toISOString(),read:false};
-  localNotifications.unshift(item); notificationUnread++; updateNotificationBadge(); renderNotifications();
-  const btn=$('notificationButton');
-  if(btn){btn.classList.remove('notificationFlash');void btn.offsetWidth;btn.classList.add('notificationFlash');}
-  beep('notification');
-  if(document.hidden && 'Notification' in window && Notification.permission==='granted'){
-    try{new Notification(item.title,{body:item.message,tag:'pixel-friend-message'});}catch(e){}
-  }
-}
-function toggleNotifications(){
-  const p=$('notificationPanel'); p?.classList.toggle('hidden');
-  if(p&&!p.classList.contains('hidden')){renderNotifications();notificationUnread=0;updateNotificationBadge();localNotifications=localNotifications.map(n=>({...n,read:true}));renderNotifications();}
-}
-function markAllRead(){notificationUnread=0;localNotifications=localNotifications.map(n=>({...n,read:true}));updateNotificationBadge();renderNotifications();}
-async function enableBrowserNotifications(){
-  if(!('Notification' in window)){toast('Browser notifications are not supported here.');return;}
+function testSound(){beep("message");toast("PIXEL SOUND TEST")}
+async function enableNotifications(){
+  beep();
+  if(!("Notification" in window)){toast("BROWSER NOTIFICATIONS NOT SUPPORTED");return}
   try{
     const p=await Notification.requestPermission();
-    if(p==='granted'){toast('🔔 Browser notifications ON');beep('notification');}
-    else toast('Notifications were not allowed.');
-  }catch(e){toast('Notification permission failed.');}
+    updateNotifyDot();
+    toast(p==="granted"?"NOTIFICATIONS ENABLED":"NOTIFICATION PERMISSION NOT GRANTED");
+  }catch(e){toast("NOTIFICATION ERROR")}
+}
+function updateNotifyDot(){
+  const d=document.getElementById("notifyDot");
+  if("Notification" in window && Notification.permission==="granted") d.textContent="●";
+}
+function notify(title,body,kind="message"){
+  beep(kind);
+  const box=document.getElementById("notify");
+  box.innerHTML="<strong>🔔 "+esc(title)+"</strong><br><small>"+esc(body)+"</small>";
+  box.classList.add("show"); setTimeout(()=>box.classList.remove("show"),3500);
+  if("Notification" in window && Notification.permission==="granted"){
+    try{new Notification(title,{body:body})}catch(e){}
+  }
 }
 
-async function pollIncomingMessages(initial=false){
-  if(!currentUser||pollingBusy)return;
-  pollingBusy=true;
-  try{
-    const r=await db.from('messages').select('id,sender_id,receiver_id,content,created_at')
-      .eq('receiver_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
-    if(r.error){console.warn('Message polling:',r.error.message);return;}
-    const rows=r.data||[];
-    if(initial){rows.forEach(m=>seenIncomingMessages.add(m.id));return;}
-    const fresh=rows.filter(m=>!seenIncomingMessages.has(m.id));
-    fresh.reverse();
-    for(const m of fresh){
-      seenIncomingMessages.add(m.id);
-      let sender='PIXEL FRIEND';
-      try{const p=await db.from('profiles').select('username,avatar').eq('id',m.sender_id).maybeSingle();if(p.data)sender=(p.data.avatar||'💬')+' '+(p.data.username||'PIXEL FRIEND');}catch(e){}
-      const d=decodeMediaContent(m.content);
-      const summary=(d.text|| (d.media?'📎 Sent media':'New message')).slice(0,120);
-      addLocalNotification({key:'msg-'+m.id,title:'💬 NEW MESSAGE',message:sender+': '+summary,created_at:m.created_at});
-      if(selectedUser?.id===m.sender_id)addMessageToChat(m);
+
+/* ---------- profile avatar ---------- */
+function renderAvatar(){
+  const side=document.getElementById("sideAvatar");
+  const profile=document.getElementById("profileAvatar");
+  const make = (el, sizeClass="")=>{
+    if(!el)return;
+    if(state.avatar){
+      el.innerHTML=`<img src="${state.avatar}" alt="CARTER avatar"><i class="online"></i>`;
+    }else{
+      el.innerHTML=`<span class="avatar-fallback">👤</span><i class="online"></i>`;
     }
-  }finally{pollingBusy=false;}
+  };
+  make(side); make(profile);
 }
-
-function startNotificationPolling(){
-  if(pollingTimer)clearInterval(pollingTimer);
-  pollIncomingMessages(true);
-  pollingTimer=setInterval(()=>pollIncomingMessages(false),2500);
+function removeAvatar(){
+  state.avatar=null;save();renderAvatar();toast("AVATAR REMOVED");
 }
+document.getElementById("avatarInput")?.addEventListener("change",function(){
+  const file=this.files[0];
+  if(!file)return;
+  if(!file.type.startsWith("image/")){toast("PLEASE SELECT AN IMAGE");return}
+  if(file.size>3*1024*1024){toast("AVATAR MUST BE UNDER 3 MB");this.value="";return}
+  const r=new FileReader();
+  r.onload=()=>{state.avatar=r.result;save();renderAvatar();toast("AVATAR UPDATED");};
+  r.readAsDataURL(file);
+});
 
-function setupRealtime(){
-  // Realtime is optional. Polling above guarantees notifications even when
-  // the messages table has not been added to Supabase Realtime.
-  try{
-    if(window.__pixelRealtime){db.removeChannel(window.__pixelRealtime);window.__pixelRealtime=null;}
-    window.__pixelRealtime=db.channel('pixel-v4-'+currentUser.id)
-      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+currentUser.id},payload=>{
-        const m=payload.new;if(!m||seenIncomingMessages.has(m.id))return;
-        seenIncomingMessages.add(m.id);
-        const d=decodeMediaContent(m.content);
-        addLocalNotification({key:'msg-'+m.id,title:'💬 NEW MESSAGE',message:'PIXEL FRIEND: '+(d.text|| (d.media?'📎 Sent media':'New message')).slice(0,120),created_at:m.created_at});
-        if(selectedUser?.id===m.sender_id)addMessageToChat(m);
-      }).subscribe();
-  }catch(e){console.warn('Realtime unavailable; polling remains active.',e);}
+/* ---------- tabs ---------- */
+function openTab(id){
+  document.querySelectorAll(".view").forEach(x=>x.classList.toggle("active",x.id===id));
+  document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("active",x.dataset.tab===id));
+  if(id==="messages") renderMessages();
+}
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>openTab(b.dataset.tab)));
+
+/* ---------- media ---------- */
+function readMedia(input, callback){
+  const file=input.files[0];
+  if(!file){callback(null);return}
+  if(file.size>4*1024*1024){toast("MEDIA MUST BE UNDER 4 MB");input.value="";callback(null);return}
+  const r=new FileReader();
+  r.onload=()=>callback({name:file.name,type:file.type,data:r.result});
+  r.readAsDataURL(file);
+}
+document.getElementById("postMedia").addEventListener("change",function(){
+  document.getElementById("postFile").textContent=this.files[0]?.name||"NO MEDIA SELECTED";
+});
+document.getElementById("messageMedia").addEventListener("change",function(){
+  document.getElementById("messageFile").textContent=this.files[0]?.name||"NO MEDIA";
+});
+
+function mediaHTML(m,cls){
+  if(!m)return "";
+  if(m.type.startsWith("video/")) return `<video class="${cls}" controls src="${m.data}"></video>`;
+  return `<img class="${cls}" src="${m.data}" alt="${esc(m.name)}">`;
 }
 
 /* ---------- posts ---------- */
-async function createPost(){
-  const text=$('postText').value.trim();
-  if(!text&&!pendingPostMedia)return status('postStatus','Write something or attach media first.',true);
-  status('postStatus','Publishing...');
-  try{
-    const content=encodeMediaContent(text,pendingPostMedia);
-    const r=await db.from('posts').insert({user_id:currentUser.id,content}).select('id,user_id,content,created_at').single();
-    if(r.error){status('postStatus',r.error.message,true);return;}
-    const xp=Number(currentProfile.xp||0)+10;
-    const u=await db.from('profiles').update({xp}).eq('id',currentUser.id);
-    if(!u.error)currentProfile.xp=xp;
-    $('postText').value='';clearPostMedia();renderProfile();await loadFeed();status('postStatus','✓ Pixel Post published! +10 XP');toast('🚀 POST PUBLISHED');
-  }catch(e){status('postStatus','POST FAILED: '+(e.message||e),true);}
+function createPost(){
+  const text=document.getElementById("postText").value.trim();
+  const input=document.getElementById("postMedia");
+  if(!text && !input.files[0]){toast("WRITE SOMETHING OR ADD MEDIA");return}
+  readMedia(input,media=>{
+    state.posts.unshift({id:Date.now(),user:"CARTER",text,media,time:new Date().toISOString(),likes:0,reactions:{}});
+    save(); renderFeed();
+    document.getElementById("postText").value="";
+    input.value=""; document.getElementById("postFile").textContent="NO MEDIA SELECTED";
+    notify("NEW POST","Your pixel post was published.","post");
+  });
 }
-
-async function loadFeed(){
-  const box=$('feed'); if(!box)return;
-  const r=await db.from('posts').select('id,user_id,content,created_at').order('created_at',{ascending:false}).limit(30);
-  if(r.error){box.innerHTML='<div class="card error">'+esc(r.error.message)+'</div>';return;}
-  const posts=r.data||[];
-  if(!posts.length){box.innerHTML='<div class="card muted">NO POSTS YET.</div>';return;}
-  const ids=[...new Set(posts.map(p=>p.user_id))];
-  const profiles=await db.from('profiles').select('id,username,avatar,avatar_url,role').in('id',ids);
-  const map={};(profiles.data||[]).forEach(p=>map[p.id]=p);
-  box.innerHTML=posts.map(p=>{
-    const u=map[p.user_id]||{username:'PLAYER',avatar:'👾'};
-    const d=decodeMediaContent(p.content);
-    return `<div class="card"><div class="row"><div class="userAvatar" style="flex:0 0 58px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||'👾')}</div><div><b>${esc(u.username)}</b><div class="muted">${new Date(p.created_at).toLocaleString()}</div></div></div>${d.text?`<p>${esc(d.text)}</p>`:''}${d.media?mediaHTML(d.media):''}${p.user_id===currentUser.id||currentProfile.role==='admin'?`<button class="dangerBtn" onclick="deletePost('${esc(p.id)}')">🗑 DELETE</button>`:''}</div>`;
-  }).join('');
+function likePost(id){
+  const p=state.posts.find(x=>x.id===id); if(p){p.likes++;save();renderFeed()}
 }
-
-async function deletePost(id){
-  if(!confirm('Delete this post?'))return;
-  let q=db.from('posts').delete().eq('id',id);
-  if(currentProfile?.role!=='admin')q=q.eq('user_id',currentUser.id);
-  const r=await q;if(r.error){toast('DELETE FAILED: '+r.error.message);return;}
-  await loadFeed();await loadPostCount();toast('🗑 POST DELETED');
+function deletePost(id){
+  state.posts=state.posts.filter(x=>x.id!==id);save();renderFeed();toast("POST DELETED");
 }
-
-/* ---------- leaderboard ---------- */
-
-async function loadLeaderboard(){
-  const r=await db
-    .from('profiles')
-    .select('username,avatar,xp,role')
-    .order('xp',{ascending:false})
-    .limit(50);
-
-  if(r.error){
-    $('leaders').innerHTML='<div class="error">'+esc(r.error.message)+'</div>';
-    return;
-  }
-
-  $('leaders').innerHTML=(r.data||[]).map((u,i)=>`
-    <div class="rank">
-      <span>
-        #${i+1} ${esc(u.avatar||'👾')} ${esc(u.username)}
-        ${u.role==='admin'?'👑':''}
-      </span>
-      <b>${Number(u.xp||0)} XP</b>
-    </div>
-  `).join('');
-}
-
-/* ---------- admin ---------- */
-
-async function loadAdmin(){
-  if(currentProfile?.role!=='admin')return;
-
-  const users=await db
-    .from('profiles')
-    .select('id',{count:'exact',head:true});
-
-  const posts=await db
-    .from('posts')
-    .select('id',{count:'exact',head:true});
-
-  const messages=await db
-    .from('messages')
-    .select('id',{count:'exact',head:true});
-
-  $('adminUsersCount').textContent=users.count||0;
-  $('adminPostsCount').textContent=posts.count||0;
-  $('adminMessagesCount').textContent=messages.count||0;
-
-  loadAdminUsers();
-}
-
-async function loadAdminUsers(){
-  if(currentProfile?.role!=='admin')return;
-
-  const q=$('adminSearch').value.trim();
-
-  let query=db
-    .from('profiles')
-    .select('id,username,avatar,role,xp')
-    .order('xp',{ascending:false})
-    .limit(100);
-
-  if(q)query=query.ilike('username','%'+q+'%');
-
-  const r=await query;
-
-  if(r.error){
-    $('adminUsersList').innerHTML=
-      '<div class="error">'+esc(r.error.message)+'</div>';
-    return;
-  }
-
-  $('adminUsersList').innerHTML=(r.data||[]).map(u=>`
-    <div class="adminUser">
-      <div>
-        <b>${esc(u.avatar||'👾')} ${esc(u.username)}</b>
-        <div class="muted">${Number(u.xp||0)} XP</div>
+function renderFeed(filter=""){
+  const feed=document.getElementById("feed");
+  const arr=state.posts.filter(p=>(p.text+" "+p.user).toLowerCase().includes(filter.toLowerCase()));
+  feed.innerHTML=arr.map(p=>`
+    <article class="post">
+      <div class="posthead"><div class="miniavatar">${p.user==="CARTER" && state.avatar ? `<img src="${state.avatar}" style="width:100%;height:100%;object-fit:cover" alt="avatar">` : (p.user==="CARTER"?"👤":"🐸")}</div>
+      <div><div class="postname">${esc(p.user)}</div><div class="time">${fmt(p.time)}</div></div></div>
+      <div class="postbody">${esc(p.text)}</div>
+      ${mediaHTML(p.media,"postmedia")}
+      <div class="postactions">
+        <button class="smallbtn" onclick="likePost(${p.id})">❤️ ${p.likes||0}</button>
+        ${p.user==="CARTER"?`<button class="smallbtn" onclick="deletePost(${p.id})">🗑 DELETE</button>`:""}
       </div>
-      <select class="field"
-        onchange="changeRole('${u.id}',this.value)">
-        <option value="user" ${u.role==='user'?'selected':''}>PLAYER</option>
-        <option value="admin" ${u.role==='admin'?'selected':''}>ADMIN</option>
-      </select>
-    </div>
-  `).join('');
+      <div class="reactbar">
+        ${["❤️","👍","😂","😮","😢","🔥","🎮"].map(r=>`<button class="reactbtn ${p.reactions?.[r]?"active":""}" onclick="reactPost(${p.id},'${r}')">${r} <span class="reaction-count">${p.reactions?.[r]||0}</span></button>`).join("")}
+      </div>
+    </article>`).join("") || `<div class="empty">NO POSTS FOUND</div>`;
 }
 
-async function changeRole(id,role){
-  if(id===currentUser.id){
-    toast('You cannot change your own role.');
-    return;
-  }
 
-  const r=await db
-    .from('profiles')
-    .update({role})
-    .eq('id',id);
-
-  if(r.error){
-    toast('ROLE UPDATE FAILED: '+r.error.message);
-    return;
-  }
-
-  toast('ROLE UPDATED');
-  loadAdmin();
+/* ---------- reactions + stickers ---------- */
+function reactPost(id,reaction){
+  const p=state.posts.find(x=>x.id===id); if(!p)return;
+  p.reactions=p.reactions||{};
+  p.reactions[reaction]=(p.reactions[reaction]||0)+1;
+  save();renderFeed();beep("message");
+}
+function reactMessage(friend,id,reaction){
+  const msgs=ensureChat(friend), m=msgs.find(x=>x.id===id); if(!m)return;
+  m.reactions=m.reactions||{};
+  m.reactions[reaction]=(m.reactions[reaction]||0)+1;
+  save();renderMessages();beep("message");
+}
+function insertSticker(sticker){
+  const box=document.getElementById("messageText");
+  box.value += (box.value ? " " : "") + sticker;
+  box.focus();
+}
+function renderReactions(obj, friend, messageId){
+  const r=obj.reactions||{};
+  return `<div class="reactbar msg-reactions">
+    ${["❤️","👍","😂","🔥","🎮"].map(x=>`<button class="reactbtn ${r[x]?"active":""}" onclick="reactMessage('${friend}',${messageId},'${x}')">${x} <span class="reaction-count">${r[x]||0}</span></button>`).join("")}
+  </div>`;
 }
 
-/* ---------- auth state ---------- */
-
-db.auth.onAuthStateChange((event,session)=>{
-  if(event==='SIGNED_OUT')return;
-
-  if(session?.user&&!currentUser){
-    setTimeout(()=>startApp(session.user),0);
+/* ---------- voice messages ---------- */
+let mediaRecorder=null, voiceChunks=[], voiceBlob=null, voiceData=null;
+async function toggleVoiceRecording(){
+  const btn=document.getElementById("voiceBtn"), status=document.getElementById("voiceStatus");
+  if(mediaRecorder && mediaRecorder.state==="recording"){
+    mediaRecorder.stop(); return;
   }
-});
-
-(async()=>{
-  const r=await db.auth.getSession();
-
-  if(r.error){
-    console.error(r.error);
-    return;
+  if(!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder){
+    toast("VOICE RECORDING IS NOT SUPPORTED IN THIS BROWSER"); return;
   }
-
-  if(r.data.session?.user){
-    await startApp(r.data.session.user);
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    voiceChunks=[];
+    mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=e=>{if(e.data.size)voiceChunks.push(e.data)};
+    mediaRecorder.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const blob=new Blob(voiceChunks,{type:mediaRecorder.mimeType||"audio/webm"});
+      if(blob.size>2.5*1024*1024){toast("VOICE MESSAGE TOO LARGE");voiceBlob=null;voiceData=null;return}
+      const r=new FileReader();
+      r.onload=()=>{voiceData=r.result; status.textContent="VOICE READY"; btn.textContent="🎙 RECORD AGAIN"; toast("VOICE READY — PRESS SEND")};
+      r.readAsDataURL(blob);
+    };
+    mediaRecorder.start();
+    btn.classList.add("recording"); btn.textContent="⏹ STOP";
+    status.textContent="RECORDING...";
+  }catch(e){
+    toast("MICROPHONE ACCESS WAS BLOCKED");
   }
-})();
+}
+function clearVoice(){
+  voiceBlob=null;voiceData=null;
+  const btn=document.getElementById("voiceBtn"), status=document.getElementById("voiceStatus");
+  if(btn){btn.classList.remove("recording");btn.textContent="🎙 VOICE"}
+  if(status)status.textContent="VOICE OFF";
+}
+function voiceHTML(data){
+  return data ? `<div class="voice-preview">🎙 <audio controls src="${data}"></audio></div>` : "";
+}
+
+/* ---------- messages ---------- */
+function ensureChat(id){
+  if(!state.messages[id]) state.messages[id]=[];
+  return state.messages[id];
+}
+function selectFriend(id){
+  state.selected=id;save();renderFriendList();renderMessages();
+}
+function renderFriendList(){
+  document.getElementById("friendList").innerHTML=friends.map(f=>`
+    <button class="friendbtn ${state.selected===f.id?"active":""}" onclick="selectFriend('${f.id}')">
+      ${f.icon} <strong>${esc(f.name)}</strong><br><small>${esc(f.role)}</small>
+    </button>`).join("");
+}
+function renderMessages(){
+  renderFriendList();
+  const f=friends.find(x=>x.id===state.selected)||friends[0];
+  document.getElementById("chatTitle").textContent=f.name;
+  const box=document.getElementById("chatMessages");
+  const msgs=ensureChat(f.id);
+  box.innerHTML=msgs.length?msgs.map(m=>`
+    <div class="msg ${m.mine?"mine":""}">
+      ${m.sticker ? `<div class="sticker-message">${esc(m.sticker)}</div>` : esc(m.text)}
+      ${mediaHTML(m.media,"msgmedia")}
+      ${voiceHTML(m.voice)}
+      <div class="msgmeta">${m.mine?"CARTER":esc(f.name)} • ${fmt(m.time)}</div>
+      ${renderReactions(m,f.id,m.id)}
+    </div>`).join(""):`<div class="empty">NO MESSAGES YET — SAY HELLO 👋</div>`;
+  box.scrollTop=box.scrollHeight;
+}
+function sendMessage(){
+  const text=document.getElementById("messageText").value.trim();
+  const input=document.getElementById("messageMedia");
+  if(!text && !input.files[0] && !voiceData){toast("WRITE A MESSAGE, ADD MEDIA, OR RECORD VOICE");return}
+  const friend=state.selected;
+  readMedia(input,media=>{
+    const isStickerOnly = /^[😀😂❤️🔥🎮🐸🌸⭐]+$/.test(text);
+    ensureChat(friend).push({
+      id:Date.now(),mine:true,text:isStickerOnly?"":text,sticker:isStickerOnly?text:null,
+      media,voice:voiceData||null,time:new Date().toISOString(),reactions:{}
+    });
+    save();renderMessages();
+    document.getElementById("messageText").value="";
+    input.value="";document.getElementById("messageFile").textContent="NO MEDIA";
+    clearVoice();
+    notify("MESSAGE SENT","Message sent to "+friend+".");
+    setTimeout(()=>incomingReply(friend),1000);
+  });
+}
+function incomingReply(friend){
+  const replies=["HELLO! 👋","NICE PIXEL! 🎮","MESSAGE RECEIVED!","THANK YOU! ⭐"];
+  ensureChat(friend).push({id:Date.now(),mine:false,text:replies[Math.floor(Math.random()*replies.length)],media:null,voice:null,reactions:{},time:new Date().toISOString()});
+  save();renderMessages();notify("NEW MESSAGE",friends.find(x=>x.id===friend)?.name+" sent you a message.");
+}
+function simulateIncoming(){
+  const f=state.selected;
+  incomingReply(f);
+  openTab("messages");
+}
+function simulatePost(){
+  state.posts.unshift({id:Date.now(),user:"pixel",text:"NEW PIXEL FRIEND POST! 🎮",media:null,time:new Date().toISOString(),likes:0,reactions:{}});
+  save();renderFeed();notify("NEW POST","pixel published a new post.","post");openTab("home");
+}
+
+/* ---------- friends ---------- */
+function renderFriends(){
+  document.getElementById("friendsGrid").innerHTML=friends.map(f=>`
+    <div class="post" style="display:flex;align-items:center;gap:14px">
+      <div class="miniavatar" style="font-size:20px">${f.icon}</div>
+      <div><strong>${esc(f.name)}</strong><br><small>${esc(f.role)}</small></div>
+      <button class="smallbtn" style="margin-left:auto" onclick="selectFriend('${f.id}');openTab('messages')">MESSAGE</button>
+    </div>`).join("");
+}
+function searchFriends(q){
+  if(q.trim()){openTab("friends");document.getElementById("friendsGrid").innerHTML=friends.filter(f=>(f.name+" "+f.role).toLowerCase().includes(q.toLowerCase())).map(f=>`
+  <div class="post"><strong>${f.icon} ${esc(f.name)}</strong><br><small>${esc(f.role)}</small></div>`).join("")||`<div class="empty">NO FRIENDS FOUND</div>`}
+  else renderFriends();
+}
+function resetDemo(){
+  if(confirm("RESET ALL LOCAL PIXEL FRIEND DATA?")){
+    localStorage.removeItem(KEY);location.reload();
+  }
+}
+
+/* ---------- startup ---------- */
+document.getElementById("notifyBtn").addEventListener("click",enableNotifications);
+renderAvatar();renderFeed();renderFriendList();renderMessages();renderFriends();updateNotifyDot();
+
+// First click on the page unlocks Web Audio in browsers that require a user gesture.
+document.addEventListener("click",()=>{try{
+  audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==="suspended") audioCtx.resume();
+}catch(e){}},{once:true});
 </script>
 </body>
 </html>
