@@ -175,7 +175,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 <header class="topbar">
   <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> PIXEL FRIEND</div>
   <div class="actions">
-    <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers()">
+    <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">
     <button id="soundToggleBtn" class="icon" onclick="toggleSound()" title="Toggle Sound">🔊</button>
     <button class="secondary" onclick="testSound()" style="padding:6px 10px;font-size:14px">🔊 SOUND TEST</button>
     <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
@@ -194,7 +194,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
   </div>
   <nav class="menu">
     <button class="active" onclick="page('home',this)">🏠 HOME</button>
-    <button onclick="page('friends',this)">👥 FRIENDS</button>
+    <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>
     <button onclick="page('messages',this)">💬 MESSAGES</button>
     <button onclick="page('leaderboard',this)">🏆 RANK</button>
     <button onclick="page('profile',this)">👤 PROFILE</button>
@@ -225,9 +225,15 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 </section>
 
 <section id="friends" class="page">
-  <div class="card" style="padding:20px"><h1>👥 PIXEL COMMUNITY</h1><input id="friendSearch" placeholder="SEARCH PIXEL FRIENDS..." oninput="searchUsers()"></div>
+  <div class="card" style="padding:20px">
+    <h1>👥 PIXEL COMMUNITY</h1>
+    <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">
+  </div>
   <div id="searchResults" class="grid" style="margin-top:15px"></div>
-  <div class="card" style="padding:20px;margin-top:20px"><h2>🤝 MY FRIENDS</h2><div id="friendsList" class="grid"></div></div>
+  <div class="card" style="padding:20px;margin-top:20px">
+    <h2>🤝 RECOMMENDED FRIENDS</h2>
+    <div id="friendsList" class="grid" style="margin-top:15px"></div>
+  </div>
 </section>
 
 <section id="messages" class="page">
@@ -249,7 +255,7 @@ main{padding:24px;max-width:1240px;width:100%;margin:auto}
 </section>
 
 <section id="leaderboard" class="page">
-  <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders"></div></div>
+  <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div>
 </section>
 
 <section id="profile" class="page">
@@ -287,7 +293,7 @@ const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>
 function toast(m){const e=$("toast");e.textContent=m;e.classList.remove("hidden");clearTimeout(window.__toast);window.__toast=setTimeout(()=>e.classList.add("hidden"),4000)}
 function status(id,m,err=false){if($(id)){ $(id).textContent=m;$(id).style.color=err?"#ff7795":"var(--green)"}}
 
-// --- SOUND NOTIFICATION SYSTEM ---
+// --- ADVANCED RETRO SYNTH AUDIO ALERTS ---
 function unlockAudio(){
   if(!audioCtx){
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -297,25 +303,49 @@ function unlockAudio(){
 }
 ['click', 'touchstart', 'keydown'].forEach(evt => document.addEventListener(evt, unlockAudio));
 
-function playMessageSound(){
+function playToneSequence(freqs, noteDuration = 0.08, type = 'square'){
   if(!soundEnabled) return;
   try{
     unlockAudio();
     if(!audioCtx) return;
     const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(523.25, now);
-    osc.frequency.setValueAtTime(659.25, now + 0.08);
-    osc.frequency.setValueAtTime(783.99, now + 0.16);
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(now); osc.stop(now + 0.35);
+    freqs.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now + (idx * noteDuration));
+      gain.gain.setValueAtTime(0.12, now + (idx * noteDuration));
+      gain.gain.exponentialRampToValueAtTime(0.001, now + ((idx + 1) * noteDuration));
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + (idx * noteDuration));
+      osc.stop(now + ((idx + 1) * noteDuration));
+    });
   } catch(e){}
 }
-function testSound(){ unlockAudio(); soundEnabled=true; playMessageSound(); toast("🔊 Retro sound test!"); }
-function toggleSound(){ soundEnabled=!soundEnabled; toast(soundEnabled?"Sound Enabled 🔊":"Sound Muted 🔇"); }
+
+// Sound Alert 1: Incoming Message (Chime)
+function playMessageSound(){ playToneSequence([523.25, 659.25, 783.99], 0.08, 'square'); }
+
+// Sound Alert 2: Reaction / Like Sound (Fast Arpeggio Pulse)
+function playReactSound(){ playToneSequence([587.33, 880.00], 0.06, 'triangle'); }
+
+// Sound Alert 3: Comment Sound (Pop Tone)
+function playCommentSound(){ playToneSequence([440.00, 554.37, 659.25], 0.06, 'sine'); }
+
+function testSound(){
+  unlockAudio();
+  soundEnabled = true;
+  playReactSound();
+  setTimeout(playCommentSound, 200);
+  setTimeout(playMessageSound, 450);
+  toast("🔊 Sound alerts active!");
+}
+
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  toast(soundEnabled ? "Sound Enabled 🔊" : "Sound Muted 🔇");
+}
 
 // --- AUTH ---
 function authTab(t){
@@ -423,7 +453,6 @@ function previewPostFile(type){
 
 async function createPost(){
   const text=$("postText").value.trim();
-  // Text-only posts are completely valid now!
   if(!text && !postImageFile && !postAudioFile) return toast("Write a text message or attach media to post.");
   
   status("postStatus", "Publishing post...");
@@ -464,15 +493,13 @@ async function createPost(){
 
 async function deletePost(postId){
   if(!confirm("Are you sure you want to delete this post?")) return;
-  
-  // Instantly remove from view
   const element = $(`post_${postId}`);
   if(element) element.remove();
 
   const r = await sb.from("posts").delete().eq("id", postId);
   if(r.error){
     toast("❌ Delete failed: " + r.error.message);
-    loadFeed(); // Reload if database delete failed
+    loadFeed();
   } else {
     toast("🗑️ Post deleted!");
   }
@@ -546,6 +573,7 @@ async function loadFeed(){
 }
 
 async function toggleReaction(postId, emoji){
+  playReactSound(); // Instant audio feedback
   const existing = await sb.from("post_reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
   if(existing.data){
     await sb.from("post_reactions").delete().eq("id", existing.data.id);
@@ -560,11 +588,12 @@ async function addComment(postId){
   const text = input.value.trim();
   if(!text) return;
   input.value = "";
+  playCommentSound(); // Instant audio feedback
   await sb.from("comments").insert({ post_id: postId, user_id: currentUser.id, content: text });
   loadFeed();
 }
 
-// --- MESSAGES SYSTEM & DELETE MESSAGE ---
+// --- MESSAGES SYSTEM ---
 async function loadMessageUsers(){
   const r=await sb.from("profiles").select("*").neq("id",currentUser.id).limit(20);
   if(!r.data) return;
@@ -631,36 +660,107 @@ async function sendMessage(){
 }
 
 async function deleteMessage(messageId){
-  // Instantly remove element from screen
   const element = $(`msg_${messageId}`);
   if(element) element.remove();
 
   const r = await sb.from("messages").delete().eq("id", messageId);
   if(r.error){
     toast("❌ Delete message failed: " + r.error.message);
-    loadMessages(); // Restore if failure
+    loadMessages();
   } else {
     toast("🗑️ Message deleted!");
   }
 }
 
+// --- REALTIME LISTENERS (FOR SOUND ALERTS) ---
 function setupRealtime(){
-  sb.channel('public:messages')
+  sb.channel('public_pixel_events')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
       if(payload.new.receiver_id === currentUser.id){
         playMessageSound();
-        toast("💬 New Pixel message received!");
+        toast("💬 New message received!");
         if(selectedUser && payload.new.sender_id === selectedUser.id) loadMessages();
       }
     })
     .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
-      // Handle real-time deletion sync
       if(payload.old?.id){
         const el = $(`msg_${payload.old.id}`);
         if(el) el.remove();
       }
     })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post_reactions' }, async payload => {
+      if(payload.new.user_id !== currentUser.id){
+        const { data } = await sb.from("posts").select("user_id").eq("id", payload.new.post_id).maybeSingle();
+        if(data && data.user_id === currentUser.id){
+          playReactSound();
+          toast(`❤️ Someone reacted ${payload.new.emoji} to your post!`);
+        }
+      }
+      if($("home").classList.contains("active")) loadFeed();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async payload => {
+      if(payload.new.user_id !== currentUser.id){
+        const { data } = await sb.from("posts").select("user_id").eq("id", payload.new.post_id).maybeSingle();
+        if(data && data.user_id === currentUser.id){
+          playCommentSound();
+          toast("💬 Someone commented on your post!");
+        }
+      }
+      if($("home").classList.contains("active")) loadFeed();
+    })
     .subscribe();
+}
+
+// --- FIXED SEARCH FRIENDS FUNCTION ---
+async function searchUsers(fromGlobal = false){
+  let term = "";
+  if(fromGlobal) {
+    term = $("globalSearch").value.trim();
+    $("friendSearch").value = term;
+    page('friends', $("navFriends"));
+  } else {
+    term = $("friendSearch").value.trim();
+    $("globalSearch").value = term;
+  }
+
+  const container = $("searchResults");
+
+  if(!term){
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1">🔍 Searching for "${esc(term)}"...</div>`;
+
+  const r = await sb.from("profiles")
+    .select("*")
+    .ilike("username", `%${term}%`)
+    .neq("id", currentUser.id)
+    .limit(20);
+
+  if(r.error) {
+    container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1;color:#ff7795">Search error: ${esc(r.error.message)}</div>`;
+    return;
+  }
+
+  if(!r.data || r.data.length === 0){
+    container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1">No pixel friends found matching "${esc(term)}"</div>`;
+    return;
+  }
+
+  container.innerHTML = r.data.map(u => {
+    const avatarMarkup = u.avatar_url 
+      ? `<img src="${esc(u.avatar_url)}">` 
+      : esc(u.avatar||"👾");
+
+    return `
+    <div class="user-card" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+      <div class="user-avatar" style="width:60px;height:60px;font-size:30px">${avatarMarkup}</div>
+      <strong>${esc(u.username)}</strong>
+      <div class="tiny">LEVEL ${Math.floor((u.xp||0)/100)+1} • ${u.xp||0} XP</div>
+      <button class="primary" style="width:100%;margin-top:6px" onclick="openChat('${u.id}')">💬 CHAT NOW</button>
+    </div>`;
+  }).join('');
 }
 
 // --- NAVIGATION & COMMUNITY ---
@@ -672,29 +772,27 @@ function page(name,btn){
   if(name==="friends") loadFriends();
 }
 
-async function searchUsers(){
-  const term=(($("friendSearch")?.value||"").trim()||($("globalSearch")?.value||"").trim());
-  if(!term) return;
-  const r=await sb.from("profiles").select("*").ilike("username",`%${term}%`).neq("id",currentUser.id).limit(20);
-  if(r.data) $("searchResults").innerHTML=r.data.map(u=>`
-    <div class="user-card">
-      <strong>${esc(u.username)}</strong>
-      <button class="primary" style="margin-top:8px" onclick="openChat('${u.id}')">💬 MESSAGE</button>
-    </div>`).join('');
-}
-
 async function loadFriends(){
   const r=await sb.from("profiles").select("*").neq("id",currentUser.id).limit(10);
-  if(r.data) $("friendsList").innerHTML=r.data.map(u=>`
-    <div class="user-card">
+  if(r.data) $("friendsList").innerHTML=r.data.map(u => {
+    const avatarMarkup = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar||"👾");
+    return `
+    <div class="user-card" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
+      <div class="user-avatar" style="width:50px;height:50px;font-size:26px">${avatarMarkup}</div>
       <strong>${esc(u.username)}</strong>
-      <button class="secondary" style="margin-top:6px" onclick="openChat('${u.id}')">💬 MESSAGE</button>
-    </div>`).join('');
+      <button class="secondary" style="width:100%;padding:6px;font-size:15px" onclick="openChat('${u.id}')">💬 MESSAGE</button>
+    </div>`;
+  }).join('');
 }
 
 async function loadLeaderboard(){
   const r=await sb.from("profiles").select("*").order("xp",{ascending:false}).limit(10);
-  if(r.data) $("leaders").innerHTML=r.data.map((u,i)=>`<div style="padding:10px;border-bottom:1px solid #223">#${i+1} ${esc(u.username)} - ${u.xp||0} XP</div>`).join('');
+  if(r.data) $("leaders").innerHTML=r.data.map((u,i)=>`
+    <div style="padding:10px;border-bottom:1px solid #223;display:flex;align-items:center;justify-content:space-between">
+      <span>#${i+1} <strong>${esc(u.username)}</strong></span>
+      <span>${u.xp||0} XP</span>
+    </div>
+  `).join('');
 }
 
 function logout(){ sb.auth.signOut().then(()=>window.location.reload()); }
