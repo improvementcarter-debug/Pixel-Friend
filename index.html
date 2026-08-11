@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PIXEL FRIEND — FINAL V2 NO MEDIA SCHEMA — Working Chat</title>
+<title>PIXEL FRIEND — V4 MEDIA + SOUND NOTIFICATIONS</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}
@@ -180,6 +180,19 @@ aside{
   .composer{flex-wrap:wrap}
   .composer .field{flex:1 1 100%}
 }
+
+.mediaBar{display:flex;gap:6px;align-items:center;margin-top:7px;flex-wrap:wrap}
+.mediaPreview{display:none;margin-top:8px;padding:8px;border:2px dashed #34518a;background:#0b1428;border-radius:6px}
+.mediaPreview.show{display:block}
+.mediaPreview img,.mediaPreview video,.mediaPreview audio{max-width:100%;max-height:260px;border-radius:5px;border:1px solid #304a77}
+.mediaThumb{margin-top:8px;max-width:100%;max-height:300px;border-radius:6px;border:1px solid #304a77;display:block}
+.mediaCaption{font-size:10px;color:#9fb0d0;margin-top:5px;word-break:break-all}
+.attachBtn{padding:9px 11px;border:2px solid #263b61;background:#182743;color:#fff;border-radius:6px}
+.attachBtn:hover{border-color:#55d9ff}
+.composer{flex-wrap:wrap}
+.composer .field{flex:1 1 auto;min-width:160px}
+.composerTools{display:flex;gap:5px;align-items:center}
+.notificationHelp{font-size:10px;color:#8fa2c5;margin-top:4px}
 </style>
 </head>
 
@@ -225,7 +238,7 @@ aside{
     <button class="icon" onclick="go('messages')">💬</button>
     <button class="icon" onclick="toggleSound()" id="soundButton">🔊</button>
     <div id="notificationPanel" class="panel hidden">
-      <div class="panelHead"><b>🔔 NOTIFICATIONS</b><button onclick="markAllRead()">READ ALL</button></div>
+      <div class="panelHead"><b>🔔 NOTIFICATIONS</b><div><button onclick="enableBrowserNotifications()">ENABLE</button> <button onclick="markAllRead()">READ ALL</button></div></div>
       <div id="notificationList"><div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div></div>
     </div>
     <button class="icon" onclick="go('profile')" id="headAvatar">👾</button>
@@ -269,6 +282,12 @@ aside{
   <div class="card">
     <h2>✍️ CREATE PIXEL POST</h2>
     <textarea id="postText" class="field" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
+    <div class="mediaBar">
+      <input id="postMediaInput" type="file" accept="image/*,video/*,audio/*" class="hidden" onchange="preparePostMedia(this.files[0])">
+      <button class="attachBtn" onclick="document.getElementById('postMediaInput').click()">📎 MEDIA</button>
+      <button class="attachBtn" id="postMediaClear" onclick="clearPostMedia()" style="display:none">✕ REMOVE</button>
+    </div>
+    <div id="postMediaPreview" class="mediaPreview"></div>
     <button class="primary" onclick="createPost()">🚀 PUBLISH +10 XP</button>
     <div id="postStatus" class="status"></div>
   </div>
@@ -307,18 +326,19 @@ aside{
           </div>
         </div>
 
-        <div id="replyBox" class="replyBox hidden">
-          <span id="replyText"></span>
-          <button class="toolBtn" style="float:right" onclick="cancelReply()">✕</button>
-        </div>
-
         <div class="composer">
           <input id="messageInput" class="field"
                  placeholder="TYPE A MESSAGE..."
                  disabled
                  onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendMessage()}">
-          <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+          <div class="composerTools">
+            <input id="messageMediaInput" type="file" accept="image/*,video/*,audio/*" class="hidden" onchange="prepareMessageMedia(this.files[0])">
+            <button class="attachBtn" id="messageMediaButton" onclick="document.getElementById('messageMediaInput').click()" disabled>📎</button>
+            <button class="attachBtn" id="messageMediaClear" onclick="clearMessageMedia()" style="display:none">✕</button>
+            <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>
+          </div>
         </div>
+        <div id="messageMediaPreview" class="mediaPreview"></div>
 
         <div id="messageStatus" class="status"></div>
       </div>
@@ -467,27 +487,12 @@ function beep(kind='message'){
   }catch(e){console.warn('beep failed:',e)}
 }
 
-async function enableBrowserNotifications(){
-  if(!('Notification' in window))return;
-  try{
-    if(Notification.permission==='granted'){
-      browserNotificationsEnabled=true;
-      return;
-    }
-    if(Notification.permission==='default'){
-      const p=await Notification.requestPermission();
-      browserNotificationsEnabled=p==='granted';
-    }
-  }catch(e){}
-}
-
 function toggleSound(){
   soundEnabled=!soundEnabled;
   $('soundButton').textContent=soundEnabled?'🔊':'🔇';
   if(soundEnabled){
     unlockAudio();
     beep('notification');
-    enableBrowserNotifications();
     toast('🔊 Sound alerts ON');
   }else{
     toast('🔇 Sound alerts OFF');
@@ -567,6 +572,8 @@ async function login(){
 
 async function logout(){
   try{
+    if(pollingTimer)clearInterval(pollingTimer);
+    if(window.__pixelRealtime)await db.removeChannel(window.__pixelRealtime);
     if(messageChannel){
       await db.removeChannel(messageChannel);
       messageChannel=null;
@@ -595,6 +602,7 @@ async function startApp(user){
     loadLeaderboard()
   ]);
 
+  startNotificationPolling();
   setupRealtime();
   go('home');
 }
@@ -856,597 +864,394 @@ async function loadFriends(){
   `).join('');
 }
 
-/* ---------- messages ---------- */
+/* ---------- media helpers ---------- */
+let pendingPostMedia=null;
+let pendingMessageMedia=null;
 
-async function loadMessageUsers(){
-  if(!currentUser)return;
+function mediaKind(type){
+  if(/^image\//i.test(type))return 'image';
+  if(/^video\//i.test(type))return 'video';
+  if(/^audio\//i.test(type))return 'audio';
+  return 'file';
+}
 
-  const box=$('messageUsers');
+function safeFileName(name){
+  return String(name||'media').replace(/[^a-zA-Z0-9._-]/g,'_').slice(-80);
+}
 
-  const r=await db
-    .from('profiles')
-    .select('id,username,avatar,avatar_url,role')
-    .neq('id',currentUser.id)
-    .order('username')
-    .limit(100);
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
 
-  if(r.error){
-    box.innerHTML='<div class="error">'+esc(r.error.message)+'</div>';
-    return;
+async function compressImage(file){
+  if(!/^image\//i.test(file.type) || file.type==='image/gif'){
+    return fileToDataURL(file);
+  }
+  const src=await fileToDataURL(file);
+  return new Promise((resolve)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1200;
+      const scale=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.width*scale));
+      c.height=Math.max(1,Math.round(img.height*scale));
+      const ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',.78));
+    };
+    img.onerror=()=>resolve(src);
+    img.src=src;
+  });
+}
+
+async function uploadToPixelStorage(file){
+  try{
+    const path=currentUser.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'-'+safeFileName(file.name);
+    const up=await db.storage.from('pixel-media').upload(path,file,{upsert:false,contentType:file.type||undefined});
+    if(up.error) return null;
+    const pub=db.storage.from('pixel-media').getPublicUrl(path);
+    return pub?.data?.publicUrl||null;
+  }catch(e){
+    console.warn('Storage upload skipped:',e);
+    return null;
+  }
+}
+
+async function prepareMedia(file){
+  if(!file)return null;
+  const kind=mediaKind(file.type);
+  const maxFallback=kind==='image'?2.5*1024*1024:5*1024*1024;
+  if(file.size>25*1024*1024){
+    toast('MEDIA TOO LARGE — MAX 25 MB');
+    return null;
   }
 
+  let url=null;
+  // Prefer Supabase Storage for persistence. If the bucket is not configured,
+  // fall back to a schema-free data URL for smaller files.
+  url=await uploadToPixelStorage(file);
+  if(!url){
+    if(file.size>maxFallback){
+      throw new Error('Storage bucket "pixel-media" is unavailable and this file is too large for the database fallback.');
+    }
+    url=kind==='image'?await compressImage(file):await fileToDataURL(file);
+  }
+
+  return {kind,url,name:file.name,type:file.type,size:file.size};
+}
+
+function encodeMediaContent(text,media){
+  if(!media)return text;
+  return text+'\n\n[[PIXEL_MEDIA]]'+JSON.stringify(media);
+}
+
+function decodeMediaContent(raw){
+  const text=String(raw||'');
+  const marker='[[PIXEL_MEDIA]]';
+  const i=text.lastIndexOf(marker);
+  if(i<0)return {text,media:null};
+  const body=text.slice(i+marker.length).trim();
+  try{
+    const media=JSON.parse(body);
+    return {text:text.slice(0,i).trimEnd(),media};
+  }catch(e){
+    return {text,media:null};
+  }
+}
+
+function mediaHTML(media){
+  if(!media?.url)return '';
+  const url=esc(media.url);
+  const name=esc(media.name||'PIXEL MEDIA');
+  if(media.kind==='image')return `<img class="mediaThumb" src="${url}" alt="${name}" loading="lazy"><div class="mediaCaption">📷 ${name}</div>`;
+  if(media.kind==='video')return `<video class="mediaThumb" src="${url}" controls preload="metadata"></video><div class="mediaCaption">🎬 ${name}</div>`;
+  if(media.kind==='audio')return `<audio style="width:100%;margin-top:8px" src="${url}" controls></audio><div class="mediaCaption">🎵 ${name}</div>`;
+  return `<a class="primary" style="display:inline-block;margin-top:8px" href="${url}" target="_blank" rel="noopener">📎 OPEN ${name}</a>`;
+}
+
+function previewMedia(containerId,clearId,media){
+  const box=$(containerId), clear=$(clearId);
+  if(!box)return;
+  if(!media){
+    box.classList.remove('show'); box.innerHTML='';
+    if(clear)clear.style.display='none';
+    return;
+  }
+  box.innerHTML=mediaHTML(media)+'<div class="mediaCaption">READY TO SEND</div>';
+  box.classList.add('show');
+  if(clear)clear.style.display='inline-block';
+}
+
+async function preparePostMedia(file){
+  if(!file)return;
+  try{
+    pendingPostMedia=await prepareMedia(file);
+    previewMedia('postMediaPreview','postMediaClear',pendingPostMedia);
+    status('postStatus',pendingPostMedia?'✓ Media attached.':'');
+  }catch(e){
+    pendingPostMedia=null;
+    previewMedia('postMediaPreview','postMediaClear',null);
+    status('postStatus','MEDIA ERROR: '+(e.message||e),true);
+  }
+}
+function clearPostMedia(){
+  pendingPostMedia=null;
+  if($('postMediaInput'))$('postMediaInput').value='';
+  previewMedia('postMediaPreview','postMediaClear',null);
+  status('postStatus','');
+}
+async function prepareMessageMedia(file){
+  if(!file)return;
+  try{
+    pendingMessageMedia=await prepareMedia(file);
+    previewMedia('messageMediaPreview','messageMediaClear',pendingMessageMedia);
+    status('messageStatus',pendingMessageMedia?'✓ Media attached.':'');
+  }catch(e){
+    pendingMessageMedia=null;
+    previewMedia('messageMediaPreview','messageMediaClear',null);
+    status('messageStatus','MEDIA ERROR: '+(e.message||e),true);
+  }
+}
+function clearMessageMedia(){
+  pendingMessageMedia=null;
+  if($('messageMediaInput'))$('messageMediaInput').value='';
+  previewMedia('messageMediaPreview','messageMediaClear',null);
+  status('messageStatus','');
+}
+
+/* ---------- messages ---------- */
+async function loadMessageUsers(){
+  if(!currentUser)return;
+  const box=$('messageUsers');
+  const r=await db.from('profiles')
+    .select('id,username,avatar,avatar_url,role')
+    .neq('id',currentUser.id).order('username').limit(100);
+  if(r.error){box.innerHTML='<div class="error">'+esc(r.error.message)+'</div>';return;}
   box.innerHTML=(r.data||[]).map(u=>`
-    <div class="chatUser ${selectedUser?.id===u.id?'active':''}"
-         onclick="openChat('${u.id}')">
+    <div class="chatUser ${selectedUser?.id===u.id?'active':''}" onclick="openChat('${u.id}')">
       <b>${esc(u.avatar||'👾')} ${esc(u.username)}</b>
       <div class="muted">${u.role==='admin'?'👑 ADMIN':'PIXEL PLAYER'}</div>
-    </div>
-  `).join('')||'<div class="muted">NO USERS</div>';
+    </div>`).join('')||'<div class="muted">NO USERS</div>';
 }
 
 async function openChat(id){
   if(!id||!currentUser)return;
-
-  const r=await db
-    .from('profiles')
-    .select('id,username,avatar,avatar_url,role')
-    .eq('id',id)
-    .single();
-
-  if(r.error){
-    toast('OPEN CHAT FAILED: '+r.error.message);
-    return;
-  }
-
+  const r=await db.from('profiles').select('id,username,avatar,avatar_url,role').eq('id',id).single();
+  if(r.error){toast('OPEN CHAT FAILED: '+r.error.message);return;}
   selectedUser=r.data;
-
-  document.querySelectorAll('.page')
-    .forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   $('messages').classList.add('active');
-
-  $('chatTitle').textContent=
-    (selectedUser.avatar||'👾')+' '+selectedUser.username;
-
-  $('chatSubtitle').textContent=
-    selectedUser.role==='admin'?'👑 ADMIN':'PIXEL FRIEND';
-
+  $('chatTitle').textContent=(selectedUser.avatar||'👾')+' '+selectedUser.username;
+  $('chatSubtitle').textContent=selectedUser.role==='admin'?'👑 ADMIN':'PIXEL FRIEND';
   $('messageInput').disabled=false;
   $('sendButton').disabled=false;
-
+  $('messageMediaButton').disabled=false;
   status('messageStatus','');
-
+  clearMessageMedia();
   await loadMessages();
-  subscribeChat();
   loadMessageUsers();
   $('messageInput').focus();
 }
 
 async function loadMessages(){
   if(!selectedUser||!currentUser)return;
-
-  /*
-    IMPORTANT:
-    Only the basic columns are selected.
-    We intentionally do NOT select is_read, reaction,
-    reply_to, or other optional columns.
-    This prevents the schema-cache error shown in
-    your screenshot.
-  */
-
-  const r=await db
-    .from('messages')
+  const r=await db.from('messages')
     .select('id,sender_id,receiver_id,content,created_at')
-    .or(
-      'and(sender_id.eq.'+currentUser.id+',receiver_id.eq.'+selectedUser.id+'),' +
-      'and(sender_id.eq.'+selectedUser.id+',receiver_id.eq.'+currentUser.id+')'
-    )
+    .or('and(sender_id.eq.'+currentUser.id+',receiver_id.eq.'+selectedUser.id+'),and(sender_id.eq.'+selectedUser.id+',receiver_id.eq.'+currentUser.id+')')
     .order('created_at',{ascending:true});
-
-  if(r.error){
-    $('chatList').innerHTML=
-      '<div class="error" style="padding:20px">'+
-      'MESSAGE LOAD ERROR:<br>'+esc(r.error.message)+
-      '</div>';
-    return;
-  }
-
+  if(r.error){$('chatList').innerHTML='<div class="error" style="padding:20px">MESSAGE LOAD ERROR:<br>'+esc(r.error.message)+'</div>';return;}
   const messages=r.data||[];
-
-  if(!messages.length){
-    $('chatList').innerHTML=
-      '<div class="muted" style="text-align:center;padding:30px">'+
-      'NO MESSAGES YET — SAY HELLO 👋</div>';
-    return;
-  }
-
-  $('chatList').innerHTML=messages.map(m=>{
-    const mine=m.sender_id===currentUser.id;
-
-    return `
-      <div class="messageWrap" id="message-${esc(m.id)}">
-        <div class="message ${mine?'mine':''}">
-          ${esc(m.content||'')}
-          <small>
-            ${new Date(m.created_at).toLocaleString()}
-          </small>
-        </div>
-        <div class="messageActions">
-          ${mine
-            ? `<button onclick="deleteMessage('${esc(m.id)}')">🗑 Delete</button>`
-            : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-
+  if(!messages.length){$('chatList').innerHTML='<div class="muted" style="text-align:center;padding:30px">NO MESSAGES YET — SAY HELLO 👋</div>';return;}
+  $('chatList').innerHTML=messages.map(renderMessageHTML).join('');
   $('chatList').scrollTop=$('chatList').scrollHeight;
 }
 
-/*
-  THIS IS THE IMPORTANT FIX:
-  The original HTML did not contain a working sendMessage()
-  implementation in the supplied code.
-*/
+function renderMessageHTML(m){
+  const mine=m.sender_id===currentUser.id;
+  const d=decodeMediaContent(m.content);
+  return `<div class="messageWrap" id="message-${esc(m.id)}">
+    <div class="message ${mine?'mine':''}">
+      ${d.text?esc(d.text):''}
+      ${d.media?mediaHTML(d.media):''}
+      <small>${new Date(m.created_at).toLocaleString()}</small>
+    </div>
+    ${mine?`<div class="messageActions"><button onclick="deleteMessage('${esc(m.id)}')">🗑 Delete</button></div>`:''}
+  </div>`;
+}
+
 async function sendMessage(){
-  if(!currentUser){
-    return status('messageStatus','You are not logged in.',true);
-  }
-
-  if(!selectedUser){
-    return status('messageStatus','Select a user first.',true);
-  }
-
+  if(!currentUser)return status('messageStatus','You are not logged in.',true);
+  if(!selectedUser)return status('messageStatus','Select a user first.',true);
   const input=$('messageInput');
   const text=input.value.trim();
-
-  if(!text)return;
-
+  if(!text&&!pendingMessageMedia)return status('messageStatus','Type a message or attach media.',true);
   const button=$('sendButton');
-  button.disabled=true;
-  input.disabled=true;
-
+  button.disabled=true; input.disabled=true; $('messageMediaButton').disabled=true;
   status('messageStatus','Sending...');
-
   try{
-    /*
-      Only insert the columns that are required for a basic message.
-      NO is_read column.
-      NO reply_to.
-      NO reaction.
-      NO message_type.
-      NO media_url.
-    */
-    const payload={
-      sender_id:currentUser.id,
-      receiver_id:selectedUser.id,
-      content:text
-    };
-
-    const r=await db
-      .from('messages')
-      .insert(payload)
-      .select('id,sender_id,receiver_id,content,created_at')
-      .single();
-
+    const content=encodeMediaContent(text,pendingMessageMedia);
+    const r=await db.from('messages').insert({sender_id:currentUser.id,receiver_id:selectedUser.id,content}).select('id,sender_id,receiver_id,content,created_at').single();
     if(r.error){
-      console.error('Supabase send error:',r.error);
-
       let msg=r.error.message||'Unable to send message.';
-
-      if(/row-level security|policy/i.test(msg)){
-        msg=
-          'MESSAGE BLOCKED BY SUPABASE RLS. '+
-          'Your messages INSERT policy must allow the logged-in user '+
-          'to insert rows where sender_id = auth.uid().';
-      }
-
-      status('messageStatus',msg,true);
-      return;
+      if(/row-level security|policy/i.test(msg))msg='MESSAGE BLOCKED BY SUPABASE RLS. Allow INSERT where sender_id = auth.uid().';
+      status('messageStatus',msg,true);return;
     }
-
-    input.value='';
-    status('messageStatus','✓ Message sent.');
-    beep('message');
-
-    /*
-      Add the message immediately so the user sees it even
-      if Realtime is not enabled.
-    */
-    addMessageToChat(r.data);
-    createMessageNotification(selectedUser.id,text);
-
-    setTimeout(()=>status('messageStatus',''),1800);
-
-  }catch(e){
-    console.error(e);
-    status('messageStatus','SEND FAILED: '+(e.message||e),true);
-  }finally{
-    button.disabled=false;
-    input.disabled=false;
-    input.focus();
-  }
+    input.value=''; clearMessageMedia(); addMessageToChat(r.data); beep('message');
+    toast('✓ MESSAGE SENT');
+    setTimeout(()=>status('messageStatus',''),1200);
+  }catch(e){status('messageStatus','SEND FAILED: '+(e.message||e),true);}
+  finally{button.disabled=false;input.disabled=false;$('messageMediaButton').disabled=false;input.focus();}
 }
 
 function addMessageToChat(m){
-  if(!m)return;
-
+  if(!m||$('message-'+m.id))return;
   const empty=$('chatList').querySelector('.muted');
-
-  if(empty && $('chatList').children.length===1){
-    $('chatList').innerHTML='';
-  }
-
-  if($('message-'+m.id))return;
-
-  const mine=m.sender_id===currentUser.id;
-
+  if(empty && $('chatList').children.length===1)$('chatList').innerHTML='';
   const wrap=document.createElement('div');
-  wrap.className='messageWrap';
-  wrap.id='message-'+m.id;
-
-  wrap.innerHTML=`
-    <div class="message ${mine?'mine':''}">
-      ${esc(m.content||'')}
-      <small>${new Date(m.created_at).toLocaleString()}</small>
-    </div>
-    ${mine?`
-      <div class="messageActions">
-        <button onclick="deleteMessage('${esc(m.id)}')">🗑 Delete</button>
-      </div>
-    `:''}
-  `;
-
-  $('chatList').appendChild(wrap);
+  wrap.innerHTML=renderMessageHTML(m);
+  $('chatList').appendChild(wrap.firstElementChild);
   $('chatList').scrollTop=$('chatList').scrollHeight;
 }
 
 async function deleteMessage(id){
-  if(!id||!currentUser)return;
-
-  if(!confirm('Delete this message?'))return;
-
-  let q=db
-    .from('messages')
-    .delete()
-    .eq('id',id)
-    .eq('sender_id',currentUser.id);
-
-  const r=await q;
-
-  if(r.error){
-    toast('DELETE FAILED: '+r.error.message);
-    return;
-  }
-
-  const el=$('message-'+id);
-  if(el)el.remove();
-
-  toast('🗑 Message deleted.');
+  if(!id||!currentUser||!confirm('Delete this message?'))return;
+  const r=await db.from('messages').delete().eq('id',id).eq('sender_id',currentUser.id);
+  if(r.error){toast('DELETE FAILED: '+r.error.message);return;}
+  $('message-'+id)?.remove(); toast('🗑 MESSAGE DELETED');
 }
 
-/* ---------- notifications ---------- */
-
+/* ---------- notifications: realtime + polling fallback ---------- */
 let localNotifications=[];
 let notificationUnread=0;
+let seenIncomingMessages=new Set();
+let pollingTimer=null;
+let pollingBusy=false;
 
 function updateNotificationBadge(){
-  const el=$('notificationCount');
-  if(!el)return;
-  if(notificationUnread>0){
-    el.textContent=notificationUnread>99?'99+':String(notificationUnread);
-    el.classList.remove('hidden');
-  }else{
-    el.classList.add('hidden');
-  }
+  const el=$('notificationCount'); if(!el)return;
+  el.textContent=notificationUnread>99?'99+':String(notificationUnread);
+  el.classList.toggle('hidden',notificationUnread===0);
 }
-
 function renderNotifications(){
-  const box=$('notificationList');
-  if(!box)return;
-  if(!localNotifications.length){
-    box.innerHTML='<div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div>';
-    return;
-  }
-  box.innerHTML=localNotifications.slice(0,50).map(n=>`
-    <div class="note ${n.is_read?'':'unread'}">
-      <b>${esc(n.title||'NEW MESSAGE')}</b>
-      <div>${esc(n.message||'')}</div>
-      <div class="muted">${n.created_at?new Date(n.created_at).toLocaleString():''}</div>
-    </div>
-  `).join('');
+  const box=$('notificationList'); if(!box)return;
+  if(!localNotifications.length){box.innerHTML='<div class="muted" style="padding:14px">NO NEW NOTIFICATIONS</div>';return;}
+  box.innerHTML=localNotifications.slice(0,50).map(n=>`<div class="note ${n.read?'':'unread'}"><b>${esc(n.title)}</b><div>${esc(n.message)}</div><div class="muted">${new Date(n.created_at).toLocaleString()}</div></div>`).join('');
 }
-
 function addLocalNotification(n){
-  const fingerprint=(n.title||'')+'|'+(n.message||'')+'|'+(n.created_at||'');
-  if(localNotifications.some(x=>x.__fingerprint===fingerprint))return;
-
-  const item={
-    id:n.id||('local-'+Date.now()+'-'+Math.random()),
-    title:n.title||'💬 New Message',
-    message:n.message||'You received a new message.',
-    created_at:n.created_at||new Date().toISOString(),
-    is_read:false,
-    __fingerprint:fingerprint
-  };
-
-  localNotifications.unshift(item);
-  notificationUnread++;
-  updateNotificationBadge();
-  renderNotifications();
-
+  const key=n.key||((n.message||'')+'|'+(n.created_at||''));
+  if(localNotifications.some(x=>x.key===key))return;
+  const item={key,title:n.title||'💬 NEW MESSAGE',message:n.message||'',created_at:n.created_at||new Date().toISOString(),read:false};
+  localNotifications.unshift(item); notificationUnread++; updateNotificationBadge(); renderNotifications();
   const btn=$('notificationButton');
-  if(btn){
-    btn.classList.remove('notificationFlash');
-    void btn.offsetWidth;
-    btn.classList.add('notificationFlash');
-  }
-
+  if(btn){btn.classList.remove('notificationFlash');void btn.offsetWidth;btn.classList.add('notificationFlash');}
   beep('notification');
-
-  if(document.hidden && browserNotificationsEnabled && 'Notification' in window){
-    try{
-      new Notification(item.title,{body:item.message,tag:'pixel-friend-message'});
-    }catch(e){}
+  if(document.hidden && 'Notification' in window && Notification.permission==='granted'){
+    try{new Notification(item.title,{body:item.message,tag:'pixel-friend-message'});}catch(e){}
   }
 }
-
 function toggleNotifications(){
-  $('notificationPanel')?.classList.toggle('hidden');
-  if(!$('notificationPanel')?.classList.contains('hidden'))renderNotifications();
+  const p=$('notificationPanel'); p?.classList.toggle('hidden');
+  if(p&&!p.classList.contains('hidden')){renderNotifications();notificationUnread=0;updateNotificationBadge();localNotifications=localNotifications.map(n=>({...n,read:true}));renderNotifications();}
+}
+function markAllRead(){notificationUnread=0;localNotifications=localNotifications.map(n=>({...n,read:true}));updateNotificationBadge();renderNotifications();}
+async function enableBrowserNotifications(){
+  if(!('Notification' in window)){toast('Browser notifications are not supported here.');return;}
+  try{
+    const p=await Notification.requestPermission();
+    if(p==='granted'){toast('🔔 Browser notifications ON');beep('notification');}
+    else toast('Notifications were not allowed.');
+  }catch(e){toast('Notification permission failed.');}
 }
 
-async function loadNotifications(){
-  localNotifications=[];
-  notificationUnread=0;
-
+async function pollIncomingMessages(initial=false){
+  if(!currentUser||pollingBusy)return;
+  pollingBusy=true;
   try{
-    const r=await db.from('notifications')
-      .select('id,title,message,created_at,is_read')
-      .eq('user_id',currentUser.id)
-      .order('created_at',{ascending:false})
-      .limit(50);
-
-    if(r.error){
-      console.warn('Notifications table unavailable:',r.error.message);
-      renderNotifications();
-      return;
+    const r=await db.from('messages').select('id,sender_id,receiver_id,content,created_at')
+      .eq('receiver_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+    if(r.error){console.warn('Message polling:',r.error.message);return;}
+    const rows=r.data||[];
+    if(initial){rows.forEach(m=>seenIncomingMessages.add(m.id));return;}
+    const fresh=rows.filter(m=>!seenIncomingMessages.has(m.id));
+    fresh.reverse();
+    for(const m of fresh){
+      seenIncomingMessages.add(m.id);
+      let sender='PIXEL FRIEND';
+      try{const p=await db.from('profiles').select('username,avatar').eq('id',m.sender_id).maybeSingle();if(p.data)sender=(p.data.avatar||'💬')+' '+(p.data.username||'PIXEL FRIEND');}catch(e){}
+      const d=decodeMediaContent(m.content);
+      const summary=(d.text|| (d.media?'📎 Sent media':'New message')).slice(0,120);
+      addLocalNotification({key:'msg-'+m.id,title:'💬 NEW MESSAGE',message:sender+': '+summary,created_at:m.created_at});
+      if(selectedUser?.id===m.sender_id)addMessageToChat(m);
     }
-
-    localNotifications=r.data||[];
-    localNotifications.forEach(n=>{
-      n.__fingerprint=(n.title||'')+'|'+(n.message||'')+'|'+(n.created_at||'');
-    });
-    notificationUnread=localNotifications.filter(x=>!x.is_read).length;
-    updateNotificationBadge();
-    renderNotifications();
-  }catch(e){
-    console.warn('loadNotifications:',e);
-    renderNotifications();
-  }
+  }finally{pollingBusy=false;}
 }
 
-async function markAllRead(){
-  notificationUnread=0;
-  localNotifications=localNotifications.map(n=>({...n,is_read:true}));
-  updateNotificationBadge();
-  renderNotifications();
-
-  try{
-    await db.from('notifications')
-      .update({is_read:true})
-      .eq('user_id',currentUser.id)
-      .eq('is_read',false);
-  }catch(e){}
-}
-
-async function createMessageNotification(receiverId,messageText){
-  try{
-    await db.from('notifications').insert({
-      user_id:receiverId,
-      sender_id:currentUser.id,
-      type:'message',
-      title:'💬 New Message',
-      message:(currentProfile?.username||'Someone')+': '+messageText.slice(0,120),
-      is_read:false
-    });
-  }catch(e){
-    // Notification insertion must never prevent message sending.
-    console.warn('Notification insert skipped:',e.message||e);
-  }
-}
-
-/* ---------- realtime chat ---------- */
-
-function subscribeChat(){
-  // A single global realtime subscription handles all incoming messages.
-  // This prevents duplicate sound alerts.
+function startNotificationPolling(){
+  if(pollingTimer)clearInterval(pollingTimer);
+  pollIncomingMessages(true);
+  pollingTimer=setInterval(()=>pollIncomingMessages(false),2500);
 }
 
 function setupRealtime(){
-  if(!currentUser)return;
-
-  if(globalMessageChannel){
-    try{db.removeChannel(globalMessageChannel)}catch(e){}
-    globalMessageChannel=null;
-  }
-
-  globalMessageChannel=db
-    .channel('pixel-global-messages-'+currentUser.id)
-    .on(
-      'postgres_changes',
-      {
-        event:'INSERT',
-        schema:'public',
-        table:'messages',
-        filter:'receiver_id=eq.'+currentUser.id
-      },
-      async payload=>{
-        const m=payload.new;
-        if(!m || m.receiver_id!==currentUser.id)return;
-
-        if(selectedUser && m.sender_id===selectedUser.id){
-          addMessageToChat(m);
-        }
-
-        let senderName='PIXEL FRIEND';
-        try{
-          const p=await db.from('profiles')
-            .select('username,avatar')
-            .eq('id',m.sender_id)
-            .maybeSingle();
-          if(p.data)senderName=(p.data.avatar||'💬')+' '+(p.data.username||'PIXEL FRIEND');
-        }catch(e){}
-
-        addLocalNotification({
-          title:'💬 NEW MESSAGE',
-          message:senderName+': '+(m.content||'New message').slice(0,120),
-          created_at:m.created_at
-        });
-      }
-    )
-    .subscribe(s=>console.log('Global message realtime:',s));
-
-  // Optional persistent notifications table realtime.
-  const notificationChannel=db
-    .channel('pixel-notifications-'+currentUser.id)
-    .on(
-      'postgres_changes',
-      {
-        event:'INSERT',
-        schema:'public',
-        table:'notifications',
-        filter:'user_id=eq.'+currentUser.id
-      },
-      payload=>{
-        if(payload.new)addLocalNotification(payload.new);
-      }
-    )
-    .subscribe(s=>console.log('Notification realtime:',s));
-
-  window.__notificationChannel=notificationChannel;
+  // Realtime is optional. Polling above guarantees notifications even when
+  // the messages table has not been added to Supabase Realtime.
+  try{
+    if(window.__pixelRealtime){db.removeChannel(window.__pixelRealtime);window.__pixelRealtime=null;}
+    window.__pixelRealtime=db.channel('pixel-v4-'+currentUser.id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+currentUser.id},payload=>{
+        const m=payload.new;if(!m||seenIncomingMessages.has(m.id))return;
+        seenIncomingMessages.add(m.id);
+        const d=decodeMediaContent(m.content);
+        addLocalNotification({key:'msg-'+m.id,title:'💬 NEW MESSAGE',message:'PIXEL FRIEND: '+(d.text|| (d.media?'📎 Sent media':'New message')).slice(0,120),created_at:m.created_at});
+        if(selectedUser?.id===m.sender_id)addMessageToChat(m);
+      }).subscribe();
+  }catch(e){console.warn('Realtime unavailable; polling remains active.',e);}
 }
 
 /* ---------- posts ---------- */
-
 async function createPost(){
   const text=$('postText').value.trim();
-
-  if(!text){
-    return status('postStatus','Write something first.',true);
-  }
-
+  if(!text&&!pendingPostMedia)return status('postStatus','Write something or attach media first.',true);
   status('postStatus','Publishing...');
-
-  const r=await db
-    .from('posts')
-    .insert({
-      user_id:currentUser.id,
-      content:text
-    })
-    .select()
-    .single();
-
-  if(r.error){
-    status('postStatus',r.error.message,true);
-    return;
-  }
-
-  const xp=Number(currentProfile.xp||0)+10;
-
-  const u=await db
-    .from('profiles')
-    .update({xp})
-    .eq('id',currentUser.id);
-
-  if(u.error){
-    status('postStatus','Post created, but XP update failed.',true);
-  }else{
-    currentProfile.xp=xp;
-  }
-
-  $('postText').value='';
-  renderProfile();
-  await loadFeed();
-  status('postStatus','✓ Pixel Post published! +10 XP');
-  toast('🚀 POST PUBLISHED');
+  try{
+    const content=encodeMediaContent(text,pendingPostMedia);
+    const r=await db.from('posts').insert({user_id:currentUser.id,content}).select('id,user_id,content,created_at').single();
+    if(r.error){status('postStatus',r.error.message,true);return;}
+    const xp=Number(currentProfile.xp||0)+10;
+    const u=await db.from('profiles').update({xp}).eq('id',currentUser.id);
+    if(!u.error)currentProfile.xp=xp;
+    $('postText').value='';clearPostMedia();renderProfile();await loadFeed();status('postStatus','✓ Pixel Post published! +10 XP');toast('🚀 POST PUBLISHED');
+  }catch(e){status('postStatus','POST FAILED: '+(e.message||e),true);}
 }
 
 async function loadFeed(){
-  const box=$('feed');
-  if(!box)return;
-
-  const r=await db
-    .from('posts')
-    .select('id,user_id,content,created_at')
-    .order('created_at',{ascending:false})
-    .limit(30);
-
-  if(r.error){
-    box.innerHTML='<div class="card error">'+esc(r.error.message)+'</div>';
-    return;
-  }
-
+  const box=$('feed'); if(!box)return;
+  const r=await db.from('posts').select('id,user_id,content,created_at').order('created_at',{ascending:false}).limit(30);
+  if(r.error){box.innerHTML='<div class="card error">'+esc(r.error.message)+'</div>';return;}
   const posts=r.data||[];
-
-  if(!posts.length){
-    box.innerHTML='<div class="card muted">NO POSTS YET.</div>';
-    return;
-  }
-
+  if(!posts.length){box.innerHTML='<div class="card muted">NO POSTS YET.</div>';return;}
   const ids=[...new Set(posts.map(p=>p.user_id))];
-
-  const profiles=await db
-    .from('profiles')
-    .select('id,username,avatar,avatar_url,role')
-    .in('id',ids);
-
-  const map={};
-  (profiles.data||[]).forEach(p=>map[p.id]=p);
-
+  const profiles=await db.from('profiles').select('id,username,avatar,avatar_url,role').in('id',ids);
+  const map={};(profiles.data||[]).forEach(p=>map[p.id]=p);
   box.innerHTML=posts.map(p=>{
     const u=map[p.user_id]||{username:'PLAYER',avatar:'👾'};
-
-    return `
-      <div class="card">
-        <div class="row">
-          <div class="userAvatar" style="flex:0 0 58px">
-            ${u.avatar_url
-              ? `<img src="${esc(u.avatar_url)}">`
-              : esc(u.avatar||'👾')}
-          </div>
-          <div>
-            <b>${esc(u.username)}</b>
-            <div class="muted">${new Date(p.created_at).toLocaleString()}</div>
-          </div>
-        </div>
-        <p>${esc(p.content)}</p>
-        ${p.user_id===currentUser.id||currentProfile.role==='admin'
-          ? `<button class="dangerBtn" onclick="deletePost('${esc(p.id)}')">🗑 DELETE</button>`
-          : ''}
-      </div>
-    `;
+    const d=decodeMediaContent(p.content);
+    return `<div class="card"><div class="row"><div class="userAvatar" style="flex:0 0 58px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||'👾')}</div><div><b>${esc(u.username)}</b><div class="muted">${new Date(p.created_at).toLocaleString()}</div></div></div>${d.text?`<p>${esc(d.text)}</p>`:''}${d.media?mediaHTML(d.media):''}${p.user_id===currentUser.id||currentProfile.role==='admin'?`<button class="dangerBtn" onclick="deletePost('${esc(p.id)}')">🗑 DELETE</button>`:''}</div>`;
   }).join('');
 }
 
 async function deletePost(id){
   if(!confirm('Delete this post?'))return;
-
   let q=db.from('posts').delete().eq('id',id);
-
-  if(currentProfile?.role!=='admin'){
-    q=q.eq('user_id',currentUser.id);
-  }
-
-  const r=await q;
-
-  if(r.error){
-    toast('DELETE FAILED: '+r.error.message);
-    return;
-  }
-
-  await loadFeed();
-  await loadPostCount();
-  toast('🗑 POST DELETED');
+  if(currentProfile?.role!=='admin')q=q.eq('user_id',currentUser.id);
+  const r=await q;if(r.error){toast('DELETE FAILED: '+r.error.message);return;}
+  await loadFeed();await loadPostCount();toast('🗑 POST DELETED');
 }
 
 /* ---------- leaderboard ---------- */
