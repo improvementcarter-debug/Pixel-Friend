@@ -770,7 +770,6 @@ async function toggleVoiceRecord(){
     try{
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Auto-detect browser supported mimeType for clean recording
       let options = {};
       if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
         options = { mimeType: 'audio/webm;codecs=opus' };
@@ -804,7 +803,7 @@ async function toggleVoiceRecord(){
         stream.getTracks().forEach(track => track.stop());
       };
 
-      mediaRecorder.start(200); // Collect slice every 200ms
+      mediaRecorder.start(200);
       isRecording = true;
       
       btn.classList.add("recording-active");
@@ -836,7 +835,6 @@ async function uploadAndSendVoice(blob, mimeType){
   const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm';
   const fileName = `${currentUser.id}/voice_${Date.now()}.${ext}`;
 
-  // Direct storage upload to posts_media
   const u = await sb.storage.from("posts_media").upload(fileName, blob, { 
     contentType: mimeType,
     upsert: true 
@@ -881,7 +879,6 @@ async function reactToMessage(msgId, emoji){
 }
 
 function handleTypingSignal(){
-  // Broadcast typing status indicator
   if(!selectedUser) return;
   sb.channel('public_pixel_events').send({
     type: 'broadcast',
@@ -938,7 +935,7 @@ async function deleteMessage(messageId){
   }
 }
 
-// --- REALTIME LISTENERS (MESSAGES, SEEN, REACTIONS, TYPING) ---
+// --- REALTIME LISTENERS ---
 function setupRealtime(){
   sb.channel('public_pixel_events')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
@@ -961,26 +958,6 @@ function setupRealtime(){
         typingTimeout = setTimeout(() => $("typingIndicator").classList.add("hidden"), 2500);
       }
     })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'post_reactions' }, async payload => {
-      if(payload.new.user_id !== currentUser.id){
-        const { data } = await sb.from("posts").select("user_id").eq("id", payload.new.post_id).maybeSingle();
-        if(data && data.user_id === currentUser.id){
-          playReactSound();
-          toast(`❤️ Someone reacted ${payload.new.emoji} to your post!`);
-        }
-      }
-      if($("home").classList.contains("active")) loadFeed();
-    })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comments' }, async payload => {
-      if(payload.new.user_id !== currentUser.id){
-        const { data } = await sb.from("posts").select("user_id").eq("id", payload.new.post_id).maybeSingle();
-        if(data && data.user_id === currentUser.id){
-          playCommentSound();
-          toast("💬 Someone commented on your post!");
-        }
-      }
-      if($("home").classList.contains("active")) loadFeed();
-    })
     .subscribe();
 }
 
@@ -997,21 +974,13 @@ async function searchUsers(fromGlobal = false){
   }
 
   const container = $("searchResults");
-
-  if(!term){
-    container.innerHTML = "";
-    return;
-  }
+  if(!term){ container.innerHTML = ""; return; }
 
   container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1">🔍 Searching for "${esc(term)}"...</div>`;
 
-  const r = await sb.from("profiles")
-    .select("*")
-    .ilike("username", `%${term}%`)
-    .neq("id", currentUser.id)
-    .limit(20);
+  const r = await sb.from("profiles").select("*").ilike("username", `%${term}%`).neq("id", currentUser.id).limit(20);
 
-  if(r.error) {
+  if(r.error){
     container.innerHTML = `<div class="card" style="padding:15px;grid-column:1/-1;color:#ff7795">Search error: ${esc(r.error.message)}</div>`;
     return;
   }
@@ -1022,10 +991,7 @@ async function searchUsers(fromGlobal = false){
   }
 
   container.innerHTML = r.data.map(u => {
-    const avatarMarkup = u.avatar_url 
-      ? `<img src="${esc(u.avatar_url)}">` 
-      : esc(u.avatar||"👾");
-
+    const avatarMarkup = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar||"👾");
     return `
     <div class="user-card" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px">
       <div class="user-avatar" style="width:60px;height:60px;font-size:30px">${avatarMarkup}</div>
@@ -1036,7 +1002,6 @@ async function searchUsers(fromGlobal = false){
   }).join('');
 }
 
-// --- NAVIGATION & COMMUNITY ---
 function page(name,btn){
   document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
   $(name)?.classList.add("active");
