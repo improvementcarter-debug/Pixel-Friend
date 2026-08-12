@@ -1481,23 +1481,6 @@ function setupRealtime() {
     .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => {
       loadFeed(true);
     })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
-      const msg = payload.new;
-      if(msg.receiver_id === currentUser.id && msg.sender_id !== currentUser.id) {
-        // Update the notification UI immediately from the Realtime payload.
-        // The database query below only reconciles the final unread count.
-        notifyIncomingMessage(msg);
-        if(selectedUser === msg.sender_id) {
-          await loadMessages();
-          await markChatMessagesSeen();
-        }
-      }
-    })
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, payload => {
-      const msg = payload.new;
-      if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) loadMessages();
-      if(msg.receiver_id === currentUser.id && msg.sender_id !== currentUser.id) updateNotificationBadge({notify:false});
-    })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, payload => {
       const r = payload.new || payload.old;
       if(r && selectedUser) loadMessages();
@@ -1508,6 +1491,51 @@ function setupRealtime() {
     console.log('Pixel-Friend feed realtime:', status);
   });
 
+  // Dedicated message channel: only subscribe to messages addressed to the
+  // current user. This keeps the notification path small and responsive.
+  const messageChannel = sb.channel('pixel-friend-messages-' + currentUser.id)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'receiver_id=eq.' + currentUser.id
+    }, async payload => {
+      const msg = payload.new;
+      if(!msg || msg.sender_id === currentUser.id) return;
+
+      // Realtime is the primary notification path. Do not wait for a
+      // database query before showing the sender/message/count/sound.
+      if(selectedUser === msg.sender_id) {
+        await loadMessages();
+        await markChatMessagesSeen();
+        return;
+      }
+
+      notifyIncomingMessage(msg);
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'messages',
+      filter: 'receiver_id=eq.' + currentUser.id
+    }, payload => {
+      const msg = payload.new;
+      if(!msg) return;
+      if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) loadMessages();
+      // Read-state changes are reconciled without triggering another sound.
+      if(msg.is_read === true) {
+        const id = String(msg.id);
+        knownUnreadMessageIds.delete(id);
+        notificationItems.delete(id);
+        renderNotificationList();
+        renderNotificationBadge(Math.max(0, localUnreadCount - 1));
+      }
+    });
+
+  messageChannel.subscribe(status => {
+    console.log('Pixel-Friend messages realtime:', status);
+  });
+
   // Reliable fallback: if Realtime is not enabled for posts/comments/reactions
   // in the Supabase project, the feed still synchronizes automatically.
   // loadFeed() uses a signature check, so unchanged data does not rebuild the UI.
@@ -1515,26 +1543,23 @@ function setupRealtime() {
   // not enabled for one of the tables. Queries are lightweight and unchanged
   // data does not rebuild the DOM.
   feedRefreshTimer = setInterval(() => {
-    if(document.visibilityState === 'visible') {
-      loadFeed(false);
-      updateNotificationBadge({ notify:false });
-    }
+    if(document.visibilityState === 'visible') loadFeed(false);
   }, 1500);
 
-  // Messages use the same short fallback so a new message is visible quickly
-  // even if the Realtime publication is unavailable.
+  // Message rendering fallback is separate from notifications. It only keeps
+  // an open conversation fresh if its Realtime stream is temporarily unavailable.
   messageRefreshTimer = setInterval(() => {
     if(document.visibilityState === 'visible' && selectedUser) loadMessages();
   }, 800);
 
-  // Dedicated notification fallback: keeps the bell/count/details responsive even
-  // when Supabase Postgres Realtime is unavailable or delayed for the messages table.
-  // Realtime remains the primary path; this only reconciles unread messages.
+  // Notification reconciliation is intentionally slow and is NOT the primary
+  // notification path. New-message notifications are delivered by the dedicated
+  // Realtime channel above, so sound/count/detail are not held behind polling.
   notificationRefreshTimer = setInterval(() => {
     if(document.visibilityState === 'visible' && currentUser) {
       updateNotificationBadge({notify:false});
     }
-  }, 500);
+  }, 5000);
 }
 
 async function restoreSession() {
