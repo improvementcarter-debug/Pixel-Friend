@@ -666,13 +666,15 @@ async function sendMessage() {
       if(chatAttachmentType === 'video') video_url = url;
     }
 
-    await sb.from("messages").insert({
+    const { error } = await sb.from("messages").insert({
       sender_id: currentUser.id,
       receiver_id: selectedUser,
       content: text,
       image_url,
       video_url
     });
+
+    if(error) throw error;
 
     $("messageInput").value = "";
     clearChatAttachment();
