@@ -423,90 +423,136 @@ async function createPost(){
 }
 window.createPost = createPost;
 
-async function loadFeed() {
-  const { data: posts, error } = await sb.from("posts").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", { ascending: false }).limit(20);
-  if(error || !posts) return;
+let feedRenderSignature = "";
+let feedRefreshTimer = null;
+let feedRealtimeStatus = "DISCONNECTED";
+let feedLoadInFlight = false;
 
-  const { data: reactions } = await sb.from("reactions").select("*");
-  const { data: comments } = await sb.from("comments").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", { ascending: true });
+async function loadFeed(forceRender = false) {
+  if (feedLoadInFlight) return;
+  feedLoadInFlight = true;
 
-  $("feed").innerHTML = posts.map(p => {
-    const u = p.profiles || {};
-    const verified = u.is_verified ? ' ✅' : '';
-    const avatarHtml = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
+  try {
+    const { data: posts, error } = await sb
+      .from("posts")
+      .select("*, profiles(username, avatar, avatar_url, is_verified)")
+      .order("created_at", { ascending: false })
+      .limit(20);
 
-    const postReactions = (reactions || []).filter(r => r.post_id === p.id);
-    const postComments = (comments || []).filter(c => c.post_id === p.id);
+    if(error || !posts) {
+      console.warn("Feed posts error:", error?.message || error);
+      return;
+    }
 
-    const counts = { '👍': 0, '❤️': 0, '🔥': 0, '👾': 0 };
-    const userReacted = { '👍': false, '❤️': false, '🔥': false, '👾': false };
+    const { data: reactions, error: reactionsError } = await sb
+      .from("reactions")
+      .select("*");
 
-    postReactions.forEach(r => {
-      if(counts[r.emoji] !== undefined) counts[r.emoji]++;
-      if(r.user_id === currentUser.id) userReacted[r.emoji] = true;
+    const { data: comments, error: commentsError } = await sb
+      .from("comments")
+      .select("*, profiles(username, avatar, avatar_url, is_verified)")
+      .order("created_at", { ascending: true });
+
+    if(reactionsError) console.warn("Feed reactions error:", reactionsError.message);
+    if(commentsError) console.warn("Feed comments error:", commentsError.message);
+
+    // Build a stable signature. The page is only re-rendered when something
+    // actually changes, so users can type comments without the input being reset.
+    const signature = JSON.stringify({
+      posts: posts.map(p => ({
+        id:p.id, content:p.content, created_at:p.created_at,
+        user_id:p.user_id, image_url:p.image_url, video_url:p.video_url, audio_url:p.audio_url
+      })),
+      reactions: (reactions || []).map(r => ({ id:r.id, post_id:r.post_id, user_id:r.user_id, emoji:r.emoji })),
+      comments: (comments || []).map(c => ({
+        id:c.id, post_id:c.post_id, user_id:c.user_id, content:c.content,
+        parent_id:c.parent_id, created_at:c.created_at
+      }))
     });
 
-    const replyContext = activeReplyTargets[p.id];
+    if(!forceRender && signature === feedRenderSignature) return;
+    feedRenderSignature = signature;
 
-    return `
-      <div class="post-card">
-        <div class="post-header">
-          <div class="post-author">
-            <div class="user-avatar">${avatarHtml}</div>
-            <div><strong>${esc(u.username || "PLAYER")}${verified}</strong><div class="tiny">${new Date(p.created_at).toLocaleString()}</div></div>
-          </div>
-        </div>
-        <div style="word-break:break-word">${esc(p.content)}</div>
-        ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img">` : ''}
-        ${p.video_url ? `<video src="${esc(p.video_url)}" controls class="post-media-img"></video>` : ''}
-        ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
+    $("feed").innerHTML = posts.map(p => {
+      const u = p.profiles || {};
+      const verified = u.is_verified ? ' ✅' : '';
+      const avatarHtml = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
 
-        <div class="post-actions">
-          <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
-          <button class="react-btn ${userReacted['❤️'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '❤️')">❤️ ${counts['❤️']}</button>
-          <button class="react-btn ${userReacted['🔥'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '🔥')">🔥 ${counts['🔥']}</button>
-          <button class="react-btn ${userReacted['👾'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👾')">👾 ${counts['👾']}</button>
-          ${p.user_id === currentUser.id ? `
-            <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
-          ` : ''}
-        </div>
+      const postReactions = (reactions || []).filter(r => r.post_id === p.id);
+      const postComments = (comments || []).filter(c => c.post_id === p.id);
 
-        <div class="comment-section">
-          <h3>💬 COMMENTS (${postComments.length})</h3>
+      const counts = { '👍': 0, '❤️': 0, '🔥': 0, '👾': 0 };
+      const userReacted = { '👍': false, '❤️': false, '🔥': false, '👾': false };
 
-          ${replyContext ? `
-            <div class="comment-reply-preview">
-              <span>Replying to <strong>@${esc(replyContext.username)}</strong></span>
-              <button class="danger" style="padding:1px 6px;font-size:12px;" onclick="cancelReply('${p.id}')">✕</button>
+      postReactions.forEach(r => {
+        if(counts[r.emoji] !== undefined) counts[r.emoji]++;
+        if(r.user_id === currentUser.id && userReacted[r.emoji] !== undefined) userReacted[r.emoji] = true;
+      });
+
+      const replyContext = activeReplyTargets[p.id];
+
+      return `
+        <div class="post-card">
+          <div class="post-header">
+            <div class="post-author">
+              <div class="user-avatar">${avatarHtml}</div>
+              <div><strong>${esc(u.username || "PLAYER")}${verified}</strong><div class="tiny">${new Date(p.created_at).toLocaleString()}</div></div>
             </div>
-          ` : ''}
-
-          <div style="display:flex;gap:6px;margin-bottom:10px;">
-            <input id="commentInput_${p.id}" placeholder="${replyContext ? 'Type a reply to @' + esc(replyContext.username) + '...' : 'Write a comment...'}" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
-            <button class="primary" style="padding:6px 12px;font-size:14px;" onclick="addComment('${p.id}')">SEND</button>
           </div>
-          <div>
-            ${postComments.map(c => {
-              const cu = c.profiles || {};
-              const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👾");
-              return `
-                <div class="comment-item">
-                  <div class="user-avatar" style="width:30px;height:30px;font-size:16px">${cAvatar}</div>
-                  <div style="flex:1;word-break:break-word;">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                      <div><strong>${esc(cu.username)}</strong><span class="tiny" style="margin-left:8px">${new Date(c.created_at).toLocaleTimeString()}</span></div>
-                      <button class="secondary" style="padding:2px 6px;font-size:12px;" onclick="setReplyTarget('${p.id}', '${c.id}', '${esc(cu.username)}')">💬 Reply</button>
+          <div style="word-break:break-word">${esc(p.content)}</div>
+          ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img">` : ''}
+          ${p.video_url ? `<video src="${esc(p.video_url)}" controls class="post-media-img"></video>` : ''}
+          ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
+
+          <div class="post-actions">
+            <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
+            <button class="react-btn ${userReacted['❤️'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '❤️')">❤️ ${counts['❤️']}</button>
+            <button class="react-btn ${userReacted['🔥'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '🔥')">🔥 ${counts['🔥']}</button>
+            <button class="react-btn ${userReacted['👾'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👾')">👾 ${counts['👾']}</button>
+            ${p.user_id === currentUser.id ? `
+              <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
+            ` : ''}
+          </div>
+
+          <div class="comment-section">
+            <h3>💬 COMMENTS (${postComments.length})</h3>
+
+            ${replyContext ? `
+              <div class="comment-reply-preview">
+                <span>Replying to <strong>@${esc(replyContext.username)}</strong></span>
+                <button class="danger" style="padding:1px 6px;font-size:12px;" onclick="cancelReply('${p.id}')">✕</button>
+              </div>
+            ` : ''}
+
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+              <input id="commentInput_${p.id}" placeholder="${replyContext ? 'Type a reply to @' + esc(replyContext.username) + '...' : 'Write a comment...'}" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
+              <button class="primary" style="padding:6px 12px;font-size:14px;" onclick="addComment('${p.id}')">SEND</button>
+            </div>
+            <div>
+              ${postComments.map(c => {
+                const cu = c.profiles || {};
+                const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👾");
+                return `
+                  <div class="comment-item">
+                    <div class="user-avatar" style="width:30px;height:30px;font-size:16px">${cAvatar}</div>
+                    <div style="flex:1;word-break:break-word;">
+                      <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div><strong>${esc(cu.username || "PLAYER")}</strong><span class="tiny" style="margin-left:8px">${new Date(c.created_at).toLocaleTimeString()}</span></div>
+                        <button class="secondary" style="padding:2px 6px;font-size:12px;" onclick="setReplyTarget('${p.id}', '${c.id}', '${esc(cu.username || "PLAYER")}')">💬 Reply</button>
+                      </div>
+                      <div>${esc(c.content)}</div>
                     </div>
-                    <div>${esc(c.content)}</div>
                   </div>
-                </div>
-              `;
-            }).join('')}
+                `;
+              }).join('')}
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  } finally {
+    feedLoadInFlight = false;
+  }
 }
 
 function setReplyTarget(postId, commentId, username) {
@@ -524,13 +570,33 @@ function cancelReply(postId) {
 window.cancelReply = cancelReply;
 
 async function toggleReaction(postId, emoji) {
-  const { data } = await sb.from("reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
+  if(!currentUser) return;
+
+  const { data, error: findError } = await sb
+    .from("reactions")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", currentUser.id)
+    .eq("emoji", emoji)
+    .maybeSingle();
+
+  if(findError) return toast("❌ Reaction error: " + findError.message);
+
   if(data) {
-    await sb.from("reactions").delete().eq("id", data.id);
+    const { error } = await sb.from("reactions").delete().eq("id", data.id);
+    if(error) return toast("❌ Unable to remove reaction: " + error.message);
   } else {
-    await sb.from("reactions").insert({ post_id: postId, user_id: currentUser.id, emoji });
+    const { error } = await sb.from("reactions").insert({
+      post_id: postId,
+      user_id: currentUser.id,
+      emoji
+    });
+    if(error) return toast("❌ Unable to add reaction: " + error.message);
   }
-  loadFeed();
+
+  playRetroSound('message');
+  // Refresh immediately for this user. Realtime/polling updates everyone else.
+  await loadFeed(true);
 }
 window.toggleReaction = toggleReaction;
 
@@ -559,13 +625,13 @@ window.deletePost = deletePost;
 
 async function addComment(postId) {
   const input = $(`commentInput_${postId}`);
+  if(!input || !currentUser) return;
+
   let content = input.value.trim();
   if(!content) return;
 
   const replyInfo = activeReplyTargets[postId];
-  if(replyInfo) {
-    content = `@${replyInfo.username} ${content}`;
-  }
+  if(replyInfo) content = `@${replyInfo.username} ${content}`;
 
   const { error } = await sb.from("comments").insert({
     post_id: postId,
@@ -574,12 +640,14 @@ async function addComment(postId) {
     parent_id: replyInfo ? replyInfo.commentId : null
   });
 
-  if(error) return toast("❌ Error adding comment");
+  if(error) return toast("❌ Error adding comment: " + error.message);
 
   delete activeReplyTargets[postId];
   input.value = "";
   playRetroSound('message');
-  loadFeed();
+  // Immediately update the sender's feed. Other users receive the same update
+  // through Supabase Realtime or the short polling fallback below.
+  await loadFeed(true);
 }
 window.addComment = addComment;
 
@@ -1065,35 +1133,51 @@ window.toggleVoiceRecord = toggleVoiceRecord;
 window.stopVoiceRecord = stopVoiceRecord;
 
 function setupRealtime() {
-  sb.channel('public-db-changes')
+  // Clear any previous fallback timer before creating a new one.
+  if(feedRefreshTimer) {
+    clearInterval(feedRefreshTimer);
+    feedRefreshTimer = null;
+  }
+
+  const channel = sb.channel('pixel-friend-live-feed-' + currentUser.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
+      loadFeed(true);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, payload => {
+      loadFeed(true);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => {
+      loadFeed(true);
+    })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
       const msg = payload.new;
       if(msg.receiver_id === currentUser.id) {
         updateNotificationBadge();
         playRetroSound('message');
-        if(selectedUser === msg.sender_id) {
-          await loadMessages();
-        }
+        if(selectedUser === msg.sender_id) await loadMessages();
       }
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, payload => {
       const msg = payload.new;
-      // When the receiver reads a message, the sender gets the update instantly.
-      if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) {
-        loadMessages();
-      }
-      if(msg.receiver_id === currentUser.id) {
-        updateNotificationBadge();
-      }
+      if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) loadMessages();
+      if(msg.receiver_id === currentUser.id) updateNotificationBadge();
     })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => { loadFeed(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, () => { loadFeed(); })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => { loadFeed(); })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, payload => {
       const r = payload.new || payload.old;
       if(r && selectedUser) loadMessages();
-    })
-    .subscribe();
+    });
+
+  channel.subscribe(status => {
+    feedRealtimeStatus = status;
+    console.log('Pixel-Friend feed realtime:', status);
+  });
+
+  // Reliable fallback: if Realtime is not enabled for posts/comments/reactions
+  // in the Supabase project, the feed still synchronizes automatically.
+  // loadFeed() uses a signature check, so unchanged data does not rebuild the UI.
+  feedRefreshTimer = setInterval(() => {
+    if(document.visibilityState === 'visible') loadFeed(false);
+  }, 2000);
 }
 
 function logout() {
