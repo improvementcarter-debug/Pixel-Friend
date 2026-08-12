@@ -23,17 +23,47 @@ function authTab(t){    const l = t === "login";    $("loginPane").classList.tog
 async function register(){    const username = $("regName").value.trim();    const email = $("regEmail").value.trim().toLowerCase();    const password = $("regPass").value;    const avatar = $("regAvatar").value;    if(username.length < 2 || !email.includes("@") || password.length < 6) return status("authStatus","Check input fields.",true);    status("authStatus","Creating account...");      const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});    if(r.error) return status("authStatus", r.error.message, true);      const loginRes = await sb.auth.signInWithPassword({email, password});    if(loginRes.error){        status("authStatus", "Account created! Please log in.");        authTab('login');    } else {        await startApp(loginRes.data.user);    }}window.register = register;
 async function login(){    const email = $("loginEmail").value.trim().toLowerCase();    const password = $("loginPass").value;    if(!email || !password) return status("authStatus","Enter email & password.",true);    status("authStatus","Logging in...");    const r = await sb.auth.signInWithPassword({email, password});    if(r.error) return status("authStatus", r.error.message, true);    await startApp(r.data.user);}window.login = login;
 async function startApp(user){    currentUser = user;    $("authScreen").style.display = "none";    $("app").style.display = "block";    playRetroSound('success');    await loadProfile();
+
   if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {        await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);        currentProfile.is_admin = true;    }
+
   if(isAdmin()){        $("navAdmin").classList.remove("hidden");    }
+
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadLeaderboard(), updateNotificationBadge()]);    setupRealtime();    setupPresence();    page("home");}
 async function loadProfile(){    let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();    if(!r.data){        const fallback = {id: currentUser.id, username: currentUser.user_metadata?.username || "PLAYER", avatar: currentUser.user_metadata?.avatar || "👾", xp: 0, is_verified: false};        r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();    }    currentProfile = r.data;    const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';    $("sideName").textContent = currentProfile.username + verifiedBadge;    $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";    $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;    $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";    $("editUsernameInput").value = currentProfile.username || "";    $("editBioInput").value = currentProfile.bio || "";    $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;    $("statXP").textContent = currentProfile.xp || 0;    renderAvatarDisplay();}
 function renderAvatarDisplay(){    const html = currentProfile.avatar_url         ? `<img src="${esc(currentProfile.avatar_url)}"><span class="online"></span>`         : `${esc(currentProfile.avatar||"👾")}<span class="online"></span>`;    $("sideAvatar").innerHTML = html;    $("profileAvatar").innerHTML = html;    $("headAvatar").innerHTML = currentProfile.avatar_url         ? `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`         : esc(currentProfile.avatar||"👾");}
 async function saveProfileInfo(){    const username = $("editUsernameInput").value.trim();    const bio = $("editBioInput").value.trim();    if(!username) return toast("Username cannot be empty");      const r = await sb.from("profiles").update({ username, bio }).eq("id", currentUser.id);    if(r.error) return toast("❌ Error updating profile: " + r.error.message);      currentProfile.username = username;    currentProfile.bio = bio;    const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';    $("sideName").textContent = username + verifiedBadge;    $("sideBio").textContent = bio || "PIXEL EXPLORER";    $("profileNameDisplay").textContent = username + verifiedBadge;    $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";    playRetroSound('success');    toast("✅ Profile details updated!");}window.saveProfileInfo = saveProfileInfo;
 async function uploadAvatar(){    const file = $("avatarUploadInput").files[0];    if(!file) return;    toast("Uploading avatar...");    try{        const ext = file.name.split('.').pop();        const path = `${currentUser.id}/avatar_${Date.now()}.${ext}`;        const u = await sb.storage.from("avatars").upload(path, file, {upsert:true});        if(u.error) throw u.error;        const avatar_url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;        await sb.from("profiles").update({ avatar_url }).eq("id", currentUser.id);        currentProfile.avatar_url = avatar_url;        renderAvatarDisplay();        playRetroSound('success');        toast("✅ Avatar uploaded!");  } catch(err){        toast("❌ Avatar upload failed: " + err.message);    }}window.uploadAvatar = uploadAvatar;
 async function removeAvatar(){    try{        await sb.from("profiles").update({ avatar_url: null }).eq("id", currentUser.id);        currentProfile.avatar_url = null;        renderAvatarDisplay();        toast("🗑️ Avatar removed!");  } catch(err){        toast("❌ Error removing avatar");  }}window.removeAvatar = removeAvatar;
-async function loadAdminUsers(){    if(!isAdmin()) return toast("❌ Unauthorized access");    const r = await sb.from("profiles").select("*").order("username", {ascending: true});    if(!r.data) return;
 
-    $("adminUserList").innerHTML = r.data.map(u => {        const isUserAdmin = u.is_admin === true;        const isVerified = u.is_verified === true;        return `            <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">                <div class="row" style="gap:12px; align-items:center;">                    <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>                    <div>                        <strong>${esc(u.username)}</strong>                         ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}                        ${isVerified ? '<span style="color:var(--green);font-size:14px;">✅ [VERIFIED]</span>' : ''}                        <div class="tiny">ID: ${u.id}</div>                    </div>                </div>                <div style="display:flex; gap:6px;">                    <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">                        ${isVerified ? '❌ Unverify' : '✅ Verify'}                    </button>                    <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">                        ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}                    </button>                </div>            </div>        `;
+async function loadAdminUsers(){
+    if(!isAdmin()) return toast("❌ Unauthorized access");
+    const r = await sb.from("profiles").select("*").order("username", {ascending: true});
+    if(!r.data) return;
+
+    $("adminUserList").innerHTML = r.data.map(u => {
+        const isUserAdmin = u.is_admin === true;
+        const isVerified = u.is_verified === true;
+        return `
+            <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div class="row" style="gap:12px; align-items:center;">
+                    <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+                    <div>
+                        <strong>${esc(u.username)}</strong> 
+                        ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
+                        ${isVerified ? '<span style="color:var(--green);font-size:14px;">✅ [VERIFIED]</span>' : ''}
+                        <div class="tiny">ID: ${u.id}</div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">
+                        ${isVerified ? '❌ Unverify' : '✅ Verify'}
+                    </button>
+                    <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">
+                        ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}
+                    </button>
+                </div>
+            </div>
+        `;
     }).join("");
 }
 window.loadAdminUsers = loadAdminUsers;
@@ -79,7 +109,6 @@ function setupPresence() {
 }
 
 function updateOnlineIndicatorsUI() {
-    // Update chat list online status dots
     document.querySelectorAll('.chat-user-item').forEach(el => {
         const uid = el.getAttribute('data-userid');
         const dot = el.querySelector('.presence-dot');
@@ -92,7 +121,6 @@ function updateOnlineIndicatorsUI() {
         }
     });
 
-    // Update active chat header status
     if (selectedUser) {
         const statusText = $("chatUserStatusText");
         if (statusText) {
@@ -167,7 +195,6 @@ async function selectChatUser(u) {
         statusText.style.color = isOnline ? "var(--green)" : "var(--muted)";
     }
 
-    // Enable inputs
     ["messageInput", "sendButton", "voiceRecordBtn", "btnImg", "btnVid", "btnSticker"].forEach(id => {
         if($(id)) $(id).removeAttribute("disabled");
     });
@@ -194,10 +221,20 @@ async function loadMessages(friendId) {
         const timeStr = new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         const seenStatusHTML = isMine ? `<span style="color:${m.is_seen ? 'var(--cyan)' : 'var(--muted)'};">${m.is_seen ? '✓✓ Seen' : '✓ Sent'}</span>` : '';
 
+        let mediaHTML = '';
+        if (m.media_url) {
+            if (m.media_type === 'video') {
+                mediaHTML = `<video src="${esc(m.media_url)}" controls class="msg-media-video"></video>`;
+            } else {
+                mediaHTML = `<img src="${esc(m.media_url)}" class="msg-media-img">`;
+            }
+        }
+
         return `
             <div class="message-wrap ${isMine ? 'mine' : ''}">
                 <div class="message ${isMine ? 'mine' : ''}">
                     ${esc(m.text || '')}
+                    ${mediaHTML}
                     <div class="message-footer">
                         <span>${timeStr}</span>
                         ${seenStatusHTML}
@@ -209,18 +246,87 @@ async function loadMessages(friendId) {
     list.scrollTop = list.scrollHeight;
 }
 
+// Media Previews and Handling
+function previewPostFile(type) {
+    const input = $(type === 'image' ? 'postImageInput' : type === 'video' ? 'postVideoInput' : 'postAudioInput');
+    const file = input.files[0];
+    if (!file) return;
+
+    if (type === 'image') postImageFile = file;
+    if (type === 'video') postVideoFile = file;
+    if (type === 'audio') postAudioFile = file;
+
+    const pill = $(type === 'image' ? 'postImagePill' : type === 'video' ? 'postVideoPill' : 'postAudioPill');
+    pill.textContent = `📎 ${file.name}`;
+    pill.classList.remove('hidden');
+    toast(`📎 ${type.toUpperCase()} attached!`);
+}
+window.previewPostFile = previewPostFile;
+
+function selectChatMedia(type) {
+    const input = $(type === 'image' ? 'chatImageInput' : 'chatVideoInput');
+    const file = input.files[0];
+    if (!file) return;
+
+    chatAttachmentFile = file;
+    chatAttachmentType = type;
+
+    const bar = $("chatContextBar");
+    const text = $("chatContextText");
+    text.textContent = `📎 Attached ${type.toUpperCase()}: ${file.name}`;
+    bar.classList.remove('hidden');
+    toast(`📎 ${type.toUpperCase()} ready to send!`);
+}
+window.selectChatMedia = selectChatMedia;
+
+function clearChatContext() {
+    chatAttachmentFile = null;
+    chatAttachmentType = null;
+    $("chatImageInput").value = "";
+    $("chatVideoInput").value = "";
+    $("chatContextBar").classList.add("hidden");
+}
+window.clearChatContext = clearChatContext;
+
+async function uploadFileToStorage(file, bucket = 'posts') {
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/${Date.now()}_${Math.random().toString(36.substring(2))}.${ext}`;
+    const uploadRes = await sb.storage.from(bucket).upload(path, file);
+    if (uploadRes.error) throw uploadRes.error;
+    return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+
 async function sendMessage() {
     const input = $("messageInput");
     const text = input.value.trim();
-    if (!text || !selectedUser) return;
+    if (!text && !chatAttachmentFile && !chatAttachmentType) return;
+    if (!selectedUser) return;
 
     input.value = "";
     playRetroSound('message');
+
+    let media_url = null;
+    let media_type = null;
+
+    if (chatAttachmentFile) {
+        toast("Uploading attachment...");
+        try {
+            media_url = await uploadFileToStorage(chatAttachmentFile, 'messages');
+            media_type = chatAttachmentType;
+        } catch(err) {
+            toast("❌ Failed to upload media: " + err.message);
+            return;
+        }
+    }
+
+    clearChatContext();
 
     await sb.from("messages").insert({
         sender_id: currentUser.id,
         recipient_id: selectedUser.id,
         text: text,
+        media_url: media_url,
+        media_type: media_type,
         is_seen: false
     });
 
@@ -243,7 +349,6 @@ async function updateNotificationBadge() {
     }
 }
 
-// Feed & Posts Stubs for completion
 async function loadFeed() {
     const r = await sb.from("posts").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", {ascending: false}).limit(20);
     const feed = $("feed");
@@ -252,25 +357,71 @@ async function loadFeed() {
         feed.innerHTML = `<div class="card" style="padding:20px;text-align:center">No posts yet. Be the first to publish!</div>`;
         return;
     }
-    feed.innerHTML = r.data.map(p => `
-        <div class="post-card">
-            <div class="post-header">
-                <div class="post-author">
-                    <div class="user-avatar" style="width:38px;height:38px">${p.profiles?.avatar_url?`<img src="${esc(p.profiles.avatar_url)}">`:esc(p.profiles?.avatar||"👾")}</div>
-                    <div><strong>${esc(p.profiles?.username || "Player")}</strong> ${p.profiles?.is_verified ? '✅' : ''}<div class="tiny">${new Date(p.created_at).toLocaleTimeString()}</div></div>
+    feed.innerHTML = r.data.map(p => {
+        let mediaHTML = '';
+        if (p.media_url) {
+            if (p.media_type === 'video') {
+                mediaHTML = `<video src="${esc(p.media_url)}" controls class="post-media-img"></video>`;
+            } else if (p.media_type === 'audio') {
+                mediaHTML = `<audio src="${esc(p.media_url)}" controls class="post-audio"></audio>`;
+            } else {
+                mediaHTML = `<img src="${esc(p.media_url)}" class="post-media-img">`;
+            }
+        }
+        return `
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="post-author">
+                        <div class="user-avatar" style="width:38px;height:38px">${p.profiles?.avatar_url?`<img src="${esc(p.profiles.avatar_url)}">`:esc(p.profiles?.avatar||"👾")}</div>
+                        <div><strong>${esc(p.profiles?.username || "Player")}</strong> ${p.profiles?.is_verified ? '✅' : ''}<div class="tiny">${new Date(p.created_at).toLocaleTimeString()}</div></div>
+                    </div>
                 </div>
+                <p>${esc(p.text)}</p>
+                ${mediaHTML}
             </div>
-            <p>${esc(p.text)}</p>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
 async function createPost() {
     const text = $("postText").value.trim();
-    if(!text) return toast("Post text cannot be empty");
-    const r = await sb.from("posts").insert({ user_id: currentUser.id, text });
+    if(!text && !postImageFile && !postVideoFile && !postAudioFile) return toast("Post text or media cannot be empty");
+    
+    toast("Publishing post...");
+    let media_url = null;
+    let media_type = null;
+
+    try {
+        if (postImageFile) {
+            media_url = await uploadFileToStorage(postImageFile, 'posts');
+            media_type = 'image';
+        } else if (postVideoFile) {
+            media_url = await uploadFileToStorage(postVideoFile, 'posts');
+            media_type = 'video';
+        } else if (postAudioFile) {
+            media_url = await uploadFileToStorage(postAudioFile, 'posts');
+            media_type = 'audio';
+        }
+    } catch(err) {
+        return toast("❌ Upload failed: " + err.message);
+    }
+
+    const r = await sb.from("posts").insert({ 
+        user_id: currentUser.id, 
+        text: text, 
+        media_url: media_url, 
+        media_type: media_type 
+    });
+
     if(r.error) return toast("❌ Error creating post: " + r.error.message);
+
     $("postText").value = "";
+    postImageFile = null; postVideoFile = null; postAudioFile = null;
+    $("postImageInput").value = ""; $("postVideoInput").value = ""; $("postAudioInput").value = "";
+    $("postImagePill").classList.add("hidden");
+    $("postVideoPill").classList.add("hidden");
+    $("postAudioPill").classList.add("hidden");
+
     toast("🚀 Post published (+10 XP)!");
     await addXP(10);
     loadFeed();
@@ -316,9 +467,7 @@ async function loadLeaderboard() {
     `).join("");
 }
 
-function searchUsers(isGlobal) {
-    // Search functionality placeholder
-}
+function searchUsers(isGlobal) {}
 window.searchUsers = searchUsers;
 
 function toggleStickerPicker() {
@@ -335,21 +484,10 @@ function sendSticker(st) {
 }
 window.sendSticker = sendSticker;
 
-function clearChatContext() {
-    $("chatContextBar").classList.add("hidden");
-}
-window.clearChatContext = clearChatContext;
-
 function toggleVoiceRecord() {
     toast("Voice recording simulated");
 }
 window.toggleVoiceRecord = toggleVoiceRecord;
-
-function previewPostFile(type) {}
-window.previewPostFile = previewPostFile;
-
-function selectChatMedia(type) {}
-window.selectChatMedia = selectChatMedia;
 
 async function logout(){
     await sb.auth.signOut();
