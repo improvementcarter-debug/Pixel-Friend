@@ -866,14 +866,49 @@ function getSupportedAudioMimeType() {
   return types.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
 }
 
+async function getVoiceInputStream() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    throw new Error('Microphone API is unavailable. Open Pixel-Friend on HTTPS or localhost.');
+  }
+
+  // Use the simplest request first. Some browsers/devices reject an
+  // advanced audio constraint object with "Requested device not found".
+  try {
+    return await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (firstError) {
+    // Retry with conservative constraints for browsers that support them.
+    try {
+      return await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+    } catch (secondError) {
+      let detail = secondError && secondError.name ? secondError.name : 'UnknownError';
+      if (detail === 'NotFoundError' || detail === 'DevicesNotFoundError') {
+        throw new Error('No microphone was detected. Connect/enable a microphone, then reload the page.');
+      }
+      if (detail === 'NotAllowedError' || detail === 'PermissionDeniedError') {
+        throw new Error('Microphone permission is blocked. Allow Microphone for this site, then reload.');
+      }
+      if (detail === 'NotReadableError' || detail === 'TrackStartError') {
+        throw new Error('The microphone is busy or unavailable. Close other apps using it and try again.');
+      }
+      throw new Error('Microphone could not be opened (' + detail + ').');
+    }
+  }
+}
+
 async function toggleVoiceRecord() {
   if (isRecordingVoice) {
     stopVoiceRecord();
     return;
   }
 
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
-    toast('❌ Voice recording is not supported by this browser. Please use Chrome/Edge over HTTPS or localhost.');
+  if (!window.MediaRecorder || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    toast('❌ Voice recording is unavailable. Use Chrome/Edge on HTTPS or localhost.');
     return;
   }
   if (!selectedUser || !currentUser) {
@@ -881,10 +916,16 @@ async function toggleVoiceRecord() {
     return;
   }
 
+  const btn = $('voiceRecordBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '🎙️ CONNECTING...';
+
   try {
-    voiceStream = await navigator.mediaDevices.getUserMedia({
-      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-    });
+    voiceStream = await getVoiceInputStream();
+    const activeTrack = voiceStream.getAudioTracks()[0];
+    if (!activeTrack) throw new Error('No audio input track was created.');
+
     voiceChunks = [];
     const mimeType = getSupportedAudioMimeType();
     mediaRecorder = mimeType ? new MediaRecorder(voiceStream, { mimeType }) : new MediaRecorder(voiceStream);
@@ -912,16 +953,19 @@ async function toggleVoiceRecord() {
       }
     };
 
-    mediaRecorder.start();
+    mediaRecorder.start(100);
     isRecordingVoice = true;
-    const btn = $('voiceRecordBtn');
+    btn.disabled = false;
     btn.classList.add('recording-active');
     btn.textContent = '⏹️ STOP & SEND';
     toast('🎙️ Recording... click STOP & SEND when finished.');
   } catch (e) {
     if (voiceStream) voiceStream.getTracks().forEach(t => t.stop());
     voiceStream = null;
-    toast('❌ Microphone access denied or unavailable: ' + e.message);
+    mediaRecorder = null;
+    btn.disabled = false;
+    btn.textContent = originalText;
+    toast('❌ ' + (e.message || 'Microphone access failed.'));
   }
 }
 
@@ -932,6 +976,7 @@ function stopVoiceRecord() {
   isRecordingVoice = false;
   const btn = $('voiceRecordBtn');
   btn.classList.remove('recording-active');
+  btn.disabled = false;
   btn.textContent = '🎤 VOICE';
 }
 
