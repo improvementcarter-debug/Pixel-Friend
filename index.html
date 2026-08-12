@@ -407,13 +407,28 @@ async function createPost(){
 window.createPost = createPost;
 
 async function loadFeed() {
-  const { data, error } = await sb.from("posts").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", { ascending: false }).limit(20);
-  if(error || !data) return;
-  
-  $("feed").innerHTML = data.map(p => {
+  const { data: posts, error } = await sb.from("posts").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", { ascending: false }).limit(20);
+  if(error || !posts) return;
+
+  const { data: reactions } = await sb.from("reactions").select("*");
+  const { data: comments } = await sb.from("comments").select("*, profiles(username, avatar, avatar_url, is_verified)").order("created_at", { ascending: true });
+
+  $("feed").innerHTML = posts.map(p => {
     const u = p.profiles || {};
     const verified = u.is_verified ? ' ✅' : '';
     const avatarHtml = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
+    
+    const postReactions = (reactions || []).filter(r => r.post_id === p.id);
+    const postComments = (comments || []).filter(c => c.post_id === p.id);
+
+    const counts = { '👍': 0, '❤️': 0, '🔥': 0, '👾': 0 };
+    const userReacted = { '👍': false, '❤️': false, '🔥': false, '👾': false };
+
+    postReactions.forEach(r => {
+      if(counts[r.emoji] !== undefined) counts[r.emoji]++;
+      if(r.user_id === currentUser.id) userReacted[r.emoji] = true;
+    });
+
     return `
       <div class="post-card">
         <div class="post-header">
@@ -426,10 +441,65 @@ async function loadFeed() {
         ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img">` : ''}
         ${p.video_url ? `<video src="${esc(p.video_url)}" controls class="post-media-img"></video>` : ''}
         ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
+
+        <div class="post-actions">
+          <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
+          <button class="react-btn ${userReacted['❤️'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '❤️')">❤️ ${counts['❤️']}</button>
+          <button class="react-btn ${userReacted['🔥'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '🔥')">🔥 ${counts['🔥']}</button>
+          <button class="react-btn ${userReacted['👾'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👾')">👾 ${counts['👾']}</button>
+        </div>
+
+        <div class="comment-section">
+          <h3>💬 COMMENTS (${postComments.length})</h3>
+          <div style="display:flex;gap:6px;margin-bottom:10px;">
+            <input id="commentInput_${p.id}" placeholder="Write a reply..." onkeydown="if(event.key==='Enter')addComment('${p.id}')">
+            <button class="primary" style="padding:6px 12px;font-size:14px;" onclick="addComment('${p.id}')">REPLY</button>
+          </div>
+          <div>
+            ${postComments.map(c => {
+              const cu = c.profiles || {};
+              const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👾");
+              return `
+                <div class="comment-item">
+                  <div class="user-avatar" style="width:30px;height:30px;font-size:16px">${cAvatar}</div>
+                  <div style="flex:1;word-break:break-word;">
+                    <strong>${esc(cu.username)}</strong><span class="tiny" style="margin-left:8px">${new Date(c.created_at).toLocaleTimeString()}</span>
+                    <div>${esc(c.content)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
       </div>
     `;
   }).join('');
 }
+
+async function toggleReaction(postId, emoji) {
+  const { data } = await sb.from("reactions").select("*").eq("post_id", postId).eq("user_id", currentUser.id).eq("emoji", emoji).maybeSingle();
+  if(data) {
+    await sb.from("reactions").delete().eq("id", data.id);
+  } else {
+    await sb.from("reactions").insert({ post_id: postId, user_id: currentUser.id, emoji });
+  }
+  loadFeed();
+}
+window.toggleReaction = toggleReaction;
+
+async function addComment(postId) {
+  const input = $(`commentInput_${postId}`);
+  const content = input.value.trim();
+  if(!content) return;
+
+  const { error } = await sb.from("comments").insert({ post_id: postId, user_id: currentUser.id, content });
+  if(error) return toast("❌ Error adding comment");
+  
+  input.value = "";
+  playRetroSound('message');
+  loadFeed();
+}
+window.addComment = addComment;
 
 async function loadLeaderboard() {
   const { data } = await sb.from("profiles").select("*").order("xp", { ascending: false }).limit(10);
@@ -589,9 +659,9 @@ function setupRealtime() {
         if(selectedUser === payload.new.sender_id) loadMessages();
       }
     })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, () => {
-      loadFeed();
-    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => { loadFeed(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, () => { loadFeed(); })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, () => { loadFeed(); })
     .subscribe();
 }
 
