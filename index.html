@@ -430,33 +430,39 @@ window.createPost = createPost;
 
 let feedRenderSignature = "";
 let feedRefreshTimer = null;
+let messageRefreshTimer = null;
 let feedRealtimeStatus = "DISCONNECTED";
 let feedLoadInFlight = false;
+let messageLoadInFlight = false;
+let messageRenderSignature = "";
 
 async function loadFeed(forceRender = false) {
   if (feedLoadInFlight) return;
   feedLoadInFlight = true;
 
   try {
-    const { data: posts, error } = await sb
-      .from("posts")
-      .select("*, profiles(username, avatar, avatar_url, is_verified)")
-      .order("created_at", { ascending: false })
-      .limit(20);
+    // Fetch the three feed datasets in parallel. The old version fetched
+    // posts -> reactions -> comments sequentially, which made updates feel
+    // noticeably delayed even when Supabase responded quickly.
+    const [postsResult, reactionsResult, commentsResult] = await Promise.all([
+      sb.from("posts")
+        .select("*, profiles(username, avatar, avatar_url, is_verified)")
+        .order("created_at", { ascending: false })
+        .limit(20),
+      sb.from("reactions").select("*"),
+      sb.from("comments")
+        .select("*, profiles(username, avatar, avatar_url, is_verified)")
+        .order("created_at", { ascending: true })
+    ]);
+
+    const { data: posts, error } = postsResult;
+    const { data: reactions, error: reactionsError } = reactionsResult;
+    const { data: comments, error: commentsError } = commentsResult;
 
     if(error || !posts) {
       console.warn("Feed posts error:", error?.message || error);
       return;
     }
-
-    const { data: reactions, error: reactionsError } = await sb
-      .from("reactions")
-      .select("*");
-
-    const { data: comments, error: commentsError } = await sb
-      .from("comments")
-      .select("*, profiles(username, avatar, avatar_url, is_verified)")
-      .order("created_at", { ascending: true });
 
     if(reactionsError) console.warn("Feed reactions error:", reactionsError.message);
     if(commentsError) console.warn("Feed comments error:", commentsError.message);
@@ -839,6 +845,7 @@ async function loadMessageUsers() {
 
 function openChat(id, name) {
   selectedUser = id;
+  messageRenderSignature = "";
   $("chatTitle").textContent = name;
   $("reachIndicator").classList.remove("hidden");
   $("reachIndicator").innerHTML = `📡 STATUS: ${presenceMarkup(id)}`;
@@ -871,16 +878,27 @@ async function markChatMessagesSeen() {
 window.markChatMessagesSeen = markChatMessagesSeen;
 
 async function loadMessages() {
-  if(!selectedUser) return;
-  const { data, error } = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", { ascending: true });
-  if(error) { console.warn("Load messages:", error.message); return; }
-  if(!data) return;
+  if(!selectedUser || messageLoadInFlight) return;
+  messageLoadInFlight = true;
+  try {
+    const { data, error } = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", { ascending: true });
+    if(error) { console.warn("Load messages:", error.message); return; }
+    if(!data) return;
 
-  if(data.length === 0){
-    $("messagesList").innerHTML = `<div class="empty">💬 NO MESSAGES YET — START THE CHAT!</div>`;
-    await markChatMessagesSeen();
-    return;
-  }
+    const basicSignature = JSON.stringify(data.map(m => ({
+      id:m.id, created_at:m.created_at, content:m.content, sticker:m.sticker,
+      sender_id:m.sender_id, receiver_id:m.receiver_id, is_read:m.is_read,
+      image_url:m.image_url, video_url:m.video_url, audio_url:m.audio_url, reply_to_id:m.reply_to_id
+    })));
+
+    if(data.length === 0){
+      if(messageRenderSignature !== 'EMPTY') {
+        $("messagesList").innerHTML = `<div class="empty">💬 NO MESSAGES YET — START THE CHAT!</div>`;
+        messageRenderSignature = 'EMPTY';
+      }
+      await markChatMessagesSeen();
+      return;
+    }
 
   const ids = data.map(m => m.id).filter(Boolean);
   let reactionRows = [];
@@ -893,6 +911,13 @@ async function loadMessages() {
   reactionRows.forEach(r => {
     (reactionsByMessage[r.message_id] ||= []).push(r);
   });
+
+  const fullMessageSignature = basicSignature + '|' + JSON.stringify(reactionRows);
+  if(fullMessageSignature === messageRenderSignature) {
+    await markChatMessagesSeen();
+    return;
+  }
+  messageRenderSignature = fullMessageSignature;
 
   $("messagesList").innerHTML = data.map(m => {
     const mine = m.sender_id === currentUser.id;
@@ -932,6 +957,9 @@ async function loadMessages() {
 
   $("messagesList").scrollTop = $("messagesList").scrollHeight;
   await markChatMessagesSeen();
+  } finally {
+    messageLoadInFlight = false;
+  }
 }
 
 function buildStickerPicker(){
@@ -1275,6 +1303,10 @@ function setupRealtime() {
     clearInterval(feedRefreshTimer);
     feedRefreshTimer = null;
   }
+  if(messageRefreshTimer) {
+    clearInterval(messageRefreshTimer);
+    messageRefreshTimer = null;
+  }
 
   const channel = sb.channel('pixel-friend-live-feed-' + currentUser.id)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
@@ -1312,9 +1344,18 @@ function setupRealtime() {
   // Reliable fallback: if Realtime is not enabled for posts/comments/reactions
   // in the Supabase project, the feed still synchronizes automatically.
   // loadFeed() uses a signature check, so unchanged data does not rebuild the UI.
+  // Fast fallback keeps the app responsive even when Postgres Realtime is
+  // not enabled for one of the tables. Queries are lightweight and unchanged
+  // data does not rebuild the DOM.
   feedRefreshTimer = setInterval(() => {
     if(document.visibilityState === 'visible') loadFeed(false);
-  }, 2000);
+  }, 800);
+
+  // Messages use the same short fallback so a new message is visible quickly
+  // even if the Realtime publication is unavailable.
+  messageRefreshTimer = setInterval(() => {
+    if(document.visibilityState === 'visible' && selectedUser) loadMessages();
+  }, 800);
 }
 
 async function restoreSession() {
