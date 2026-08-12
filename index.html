@@ -588,6 +588,7 @@ window.createPost = createPost;
 let feedRenderSignature = "";
 let feedRefreshTimer = null;
 let messageRefreshTimer = null;
+let notificationRefreshTimer = null;
 let feedRealtimeStatus = "DISCONNECTED";
 let feedLoadInFlight = false;
 let messageLoadInFlight = false;
@@ -1465,6 +1466,10 @@ function setupRealtime() {
     clearInterval(messageRefreshTimer);
     messageRefreshTimer = null;
   }
+  if(notificationRefreshTimer) {
+    clearInterval(notificationRefreshTimer);
+    notificationRefreshTimer = null;
+  }
 
   const channel = sb.channel('pixel-friend-live-feed-' + currentUser.id)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
@@ -1521,6 +1526,15 @@ function setupRealtime() {
   messageRefreshTimer = setInterval(() => {
     if(document.visibilityState === 'visible' && selectedUser) loadMessages();
   }, 800);
+
+  // Dedicated notification fallback: keeps the bell/count/details responsive even
+  // when Supabase Postgres Realtime is unavailable or delayed for the messages table.
+  // Realtime remains the primary path; this only reconciles unread messages.
+  notificationRefreshTimer = setInterval(() => {
+    if(document.visibilityState === 'visible' && currentUser) {
+      updateNotificationBadge({notify:false});
+    }
+  }, 500);
 }
 
 async function restoreSession() {
