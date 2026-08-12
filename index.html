@@ -1180,9 +1180,41 @@ function setupRealtime() {
   }, 2000);
 }
 
+async function restoreSession() {
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+
+    if (data?.session?.user) {
+      await startApp(data.session.user);
+    } else {
+      currentUser = null;
+      currentProfile = null;
+      $("authScreen").style.display = "grid";
+      $("app").style.display = "none";
+    }
+  } catch (err) {
+    console.error("Session restore failed:", err);
+    toast("⚠️ Unable to restore your session. Please log in again.");
+    $("authScreen").style.display = "grid";
+    $("app").style.display = "none";
+  }
+}
+
+// Keep the logged-in session when the page is refreshed.
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT" || !session) {
+    currentUser = null;
+    currentProfile = null;
+    $("authScreen").style.display = "grid";
+    $("app").style.display = "none";
+  }
+});
+
 function logout() {
   sb.auth.signOut();
-  window.location.reload();
 }
 window.logout = logout;
+
+restoreSession();
 </script></body></html>
