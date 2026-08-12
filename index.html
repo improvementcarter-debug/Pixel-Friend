@@ -707,8 +707,6 @@ async function setupPresence(){
     Object.keys(state || {}).forEach(key => ids.add(String(key)));
     onlineUserIds = ids;
     refreshPresenceUI();
-    loadFriends();
-    loadMessageUsers();
   };
 
   presenceChannel
@@ -717,6 +715,7 @@ async function setupPresence(){
     .on('presence', { event: 'leave' }, update);
 
   presenceChannel.subscribe(async status => {
+    console.log('Pixel-Friend presence:', status);
     if(status === 'SUBSCRIBED'){
       try{
         await presenceChannel.track({
@@ -725,6 +724,11 @@ async function setupPresence(){
           online_at: new Date().toISOString()
         });
       }catch(e){ console.warn('Presence track failed:', e); }
+      refreshPresenceUI();
+    } else if(status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+      console.warn('Presence channel unavailable:', status);
+      onlineUserIds = new Set();
+      refreshPresenceUI();
     }
   });
 }
@@ -817,6 +821,12 @@ async function loadMessages() {
   const { data, error } = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", { ascending: true });
   if(error) { console.warn("Load messages:", error.message); return; }
   if(!data) return;
+
+  if(data.length === 0){
+    $("messagesList").innerHTML = `<div class="empty">💬 NO MESSAGES YET — START THE CHAT!</div>`;
+    await markChatMessagesSeen();
+    return;
+  }
 
   const ids = data.map(m => m.id).filter(Boolean);
   let reactionRows = [];
