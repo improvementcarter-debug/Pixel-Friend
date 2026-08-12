@@ -61,9 +61,27 @@ const ADMIN_EMAIL = "admin@pixel.com";
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 
+let retroAudioCtx = null;
+let audioUnlocked = false;
+
+function unlockRetroAudio() {
+  try {
+    if(!retroAudioCtx) retroAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(retroAudioCtx.state === 'suspended') retroAudioCtx.resume();
+    audioUnlocked = retroAudioCtx.state === 'running';
+  } catch(e) {
+    audioUnlocked = false;
+  }
+}
+
+window.addEventListener('pointerdown', unlockRetroAudio, { once:false, passive:true });
+window.addEventListener('keydown', unlockRetroAudio, { once:false, passive:true });
+
 function playRetroSound(type = 'click') {
   try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(!retroAudioCtx) retroAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(retroAudioCtx.state === 'suspended') retroAudioCtx.resume();
+    const audioCtx = retroAudioCtx;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain);
@@ -336,17 +354,48 @@ async function toggleUserVerify(targetUserId, currentStatus){
 }
 window.toggleUserVerify = toggleUserVerify;
 
-async function updateNotificationBadge(){
+let notificationInitialized = false;
+let knownUnreadMessageIds = new Set();
+let notificationCheckInFlight = false;
+
+async function updateNotificationBadge(options = {}){
+  const notify = options.notify !== false;
+  if(!currentUser || notificationCheckInFlight) return;
+  notificationCheckInFlight = true;
   try {
-    const { count } = await sb.from("messages").select("*", { count: 'exact', head: true }).eq("receiver_id", currentUser.id).eq("is_read", false);
+    const { data, error } = await sb.from("messages")
+      .select("id,sender_id")
+      .eq("receiver_id", currentUser.id)
+      .eq("is_read", false);
+    if(error) throw error;
+
+    const unreadRows = data || [];
+    const unreadIds = new Set(unreadRows.map(m => String(m.id)));
+    const newUnread = notificationInitialized
+      ? unreadRows.filter(m => !knownUnreadMessageIds.has(String(m.id)) && m.sender_id !== currentUser.id)
+      : [];
+
+    knownUnreadMessageIds = unreadIds;
+    notificationInitialized = true;
+
     const badge = $("notifBadge");
-    if(badge && count > 0){
-      badge.textContent = count;
-      badge.style.display = "inline-block";
-    } else if(badge){
-      badge.style.display = "none";
+    const count = unreadRows.length;
+    if(badge){
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.style.display = count > 0 ? "inline-block" : "none";
     }
-  } catch(e){ console.warn(e); }
+
+    // Play exactly once for each newly detected unread incoming message.
+    // Realtime and polling both call this function, so duplicate alerts are avoided.
+    if(notify && newUnread.length > 0){
+      playRetroSound('message');
+      toast(newUnread.length === 1 ? '💬 New message received!' : `💬 ${newUnread.length} new messages received!`);
+    }
+  } catch(e){
+    console.warn('Notification badge:', e);
+  } finally {
+    notificationCheckInFlight = false;
+  }
 }
 
 function previewPostFile(type){
@@ -1321,9 +1370,13 @@ function setupRealtime() {
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
       const msg = payload.new;
       if(msg.receiver_id === currentUser.id) {
-        updateNotificationBadge();
-        playRetroSound('message');
-        if(selectedUser === msg.sender_id) await loadMessages();
+        // The notification manager owns the sound + badge so Realtime and
+        // the polling fallback cannot produce duplicate alerts.
+        await updateNotificationBadge({ notify:true });
+        if(selectedUser === msg.sender_id) {
+          await loadMessages();
+          await markChatMessagesSeen();
+        }
       }
     })
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, payload => {
@@ -1348,7 +1401,10 @@ function setupRealtime() {
   // not enabled for one of the tables. Queries are lightweight and unchanged
   // data does not rebuild the DOM.
   feedRefreshTimer = setInterval(() => {
-    if(document.visibilityState === 'visible') loadFeed(false);
+    if(document.visibilityState === 'visible') {
+      loadFeed(false);
+      updateNotificationBadge({ notify:true });
+    }
   }, 800);
 
   // Messages use the same short fallback so a new message is visible quickly
@@ -1382,6 +1438,8 @@ async function restoreSession() {
 // Keep the logged-in session when the page is refreshed.
 sb.auth.onAuthStateChange((event, session) => {
   if (event === "SIGNED_OUT" || !session) {
+    notificationInitialized = false;
+    knownUnreadMessageIds.clear();
     if(presenceChannel) stopPresence();
     currentUser = null;
     currentProfile = null;
@@ -1391,6 +1449,8 @@ sb.auth.onAuthStateChange((event, session) => {
 });
 
 async function logout() {
+  notificationInitialized = false;
+  knownUnreadMessageIds.clear();
   await stopPresence();
   await sb.auth.signOut();
 }
