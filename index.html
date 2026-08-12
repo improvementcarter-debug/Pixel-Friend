@@ -367,15 +367,45 @@ function renderNotificationBadge(count){
   badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
 }
 
-function notifyIncomingMessage(messageId){
-  if(!currentUser || !messageId) return;
-  const id = String(messageId);
+async function notifyIncomingMessage(message){
+  if(!currentUser || !message?.id) return;
+  const id = String(message.id);
   if(knownUnreadMessageIds.has(id)) return;
   knownUnreadMessageIds.add(id);
   renderNotificationBadge(localUnreadCount + 1);
+
+  let senderName = 'PIXEL USER';
+  try {
+    const { data } = await sb.from('profiles').select('username').eq('id', message.sender_id).maybeSingle();
+    senderName = data?.username || 'PIXEL USER';
+  } catch(e) {}
+
+  let detail = message.content?.trim() || '';
+  if(!detail) {
+    if(message.sticker) detail = '🎟️ Sent a sticker';
+    else if(message.image_url) detail = '🖼️ Sent an image';
+    else if(message.video_url) detail = '📹 Sent a video';
+    else if(message.audio_url) detail = '🎤 Sent a voice message';
+    else detail = '📩 Sent a message';
+  }
+
   playRetroSound('message');
-  toast('💬 New message received!');
+  toast(`🔔 ${senderName}: ${detail}`);
+
+  // Also use the browser's notification center when permission has been granted.
+  if(document.visibilityState !== 'visible' && 'Notification' in window && Notification.permission === 'granted') {
+    try { new Notification(`💬 ${senderName}`, { body: detail }); } catch(e) {}
+  }
 }
+
+function requestNotificationPermission(){
+  if('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().catch(() => {});
+  }
+}
+window.requestNotificationPermission = requestNotificationPermission;
+
+document.addEventListener('click', () => requestNotificationPermission(), { once:true });
 
 async function updateNotificationBadge(options = {}){
   const notify = options.notify === true;
@@ -1384,7 +1414,7 @@ function setupRealtime() {
       if(msg.receiver_id === currentUser.id && msg.sender_id !== currentUser.id) {
         // Update the notification UI immediately from the Realtime payload.
         // The database query below only reconciles the final unread count.
-        notifyIncomingMessage(msg.id);
+        notifyIncomingMessage(msg);
         if(selectedUser === msg.sender_id) {
           await loadMessages();
           await markChatMessagesSeen();
