@@ -1,11 +1,14 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
+  "id": "/Pixel-Friend/",
+  "name": "Pixel-Friend",
+  "short_name": "Pixel-Friend",
+  "description": "Pixel-Friend - Connect, Chat and Share",
+  "start_url": "/Pixel-Friend/",
+  "scope": "/Pixel-Friend/",
   "display": "standalone",
-  "name": "improvementcarter-debug.github",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "improvementcarter-debug.github",
-  "start_url": "/",
-  "theme_color": "#ffffff"
+  "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+  "theme_color": "#111827",
+  "background_color": "#0f172a"
 }
