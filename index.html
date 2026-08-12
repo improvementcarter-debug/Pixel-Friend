@@ -691,6 +691,7 @@ async function loadMessages() {
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','❤️')">❤️</button>
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','👍')">👍</button>
             <button class="message-tool" onclick="toggleReactionPicker('${esc(m.id)}')">➕ REACT</button>
+            ${mine ? `<button class="message-tool message-delete-tool" onclick="deleteMessage('${esc(m.id)}')">🗑 DELETE</button>` : ''}
           </div>
           ${status}
         </div>
@@ -753,6 +754,30 @@ async function quickReact(id, emoji){
   await toggleMessageReaction(id, emoji);
 }
 window.quickReact = quickReact;
+
+async function deleteMessage(messageId){
+  if(!currentUser || !selectedUser || !messageId) return;
+  const ok = window.confirm('Delete this message? This will remove it from the conversation.');
+  if(!ok) return;
+  try{
+    // Remove reactions first so the deleted message leaves no orphaned reactions.
+    const reactionDelete = await sb.from('message_reactions').delete().eq('message_id', messageId);
+    if(reactionDelete.error) throw reactionDelete.error;
+
+    // Only the original sender can delete their own message.
+    const { error } = await sb.from('messages')
+      .delete()
+      .eq('id', messageId)
+      .eq('sender_id', currentUser.id);
+    if(error) throw error;
+
+    playRetroSound('message');
+    await loadMessages();
+  }catch(e){
+    toast('❌ Delete failed: ' + (e?.message || 'Database error') + '. Please check the Messages DELETE policy in Supabase.');
+  }
+}
+window.deleteMessage = deleteMessage;
 
 async function toggleMessageReaction(messageId, reaction){
   if(!currentUser) return;
