@@ -48,8 +48,14 @@ async function loadAdminUsers(){    if(!isAdmin()) return toast("❌ Unauthorize
 
   $("adminUserList").innerHTML = r.data.map(u => {        const isUserAdmin = u.is_admin === true;        const isVerified = u.is_verified === true;        return `            <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">                <div class="row" style="gap:12px; align-items:center;">                    <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>                    <div>                        <strong>${esc(u.username)}</strong>                         ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}                        ${isVerified ? '<span style="color:var(--green);font-size:14px;">✅ [VERIFIED]</span>' : ''}                        <div class="tiny">ID: ${u.id}</div>                    </div>                </div>                <div style="display:flex; gap:6px;">                    <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">                        ${isVerified ? '❌ Unverify' : '✅ Verify Account'}                    </button>                    <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">                        ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}                    </button>                </div>            </div>`;    }).join('');}
 
-// Fixed sendSticker function to pass content fallback and prevent null constraint error
-async function sendSticker(stickerEmoji) {    if (!selectedUser) return;    try {        const { error } = await sb.from("messages").insert({            sender_id: currentUser.id,            receiver_id: selectedUser.id,            content: stickerEmoji, // Provide fallback content so it satisfies the not-null constraint            media_url: stickerEmoji,            media_type: 'sticker',            reply_to: activeReplyMsgId || null        });
+// Fix for clearChatAttachment not defined error
+function clearChatAttachment() {
+    chatAttachmentFile = null;
+    chatAttachmentType = null;
+}
+window.clearChatAttachment = clearChatAttachment;
+
+async function sendSticker(stickerEmoji) {    if (!selectedUser) return;    try {        const { error } = await sb.from("messages").insert({            sender_id: currentUser.id,            receiver_id: selectedUser.id,            content: stickerEmoji,            media_url: stickerEmoji,            media_type: 'sticker',            reply_to: activeReplyMsgId || null        });
 
         if (error) throw error;
         
