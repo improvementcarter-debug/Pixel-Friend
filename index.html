@@ -767,7 +767,7 @@ async function toggleMessageReaction(messageId, reaction){
       if(error) throw error;
     }
     await loadMessages();
-  }catch(e){ toast('❌ Reaction failed: ' + e.message); }
+  }catch(e){ toast('❌ Reaction failed: ' + (e?.message || 'Database error') + '. Please run the Pixel-Friend chat SQL setup.'); }
 }
 window.toggleMessageReaction = toggleMessageReaction;
 
