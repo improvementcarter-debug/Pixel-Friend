@@ -357,36 +357,48 @@ window.toggleUserVerify = toggleUserVerify;
 let notificationInitialized = false;
 let knownUnreadMessageIds = new Set();
 let notificationCheckInFlight = false;
+let localUnreadCount = 0;
+
+function renderNotificationBadge(count){
+  localUnreadCount = Math.max(0, Number(count) || 0);
+  const badge = $("notifBadge");
+  if(!badge) return;
+  badge.textContent = localUnreadCount > 99 ? '99+' : String(localUnreadCount);
+  badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
+}
+
+function notifyIncomingMessage(messageId){
+  if(!currentUser || !messageId) return;
+  const id = String(messageId);
+  if(knownUnreadMessageIds.has(id)) return;
+  knownUnreadMessageIds.add(id);
+  renderNotificationBadge(localUnreadCount + 1);
+  playRetroSound('message');
+  toast('💬 New message received!');
+}
 
 async function updateNotificationBadge(options = {}){
-  const notify = options.notify !== false;
+  const notify = options.notify === true;
   if(!currentUser || notificationCheckInFlight) return;
   notificationCheckInFlight = true;
   try {
-    const { data, error } = await sb.from("messages")
-      .select("id,sender_id")
-      .eq("receiver_id", currentUser.id)
-      .eq("is_read", false);
+    const { data, error } = await sb.from('messages')
+      .select('id,sender_id')
+      .eq('receiver_id', currentUser.id)
+      .eq('is_read', false);
     if(error) throw error;
 
     const unreadRows = data || [];
     const unreadIds = new Set(unreadRows.map(m => String(m.id)));
+    const previousIds = knownUnreadMessageIds;
     const newUnread = notificationInitialized
-      ? unreadRows.filter(m => !knownUnreadMessageIds.has(String(m.id)) && m.sender_id !== currentUser.id)
+      ? unreadRows.filter(m => !previousIds.has(String(m.id)) && m.sender_id !== currentUser.id)
       : [];
 
     knownUnreadMessageIds = unreadIds;
     notificationInitialized = true;
+    renderNotificationBadge(unreadRows.length);
 
-    const badge = $("notifBadge");
-    const count = unreadRows.length;
-    if(badge){
-      badge.textContent = count > 99 ? '99+' : String(count);
-      badge.style.display = count > 0 ? "inline-block" : "none";
-    }
-
-    // Play exactly once for each newly detected unread incoming message.
-    // Realtime and polling both call this function, so duplicate alerts are avoided.
     if(notify && newUnread.length > 0){
       playRetroSound('message');
       toast(newUnread.length === 1 ? '💬 New message received!' : `💬 ${newUnread.length} new messages received!`);
@@ -1369,10 +1381,10 @@ function setupRealtime() {
     })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
       const msg = payload.new;
-      if(msg.receiver_id === currentUser.id) {
-        // The notification manager owns the sound + badge so Realtime and
-        // the polling fallback cannot produce duplicate alerts.
-        await updateNotificationBadge({ notify:true });
+      if(msg.receiver_id === currentUser.id && msg.sender_id !== currentUser.id) {
+        // Update the notification UI immediately from the Realtime payload.
+        // The database query below only reconciles the final unread count.
+        notifyIncomingMessage(msg.id);
         if(selectedUser === msg.sender_id) {
           await loadMessages();
           await markChatMessagesSeen();
@@ -1382,7 +1394,7 @@ function setupRealtime() {
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, payload => {
       const msg = payload.new;
       if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) loadMessages();
-      if(msg.receiver_id === currentUser.id) updateNotificationBadge();
+      if(msg.receiver_id === currentUser.id && msg.sender_id !== currentUser.id) updateNotificationBadge({notify:false});
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, payload => {
       const r = payload.new || payload.old;
@@ -1403,9 +1415,9 @@ function setupRealtime() {
   feedRefreshTimer = setInterval(() => {
     if(document.visibilityState === 'visible') {
       loadFeed(false);
-      updateNotificationBadge({ notify:true });
+      updateNotificationBadge({ notify:false });
     }
-  }, 800);
+  }, 1500);
 
   // Messages use the same short fallback so a new message is visible quickly
   // even if the Realtime publication is unavailable.
