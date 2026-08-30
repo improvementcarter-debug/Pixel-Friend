@@ -69,13 +69,22 @@ const ADMIN_EMAIL = "admin@pixel.com";
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 
+function isGuestProfile(profile){
+  // Primary source: database flag. Fallback keeps previously-created guest
+  // profiles correctly identified even if their profile row was created by an
+  // older trigger before is_guest was saved.
+  if(profile?.is_guest === true) return true;
+  const username = String(profile?.username || '');
+  return /^GUEST-/i.test(username);
+}
+
 function accountBadge(profile, small=false){
-  const guest = profile?.is_guest === true;
+  const guest = isGuestProfile(profile);
   return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}</span>`;
 }
 
 function accountTypeBanner(profile){
-  const guest = profile?.is_guest === true;
+  const guest = isGuestProfile(profile);
   return `<div class="account-type-banner ${guest ? 'guest' : 'real'}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}<span class="sub">${guest ? 'This user entered using Guest Access' : 'Registered Pixel-Friend account'}</span></div>`;
 }
 
@@ -245,11 +254,32 @@ async function startApp(user){
 }
 
 async function loadProfile(){
+  const authGuest = currentUser?.is_anonymous === true || currentUser?.user_metadata?.is_guest === true;
   let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+
   if(!r.data){
-    const fallback = {id: currentUser.id, username: currentUser.user_metadata?.username || (currentUser.is_anonymous ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"), avatar: currentUser.user_metadata?.avatar || (currentUser.is_anonymous ? "🎮" : "👾"), xp: 0, is_verified: false, is_guest: currentUser.is_anonymous === true};
+    const fallback = {
+      id: currentUser.id,
+      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
+      avatar: currentUser.user_metadata?.avatar || (authGuest ? "🎮" : "👾"),
+      xp: 0,
+      is_verified: false,
+      is_guest: authGuest
+    };
     r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
+  } else if(authGuest && r.data.is_guest !== true){
+    // A database trigger may already have created this profile with the default
+    // is_guest=false. Correct it immediately for every anonymous login.
+    const {data: fixedProfile, error: fixError} = await sb
+      .from("profiles")
+      .update({is_guest:true})
+      .eq("id", currentUser.id)
+      .select("*")
+      .maybeSingle();
+    if(!fixError && fixedProfile) r.data = fixedProfile;
+    else r.data = {...r.data, is_guest:true}; // still identify correctly in this session
   }
+
   currentProfile = r.data;
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = currentProfile.username + verifiedBadge;
@@ -258,7 +288,7 @@ async function loadProfile(){
   $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
   $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
   $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  document.body.classList.toggle('guest-user', currentProfile.is_guest === true);
+  document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
   $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
