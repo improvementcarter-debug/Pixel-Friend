@@ -1042,13 +1042,30 @@ async function loadStories(){
   if(!currentUser) return;
   try{
     const now = new Date().toISOString();
-    const {data,error}=await sb.from('stories').select('*, profiles(username,avatar,avatar_url,is_verified,is_guest)').gt('expires_at',now).order('created_at',{ascending:false}).limit(100);
+    // Query stories first, then profiles separately. This avoids failures when
+    // PostgREST cannot infer a stories -> profiles relationship in a project.
+    const {data,error}=await sb.from('stories')
+      .select('id,user_id,content,media_url,media_type,created_at,expires_at')
+      .gt('expires_at',now)
+      .order('created_at',{ascending:false})
+      .limit(100);
     if(error) throw error;
-    storiesCache=data||[];
+
+    const rows=data||[];
+    const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+    let profileMap=new Map();
+    if(ids.length){
+      const pr=await sb.from('profiles').select('id,username,avatar,avatar_url,is_verified,is_guest').in('id',ids);
+      if(pr.error) throw pr.error;
+      profileMap=new Map((pr.data||[]).map(u=>[String(u.id),u]));
+    }
+    storiesCache=rows.map(st=>({...st,profiles:profileMap.get(String(st.user_id))||{username:'PIXEL USER',avatar:'👾'}}));
     renderStories();
   }catch(err){
-    const row=$('storiesRow'); if(row) row.innerHTML='<div class="story-empty">Stories are not configured yet. Add the Supabase SQL setup below.</div>';
-    console.warn('Stories:',err.message);
+    const message=err?.message||String(err);
+    const row=$('storiesRow');
+    if(row) row.innerHTML=`<div class="story-empty">❌ STORIES ERROR: ${esc(message)}<br><br>Check the stories table, RLS policies, and storage bucket.</div>`;
+    console.warn('Stories:',err);
   }
 }
 function renderStories(){
@@ -1084,7 +1101,10 @@ async function publishStory(){
     if(error) throw error;
     $('storyText').value=''; $('storyMediaInput').value=''; storyMediaFile=null; $('storyMediaPreview').textContent='';
     closeStoryCreator(); playRetroSound('success'); toast('📸 Story published for 24 hours!'); await loadStories();
-  }catch(err){ status('storyStatus','❌ '+err.message,true); }
+  }catch(err){
+    console.error('Publish story failed:',err);
+    status('storyStatus','❌ Story publish failed: '+(err?.message||String(err)),true);
+  }
 }
 function openStoryViewer(index){
   if(!storiesCache[index]) return; activeStoryIndex=index; const st=storiesCache[index],u=st.profiles||{};
