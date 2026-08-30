@@ -15,7 +15,7 @@
 .reply-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#091522;border:1px solid var(--cyan);padding:7px 10px;margin-bottom:4px;font-size:14px}
 .sticker-picker{display:flex;gap:6px;flex-wrap:wrap;background:#091522;border:2px solid #30415f;padding:9px;margin-bottom:5px}
 .sticker-picker button{background:#14233b;border:1px solid #355174;padding:6px 9px;font-size:25px;border-radius:3px}
-.account-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;margin-left:6px;border:1px solid #355174;border-radius:10px;font-size:11px;letter-spacing:.3px;vertical-align:middle}.account-badge.real{color:var(--cyan);border-color:#3574a8;background:#10263c}.account-badge.guest{color:var(--yellow);border-color:#735b28;background:#2a210f}.account-badge.small{font-size:10px;padding:2px 5px;margin-left:4px}.guest-note{font-size:14px;color:var(--muted);text-align:center;margin:10px 0 0}.auth-guest{margin-top:10px;width:100%}</style></head><body>
+.account-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;margin-left:6px;border:1px solid #355174;border-radius:10px;font-size:11px;letter-spacing:.3px;vertical-align:middle}.account-badge.real{color:var(--cyan);border-color:#3574a8;background:#10263c}.account-badge.guest{color:var(--yellow);border-color:#735b28;background:#2a210f}.account-badge.small{font-size:10px;padding:2px 5px;margin-left:4px}.account-badge{font-family:"Press Start 2P",Consolas,monospace;font-weight:900;white-space:nowrap;box-shadow:2px 2px 0 #050912}.account-badge.guest{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(255,211,78,.18),2px 2px 0 #050912}.account-badge.real{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(67,231,255,.15),2px 2px 0 #050912}.account-type-banner{margin:10px auto 14px;padding:10px 12px;border:2px solid var(--cyan);background:#0b1b2c;color:var(--cyan);font-family:"Press Start 2P",Consolas,monospace;font-size:11px;line-height:1.6;max-width:360px;box-shadow:3px 3px 0 #050912}.account-type-banner.guest{border-color:var(--yellow);background:#211b0b;color:var(--yellow)}.account-type-banner .sub{display:block;font-family:"VT323",Consolas,monospace;font-size:17px;letter-spacing:.3px;margin-top:4px;color:#dce8ff}.guest-user .avatar,.guest-user .user-avatar{border-color:var(--yellow)}.guest-user .topbar{border-bottom-color:#735b28}.guest-note{font-size:14px;color:var(--muted);text-align:center;margin:10px 0 0}.auth-guest{margin-top:10px;width:100%}</style></head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
@@ -24,7 +24,7 @@
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
 <main><section id="home" class="page active">    <div class="hero">    <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>REALTIME MESSAGING • MEDIA • EMOJI REACTIONS • THREADED REPLIES</p></div>    <div style="font-size:50px">🕹️</div>  </div>    <div class="card" style="padding:20px">        <h2>✍️ CREATE POST</h2>        <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;">            <button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PICTURE</button>            <button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button>            <button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button>
 
       <span id="postImagePill" class="file-pill hidden"></span>      <span id="postVideoPill" class="file-pill hidden"></span>      <span id="postAudioPill" class="file-pill hidden"></span>
@@ -40,7 +40,7 @@
             <input id="messageInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">                        <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>                    </div>                </div>      </div>        </div>    </div></section>
 <section id="leaderboard" class="page">    <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div></section>
 <section id="adminPanel" class="page">  <div class="card" style="padding:20px">    <h1>🛡️ ADMIN CONTROL PANEL</h1>    <p class="tiny">Manage user administrator and account verification statuses. 🎮 Guest and 👤 Real account types are visible to everyone.</p>    <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>  </div></section>
-<section id="profile" class="page">    <div class="card" style="padding:24px;max-width:540px;margin:0 auto">        <div style="text-align:center;margin-bottom:20px">      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>          <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1>          <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>    </div>
+<section id="profile" class="page">    <div class="card" style="padding:24px;max-width:540px;margin:0 auto">        <div style="text-align:center;margin-bottom:20px">      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>          <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1><div id="profileAccountType"></div>          <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>    </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">      <div class="card" style="padding:14px;text-align:center">        <div class="tiny" style="margin-bottom:4px">CURRENT LEVEL</div>        <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong>      </div>      <div class="card" style="padding:14px;text-align:center">        <div class="tiny" style="margin-bottom:4px">TOTAL XP</div>        <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong>      </div>    </div>
 
@@ -71,7 +71,12 @@ const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 
 function accountBadge(profile, small=false){
   const guest = profile?.is_guest === true;
-  return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '🎮 GUEST' : '👤 REAL'}</span>`;
+  return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}</span>`;
+}
+
+function accountTypeBanner(profile){
+  const guest = profile?.is_guest === true;
+  return `<div class="account-type-banner ${guest ? 'guest' : 'real'}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}<span class="sub">${guest ? 'This user entered using Guest Access' : 'Registered Pixel-Friend account'}</span></div>`;
 }
 
 let retroAudioCtx = null;
@@ -247,11 +252,13 @@ async function loadProfile(){
   }
   currentProfile = r.data;
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
-  const accountBadgeText = currentProfile.is_guest ? ' 🎮 GUEST' : ' 👤 REAL';
-  $("sideName").textContent = currentProfile.username + verifiedBadge + accountBadgeText;
+  $("sideName").textContent = currentProfile.username + verifiedBadge;
+  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
   $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge + accountBadgeText;
+  $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
+  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
   $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  document.body.classList.toggle('guest-user', currentProfile.is_guest === true);
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
   $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
@@ -279,10 +286,11 @@ async function saveProfileInfo(){
   currentProfile.username = username;
   currentProfile.bio = bio;
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
-  const accountBadgeText = currentProfile.is_guest ? ' 🎮 GUEST' : ' 👤 REAL';
-  $("sideName").textContent = username + verifiedBadge + accountBadgeText;
+  $("sideName").textContent = username + verifiedBadge;
+  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
   $("sideBio").textContent = bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = username + verifiedBadge + accountBadgeText;
+  $("profileNameDisplay").textContent = username + verifiedBadge;
+  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
   $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
   playRetroSound('success');
   toast("✅ Profile details updated!");
