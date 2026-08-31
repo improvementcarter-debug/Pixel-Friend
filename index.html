@@ -86,6 +86,9 @@
 .follow-action-btn{min-height:34px;font-size:13px;font-weight:700;white-space:nowrap}
 .follow-action-btn[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--cyan)}
 
+
+/* INVITE FRIENDS */
+.invite-modal{position:fixed;inset:0;z-index:10000;background:rgba(2,7,18,.82);display:grid;place-items:center;padding:18px}.invite-card{width:min(560px,100%);background:#0b1423;border:1px solid #365174;border-radius:18px;padding:22px;box-shadow:0 0 32px rgba(0,229,255,.16)}.invite-card h2{margin:0 0 8px}.invite-link{width:100%;box-sizing:border-box;margin:12px 0;padding:13px;background:#07101d;border:1px solid #294968;border-radius:10px;color:#bfeaff;font-family:monospace}.invite-actions{display:flex;gap:10px;flex-wrap:wrap}.invite-actions button{flex:1;min-width:150px}.invite-stats{margin-top:12px;padding:10px;border:1px dashed #365174;border-radius:10px;color:#9db3c9}.invite-joined{margin-top:8px;color:#8fffc1}
 </style></head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -95,7 +98,7 @@
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -360,6 +363,7 @@ async function startApp(user){
   $("app").style.display = "block";
   playRetroSound('success');
   await loadProfile();
+  await applyPendingInvite();
 
   if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
     await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);
@@ -868,6 +872,80 @@ function closePostView(){
   document.body.style.overflow = '';
 }
 window.closePostView = closePostView;
+
+
+function getInviteUrl(userId=currentUser?.id){
+  const base = window.location.origin + window.location.pathname;
+  return base + '?invite=' + encodeURIComponent(userId || '');
+}
+function readInviteFromUrl(){
+  try{
+    const id = new URLSearchParams(window.location.search).get('invite');
+    if(id && /^[0-9a-fA-F-]{20,}$/.test(id)){
+      localStorage.setItem('pf_pending_inviter', id);
+      return id;
+    }
+  }catch(e){}
+  return localStorage.getItem('pf_pending_inviter') || '';
+}
+function clearInviteFromUrl(){
+  try{
+    const u=new URL(window.location.href);
+    u.searchParams.delete('invite');
+    history.replaceState({},'',u.pathname+u.search+u.hash);
+  }catch(e){}
+}
+async function openInviteModal(){
+  if(!currentUser) return toast('Please log in first.');
+  const link=getInviteUrl();
+  const input=$('inviteLink'); if(input) input.value=link;
+  const stat=$('inviteStats');
+  if(stat){
+    let count=0;
+    try{
+      const {count:c,error}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('invited_by',currentUser.id);
+      if(!error) count=c||0;
+    }catch(e){}
+    stat.textContent='👥 Joined through your link: '+count;
+  }
+  $('inviteModal')?.classList.remove('hidden');
+}
+function closeInviteModal(){ $('inviteModal')?.classList.add('hidden'); }
+async function copyInviteLink(){
+  const link=$('inviteLink')?.value || getInviteUrl();
+  const ok=await copyShareText(link);
+  toast(ok?'🔗 Invite link copied!':'Copy this invite link manually.');
+  if(!ok) window.prompt('Copy your invite link:',link);
+}
+async function shareInviteLink(){
+  const link=$('inviteLink')?.value || getInviteUrl();
+  const title='Join me on Pixel-Friend!';
+  const text='👾 Join me on Pixel-Friend and let’s connect!';
+  if(navigator.share){
+    try{ await navigator.share({title,text,url:link}); toast('🚀 Invite shared successfully!'); return; }
+    catch(e){ if(e?.name==='AbortError') return; }
+  }
+  const ok=await copyShareText(link);
+  if(ok) toast('🔗 Invite link copied! Paste it anywhere to invite friends.');
+  else window.prompt('Copy your invite link:',link);
+}
+async function applyPendingInvite(){
+  if(!currentUser) return;
+  const inviterId=readInviteFromUrl();
+  if(!inviterId || inviterId===currentUser.id) return;
+  // Try to remember the referral in the profile. If the column is not configured, follow fallback still works.
+  try{ await sb.from('profiles').update({invited_by:inviterId}).eq('id',currentUser.id).is('invited_by',null); }catch(e){}
+  // Automatically follow the inviter when the follows table is available.
+  try{
+    const {error}=await sb.from('follows').insert({follower_id:currentUser.id,following_id:inviterId});
+    if(error && !String(error.message||'').toLowerCase().includes('duplicate')) console.warn('Invite follow:',error.message);
+  }catch(e){}
+  localStorage.removeItem('pf_pending_inviter');
+  clearInviteFromUrl();
+  toast('🎉 You joined Pixel-Friend through a friend’s invite!');
+}
+window.openInviteModal=openInviteModal; window.closeInviteModal=closeInviteModal;
+window.copyInviteLink=copyInviteLink; window.shareInviteLink=shareInviteLink;
 
 async function copyShareText(value){
   if(navigator.clipboard && window.isSecureContext){
@@ -2312,4 +2390,18 @@ async function logout() {
 window.logout = logout;
 
 restoreSession();
-</script></body></html>
+</script>
+<div id="inviteModal" class="invite-modal hidden" role="dialog" aria-modal="true">
+  <div class="invite-card">
+    <h2>🔗 INVITE FRIENDS</h2>
+    <div class="tiny">Share your personal Pixel-Friend invite link. Friends who join through it can be connected to you automatically.</div>
+    <input id="inviteLink" class="invite-link" readonly>
+    <div class="invite-actions">
+      <button class="primary" onclick="shareInviteLink()">📤 SHARE INVITE</button>
+      <button class="secondary" onclick="copyInviteLink()">📋 COPY LINK</button>
+      <button class="secondary" onclick="closeInviteModal()">✖ CLOSE</button>
+    </div>
+    <div id="inviteStats" class="invite-stats">👥 Joined through your link: 0</div>
+  </div>
+</div>
+</body></html>
