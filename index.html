@@ -3,7 +3,6 @@
 
 
 
-
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pixel-Friend</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');*{box-sizing:border-box}:root{  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;}html,body{margin:0;min-height:100%;background:var(--bg)}body{  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;  letter-spacing:.25px;  background:    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);  background-size:8px 8px,8px 8px,100% 100%;}body:before{  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);}button,input,textarea,select{font:inherit}button{cursor:pointer}h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{  font-family:"Press Start 2P",Consolas,monospace;}h1{font-size:20px;line-height:1.55}h2{font-size:15px;line-height:1.6}h3{font-size:13px}.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.auth-screen{  min-height:100vh;display:grid;place-items:center;padding:20px;  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;}.card,.auth-card{  background:linear-gradient(180deg,#111b2d,#0b1220);  border:2px solid var(--border);border-radius:4px;  box-shadow:6px 6px 0 var(--shadow);}.auth-card{width:min(460px,100%);padding:28px;}.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px}.tagline{text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}.tabs button,.menu button,.icon,.notification-button,.secondary{  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;  padding:11px 12px;box-shadow:3px 3px 0 #050912;}.tabs .active,.primary{  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;}.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}button:active{transform:translate(2px,2px)}input,textarea,select{  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;  padding:12px;margin-bottom:12px;outline:none;}input:focus,textarea:focus,select:focus{border-color:var(--cyan)}textarea{min-height:100px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}.app{display:none}.topbar{  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;}.brand{font-size:14px;cursor:pointer}.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:200px;margin:0}.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}.mini{text-align:center}.avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}.presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#667085;vertical-align:middle}.presence-dot.presence-online{position:static;width:8px;height:8px;border:0;background:var(--green);display:inline-block}.presence-label{font-size:11px;letter-spacing:.4px}.presence-label.online-label{color:var(--green)}.presence-label.offline-label{color:#8892a8}.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;  border:2px solid #36547d;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}.user-avatar{width:46px;height:46px;font-size:24px}.post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}.post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.post-author{display:flex;align-items:center;gap:12px}.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}.post-audio,.msg-audio{width:100%;margin-top:8px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}.react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}.react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}.comment-section{margin-top:14px;background:#09101d;padding:12px;border:1px solid #1c2c47;border-radius:2px}.comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}.comment-reply-preview{background:#060c16;border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.messages-layout{display:grid;grid-template-columns:280px 1fr;min-height:640px}.chat-users{border-right:2px solid var(--border);padding-right:15px}.chat-user{padding:12px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;position:relative}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}.message-wrap.mine{align-self:flex-end;align-items:flex-end}.message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}.message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}.message:not(.mine){border-bottom-left-radius:2px}.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}.typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}.chat-controls{display:flex;gap:8px;align-items:center}.chat-controls input{margin:0}.file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}.notification-wrap{position:relative}.notification-panel{position:absolute;right:0;top:50px;width:min(390px,calc(100vw - 30px));background:#0b1423;border:2px solid var(--border);box-shadow:5px 5px 0 #02050b;z-index:1000}.notification-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:2px solid var(--border);font-size:12px}.notification-clear{background:#15233a;border:1px solid #2b3d5d;color:#dce8ff;padding:5px 7px;font-size:10px}.notification-list{max-height:430px;overflow-y:auto}.notification-item{display:flex;gap:10px;padding:11px;border-bottom:1px solid #1c2c47;cursor:pointer;background:#0d1829}.notification-item:hover{background:#162945}.notification-item.unread{border-left:4px solid var(--cyan)}.notification-item-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;background:#16263e;border:1px solid #35517a}.notification-item-body{min-width:0}.notification-item-title{font-size:16px;font-weight:bold}.notification-item-text{font-size:16px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;margin-top:3px;color:#eaf2ff}.notification-item-time{font-size:12px;color:var(--muted);margin-top:4px}.notification-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:14px}@media(max-width:600px){.notification-panel{right:-48px}}.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}.recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}@keyframes pulse{from{opacity:1}to{opacity:0.5}}@media(max-width:850px){  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}}.message-status{display:block;margin-top:4px;text-align:right;font-size:11px;color:var(--muted);letter-spacing:.5px}.message-status.seen{color:var(--cyan);font-weight:bold}.message-wrap:not(.mine) .message-status{text-align:left}
 .message-tools{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;opacity:.9}
 .message-tool{background:#0b1729;border:1px solid #355174;color:#dce8ff;padding:4px 7px;border-radius:3px;font-size:13px;box-shadow:2px 2px 0 #050912}
@@ -34,6 +33,47 @@
   .topbar{position:sticky;top:0;z-index:100;}
   html,body{overflow-x:hidden;}
 }
+
+/* ===== PIXEL-FRIEND NEXT-GEN DASHBOARD ===== */
+:root{--glow-blue:rgba(78,161,255,.34);--glow-purple:rgba(155,108,255,.32);--glow-pink:rgba(255,79,145,.24)}
+.topbar{background:linear-gradient(90deg,#070d18,#0a1120 55%,#10122a)!important;border-bottom:1px solid #263b60!important;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.brand{font-size:18px!important;background:linear-gradient(90deg,var(--cyan),#82aaff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none!important}
+.brand-icon{color:#fff!important;background:#121c31;border:1px solid #35527c;padding:7px 10px;margin-right:7px;display:inline-block;box-shadow:0 0 18px var(--glow-purple)}
+.actions input{width:320px!important;background:#0a1120!important;border-color:#263c63!important;border-radius:10px!important;padding-left:15px!important}
+.side{background:linear-gradient(180deg,#0a1220,#090f1d)!important;border-right:1px solid #253958!important;box-shadow:10px 0 28px rgba(0,0,0,.2)}
+.mini{background:linear-gradient(135deg,rgba(30,52,86,.45),rgba(12,19,33,.6));border:1px solid #2a4166;border-radius:14px;padding:16px 10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.avatar{border-radius:18px!important;box-shadow:0 0 24px var(--glow-blue);border-color:#48698e!important}
+.menu{gap:8px!important}.menu button{border:1px solid transparent!important;border-radius:10px!important;padding:12px 13px!important;color:#aebcd2!important;transition:.18s ease!important}.menu button:hover{background:#131f35!important;color:#fff!important;border-color:#314b73!important}.menu button.active{background:linear-gradient(90deg,rgba(110,59,220,.34),rgba(34,39,94,.5))!important;border-color:#754bda!important;border-left:3px solid var(--pink)!important;box-shadow:0 0 20px rgba(122,72,255,.15)}
+.home-dashboard{display:grid;gap:16px}.home-welcome{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:linear-gradient(135deg,rgba(41,74,121,.45),rgba(18,25,55,.7) 55%,rgba(67,31,87,.55));border:1px solid #314b75;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.22)}.home-welcome h1{margin:0 0 8px;font-size:17px}.home-welcome p{margin:0;color:#91a3c1}.welcome-actions{display:flex;gap:8px;flex-wrap:wrap}.quick-btn{background:#111d32;border:1px solid #344f78;color:#cfe5ff;border-radius:9px;padding:9px 11px}.quick-btn:hover{border-color:var(--cyan);box-shadow:0 0 18px var(--glow-blue)}
+.home-columns{display:grid;grid-template-columns:minmax(280px,340px) minmax(420px,1fr) minmax(250px,300px);gap:16px;align-items:start}.home-left,.home-center,.home-right{min-width:0}.home-left{display:grid;gap:16px}.home-center{min-width:0}.home-right{display:grid;gap:14px;position:sticky;top:12px}
+.card,.user-card,.post-card{border:1px solid #2b4266!important;border-radius:12px!important;background:linear-gradient(180deg,#0e1829,#0a1220)!important;box-shadow:0 10px 28px rgba(0,0,0,.22)}
+.story-section{padding:15px!important;border-radius:14px!important;background:linear-gradient(90deg,#101a30,#0d1729)!important}.story-ring{width:76px!important;height:76px!important;border-radius:50%!important;border-width:3px!important;box-shadow:0 0 18px var(--glow-purple)}.story-card{width:94px!important;min-width:94px!important}.story-add{background:radial-gradient(circle,rgba(61,179,220,.22),#101a2b)!important}.story-name{color:#c8d7ec}
+.composer-card{padding:18px!important}.composer-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.composer-card textarea{border-radius:12px!important;min-height:135px!important;background:#09111f!important;border-color:#263d61!important}.media-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.media-actions button{padding:10px 6px!important;font-size:15px}.publish-wide{width:100%;margin-top:12px;padding:14px!important;border-radius:10px!important;background:linear-gradient(90deg,#7635e9,#3d9ef8)!important;color:white!important;border-color:#6baeff!important;box-shadow:0 8px 25px rgba(90,74,255,.28)!important}
+.feed-shell{padding:0!important;overflow:hidden}.feed-tabs{display:flex;align-items:center;gap:24px;padding:14px 18px;border-bottom:1px solid #243b5c}.feed-tabs button{background:transparent;border:0;color:#95a7c5;padding:6px 0}.feed-tabs button.active{color:#fff;border-bottom:2px solid var(--purple)}.feed-tabs .filter{margin-left:auto}.feed-shell #feed{padding:0 16px 16px}.post-card{margin-top:14px!important}.post-card:first-child{margin-top:16px!important}
+.rail-card{padding:16px;border:1px solid #2b4266;border-radius:12px;background:linear-gradient(135deg,#10192c,#0c1322);box-shadow:0 10px 24px rgba(0,0,0,.18)}.rail-title{font-family:"Press Start 2P",monospace;font-size:11px;color:#c8d4ef;margin-bottom:14px}.level-hero{display:flex;align-items:center;gap:12px}.level-orb{font-size:40px;width:60px;height:60px;display:grid;place-items:center;background:radial-gradient(circle,rgba(139,92,246,.32),#101b2e);border:1px solid #7a52d7;border-radius:50%;box-shadow:0 0 20px var(--glow-purple)}.rail-xp{height:9px;background:#172238;border-radius:999px;overflow:hidden;margin:10px 0}.rail-xp>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#7d4cff,#d6a8ff);border-radius:999px;transition:width .35s ease}.rank-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #1d2c45}.rank-row:last-child{border-bottom:0}.rank-num{width:23px;color:#ffcc57;font-weight:bold}.rank-avatar{width:28px;height:28px;display:grid;place-items:center;background:#15233a;border:1px solid #365174;border-radius:8px}.rank-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trend{display:flex;justify-content:space-between;padding:6px 0;color:#7dd8ff}.trend small{color:#8292b3}.bonus-card{background:linear-gradient(135deg,rgba(97,30,108,.72),rgba(60,31,89,.8),rgba(160,84,24,.55));border-color:#b44dd8}.bonus-row{display:flex;align-items:center;justify-content:space-between}.bonus-xp{font-size:26px;color:#ffd34e;font-weight:bold}.bonus-chest{font-size:48px;filter:drop-shadow(0 0 14px rgba(255,174,55,.4))}.claim-btn{padding:7px 12px;background:#d248a2;border:1px solid #ff9bd3;color:#fff;border-radius:8px;font-weight:bold}.claim-btn.claimed{opacity:.65;filter:grayscale(.7)}
+.follow-list{display:grid;gap:8px}.follow-mini{display:flex;align-items:center;gap:9px;padding:8px;background:#0b1423;border:1px solid #213755;border-radius:9px}.follow-mini .mini-av{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;background:#17263f}.follow-mini .follow-name{flex:1;overflow:hidden}.follow-mini button{padding:5px 9px;background:#12233a;border:1px solid #365174;color:#9fd6ff;border-radius:7px}
+@media(max-width:1250px){.home-columns{grid-template-columns:minmax(270px,330px) minmax(420px,1fr)}.home-right{grid-column:1/-1;position:static;grid-template-columns:repeat(2,minmax(0,1fr));display:grid}.home-right .bonus-card{grid-column:span 2}.actions input{width:220px!important}}
+@media(max-width:950px){.home-columns{grid-template-columns:1fr}.home-right{grid-template-columns:1fr}.home-right .bonus-card{grid-column:auto}.home-welcome{align-items:flex-start;flex-direction:column}.actions input{width:160px!important}}
+@media(max-width:600px){.home-right{display:grid}.media-actions{grid-template-columns:1fr}.story-card{width:78px!important;min-width:78px!important}.story-ring{width:64px!important;height:64px!important}}
+
+
+/* POST VIEW + SHARE */
+.post-engagement{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid rgba(48,65,95,.55)}
+.post-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:105px;padding:8px 12px;background:#101d31;border:1px solid #314d73;border-radius:6px;color:#dce8ff;box-shadow:2px 2px 0 #050912;transition:transform .15s,border-color .15s,box-shadow .15s}
+.post-action-btn:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(67,231,255,.18),2px 2px 0 #050912;transform:translateY(-1px)}
+.post-action-btn.share{border-color:#7b55bf;color:#e2ccff;background:linear-gradient(135deg,#151431,#221635)}
+.post-action-btn.view{border-color:#356d9f;color:#a9d8ff}
+.post-view-count{font-size:15px;color:var(--muted);margin-left:auto}
+.post-view-modal{position:fixed;inset:0;background:rgba(2,6,15,.82);backdrop-filter:blur(8px);z-index:1500;display:grid;place-items:center;padding:20px}
+.post-view-dialog{width:min(760px,100%);max-height:calc(100vh - 40px);overflow:auto;background:linear-gradient(180deg,#111b2d,#08111f);border:2px solid #3c5b86;border-radius:10px;box-shadow:0 0 0 1px rgba(67,231,255,.12),10px 10px 0 #02050b}
+.post-view-head{position:sticky;top:0;z-index:2;background:#0b1423;border-bottom:1px solid #2b405f;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.post-view-body{padding:18px}
+.post-view-close{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:18px}
+.post-view-media{width:100%;max-height:520px;object-fit:contain;background:#030811;border:1px solid #314d73;border-radius:7px;margin-top:12px}
+.post-view-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:15px;margin-top:6px}
+.post-view-text{font-size:22px;line-height:1.35;white-space:pre-wrap;word-break:break-word;margin-top:14px}
+.post-view-footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid #223651}
+@media(max-width:650px){.post-action-btn{min-width:0;flex:1}.post-view-count{width:100%;margin-left:0}.post-view-dialog{max-height:calc(100vh - 20px)}.post-view-modal{padding:10px}}
 </style></head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -44,15 +84,40 @@
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
 <div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
-<main><section id="home" class="page active">    <div class="hero">    <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>REALTIME MESSAGING • MEDIA • EMOJI REACTIONS • THREADED REPLIES</p></div>    <div style="font-size:50px">🕹️</div>  </div>    <div class="card story-section">
-  <div class="story-head"><div><h2 style="margin:0">📸 PIXEL STORIES</h2><div class="tiny">Stories disappear automatically after 24 hours</div></div><button class="primary" style="padding:8px 12px;font-size:13px" onclick="openStoryCreator()">＋ ADD STORY</button></div>
-  <div id="storiesRow" class="story-row"><div class="story-empty">Loading stories...</div></div>
+<main><section id="home" class="page active">
+<div class="home-dashboard">
+  <div class="home-welcome">
+    <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>CONNECT • SHARE • CHAT • LEVEL UP</p></div>
+    <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 NEW STORY</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ CREATE POST</button><button class="quick-btn" onclick="page('friends')">👥 EXPLORE</button></div>
+  </div>
+  <div class="card story-section">
+    <div class="story-head"><div><h2 style="margin:0">✨ PIXEL STORIES</h2><div class="tiny">Share moments that disappear after 24 hours</div></div><button class="primary" style="padding:8px 12px;font-size:13px" onclick="openStoryCreator()">＋ ADD STORY</button></div>
+    <div id="storiesRow" class="story-row"><div class="story-empty">Loading stories...</div></div>
+  </div>
+  <div class="home-columns">
+    <div class="home-left">
+      <div class="card composer-card">
+        <div class="composer-title"><h2 style="margin:0">✍️ CREATE POST</h2><span class="tiny">+10 XP</span></div>
+        <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>
+        <div class="media-actions"><button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PHOTO</button><button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button><button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span id="postImagePill" class="file-pill hidden"></span><span id="postVideoPill" class="file-pill hidden"></span><span id="postAudioPill" class="file-pill hidden"></span></div>
+        <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')"><input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')"><input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">
+        <button class="primary publish-wide" onclick="createPost()">🚀 PUBLISH POST (+10 XP)</button><div id="postStatus" class="status"></div>
+      </div>
+      <div class="rail-card"><div class="rail-title">👥 WHO TO FOLLOW</div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
+    </div>
+    <div class="home-center">
+      <div class="card feed-shell"><div class="feed-tabs"><button class="active">ALL POSTS</button><button>FOLLOWING</button><button>FRIENDS</button><span class="filter">⚱</span></div><div id="feed"></div></div>
+    </div>
+    <aside class="home-right">
+      <div class="rail-card"><div class="rail-title">🏅 LEVEL PROGRESS</div><div class="level-hero"><div class="level-orb">🏅</div><div style="flex:1"><strong>LEVEL <span id="railLevel">1</span></strong><div class="rail-xp"><span id="railXpBar"></span></div><div class="tiny"><span id="railXpText">0 / 100 XP</span></div></div></div></div>
+      <div class="rail-card"><div class="rail-title">🔥 RANKING THIS WEEK</div><div id="homeRankList"><div class="tiny">Loading ranking...</div></div><button class="secondary" style="width:100%;margin-top:10px" onclick="page('leaderboard')">VIEW FULL RANKING</button></div>
+      <div class="rail-card"><div class="rail-title">🔥 TRENDING HASHTAGS</div><div class="trend"><span>#PixelWorld</span><small>12.5K posts</small></div><div class="trend"><span>#Gaming</span><small>8.2K posts</small></div><div class="trend"><span>#Friends</span><small>6.7K posts</small></div><div class="trend"><span>#Adventure</span><small>5.1K posts</small></div></div>
+      <div class="rail-card bonus-card"><div class="rail-title">🎁 DAILY BONUS</div><div class="bonus-row"><div><div class="tiny">Claim your daily XP!</div><div class="bonus-xp">+50 XP</div><button id="dailyBonusBtn" class="claim-btn" onclick="claimDailyBonus()">CLAIM</button></div><div class="bonus-chest">🎁</div></div></div>
+    </aside>
+  </div>
 </div>
-<div class="card" style="padding:20px">        <h2>✍️ CREATE POST</h2>        <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND?"></textarea>            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0;">            <button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PICTURE</button>            <button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button>            <button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button>
-
-      <span id="postImagePill" class="file-pill hidden"></span>      <span id="postVideoPill" class="file-pill hidden"></span>      <span id="postAudioPill" class="file-pill hidden"></span>
-
-      <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')">            <input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')">            <input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">        </div>    <div class="row"><button class="primary" onclick="createPost()">🚀 PUBLISH POST (+10 XP)</button></div>        <div id="postStatus" class="status"></div>    </div>    <div id="feed"></div></section>
+</section>
 <section id="friends" class="page">    <div class="card" style="padding:20px">        <h1>👥 PIXEL COMMUNITY</h1>        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">    </div>    <div id="searchResults" class="grid" style="margin-top:15px"></div>    <div class="card" style="padding:20px;margin-top:20px">        <h2>🤝 RECOMMENDED FRIENDS</h2>        <div id="friendsList" class="grid" style="margin-top:15px"></div>    </div></section>
 <section id="messages" class="page">    <div class="card" style="padding:20px">        <div class="messages-layout">            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
@@ -72,6 +137,16 @@
     <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div></section>
 </main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
 <div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
+
+<div id="postViewModal" class="post-view-modal hidden" onclick="if(event.target===this)closePostView()">
+  <div class="post-view-dialog" role="dialog" aria-modal="true" aria-label="Post viewer">
+    <div class="post-view-head">
+      <strong>👁️ VIEW POST</strong>
+      <button class="secondary post-view-close" onclick="closePostView()">✕</button>
+    </div>
+    <div id="postViewContent" class="post-view-body"></div>
+  </div>
+</div>
 <div id="toast" class="toast hidden"></div>
 <script>
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
@@ -278,6 +353,30 @@ async function startApp(user){
   page("home");
 }
 
+async function refreshHomeDashboard(){
+  if(!currentProfile) return;
+  const xp = Number(currentProfile.xp || 0), level = Math.floor(xp / 100) + 1, progress = xp % 100;
+  const setText=(id,v)=>{const e=$(id); if(e)e.textContent=v};
+  setText('railLevel', level); setText('railXpText', `${progress} / 100 XP`);
+  const bar=$('railXpBar'); if(bar) bar.style.width = progress + '%';
+  try{
+    const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
+    const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.avatar||'👾')}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
+    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button onclick="page('friends')">FOLLOW</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
+  }catch(e){ console.warn('Dashboard widgets:',e); }
+  const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
+}
+async function claimDailyBonus(){
+  if(!currentUser || !currentProfile) return;
+  const key='pixelFriendDailyBonus', today=new Date().toDateString();
+  if(localStorage.getItem(key)===today) return toast('🎁 Daily bonus already claimed! Come back tomorrow.');
+  const newXP=Number(currentProfile.xp||0)+50;
+  const {error}=await sb.from('profiles').update({xp:newXP}).eq('id',currentUser.id);
+  if(error) return toast('❌ Unable to claim bonus: '+error.message);
+  currentProfile.xp=newXP; localStorage.setItem(key,today); toast('🎉 +50 XP claimed!'); await loadProfile(); await refreshHomeDashboard();
+}
+window.claimDailyBonus=claimDailyBonus;
+
 async function loadProfile(){
   const authGuest = currentUser?.is_anonymous === true || currentUser?.user_metadata?.is_guest === true;
   let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
@@ -319,6 +418,7 @@ async function loadProfile(){
   $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
   $("statXP").textContent = currentProfile.xp || 0;
   renderAvatarDisplay();
+  refreshHomeDashboard();
 }
 
 function renderAvatarDisplay(){
@@ -676,6 +776,111 @@ let feedLoadInFlight = false;
 let messageLoadInFlight = false;
 let messageRenderSignature = "";
 
+
+function getPostViewCount(postId){
+  try { return Number(localStorage.getItem('pf_post_views_' + postId) || 0); }
+  catch(e){ return 0; }
+}
+
+function recordPostView(postId){
+  let count = getPostViewCount(postId) + 1;
+  try { localStorage.setItem('pf_post_views_' + postId, String(count)); } catch(e) {}
+  const el = document.getElementById('postViews_' + postId);
+  if(el) el.textContent = `👁️ ${count} VIEWS`;
+  return count;
+}
+
+async function viewPost(postId){
+  if(!postId) return;
+  const modal = $('postViewModal');
+  const box = $('postViewContent');
+  if(!modal || !box) return;
+
+  box.innerHTML = '<div class="tiny">Loading post...</div>';
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  recordPostView(postId);
+
+  try{
+    const {data: post, error} = await sb
+      .from('posts')
+      .select('*, profiles(username, avatar, avatar_url, is_verified, is_guest)')
+      .eq('id', postId)
+      .maybeSingle();
+    if(error) throw error;
+    if(!post) throw new Error('Post not found.');
+
+    const u = post.profiles || {};
+    const avatar = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || '👾');
+    const verified = u.is_verified ? ' ✅' : '';
+    const badge = accountBadge(u, true);
+
+    box.innerHTML = `
+      <div class="post-author">
+        <div class="user-avatar">${avatar}</div>
+        <div>
+          <strong>${esc(u.username || 'PLAYER')}${verified}${badge}</strong>
+          <div class="post-view-meta">${new Date(post.created_at).toLocaleString()} • 👁️ ${getPostViewCount(postId)} local views</div>
+        </div>
+      </div>
+      ${post.content ? `<div class="post-view-text">${esc(post.content)}</div>` : ''}
+      ${post.image_url ? `<img src="${esc(post.image_url)}" class="post-view-media">` : ''}
+      ${post.video_url ? `<video src="${esc(post.video_url)}" controls autoplay class="post-view-media"></video>` : ''}
+      ${post.audio_url ? `<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>` : ''}
+      <div class="post-view-footer">
+        <button class="post-action-btn share" onclick="sharePost('${post.id}')">↗️ SHARE POST</button>
+        <button class="post-action-btn view" onclick="closePostView()">← BACK TO FEED</button>
+      </div>
+    `;
+  }catch(e){
+    box.innerHTML = `<div class="tiny" style="color:#ff86ac">❌ Unable to load post: ${esc(e.message || 'Unknown error')}</div>`;
+  }
+}
+window.viewPost = viewPost;
+
+function closePostView(){
+  const modal = $('postViewModal');
+  if(modal) modal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+window.closePostView = closePostView;
+
+async function sharePost(postId){
+  if(!postId) return;
+  const shareUrl = window.location.origin + window.location.pathname + '#post=' + encodeURIComponent(postId);
+  let title = 'Pixel-Friend Post';
+  let text = 'Check out this post on Pixel-Friend!';
+
+  try{
+    const {data} = await sb.from('posts').select('content, profiles(username)').eq('id', postId).maybeSingle();
+    if(data){
+      title = `${data.profiles?.username || 'Pixel-Friend'} on Pixel-Friend`;
+      if(data.content) text = data.content.slice(0, 180);
+    }
+  }catch(e){}
+
+  try{
+    if(navigator.share){
+      await navigator.share({title, text, url: shareUrl});
+      toast('🚀 Post shared successfully!');
+      return;
+    }
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(shareUrl);
+      toast('🔗 Post link copied to clipboard!');
+      return;
+    }
+    window.prompt('Copy this post link:', shareUrl);
+  }catch(e){
+    if(e?.name !== 'AbortError') toast('❌ Unable to share post.');
+  }
+}
+window.sharePost = sharePost;
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closePostView();
+});
+
 async function loadFeed(forceRender = false) {
   if (feedLoadInFlight) return;
   feedLoadInFlight = true;
@@ -764,6 +969,12 @@ async function loadFeed(forceRender = false) {
             ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
+          </div>
+
+          <div class="post-engagement">
+            <button class="post-action-btn view" onclick="viewPost('${p.id}')">👁️ VIEW</button>
+            <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
+            <span id="postViews_${p.id}" class="post-view-count">👁️ ${getPostViewCount('${p.id}')} VIEWS</span>
           </div>
 
           <div class="comment-section">
