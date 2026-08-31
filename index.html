@@ -74,6 +74,10 @@
 .post-view-text{font-size:22px;line-height:1.35;white-space:pre-wrap;word-break:break-word;margin-top:14px}
 .post-view-footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid #223651}
 @media(max-width:650px){.post-action-btn{min-width:0;flex:1}.post-view-count{width:100%;margin-left:0}.post-view-dialog{max-height:calc(100vh - 20px)}.post-view-modal{padding:10px}}
+
+.follow-action-btn{min-height:34px;font-size:13px;font-weight:700;white-space:nowrap}
+.follow-action-btn[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--cyan)}
+
 </style></head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -355,6 +359,7 @@ async function startApp(user){
 
 async function refreshHomeDashboard(){
   if(!currentProfile) return;
+  if(currentUser) await loadFollowingState();
   const xp = Number(currentProfile.xp || 0), level = Math.floor(xp / 100) + 1, progress = xp % 100;
   const setText=(id,v)=>{const e=$(id); if(e)e.textContent=v};
   setText('railLevel', level); setText('railXpText', `${progress} / 100 XP`);
@@ -362,7 +367,7 @@ async function refreshHomeDashboard(){
   try{
     const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
     const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.avatar||'👾')}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
-    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button onclick="page('friends')">FOLLOW</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
+    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
   }catch(e){ console.warn('Dashboard widgets:',e); }
   const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
 }
@@ -1358,34 +1363,218 @@ async function deleteCurrentStory(){
 }
 window.openStoryCreator=openStoryCreator; window.closeStoryCreator=closeStoryCreator; window.previewStoryMedia=previewStoryMedia; window.publishStory=publishStory; window.openStoryViewer=openStoryViewer; window.closeStoryViewer=closeStoryViewer; window.storyPrev=storyPrev; window.storyNext=storyNext; window.deleteCurrentStory=deleteCurrentStory;
 
-async function loadFriends() {
-  const { data } = await sb.from("profiles").select("*").neq("id", currentUser.id).limit(10);
-  if(!data) return;
-  $("friendsList").innerHTML = data.map(u => `
+
+// ============================================================
+// FOLLOWING + FRIEND SYSTEM
+// Uses Supabase table "follows" when available:
+// follower_id -> following_id
+// If the table has not been created yet, buttons still work in
+// this browser using local storage as a safe fallback.
+// ============================================================
+let followingIds = new Set();
+let followBackIds = new Set();
+let followsDbAvailable = null;
+
+function followStorageKey(){
+  return currentUser ? `pixelFriendFollowing_${currentUser.id}` : 'pixelFriendFollowing_guest';
+}
+
+function loadLocalFollowing(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(followStorageKey()) || '[]');
+    followingIds = new Set((Array.isArray(saved) ? saved : []).map(String));
+  }catch(e){
+    followingIds = new Set();
+  }
+}
+
+function saveLocalFollowing(){
+  try{ localStorage.setItem(followStorageKey(), JSON.stringify([...followingIds])); }catch(e){}
+}
+
+function isMissingFollowsTable(error){
+  const msg = String(error?.message || error || '').toLowerCase();
+  return error?.code === 'PGRST205' ||
+    msg.includes('relation') && msg.includes('follows') ||
+    msg.includes('could not find the table') ||
+    msg.includes('schema cache');
+}
+
+async function loadFollowingState(){
+  if(!currentUser) return;
+  loadLocalFollowing();
+
+  try{
+    const [mine, back] = await Promise.all([
+      sb.from('follows').select('following_id').eq('follower_id', currentUser.id),
+      sb.from('follows').select('follower_id').eq('following_id', currentUser.id)
+    ]);
+
+    if(mine.error) throw mine.error;
+    if(back.error) throw back.error;
+
+    followingIds = new Set((mine.data || []).map(r => String(r.following_id)));
+    followBackIds = new Set((back.data || []).map(r => String(r.follower_id)));
+    followsDbAvailable = true;
+    saveLocalFollowing();
+  }catch(e){
+    followsDbAvailable = false;
+    followBackIds = new Set();
+    loadLocalFollowing();
+    if(!isMissingFollowsTable(e)) console.warn('Follow system database unavailable:', e);
+  }
+}
+
+function followButtonLabel(userId){
+  const id = String(userId);
+  if(!followingIds.has(id)) return '➕ FOLLOW';
+  if(followsDbAvailable && followBackIds.has(id)) return '🤝 FRIEND';
+  return '✓ FOLLOWING';
+}
+
+function followButtonClass(userId){
+  return followingIds.has(String(userId)) ? 'secondary' : 'primary';
+}
+
+async function toggleFollow(userId){
+  if(!currentUser || !userId || String(userId) === String(currentUser.id)) return;
+  const targetId = String(userId);
+  const wasFollowing = followingIds.has(targetId);
+
+  // Update the UI state immediately so the button feels responsive.
+  if(wasFollowing) followingIds.delete(targetId);
+  else followingIds.add(targetId);
+  saveLocalFollowing();
+  renderFollowButtons();
+  await loadFriends();
+
+  if(followsDbAvailable === false){
+    toast(wasFollowing ? '↩️ Unfollowed (saved on this device)' : '⭐ Following (saved on this device)');
+    return;
+  }
+
+  try{
+    if(wasFollowing){
+      const {error} = await sb.from('follows')
+        .delete()
+        .eq('follower_id', currentUser.id)
+        .eq('following_id', targetId);
+      if(error) throw error;
+      followBackIds.delete(targetId);
+      toast('↩️ Unfollowed');
+    }else{
+      const {error} = await sb.from('follows').insert({
+        follower_id: currentUser.id,
+        following_id: targetId
+      });
+      if(error) throw error;
+      toast('⭐ Now following this user!');
+    }
+
+    followsDbAvailable = true;
+    await loadFollowingState();
+  }catch(e){
+    // If the follows table does not exist, keep the local fallback.
+    if(isMissingFollowsTable(e)){
+      followsDbAvailable = false;
+      toast(wasFollowing ? '↩️ Unfollowed (saved on this device)' : '⭐ Following (saved on this device)');
+      return;
+    }
+
+    // Revert on real database errors so the UI stays truthful.
+    if(wasFollowing) followingIds.add(targetId);
+    else followingIds.delete(targetId);
+    saveLocalFollowing();
+    renderFollowButtons();
+    await loadFriends();
+    toast('❌ Follow failed: ' + (e?.message || 'Database permission error'));
+  }
+}
+
+function renderFollowButtons(){
+  document.querySelectorAll('[data-follow-user-id]').forEach(btn => {
+    const id = String(btn.dataset.followUserId || '');
+    btn.textContent = followButtonLabel(id);
+    btn.className = `${followButtonClass(id)} follow-action-btn`;
+    btn.setAttribute('aria-pressed', followingIds.has(id) ? 'true' : 'false');
+  });
+}
+
+window.toggleFollow = toggleFollow;
+
+function renderUserCard(u, options = {}){
+  const following = followingIds.has(String(u.id));
+  const mutual = followsDbAvailable && following && followBackIds.has(String(u.id));
+  const relation = mutual ? '<div class="tiny" style="margin-top:4px">🤝 MUTUAL FRIEND</div>' :
+                   following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
+  return `
     <div class="user-card">
       <div class="user-avatar" style="margin-bottom:8px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-      <strong>${esc(u.username)}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
-      <div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>
+      <strong>${esc(u.username || 'PIXEL USER')}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
+      ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
+      ${relation}
       <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel Explorer")}</p>
-      <button class="primary" style="width:100%;font-size:14px;padding:6px;" onclick="openChat('${u.id}', '${esc(u.username)}')">💬 MESSAGE</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <button class="${followButtonClass(u.id)} follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button>
+        <button class="secondary" onclick="openChat('${esc(u.id)}', '${esc(u.username || 'PIXEL USER')}')">💬 MESSAGE</button>
+      </div>
     </div>
-  `).join('');
+  `;
+}
+
+async function loadFriends() {
+  if(!currentUser) return;
+  await loadFollowingState();
+
+  const { data, error } = await sb.from("profiles")
+    .select("*")
+    .neq("id", currentUser.id)
+    .limit(30);
+
+  if(error){
+    console.warn('Load community:', error);
+    return;
+  }
+
+  const users = data || [];
+  const following = users.filter(u => followingIds.has(String(u.id)));
+  const others = users.filter(u => !followingIds.has(String(u.id)));
+
+  // Keep followed users first so FRIENDS has useful meaning.
+  const ordered = [...following, ...others];
+  $("friendsList").innerHTML = ordered.length
+    ? ordered.map(u => renderUserCard(u, {presence:true})).join('')
+    : '<div class="tiny">No other Pixel users found yet.</div>';
+
+  renderFollowButtons();
 }
 
 async function searchUsers(isGlobal) {
   const q = $(isGlobal ? 'globalSearch' : 'friendSearch').value.trim();
-  if(!q) return;
-  const { data } = await sb.from("profiles").select("*").ilike("username", `%${q}%`).neq("id", currentUser.id);
-  if(!data) return;
-  const target = $(isGlobal ? 'searchResults' : 'searchResults');
+  const target = $("searchResults");
   if(!target) return;
-  target.innerHTML = data.map(u => `
-    <div class="user-card">
-      <div class="user-avatar" style="margin-bottom:8px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-      <strong>${esc(u.username)}${accountBadge(u, true)}</strong>
-      <button class="primary" style="width:100%;font-size:14px;padding:6px;margin-top:8px;" onclick="openChat('${u.id}', '${esc(u.username)}')">💬 MESSAGE</button>
-    </div>
-  `).join('');
+
+  if(!q){
+    target.innerHTML = '';
+    return;
+  }
+
+  const { data, error } = await sb.from("profiles")
+    .select("*")
+    .ilike("username", `%${q}%`)
+    .neq("id", currentUser.id)
+    .limit(30);
+
+  if(error){
+    target.innerHTML = `<div class="tiny">❌ Search failed: ${esc(error.message)}</div>`;
+    return;
+  }
+
+  target.innerHTML = (data || []).length
+    ? data.map(u => renderUserCard(u)).join('')
+    : '<div class="tiny">No users found.</div>';
+
+  renderFollowButtons();
 }
 window.searchUsers = searchUsers;
 
