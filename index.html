@@ -869,6 +869,25 @@ function closePostView(){
 }
 window.closePostView = closePostView;
 
+async function copyShareText(value){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(value);
+    return true;
+  }
+  const ta = document.createElement('textarea');
+  ta.value = value;
+  ta.setAttribute('readonly','');
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  ta.setSelectionRange(0, ta.value.length);
+  let copied = false;
+  try { copied = document.execCommand('copy'); } catch(e) { copied = false; }
+  document.body.removeChild(ta);
+  return copied;
+}
+
 async function sharePost(postId){
   if(!postId) return;
   const shareUrl = window.location.origin + window.location.pathname + '#post=' + encodeURIComponent(postId);
@@ -881,24 +900,37 @@ async function sharePost(postId){
       title = `${data.profiles?.username || 'Pixel-Friend'} on Pixel-Friend`;
       if(data.content) text = data.content.slice(0, 180);
     }
-  }catch(e){}
+  }catch(e){
+    console.warn('Could not load post details for sharing:', e);
+  }
 
-  try{
-    if(navigator.share){
+  // Native share first. If it is unavailable or fails, continue to copy fallback.
+  if(navigator.share){
+    try{
       await navigator.share({title, text, url: shareUrl});
       toast('🚀 Post shared successfully!');
       return;
+    }catch(e){
+      // User cancelling the share sheet is not an error.
+      if(e?.name === 'AbortError') return;
+      console.warn('Native share failed, using copy fallback:', e);
     }
-    if(navigator.clipboard && window.isSecureContext){
-      await navigator.clipboard.writeText(shareUrl);
-      toast('🔗 Post link copied to clipboard!');
+  }
+
+  try{
+    const copied = await copyShareText(shareUrl);
+    if(copied){
+      toast('🔗 Post link copied! You can now paste and share it anywhere.');
       return;
     }
-    window.prompt('Copy this post link:', shareUrl);
   }catch(e){
-    if(e?.name !== 'AbortError') toast('❌ Unable to share post.');
+    console.warn('Clipboard fallback failed:', e);
   }
+
+  // Final fallback works even when Clipboard API is blocked.
+  window.prompt('Copy this post link and share it:', shareUrl);
 }
+window.copyShareText = copyShareText;
 window.sharePost = sharePost;
 
 document.addEventListener('keydown', e => {
