@@ -1089,6 +1089,12 @@ async function loadFeed(forceRender = false) {
               <div class="user-avatar">${avatarHtml}</div>
               <div><strong>${esc(u.username || "PLAYER")}${verified}${userTypeBadge}</strong><div class="tiny">${new Date(p.created_at).toLocaleString()}</div></div>
             </div>
+            ${String(p.user_id) !== String(currentUser.id) ? `
+              <div class="post-author-actions" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                <button class="${followButtonClass(p.user_id)} follow-action-btn" data-follow-user-id="${esc(p.user_id)}" onclick="toggleFollow('${esc(p.user_id)}')">${followButtonLabel(p.user_id)}</button>
+                <button class="secondary" style="padding:6px 9px;font-size:12px" onclick="openChat('${esc(p.user_id)}','${esc(u.username || 'PIXEL USER')}')">💬</button>
+              </div>
+            ` : `<span class="tiny">YOUR POST</span>`}
           </div>
           <div style="word-break:break-word">${linkify(p.content)}</div>
           ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img" loading="lazy" decoding="async">` : ''}
