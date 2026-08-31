@@ -101,7 +101,7 @@
 .game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
 .pet-stage{min-height:180px;display:grid;place-items:center;border:1px solid #2d466a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#182b48,#08111d 70%);margin:12px 0}.pixel-pet{font-size:100px;filter:drop-shadow(0 0 18px rgba(67,231,255,.3));animation:pfPetBounce .7s infinite alternate}@keyframes pfPetBounce{to{transform:translateY(-8px) scale(1.03)}}
 .target-food{text-align:center;font-size:18px;margin:12px 0}.target-food span{font-size:36px}.food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.food-btn{min-height:76px;font-size:40px;border:1px solid #3a587f;border-radius:12px;background:#101d31;cursor:pointer}.food-btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(67,231,255,.18)}.food-btn:disabled{opacity:.45;cursor:not-allowed}
-.game-status{min-height:26px;text-align:center;margin-top:12px}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
+.game-status{min-height:26px;text-align:center;margin-top:12px}.memory-card{margin-top:18px}.memory-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(52px,1fr));gap:10px;margin:18px 0}.memory-tile{min-height:72px;border:1px solid #34547e;background:#0a1423;border-radius:12px;color:#9eb2ce;font-size:28px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}.memory-tile:hover{transform:translateY(-2px);border-color:var(--cyan)}.memory-tile.revealed,.memory-tile.matched{background:linear-gradient(135deg,#12344b,#11243a);color:#fff}.memory-tile.matched{border-color:#48e0a4;box-shadow:0 0 14px rgba(72,224,164,.18)}.memory-status{min-height:24px;text-align:center;margin-top:10px}.game-switches{display:flex;gap:8px;flex-wrap:wrap}.game-switches button{padding:9px 12px}@media(max-width:520px){.memory-board{grid-template-columns:repeat(3,1fr)}.memory-tile{min-height:62px}}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
 </style>
 <script>
 
@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 <section id="games" class="page">
   <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><button class="primary" onclick="startPetGame()">▶ PLAY NOW</button></div>
+    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button></div></div>
     <div class="game-grid">
       <div class="game-card">
         <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
@@ -250,10 +250,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
       </div>
       <aside class="arcade-list">
         <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
-        <div class="arcade-mini"><h3>⚡ HOW TO PLAY</h3><p>Feed the pet the food it wants before time runs out. Correct answers increase your score and combo. Wrong answers cost points.</p></div>
+        <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
         <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>COMING NEXT</h3><p>🧠 Memory Match<br>⚔️ Pixel Battle<br>🎯 Fast Click Challenge</p></div>
+        <div class="arcade-mini"><h3>COMING NEXT</h3><p>⚔️ Pixel Battle<br>🎯 Fast Click Challenge<br>🏎️ Pixel Racing</p></div>
       </aside>
+    </div>
+    <div class="game-card memory-card">
+      <div class="memory-header"><div><h2 style="margin:0">🧠 PIXEL MEMORY MATCH</h2><p class="tiny" style="margin:7px 0 0">Match all the cute pairs before time runs out!</p></div><button id="memoryStartBtn" class="primary" onclick="startMemoryGame()">▶ START MEMORY GAME</button></div>
+      <div class="game-stats" style="margin-top:16px"><div class="game-stat">PAIRS<b id="memoryMatches">0/6</b></div><div class="game-stat">TIME<b id="memoryTimer">30</b></div><div class="game-stat">MOVES<b id="memoryMoves">0</b></div><div class="game-stat">BEST<b id="memoryBest">—</b></div></div>
+      <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
+      <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
+      <div id="memoryStatus" class="memory-status tiny"></div>
     </div>
   </div>
 </section>
@@ -2516,6 +2523,19 @@ function checkPetFood(food){if(!petGamePlaying)return;if(food===petGameTarget){p
 function endPetGame(){petGamePlaying=false;clearInterval(petGameInterval);$('foodGrid').innerHTML='<div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">⏰ TIME’S UP!</div>';const old=Number(localStorage.getItem(pfBestKey())||0);let msg=`🎉 Game over! You scored ${petGameScore} points.`;if(petGameScore>old){localStorage.setItem(pfBestKey(),String(petGameScore));msg+=' 🏆 NEW PERSONAL BEST!';} $('petGameStatus').textContent=msg;$('petStartBtn').textContent='▶ PLAY AGAIN';updatePetStats();if(typeof toast==='function')toast(msg);}
 async function sharePetScore(){const text=`🎮 I scored ${petGameScore} points in Feed the Pixel Pet on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Arcade',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Score challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
 window.startPetGame=startPetGame;window.checkPetFood=checkPetFood;window.sharePetScore=sharePetScore;
+
+/* ===== PIXEL-FRIEND ARCADE: MEMORY MATCH ===== */
+const memoryIcons=['🐱','🐶','🐰','🦊','🐼','🐨'];
+let memoryCards=[],memoryFlipped=[],memoryMatches=0,memoryMoves=0,memoryTime=30,memoryPlaying=false,memoryCanFlip=true,memoryInterval=null;
+function memoryBestKey(){return 'pf_memory_best_'+(currentUser?.id||'guest');}
+function renderMemoryBest(){const v=localStorage.getItem(memoryBestKey()); const el=$('memoryBest'); if(el)el.textContent=v?v+'s':'—';}
+function updateMemoryStats(){if($('memoryMatches'))$('memoryMatches').textContent=memoryMatches+'/6';if($('memoryTimer'))$('memoryTimer').textContent=memoryTime;if($('memoryMoves'))$('memoryMoves').textContent=memoryMoves;renderMemoryBest();}
+function renderMemoryBoard(){const board=$('memoryBoard');if(!board)return;board.innerHTML=memoryCards.map((c,i)=>`<button class="memory-tile ${c.flipped?'revealed':''} ${c.matched?'matched':''}" onclick="flipMemoryCard(${i})">${(c.flipped||c.matched)?c.icon:'❓'}</button>`).join('');}
+function startMemoryGame(){clearInterval(memoryInterval);memoryMatches=0;memoryMoves=0;memoryTime=30;memoryFlipped=[];memoryPlaying=true;memoryCanFlip=true;memoryCards=[...memoryIcons,...memoryIcons].sort(()=>Math.random()-.5).map((icon,i)=>({id:i,icon,flipped:false,matched:false}));$('memoryStartBtn').textContent='🔄 RESTART MEMORY GAME';$('memoryStatus').textContent='🧠 GO! Find all matching pairs.';updateMemoryStats();renderMemoryBoard();memoryInterval=setInterval(()=>{memoryTime--;updateMemoryStats();if(memoryTime<=0)endMemoryGame(false);},1000);}
+function flipMemoryCard(index){if(!memoryPlaying||!memoryCanFlip)return;const card=memoryCards[index];if(card.flipped||card.matched)return;card.flipped=true;memoryFlipped.push(index);renderMemoryBoard();if(memoryFlipped.length===2){memoryCanFlip=false;memoryMoves++;const [a,b]=memoryFlipped;if(memoryCards[a].icon===memoryCards[b].icon){memoryCards[a].matched=true;memoryCards[b].matched=true;memoryMatches++;memoryFlipped=[];memoryCanFlip=true;updateMemoryStats();renderMemoryBoard();if(memoryMatches===memoryIcons.length)endMemoryGame(true);}else{updateMemoryStats();setTimeout(()=>{memoryCards[a].flipped=false;memoryCards[b].flipped=false;memoryFlipped=[];memoryCanFlip=true;renderMemoryBoard();},650);}}}
+function endMemoryGame(won){memoryPlaying=false;clearInterval(memoryInterval);let msg='⏰ Time is up! Try again and beat your best.';if(won){const used=30-memoryTime;const old=Number(localStorage.getItem(memoryBestKey())||9999);msg=`🌟 Amazing! You matched all pairs in ${used} seconds and ${memoryMoves} moves!`;if(used<old){localStorage.setItem(memoryBestKey(),String(used));msg+=' 🏆 NEW PERSONAL BEST!';}}$('memoryStatus').textContent=msg;$('memoryStartBtn').textContent='▶ PLAY AGAIN';updateMemoryStats();if(typeof toast==='function')toast(msg);}
+async function shareMemoryScore(){const text=`🧠 I completed Pixel Memory Match in ${30-memoryTime} seconds with ${memoryMoves} moves on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Memory Match',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Memory challenge copied!');}catch(e){window.prompt('Copy and share your result:',text+' '+location.href);}}
+window.startMemoryGame=startMemoryGame;window.flipMemoryCard=flipMemoryCard;window.shareMemoryScore=shareMemoryScore;
 
 restoreSession();
 </script>
