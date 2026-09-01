@@ -1,0 +1,16 @@
+/* ===== CALL STYLES ===== */
+.call-button-group{display:flex;gap:6px;margin-top:8px}
+.call-button{padding:8px 12px;font-size:12px;border-radius:6px;border:1px solid #355174;background:#0b1729;color:#dce8ff;cursor:pointer;transition:.2s}
+.call-button:hover{border-color:var(--cyan);background:#1a3456}
+.call-button.video{border-color:#43e7ff}
+.call-button.audio{border-color:#7cff43}
+.call-history-item{display:flex;align-items:center;gap:10px;padding:10px;background:#0a1423;border:1px solid #213755;border-radius:8px;margin-bottom:8px;font-size:13px}
+.call-history-icon{font-size:18px}
+.call-history-details{flex:1;min-width:0}
+.call-history-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.call-history-time{color:var(--muted);font-size:11px}
+.call-history-duration{color:var(--green);font-size:12px;font-weight:700}
+.call-status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:11px;margin-left:auto}
+.call-status-badge.missed{background:rgba(255,119,149,0.2);color:#ff7795}
+.call-status-badge.received{background:rgba(120,255,67,0.2);color:#78ff43}
+.call-status-badge.placed{background:rgba(67,231,255,0.2);color:#43e7ff}
