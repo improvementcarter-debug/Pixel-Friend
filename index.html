@@ -2541,6 +2541,7 @@ restoreSession();
     <div id="callAvatar" class="call-avatar">👾</div>
     <div class="call-videos">
       <video id="remoteVideo" autoplay playsinline></video>
+      <audio id="remoteAudio" autoplay playsinline></audio>
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
     <div id="incomingActions" class="incoming-actions hidden">
@@ -2575,12 +2576,31 @@ let originalTitle = document.title;
 let titleTimer = null;
 let callTimeout = null;
 
-const RTC_CONFIG = {
-  iceServers: [
+/* TURN-ready configuration.
+   Replace the TURN values below with credentials from a TURN provider/server you own.
+   Do NOT publish permanent TURN credentials in a public production HTML file. */
+const TURN_CONFIG = {
+  urls: [
+    "turn:YOUR_TURN_HOST:3478?transport=udp",
+    "turn:YOUR_TURN_HOST:3478?transport=tcp",
+    "turns:YOUR_TURN_HOST:5349?transport=tcp"
+  ],
+  username: "YOUR_TURN_USERNAME",
+  credential: "YOUR_TURN_PASSWORD"
+};
+function hasTurnConfig(){
+  return !TURN_CONFIG.urls[0].includes("YOUR_TURN_HOST") &&
+         TURN_CONFIG.username !== "YOUR_TURN_USERNAME" &&
+         TURN_CONFIG.credential !== "YOUR_TURN_PASSWORD";
+}
+function buildRtcConfig(){
+  const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
     { urls: "stun:stun1.l.google.com:19302" }
-  ]
-};
+  ];
+  if(hasTurnConfig()) iceServers.push(TURN_CONFIG);
+  return { iceServers, iceCandidatePoolSize: 4 };
+}
 
 function callUserName(){
   if(!selectedUser) return "PIXEL FRIEND";
@@ -2602,6 +2622,7 @@ function hideCallModal(){
   $("incomingActions").classList.add("hidden");
   $("callControls").classList.add("hidden");
   $("remoteVideo").srcObject = null;
+  $("remoteAudio").srcObject = null;
   $("localVideo").srcObject = null;
 }
 function updateCallStatus(text){ $("callStatus").textContent = text; }
@@ -2675,6 +2696,7 @@ async function setupCallSignaling(){
   callChannel
     .on("broadcast", {event:"call-offer"}, ({payload}) => receiveCallOffer(payload))
     .on("broadcast", {event:"call-answer"}, ({payload}) => receiveCallAnswer(payload))
+    .on("broadcast", {event:"call-accepted"}, ({payload}) => receiveCallAccepted(payload))
     .on("broadcast", {event:"call-ice"}, ({payload}) => receiveIce(payload))
     .on("broadcast", {event:"call-decline"}, ({payload}) => receiveCallDecline(payload))
     .on("broadcast", {event:"call-end"}, ({payload}) => receiveCallEnd(payload))
@@ -2697,32 +2719,57 @@ async function sendCallSignal(targetUserId, event, payload){
   });
 }
 
+async function unlockRemoteAudio(){
+  const a = $("remoteAudio");
+  if(!a) return;
+  try { await a.play(); } catch(e) { console.warn("Remote audio play is waiting for user interaction", e); }
+}
+
 async function createPeer(mode){
-  peerConnection = new RTCPeerConnection(RTC_CONFIG);
+  peerConnection = new RTCPeerConnection(buildRtcConfig());
   peerConnection.onicecandidate = async e => {
     if(e.candidate && activeCall?.peerId){
       await sendCallSignal(activeCall.peerId, "call-ice", {candidate:e.candidate.toJSON(), callId:activeCall.id});
     }
   };
-  peerConnection.ontrack = e => {
-    $("remoteVideo").srcObject = e.streams[0];
+  peerConnection.ontrack = async e => {
+    const stream = e.streams?.[0] || new MediaStream([e.track]);
+    if(e.track.kind === "audio"){
+      $("remoteAudio").srcObject = stream;
+      $("remoteAudio").muted = false;
+      $("remoteAudio").volume = 1;
+      await unlockRemoteAudio();
+    }
+    if(e.track.kind === "video") $("remoteVideo").srcObject = stream;
+    e.track.onunmute = async () => {
+      if(e.track.kind === "audio") await unlockRemoteAudio();
+    };
     updateCallStatus("CONNECTED");
     clearCallAlerts();
     startCallTimer();
   };
   peerConnection.onconnectionstatechange = () => {
     const state = peerConnection?.connectionState;
-    if(state === "connected"){ updateCallStatus("CONNECTED"); startCallTimer(); }
-    if(["failed","disconnected","closed"].includes(state) && activeCall){ updateCallStatus("CALL ENDED"); }
+    if(state === "connected"){ updateCallStatus("CONNECTED"); clearCallAlerts(); startCallTimer(); }
+    if(state === "connecting") updateCallStatus("CONNECTING...");
+    if(state === "disconnected") updateCallStatus("RECONNECTING...");
+    if(state === "failed"){ updateCallStatus(hasTurnConfig() ? "CONNECTION FAILED" : "CONNECTION FAILED • TURN MAY BE REQUIRED"); }
+  };
+  peerConnection.oniceconnectionstatechange = () => {
+    const state = peerConnection?.iceConnectionState;
+    if(state === "failed" && peerConnection?.restartIce){
+      updateCallStatus("RECONNECTING...");
+      try { peerConnection.restartIce(); } catch(e) {}
+    }
   };
   localStream = await navigator.mediaDevices.getUserMedia({
-    audio:true,
-    video: mode === "video" ? {facingMode:"user"} : false
+    audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true, channelCount:1 },
+    video: mode === "video" ? {facingMode:"user", width:{ideal:1280}, height:{ideal:720}} : false
   });
   localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
   $("localVideo").srcObject = localStream;
+  await unlockRemoteAudio();
 }
-
 async function startCall(mode){
   if(!selectedUser || !currentUser) return toast("Select a friend first.");
   if(!navigator.mediaDevices?.getUserMedia) return toast("Voice/video calling requires HTTPS or localhost.");
@@ -2771,6 +2818,7 @@ async function receiveCallOffer(p){
 async function acceptIncomingCall(){
   if(!incomingCall) return;
   try{
+    await unlockRemoteAudio();
     clearCallAlerts();
     $("incomingActions").classList.add("hidden");
     $("callControls").classList.remove("hidden");
@@ -2844,6 +2892,8 @@ async function endCall(notify=true){
   clearInterval(callTimer); callTimer=null; callSeconds=0;
   clearCallAlerts();
   if(peerConnection){ peerConnection.ontrack=null; peerConnection.onicecandidate=null; peerConnection.close(); }
+  const remoteAudio = $("remoteAudio");
+  if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} remoteAudio.srcObject=null; }
   if(localStream) localStream.getTracks().forEach(t=>t.stop());
   peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[];
   hideCallModal();
@@ -2854,6 +2904,7 @@ window.declineIncomingCall=declineIncomingCall;
 window.endCall=endCall;
 window.toggleMute=toggleMute;
 window.toggleCamera=toggleCamera;
+document.addEventListener("pointerdown", unlockRemoteAudio, {passive:true});
 </script>
 
 </body></html>
