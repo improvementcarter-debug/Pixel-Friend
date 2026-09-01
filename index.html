@@ -2544,7 +2544,7 @@ restoreSession();
       <video id="localVideo" autoplay muted playsinline></video>
     </div>
     <div id="incomingActions" class="incoming-actions hidden">
-      <button class="primary" onclick="acceptIncomingCall()">✓ ACCEPT</button>
+      <button class="primary" onclick="acceptIncomingCall()">📞 ACCEPT</button>
       <button class="danger secondary" onclick="declineIncomingCall()">✕ DECLINE</button>
     </div>
     <div id="callControls" class="call-controls hidden">
@@ -2782,6 +2782,7 @@ async function acceptIncomingCall(){
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     await sendCallSignal(incomingCall.from, "call-answer", {callId:incomingCall.callId, answer:peerConnection.localDescription});
+    await sendCallSignal(incomingCall.from, "call-accepted", {callId:incomingCall.callId});
     incomingCall = null;
   }catch(e){ toast("❌ Could not accept call: " + (e.message || e)); endCall(false); }
 }
@@ -2789,6 +2790,9 @@ async function acceptIncomingCall(){
 async function declineIncomingCall(){
   if(incomingCall) await sendCallSignal(incomingCall.from, "call-decline", {callId:incomingCall.callId});
   endCall(false);
+}
+function receiveCallAccepted(p){
+  if(activeCall && p.callId === activeCall.id){ clearCallAlerts(); updateCallStatus("CONNECTING..."); }
 }
 async function receiveCallAnswer(p){
   if(!activeCall || p.callId !== activeCall.id || !peerConnection) return;
