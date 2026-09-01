@@ -383,11 +383,7 @@ function playRetroSound(type = 'click') {
   }
 }
 
-document.addEventListener('click', (e) => {
-  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-    playRetroSound('click');
-  }
-});
+// Generic button click sounds removed. Important alerts (messages/calls) keep their own sounds.
 
 function isAdmin(){
   return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
@@ -2567,7 +2563,7 @@ let peerConnection = null;
 let localStream = null;
 let activeCall = null;
 let incomingCall = null;
-let pendingIce = [];
+let pendingIce = [];\nlet pendingIceByCall = new Map();
 let callTimer = null;
 let callSeconds = 0;
 let ringTimer = null;
@@ -2716,16 +2712,30 @@ async function setupCallSignaling(){
   });
 }
 async function sendCallSignal(targetUserId, event, payload){
-  if(!targetUserId) return;
-  if(!callChannelReady){ const ok = await setupCallSignaling(); if(!ok) return; }
-  const channel = sb.channel("pixel-call:" + targetUserId);
-  await new Promise(resolve => {
-    const timeout = setTimeout(resolve, 1200);
+  if(!targetUserId || !currentUser) return false;
+  if(!callChannelReady){
+    const ok = await setupCallSignaling();
+    if(!ok) return false;
+  }
+  const channel = sb.channel("pixel-call:" + targetUserId, { config:{ broadcast:{ self:false } } });
+  return await new Promise(resolve => {
+    let finished = false;
+    const done = async ok => {
+      if(finished) return;
+      finished = true;
+      clearTimeout(timeout);
+      try { await sb.removeChannel(channel); } catch(e) {}
+      resolve(ok);
+    };
+    const timeout = setTimeout(() => done(false), 5000);
     channel.subscribe(async status => {
       if(status === "SUBSCRIBED"){
-        await channel.send({type:"broadcast", event, payload:{...payload, from:currentUser.id}});
-        clearTimeout(timeout); resolve();
-        sb.removeChannel(channel);
+        try{
+          const result = await channel.send({type:"broadcast", event, payload:{...payload, from:currentUser.id}});
+          done(result === "ok" || result === "timed out" ? true : true);
+        }catch(e){ done(false); }
+      } else if(status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED"){
+        done(false);
       }
     });
   });
@@ -2734,7 +2744,15 @@ async function sendCallSignal(targetUserId, event, payload){
 async function unlockRemoteAudio(){
   const a = $("remoteAudio");
   if(!a) return;
-  try { await a.play(); } catch(e) { console.warn("Remote audio play is waiting for user interaction", e); }
+  try{
+    // This runs from ACCEPT / any user gesture and is the browser-safe place
+    // to unlock incoming WebRTC audio.
+    a.muted = false;
+    a.volume = 1;
+    await a.play();
+  }catch(e){
+    console.warn("Remote audio is waiting for user interaction", e);
+  }
 }
 
 async function createPeer(mode){
@@ -2748,15 +2766,35 @@ async function createPeer(mode){
   peerConnection.ontrack = async e => {
     const track = e.track;
     if(!remoteStream.getTracks().some(t=>t.id===track.id)) remoteStream.addTrack(track);
+
+    // Always attach the full remote stream to audio. This makes voice calls work
+    // even when the remote stream has no video track.
     const audio = $("remoteAudio");
+    const video = $("remoteVideo");
     audio.srcObject = remoteStream;
-    audio.autoplay = true; audio.playsInline = true; audio.muted = false; audio.volume = 1;
-    $("remoteVideo").srcObject = remoteStream;
-    const forcePlay = async () => { try{ await audio.play(); }catch(err){ console.warn("Remote audio blocked", err); } };
+    video.srcObject = remoteStream;
+    audio.autoplay = true;
+    audio.playsInline = true;
+    audio.muted = false;
+    audio.volume = 1;
+
+    const forcePlay = async () => {
+      try { await audio.play(); }
+      catch(err) {
+        // Browsers may require the ACCEPT button to unlock media. A later
+        // pointer/touch event will retry through unlockRemoteAudio().
+        console.warn("Remote audio waiting for user interaction", err);
+      }
+    };
     track.onunmute = forcePlay;
     audio.onloadedmetadata = forcePlay;
     await forcePlay();
-    updateCallStatus("CONNECTED"); clearCallAlerts(); startCallTimer();
+
+    if(track.kind === "audio" || peerConnection.connectionState === "connected"){
+      updateCallStatus("CONNECTED");
+      clearCallAlerts();
+      startCallTimer();
+    }
   };
   peerConnection.onconnectionstatechange = () => {
     const state = peerConnection?.connectionState;
@@ -2815,6 +2853,8 @@ async function receiveCallOffer(p){
   }
   await setupCallSignaling();
   incomingCall = p;
+  pendingIce = pendingIceByCall.get(p.callId) || [];
+  pendingIceByCall.delete(p.callId);
   activeCall = {id:p.callId, peerId:p.from, mode:p.mode, outgoing:false};
   $("callAvatar").textContent = p.callerAvatar || "👾";
   showCallModal(p.mode, (p.callerName || "PIXEL FRIEND") + " IS CALLING...");
@@ -2839,7 +2879,9 @@ async function acceptIncomingCall(){
     updateCallStatus("CONNECTING...");
     await createPeer(incomingCall.mode);
     await peerConnection.setRemoteDescription(incomingCall.offer);
-    for(const c of pendingIce.splice(0)) await peerConnection.addIceCandidate(c);
+    for(const c of pendingIce.splice(0)){
+      try { await peerConnection.addIceCandidate(c); } catch(e) { console.warn("Queued ICE rejected", e); }
+    }
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
     await sendCallSignal(incomingCall.from, "call-answer", {callId:incomingCall.callId, answer:peerConnection.localDescription});
@@ -2858,14 +2900,26 @@ function receiveCallAccepted(p){
 async function receiveCallAnswer(p){
   if(!activeCall || p.callId !== activeCall.id || !peerConnection) return;
   await peerConnection.setRemoteDescription(p.answer);
-  for(const c of pendingIce.splice(0)) await peerConnection.addIceCandidate(c);
+  for(const c of pendingIce.splice(0)){
+    try { await peerConnection.addIceCandidate(c); } catch(e) { console.warn("Queued ICE rejected", e); }
+  }
   updateCallStatus("CONNECTING...");
 }
 async function receiveIce(p){
-  if(!p?.candidate) return;
+  if(!p?.candidate || !p.callId) return;
   const c = new RTCIceCandidate(p.candidate);
-  if(peerConnection?.remoteDescription) await peerConnection.addIceCandidate(c);
-  else pendingIce.push(c);
+  const belongsToActive = activeCall && p.callId === activeCall.id;
+  if(!belongsToActive){
+    const q = pendingIceByCall.get(p.callId) || [];
+    q.push(c);
+    pendingIceByCall.set(p.callId, q);
+    return;
+  }
+  if(peerConnection?.remoteDescription){
+    try { await peerConnection.addIceCandidate(c); } catch(e) { console.warn("ICE candidate rejected", e); }
+  } else {
+    pendingIce.push(c);
+  }
 }
 function receiveCallDecline(p){
   if(activeCall && p.callId === activeCall.id){ toast("📞 Call declined or user is busy."); endCall(false); }
@@ -2908,7 +2962,7 @@ async function endCall(notify=true){
   const remoteAudio = $("remoteAudio");
   if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} remoteAudio.srcObject=null; }
   if(localStream) localStream.getTracks().forEach(t=>t.stop());
-  peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[]; remoteStream=new MediaStream();
+  peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[]; pendingIceByCall.clear(); remoteStream=new MediaStream();
   hideCallModal();
 }
 window.startCall=startCall;
