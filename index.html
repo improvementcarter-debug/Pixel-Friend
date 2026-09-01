@@ -185,6 +185,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
 @media(max-width:600px){.call-videos{grid-template-columns:1fr}.call-videos #localVideo{width:45%;position:absolute;right:18px;bottom:85px}.call-card{min-height:100vh;border:0}.call-avatar{margin-top:35px}}
 </style>
 
+
+<style>
+.call-alert-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9000;width:min(560px,calc(100% - 24px));background:#09172a;border:2px solid var(--cyan);box-shadow:6px 6px 0 #000;padding:12px;display:flex;align-items:center;gap:12px}
+.call-alert-banner.hidden{display:none!important}
+.call-alert-icon{font-size:34px;animation:pixelPulse 1s steps(2,end) infinite}
+.call-alert-text{flex:1}.call-alert-text strong{display:block}.call-alert-text small{color:var(--cyan)}
+@keyframes pixelPulse{50%{transform:scale(1.15)}}
+.call-card.ringing{animation:ringCard .7s ease-in-out infinite}
+@keyframes ringCard{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+</style>
+
 </head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -479,6 +490,7 @@ async function startApp(user){
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
   await setupCallSignaling();
+  if("Notification" in window && Notification.permission==="default") Notification.requestPermission().catch(()=>{});
   await setupPresence();
   page("home");
 }
@@ -2515,6 +2527,13 @@ restoreSession();
   </div>
 </div>
 
+
+<div id="callAlertBanner" class="call-alert-banner hidden">
+  <div id="callAlertIcon" class="call-alert-icon">📞</div>
+  <div class="call-alert-text"><strong id="callAlertTitle">Incoming Call</strong><small id="callAlertText">Pixel Friend is calling you</small></div>
+  <button onclick="focusCallAlert()">OPEN</button>
+</div>
+
 <div id="callModal" class="call-modal hidden">
   <div class="call-card">
     <div class="call-title" id="callTitle">PIXEL CALL</div>
@@ -2550,6 +2569,11 @@ let incomingCall = null;
 let pendingIce = [];
 let callTimer = null;
 let callSeconds = 0;
+let ringTimer = null;
+let ringAudioContext = null;
+let originalTitle = document.title;
+let titleTimer = null;
+let callTimeout = null;
 
 const RTC_CONFIG = {
   iceServers: [
@@ -2570,8 +2594,10 @@ function showCallModal(mode, status){
   $("remoteVideo").style.display = mode === "video" ? "block" : "none";
   $("localVideo").style.display = mode === "video" ? "block" : "none";
   $("callAvatar").style.display = mode === "video" ? "none" : "grid";
+  document.querySelector(".call-card")?.classList.remove("ringing");
 }
 function hideCallModal(){
+  clearCallAlerts();
   $("callModal").classList.add("hidden");
   $("incomingActions").classList.add("hidden");
   $("callControls").classList.add("hidden");
@@ -2579,6 +2605,63 @@ function hideCallModal(){
   $("localVideo").srcObject = null;
 }
 function updateCallStatus(text){ $("callStatus").textContent = text; }
+
+function notifyCall(title, body, tag="pixel-friend-call"){
+  if("Notification" in window){
+    if(Notification.permission === "default") Notification.requestPermission().catch(()=>{});
+    if(Notification.permission === "granted"){
+      try{
+        const n = new Notification(title,{body,tag,renotify:true,requireInteraction:true});
+        n.onclick=()=>{ window.focus(); focusCallAlert(); n.close(); };
+      }catch(e){}
+    }
+  }
+  if(navigator.vibrate) navigator.vibrate([350,180,350,180,600]);
+}
+function playRingTone(kind="incoming"){
+  stopRingTone();
+  ringAudioContext = new (window.AudioContext||window.webkitAudioContext)();
+  const beep = ()=>{
+    if(!ringAudioContext) return;
+    const o=ringAudioContext.createOscillator(), g=ringAudioContext.createGain();
+    o.frequency.value = kind==="outgoing" ? 440 : 660;
+    g.gain.setValueAtTime(0.0001, ringAudioContext.currentTime);
+    g.gain.exponentialRampToValueAtTime(.12, ringAudioContext.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.0001, ringAudioContext.currentTime+.28);
+    o.connect(g).connect(ringAudioContext.destination); o.start(); o.stop(ringAudioContext.currentTime+.3);
+    if(kind==="incoming"){
+      setTimeout(()=>{ if(ringAudioContext){ const o2=ringAudioContext.createOscillator(),g2=ringAudioContext.createGain(); o2.frequency.value=760; g2.gain.setValueAtTime(.0001,ringAudioContext.currentTime); g2.gain.exponentialRampToValueAtTime(.1,ringAudioContext.currentTime+.02); g2.gain.exponentialRampToValueAtTime(.0001,ringAudioContext.currentTime+.24); o2.connect(g2).connect(ringAudioContext.destination); o2.start(); o2.stop(ringAudioContext.currentTime+.25); }},340);
+    }
+  };
+  beep(); ringTimer=setInterval(beep, kind==="outgoing"?2400:1800);
+}
+function stopRingTone(){
+  if(ringTimer){clearInterval(ringTimer);ringTimer=null;}
+  if(ringAudioContext){ringAudioContext.close().catch(()=>{});ringAudioContext=null;}
+  if(navigator.vibrate) navigator.vibrate(0);
+}
+function startTitleAlert(text){
+  stopTitleAlert();
+  let flip=false;
+  titleTimer=setInterval(()=>{document.title=flip?originalTitle:text;flip=!flip;},900);
+}
+function stopTitleAlert(){
+  if(titleTimer){clearInterval(titleTimer);titleTimer=null;}
+  document.title=originalTitle;
+}
+function showCallAlert(title,text,icon="📞"){
+  $("callAlertTitle").textContent=title; $("callAlertText").textContent=text; $("callAlertIcon").textContent=icon;
+  $("callAlertBanner").classList.remove("hidden");
+}
+function hideCallAlert(){ $("callAlertBanner").classList.add("hidden"); }
+function focusCallAlert(){ hideCallAlert(); $("callModal").classList.remove("hidden"); window.focus(); }
+window.focusCallAlert=focusCallAlert;
+function clearCallAlerts(){
+  stopRingTone(); stopTitleAlert(); hideCallAlert();
+  if(callTimeout){clearTimeout(callTimeout);callTimeout=null;}
+  document.querySelector(".call-card")?.classList.remove("ringing");
+}
+
 
 function enableCallButtons(){
   const ok = !!selectedUser && !!currentUser;
@@ -2595,6 +2678,7 @@ async function setupCallSignaling(){
     .on("broadcast", {event:"call-ice"}, ({payload}) => receiveIce(payload))
     .on("broadcast", {event:"call-decline"}, ({payload}) => receiveCallDecline(payload))
     .on("broadcast", {event:"call-end"}, ({payload}) => receiveCallEnd(payload))
+    .on("broadcast", {event:"call-cancel"}, ({payload}) => receiveCallCancel(payload))
     .subscribe();
 }
 
@@ -2623,6 +2707,7 @@ async function createPeer(mode){
   peerConnection.ontrack = e => {
     $("remoteVideo").srcObject = e.streams[0];
     updateCallStatus("CONNECTED");
+    clearCallAlerts();
     startCallTimer();
   };
   peerConnection.onconnectionstatechange = () => {
@@ -2644,6 +2729,9 @@ async function startCall(mode){
   try{
     activeCall = {id:crypto.randomUUID(), peerId:selectedUser, mode, outgoing:true};
     showCallModal(mode, "CALLING " + callUserName().toUpperCase() + "...");
+    showCallAlert(mode==="video"?"🎥 Video Calling":"📞 Calling", "Calling " + callUserName() + "...", mode==="video"?"🎥":"📞");
+    playRingTone("outgoing"); startTitleAlert("📞 CALLING...");
+    callTimeout=setTimeout(()=>{ if(activeCall?.outgoing){ toast("📞 No answer."); endCall(true); } },45000);
     $("callControls").classList.remove("hidden");
     $("cameraBtn").classList.toggle("hidden", mode !== "video");
     await createPeer(mode);
@@ -2670,6 +2758,12 @@ async function receiveCallOffer(p){
   activeCall = {id:p.callId, peerId:p.from, mode:p.mode, outgoing:false};
   $("callAvatar").textContent = p.callerAvatar || "👾";
   showCallModal(p.mode, (p.callerName || "PIXEL FRIEND") + " IS CALLING...");
+  document.querySelector(".call-card")?.classList.add("ringing");
+  const callType = p.mode==="video" ? "Video Call" : "Voice Call";
+  showCallAlert("📞 Incoming " + callType, (p.callerName || "PIXEL FRIEND") + " is calling you", p.mode==="video"?"🎥":"📞");
+  notifyCall("Pixel-Friend: Incoming " + callType, (p.callerName || "PIXEL FRIEND") + " is calling you");
+  playRingTone("incoming"); startTitleAlert("📞 INCOMING CALL");
+  callTimeout=setTimeout(()=>{ if(incomingCall){ toast("📞 Missed call."); declineIncomingCall(); } },45000);
   $("incomingActions").classList.remove("hidden");
   $("callControls").classList.add("hidden");
 }
@@ -2677,6 +2771,7 @@ async function receiveCallOffer(p){
 async function acceptIncomingCall(){
   if(!incomingCall) return;
   try{
+    clearCallAlerts();
     $("incomingActions").classList.add("hidden");
     $("callControls").classList.remove("hidden");
     $("cameraBtn").classList.toggle("hidden", incomingCall.mode !== "video");
@@ -2713,6 +2808,9 @@ function receiveCallDecline(p){
 function receiveCallEnd(p){
   if(activeCall && p.callId === activeCall.id){ toast("📞 Call ended."); endCall(false); }
 }
+function receiveCallCancel(p){
+  if(activeCall && p.callId === activeCall.id){ toast("📞 Call cancelled."); endCall(false); }
+}
 function toggleMute(){
   if(!localStream) return;
   const track = localStream.getAudioTracks()[0]; if(!track) return;
@@ -2737,8 +2835,10 @@ function startCallTimer(){
 }
 async function endCall(notify=true){
   const old = activeCall;
-  if(notify && old?.peerId) await sendCallSignal(old.peerId, "call-end", {callId:old.id});
+  const unanswered = !!old && !peerConnection?.remoteDescription;
+  if(notify && old?.peerId) await sendCallSignal(old.peerId, unanswered ? "call-cancel" : "call-end", {callId:old.id});
   clearInterval(callTimer); callTimer=null; callSeconds=0;
+  clearCallAlerts();
   if(peerConnection){ peerConnection.ontrack=null; peerConnection.onicecandidate=null; peerConnection.close(); }
   if(localStream) localStream.getTracks().forEach(t=>t.stop());
   peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[];
