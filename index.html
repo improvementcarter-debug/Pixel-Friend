@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 }
 .pf-live-notification-close:hover{opacity:1}
 .pf-live-notification-progress{height:2px;margin-top:9px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
-.pf-live-notification-progress span{display:block;height:100%;width:100%;background:currentColor;transform-origin:left;animation:pfNotifProgress 5s linear forwards}
+.pf-live-notification-progress span{display:block;height:100%;width:100%;background:currentColor;transform-origin:left;animation:pfNotifProgress 7s linear forwards}
 .pf-notif-pulse{animation:pfNotifPulse .7s ease-out}
 @keyframes pfNotifIn{from{opacity:0;transform:translateX(35px) scale(.97)}to{opacity:1;transform:none}}
 @keyframes pfNotifOut{to{opacity:0;transform:translateX(35px) scale(.97)}}
@@ -220,6 +220,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
 }
 </style>
 
+
+<style id="instant-alert-effects">
+@keyframes pfBellFlash{0%,100%{filter:none}20%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}45%{filter:none}70%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}}
+.pf-live-notification{animation:pfNotifIn .22s ease-out,pfBellFlash .75s ease-out}
+</style>
 </head><body>
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
@@ -737,6 +742,7 @@ let knownUnreadMessageIds = new Set();
 let notificationCheckInFlight = false;
 let localUnreadCount = 0;
 let notificationProfileCache = new Map();
+let notificationProfileDataCache = new Map();
 let notificationItems = new Map();
 
 function renderNotificationBadge(count){
@@ -827,68 +833,55 @@ async function markAllNotificationsRead(e){
 }
 window.markAllNotificationsRead = markAllNotificationsRead;
 
-async function notifyIncomingMessage(message){
-  if(!currentUser || !message?.id || message.receiver_id !== currentUser.id) return;
+function notifyIncomingMessage(message){
+  if(!currentUser || !message?.id || String(message.receiver_id) !== String(currentUser.id)) return;
 
   const id = String(message.id);
   if(knownUnreadMessageIds.has(id)) return;
   knownUnreadMessageIds.add(id);
 
   const senderId = String(message.sender_id || '');
-  let senderName = notificationProfileCache.get(senderId) || 'PIXEL USER';
-  let senderAvatar = '👾';
+  const senderName = notificationProfileCache.get(senderId) || 'PIXEL USER';
+  const cachedProfile = notificationProfileDataCache.get(senderId);
+  const senderAvatar = cachedProfile
+    ? (cachedProfile.avatar_url
+        ? `<img src="${esc(cachedProfile.avatar_url)}" alt="">`
+        : esc(cachedProfile.avatar || '👾'))
+    : '👾';
 
-  // Keep the live alert independent from a database lookup.
-  const cachedProfile = notificationProfileDataCache?.get?.(senderId);
-  if(cachedProfile){
-    senderName = cachedProfile.username || senderName;
-    senderAvatar = cachedProfile.avatar_url
-      ? `<img src="${esc(cachedProfile.avatar_url)}" alt="">`
-      : esc(cachedProfile.avatar || '👾');
-  }
-
+  // IMMEDIATE UI + SOUND — no await, no database lookup.
   renderNotificationBadge(localUnreadCount + 1);
   addNotificationItem(message, senderName, true);
-
-  // Telegram-style in-app popup.
   showTelegramNotification(message, senderName, senderAvatar);
+  playRetroSound('notification');
 
-  // Existing sound + toast.
-  playRetroSound('message');
-  toast(`🔔 ${senderName}: ${notificationDetail(message)}`);
-
-  // Browser notification when permission is available.
   if('Notification' in window && Notification.permission === 'granted'){
-    try {
+    try{
       new Notification(`💬 ${senderName}`, {
         body: notificationDetail(message),
         tag:'pixel-friend-'+id,
         renotify:true
       });
-    } catch(e) {}
+    }catch(e){}
   }
 
-  // Resolve profile after the popup is already visible.
+  // Profile lookup happens AFTER the alert is already visible/audible.
   if(!notificationProfileCache.has(senderId) && message.sender_id){
-    try {
-      const {data} = await sb.from('profiles')
-        .select('username,avatar,avatar_url')
-        .eq('id', message.sender_id)
-        .maybeSingle();
-
-      const resolved = data?.username || 'PIXEL USER';
-      notificationProfileCache.set(senderId, resolved);
-
-      if(typeof notificationProfileDataCache !== 'undefined'){
+    sb.from('profiles')
+      .select('username,avatar,avatar_url')
+      .eq('id', message.sender_id)
+      .maybeSingle()
+      .then(({data}) => {
+        const resolved = data?.username || 'PIXEL USER';
+        notificationProfileCache.set(senderId, resolved);
         notificationProfileDataCache.set(senderId, data || {});
-      }
-
-      const existing = notificationItems.get(id);
-      if(existing){
-        existing.senderName = resolved;
-        renderNotificationList();
-      }
-    } catch(e) {}
+        const existing = notificationItems.get(id);
+        if(existing){
+          existing.senderName = resolved;
+          renderNotificationList();
+        }
+      })
+      .catch(()=>{});
   }
 }
 
@@ -944,7 +937,7 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
     if(!item.isConnected) return;
     item.classList.add('removing');
     setTimeout(() => item.remove(), 200);
-  }, 5000);
+  }, 7000);
 }
 
 function requestNotificationPermission(){
@@ -2570,13 +2563,14 @@ async function setupRealtime(force=false){
       if(!msg || String(msg.sender_id) === uid) return;
 
       // This is the real-time notification path. No polling/query is needed.
-      if(selectedUser && String(selectedUser) === String(msg.sender_id)){
-        await loadMessages();
-        await markChatMessagesSeen();
-        return;
-      }
+      // NEVER wait for UI/database refresh before firing the alert.
+      // The notification must be the first action on the Realtime event.
+      notifyIncomingMessage(msg);
 
-      await notifyIncomingMessage(msg);
+      if(selectedUser && String(selectedUser) === String(msg.sender_id)){
+        loadMessages();
+        markChatMessagesSeen();
+      }
     })
     .on('postgres_changes', {
       event:'UPDATE', schema:'public', table:'messages',
