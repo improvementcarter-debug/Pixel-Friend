@@ -174,7 +174,54 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 </script>
+
+<style id="telegram-style-notifications">
+/* Telegram-style live notification popup */
+.pf-live-notification-stack{
+  position:fixed;right:18px;top:18px;z-index:99999;
+  width:min(380px,calc(100vw - 28px));
+  display:flex;flex-direction:column;gap:10px;pointer-events:none;
+}
+.pf-live-notification{
+  pointer-events:auto;display:flex;gap:11px;align-items:flex-start;
+  padding:12px 13px;border-radius:15px;
+  background:rgba(25,31,42,.97);border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 12px 35px rgba(0,0,0,.38);
+  cursor:pointer;animation:pfNotifIn .24s ease-out;
+  backdrop-filter:blur(12px);
+}
+.pf-live-notification.removing{animation:pfNotifOut .2s ease-in forwards}
+.pf-live-notification-avatar{
+  width:44px;height:44px;min-width:44px;border-radius:50%;
+  overflow:hidden;display:grid;place-items:center;background:#303b50;
+  font-size:22px;border:1px solid rgba(255,255,255,.12);
+}
+.pf-live-notification-avatar img{width:100%;height:100%;object-fit:cover}
+.pf-live-notification-main{min-width:0;flex:1}
+.pf-live-notification-head{display:flex;gap:8px;align-items:center}
+.pf-live-notification-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pf-live-notification-time{margin-left:auto;font-size:11px;opacity:.55;white-space:nowrap}
+.pf-live-notification-text{font-size:13px;line-height:1.35;opacity:.88;margin-top:3px;word-break:break-word}
+.pf-live-notification-close{
+  border:0;background:transparent;color:inherit;opacity:.55;
+  cursor:pointer;font-size:16px;padding:0 2px;line-height:1
+}
+.pf-live-notification-close:hover{opacity:1}
+.pf-live-notification-progress{height:2px;margin-top:9px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+.pf-live-notification-progress span{display:block;height:100%;width:100%;background:currentColor;transform-origin:left;animation:pfNotifProgress 5s linear forwards}
+.pf-notif-pulse{animation:pfNotifPulse .7s ease-out}
+@keyframes pfNotifIn{from{opacity:0;transform:translateX(35px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes pfNotifOut{to{opacity:0;transform:translateX(35px) scale(.97)}}
+@keyframes pfNotifProgress{to{transform:scaleX(0)}}
+@keyframes pfNotifPulse{0%,100%{transform:none}35%{transform:scale(1.14)}}
+@media(max-width:600px){
+  .pf-live-notification-stack{top:10px;right:10px;left:10px;width:auto}
+  .pf-live-notification{border-radius:13px}
+}
+</style>
+
 </head><body>
+<div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
@@ -782,26 +829,122 @@ window.markAllNotificationsRead = markAllNotificationsRead;
 
 async function notifyIncomingMessage(message){
   if(!currentUser || !message?.id || message.receiver_id !== currentUser.id) return;
+
   const id = String(message.id);
   if(knownUnreadMessageIds.has(id)) return;
   knownUnreadMessageIds.add(id);
-  const senderName = notificationProfileCache.get(String(message.sender_id)) || 'PIXEL USER';
+
+  const senderId = String(message.sender_id || '');
+  let senderName = notificationProfileCache.get(senderId) || 'PIXEL USER';
+  let senderAvatar = '👾';
+
+  // Keep the live alert independent from a database lookup.
+  const cachedProfile = notificationProfileDataCache?.get?.(senderId);
+  if(cachedProfile){
+    senderName = cachedProfile.username || senderName;
+    senderAvatar = cachedProfile.avatar_url
+      ? `<img src="${esc(cachedProfile.avatar_url)}" alt="">`
+      : esc(cachedProfile.avatar || '👾');
+  }
+
   renderNotificationBadge(localUnreadCount + 1);
   addNotificationItem(message, senderName, true);
+
+  // Telegram-style in-app popup.
+  showTelegramNotification(message, senderName, senderAvatar);
+
+  // Existing sound + toast.
   playRetroSound('message');
   toast(`🔔 ${senderName}: ${notificationDetail(message)}`);
+
+  // Browser notification when permission is available.
   if('Notification' in window && Notification.permission === 'granted'){
-    try { new Notification(`💬 ${senderName}`, {body: notificationDetail(message), tag:'pixel-friend-'+id}); } catch(e) {}
-  }
-  if(!notificationProfileCache.has(String(message.sender_id)) && message.sender_id){
     try {
-      const {data} = await sb.from('profiles').select('username').eq('id', message.sender_id).maybeSingle();
-      const resolved = data?.username || 'PIXEL USER';
-      notificationProfileCache.set(String(message.sender_id), resolved);
-      const existing = notificationItems.get(id);
-      if(existing){ existing.senderName = resolved; renderNotificationList(); }
+      new Notification(`💬 ${senderName}`, {
+        body: notificationDetail(message),
+        tag:'pixel-friend-'+id,
+        renotify:true
+      });
     } catch(e) {}
   }
+
+  // Resolve profile after the popup is already visible.
+  if(!notificationProfileCache.has(senderId) && message.sender_id){
+    try {
+      const {data} = await sb.from('profiles')
+        .select('username,avatar,avatar_url')
+        .eq('id', message.sender_id)
+        .maybeSingle();
+
+      const resolved = data?.username || 'PIXEL USER';
+      notificationProfileCache.set(senderId, resolved);
+
+      if(typeof notificationProfileDataCache !== 'undefined'){
+        notificationProfileDataCache.set(senderId, data || {});
+      }
+
+      const existing = notificationItems.get(id);
+      if(existing){
+        existing.senderName = resolved;
+        renderNotificationList();
+      }
+    } catch(e) {}
+  }
+}
+
+function showTelegramNotification(message, senderName, senderAvatar='👾'){
+  const stack = $("pfLiveNotificationStack");
+  if(!stack || !message?.id) return;
+
+  const id = String(message.id);
+  // Prevent duplicate popups for the same message.
+  if(stack.querySelector(`[data-pf-notification-id="${CSS.escape(id)}"]`)) return;
+
+  const item = document.createElement('div');
+  item.className = 'pf-live-notification';
+  item.dataset.pfNotificationId = id;
+  item.setAttribute('role','button');
+  item.innerHTML = `
+    <div class="pf-live-notification-avatar">${senderAvatar || '👾'}</div>
+    <div class="pf-live-notification-main">
+      <div class="pf-live-notification-head">
+        <div class="pf-live-notification-name">${esc(senderName || 'PIXEL USER')}</div>
+        <div class="pf-live-notification-time">now</div>
+      </div>
+      <div class="pf-live-notification-text">${esc(notificationDetail(message))}</div>
+      <div class="pf-live-notification-progress"><span></span></div>
+    </div>
+    <button class="pf-live-notification-close" type="button" aria-label="Close">×</button>
+  `;
+
+  const open = () => {
+    item.classList.add('removing');
+    setTimeout(() => item.remove(), 200);
+    openNotification(id, message.sender_id, senderName);
+  };
+
+  item.addEventListener('click', e => {
+    if(e.target.closest('.pf-live-notification-close')) return;
+    open();
+  });
+
+  item.querySelector('.pf-live-notification-close')?.addEventListener('click', e => {
+    e.stopPropagation();
+    item.classList.add('removing');
+    setTimeout(() => item.remove(), 200);
+  });
+
+  stack.prepend(item);
+
+  // Keep the stack compact.
+  while(stack.children.length > 4) stack.lastElementChild.remove();
+
+  // Auto-dismiss after 5 seconds, like a chat notification preview.
+  setTimeout(() => {
+    if(!item.isConnected) return;
+    item.classList.add('removing');
+    setTimeout(() => item.remove(), 200);
+  }, 5000);
 }
 
 function requestNotificationPermission(){
@@ -2521,6 +2664,7 @@ sb.auth.onAuthStateChange((event, session) => {
     notificationInitialized = false;
     knownUnreadMessageIds.clear();
     notificationProfileCache.clear();
+    if(typeof notificationProfileDataCache !== 'undefined') notificationProfileDataCache.clear();
     notificationItems.clear();
     teardownRealtime();
     if(presenceChannel) stopPresence();
@@ -2571,6 +2715,7 @@ sb.auth.onAuthStateChange((event, session) => {
     notificationInitialized = false;
     knownUnreadMessageIds.clear();
     notificationProfileCache.clear();
+    if(typeof notificationProfileDataCache !== 'undefined') notificationProfileDataCache.clear();
     notificationItems.clear();
     if(presenceChannel) stopPresence();
     currentUser = null;
