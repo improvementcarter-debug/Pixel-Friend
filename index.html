@@ -94,14 +94,6 @@
 
 /* Telegram-style paste media */
 .paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
-
-/* ===== PIXEL-FRIEND ARCADE ===== */
-.arcade-page{padding:20px;max-width:1100px;margin:0 auto}.arcade-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;padding:22px;border:1px solid #34547e;border-radius:16px;background:linear-gradient(135deg,#111c31,#0a1220);box-shadow:0 0 30px rgba(67,231,255,.08)}
-.arcade-title{margin:0;font-size:28px}.arcade-sub{color:var(--muted);margin-top:8px}.game-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.game-card{border:1px solid #2d466a;border-radius:16px;background:linear-gradient(180deg,#101a2d,#09111e);padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
-.game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
-.pet-stage{min-height:180px;display:grid;place-items:center;border:1px solid #2d466a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#182b48,#08111d 70%);margin:12px 0}.pixel-pet{font-size:100px;filter:drop-shadow(0 0 18px rgba(67,231,255,.3));animation:pfPetBounce .7s infinite alternate}@keyframes pfPetBounce{to{transform:translateY(-8px) scale(1.03)}}
-.target-food{text-align:center;font-size:18px;margin:12px 0}.target-food span{font-size:36px}.food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.food-btn{min-height:76px;font-size:40px;border:1px solid #3a587f;border-radius:12px;background:#101d31;cursor:pointer}.food-btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(67,231,255,.18)}.food-btn:disabled{opacity:.45;cursor:not-allowed}
-.game-status{min-height:26px;text-align:center;margin-top:12px}.memory-card{margin-top:18px}.memory-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(52px,1fr));gap:10px;margin:18px 0}.memory-tile{min-height:72px;border:1px solid #34547e;background:#0a1423;border-radius:12px;color:#9eb2ce;font-size:28px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}.memory-tile:hover{transform:translateY(-2px);border-color:var(--cyan)}.memory-tile.revealed,.memory-tile.matched{background:linear-gradient(135deg,#12344b,#11243a);color:#fff}.memory-tile.matched{border-color:#48e0a4;box-shadow:0 0 14px rgba(72,224,164,.18)}.memory-status{min-height:24px;text-align:center;margin-top:10px}.game-switches{display:flex;gap:8px;flex-wrap:wrap}.game-switches button{padding:9px 12px}@media(max-width:520px){.memory-board{grid-template-columns:repeat(3,1fr)}.memory-tile{min-height:62px}}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
 </style>
 <script>
 
@@ -173,6 +165,26 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 
 </script>
+
+<style>
+.call-actions{display:flex;gap:8px;align-items:center}
+.call-btn{width:44px;height:40px;padding:0;border:2px solid #2b3d5d;background:#15233a;color:#fff;font-size:20px}
+.call-btn:disabled{opacity:.45;cursor:not-allowed}
+.call-modal{position:fixed;inset:0;z-index:5000;background:rgba(2,5,11,.94);display:flex;align-items:center;justify-content:center;padding:18px}
+.call-modal.hidden{display:none!important}
+.call-card{width:min(760px,100%);min-height:480px;border:2px solid var(--cyan);background:#08111f;box-shadow:8px 8px 0 #000;position:relative;overflow:hidden;padding:18px}
+.call-title{text-align:center;font-family:"Press Start 2P",monospace;font-size:14px;line-height:1.8}
+.call-status{text-align:center;color:var(--cyan);margin:14px 0}
+.call-avatar{width:110px;height:110px;margin:22px auto;border:3px solid var(--border);display:grid;place-items:center;font-size:52px;background:#14233b}
+.call-videos{display:grid;grid-template-columns:1fr 180px;gap:12px;align-items:end;margin:16px 0}
+.call-videos video{width:100%;background:#000;border:2px solid #30415f;max-height:380px;object-fit:cover}
+#localVideo{width:180px;max-height:140px}
+.call-controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.call-controls button{min-width:110px}
+.incoming-actions{display:flex;justify-content:center;gap:12px;margin-top:22px}
+@media(max-width:600px){.call-videos{grid-template-columns:1fr}.call-videos #localVideo{width:45%;position:absolute;right:18px;bottom:85px}.call-card{min-height:100vh;border:0}.call-avatar{margin-top:35px}}
+</style>
+
 </head><body>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -182,7 +194,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('games',this)">🎮 GAMES</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -218,7 +230,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </div>
 </section>
 <section id="friends" class="page">    <div class="card" style="padding:20px">        <h1>👥 PIXEL COMMUNITY</h1>        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">    </div>    <div id="searchResults" class="grid" style="margin-top:15px"></div>    <div class="card" style="padding:20px;margin-top:20px">        <h2>🤝 RECOMMENDED FRIENDS</h2>        <div id="friendsList" class="grid" style="margin-top:15px"></div>    </div></section>
-<section id="messages" class="page">    <div class="card" style="padding:20px">        <div class="messages-layout">            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
+<section id="messages" class="page">    <div class="card" style="padding:20px">        <div class="messages-layout">            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div style="display:flex;gap:10px;align-items:center">
+  <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>
+  <div class="call-actions">
+    <button id="voiceCallBtn" class="call-btn" title="Voice Call" onclick="startCall('voice')" disabled>📞</button>
+    <button id="videoCallBtn" class="call-btn" title="Video Call" onclick="startCall('video')" disabled>🎥</button>
+  </div>
+</div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
         <div class="chat-input-bar">                    <div id="replyBar" class="reply-bar hidden"><span id="replyBarText"></span><button class="danger" style="padding:3px 7px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button></div>                    <div id="stickerPicker" class="sticker-picker hidden"></div>                    <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">                        <span id="chatAttachmentPill" class="file-pill"></span>                        <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>                    </div>          <div class="chat-controls" style="flex-wrap:wrap">                        <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>                        <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>                        <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>                        <button class="secondary" onclick="toggleStickerPicker()" title="Send Sticker" disabled id="btnSticker">😀</button>
 
@@ -234,36 +252,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">      <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>      <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>      <input id="editUsernameInput" placeholder="Enter new username...">            <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>      <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>            <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>    </div>
 
     <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div></section>
-
-<section id="games" class="page">
-  <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button></div></div>
-    <div class="game-grid">
-      <div class="game-card">
-        <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
-        <div class="game-stats"><div class="game-stat">SCORE<b id="petScore">0</b></div><div class="game-stat">TIME<b id="petTimer">20</b></div><div class="game-stat">COMBO<b id="petCombo">0</b></div><div class="game-stat">BEST<b id="petBest">0</b></div></div>
-        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👾</div></div>
-        <div class="target-food">PET WANTS: <span id="desiredFood">🍪</span></div>
-        <div id="foodGrid" class="food-grid"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">Press PLAY NOW to start!</div></div>
-        <div class="game-actions"><button id="petStartBtn" class="primary" onclick="startPetGame()">▶ START GAME</button><button class="secondary" onclick="sharePetScore()">↗️ SHARE SCORE</button></div>
-        <div id="petGameStatus" class="game-status tiny"></div>
-      </div>
-      <aside class="arcade-list">
-        <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
-        <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
-        <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>COMING NEXT</h3><p>⚔️ Pixel Battle<br>🎯 Fast Click Challenge<br>🏎️ Pixel Racing</p></div>
-      </aside>
-    </div>
-    <div class="game-card memory-card">
-      <div class="memory-header"><div><h2 style="margin:0">🧠 PIXEL MEMORY MATCH</h2><p class="tiny" style="margin:7px 0 0">Match all the cute pairs before time runs out!</p></div><button id="memoryStartBtn" class="primary" onclick="startMemoryGame()">▶ START MEMORY GAME</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">PAIRS<b id="memoryMatches">0/6</b></div><div class="game-stat">TIME<b id="memoryTimer">30</b></div><div class="game-stat">MOVES<b id="memoryMoves">0</b></div><div class="game-stat">BEST<b id="memoryBest">—</b></div></div>
-      <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
-      <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
-      <div id="memoryStatus" class="memory-status tiny"></div>
-    </div>
-  </div>
-</section>
 </main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
 <div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
 
@@ -490,6 +478,7 @@ async function startApp(user){
 
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
+  await setupCallSignaling();
   await setupPresence();
   page("home");
 }
@@ -1902,6 +1891,7 @@ async function loadMessageUsers() {
 
 function openChat(id, name) {
   selectedUser = id;
+  enableCallButtons();
   messageRenderSignature = "";
   $("chatTitle").textContent = name;
   $("reachIndicator").classList.remove("hidden");
@@ -2509,34 +2499,6 @@ async function logout() {
 }
 window.logout = logout;
 
-
-/* ===== PIXEL-FRIEND ARCADE: FEED THE PET ===== */
-const pfPets=['👾','🦊','🐱','🤖','🐼','🐸'];
-const pfFoods=['🍪','⭐','🍎','🍰','🍕','🍬','🥕','🧁'];
-let petGameScore=0,petGameTime=20,petGameCombo=0,petGameTarget='🍪',petGamePlaying=false,petGameInterval=null;
-function pfBestKey(){return 'pf_pet_best_'+(currentUser?.id||'guest');}
-function renderPetBest(){const b=Number(localStorage.getItem(pfBestKey())||0); const e=$('petBest'); if(e)e.textContent=b; const t=$('petBestText'); if(t)t.textContent=b?`Your personal best is ${b} points. Can you beat it?`:'Play your first game and set a high score!';}
-function startPetGame(){clearInterval(petGameInterval);petGameScore=0;petGameTime=20;petGameCombo=0;petGamePlaying=true;updatePetStats();$('petStartBtn').textContent='🔄 RESTART GAME';$('petGameStatus').textContent='🔥 GO! Feed the pet the correct food.';nextPetRound();petGameInterval=setInterval(()=>{petGameTime--;updatePetStats();if(petGameTime<=0)endPetGame();},1000);}
-function updatePetStats(){if($('petScore'))$('petScore').textContent=petGameScore;if($('petTimer'))$('petTimer').textContent=petGameTime;if($('petCombo'))$('petCombo').textContent=petGameCombo;renderPetBest();}
-function nextPetRound(){if(!petGamePlaying)return;petGameTarget=pfFoods[Math.floor(Math.random()*pfFoods.length)];$('desiredFood').textContent=petGameTarget;$('petAvatar').textContent=pfPets[Math.floor(Math.random()*pfPets.length)];let choices=[petGameTarget];while(choices.length<4){let f=pfFoods[Math.floor(Math.random()*pfFoods.length)];if(!choices.includes(f))choices.push(f);}choices.sort(()=>Math.random()-.5);$('foodGrid').innerHTML=choices.map(f=>`<button class="food-btn" onclick="checkPetFood('${f}')">${f}</button>`).join('');}
-function checkPetFood(food){if(!petGamePlaying)return;if(food===petGameTarget){petGameCombo++;const bonus=Math.min(20,(petGameCombo-1)*2);petGameScore+=10+bonus;$('petGameStatus').innerHTML=`✅ YUMMY! <span class="combo">COMBO x${petGameCombo}</span> +${10+bonus}`;nextPetRound();}else{petGameScore=Math.max(0,petGameScore-5);petGameCombo=0;$('petGameStatus').textContent='❌ Wrong food! -5 points. Try again!';}updatePetStats();}
-function endPetGame(){petGamePlaying=false;clearInterval(petGameInterval);$('foodGrid').innerHTML='<div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">⏰ TIME’S UP!</div>';const old=Number(localStorage.getItem(pfBestKey())||0);let msg=`🎉 Game over! You scored ${petGameScore} points.`;if(petGameScore>old){localStorage.setItem(pfBestKey(),String(petGameScore));msg+=' 🏆 NEW PERSONAL BEST!';} $('petGameStatus').textContent=msg;$('petStartBtn').textContent='▶ PLAY AGAIN';updatePetStats();if(typeof toast==='function')toast(msg);}
-async function sharePetScore(){const text=`🎮 I scored ${petGameScore} points in Feed the Pixel Pet on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Arcade',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Score challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
-window.startPetGame=startPetGame;window.checkPetFood=checkPetFood;window.sharePetScore=sharePetScore;
-
-/* ===== PIXEL-FRIEND ARCADE: MEMORY MATCH ===== */
-const memoryIcons=['🐱','🐶','🐰','🦊','🐼','🐨'];
-let memoryCards=[],memoryFlipped=[],memoryMatches=0,memoryMoves=0,memoryTime=30,memoryPlaying=false,memoryCanFlip=true,memoryInterval=null;
-function memoryBestKey(){return 'pf_memory_best_'+(currentUser?.id||'guest');}
-function renderMemoryBest(){const v=localStorage.getItem(memoryBestKey()); const el=$('memoryBest'); if(el)el.textContent=v?v+'s':'—';}
-function updateMemoryStats(){if($('memoryMatches'))$('memoryMatches').textContent=memoryMatches+'/6';if($('memoryTimer'))$('memoryTimer').textContent=memoryTime;if($('memoryMoves'))$('memoryMoves').textContent=memoryMoves;renderMemoryBest();}
-function renderMemoryBoard(){const board=$('memoryBoard');if(!board)return;board.innerHTML=memoryCards.map((c,i)=>`<button class="memory-tile ${c.flipped?'revealed':''} ${c.matched?'matched':''}" onclick="flipMemoryCard(${i})">${(c.flipped||c.matched)?c.icon:'❓'}</button>`).join('');}
-function startMemoryGame(){clearInterval(memoryInterval);memoryMatches=0;memoryMoves=0;memoryTime=30;memoryFlipped=[];memoryPlaying=true;memoryCanFlip=true;memoryCards=[...memoryIcons,...memoryIcons].sort(()=>Math.random()-.5).map((icon,i)=>({id:i,icon,flipped:false,matched:false}));$('memoryStartBtn').textContent='🔄 RESTART MEMORY GAME';$('memoryStatus').textContent='🧠 GO! Find all matching pairs.';updateMemoryStats();renderMemoryBoard();memoryInterval=setInterval(()=>{memoryTime--;updateMemoryStats();if(memoryTime<=0)endMemoryGame(false);},1000);}
-function flipMemoryCard(index){if(!memoryPlaying||!memoryCanFlip)return;const card=memoryCards[index];if(card.flipped||card.matched)return;card.flipped=true;memoryFlipped.push(index);renderMemoryBoard();if(memoryFlipped.length===2){memoryCanFlip=false;memoryMoves++;const [a,b]=memoryFlipped;if(memoryCards[a].icon===memoryCards[b].icon){memoryCards[a].matched=true;memoryCards[b].matched=true;memoryMatches++;memoryFlipped=[];memoryCanFlip=true;updateMemoryStats();renderMemoryBoard();if(memoryMatches===memoryIcons.length)endMemoryGame(true);}else{updateMemoryStats();setTimeout(()=>{memoryCards[a].flipped=false;memoryCards[b].flipped=false;memoryFlipped=[];memoryCanFlip=true;renderMemoryBoard();},650);}}}
-function endMemoryGame(won){memoryPlaying=false;clearInterval(memoryInterval);let msg='⏰ Time is up! Try again and beat your best.';if(won){const used=30-memoryTime;const old=Number(localStorage.getItem(memoryBestKey())||9999);msg=`🌟 Amazing! You matched all pairs in ${used} seconds and ${memoryMoves} moves!`;if(used<old){localStorage.setItem(memoryBestKey(),String(used));msg+=' 🏆 NEW PERSONAL BEST!';}}$('memoryStatus').textContent=msg;$('memoryStartBtn').textContent='▶ PLAY AGAIN';updateMemoryStats();if(typeof toast==='function')toast(msg);}
-async function shareMemoryScore(){const text=`🧠 I completed Pixel Memory Match in ${30-memoryTime} seconds with ${memoryMoves} moves on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Memory Match',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Memory challenge copied!');}catch(e){window.prompt('Copy and share your result:',text+' '+location.href);}}
-window.startMemoryGame=startMemoryGame;window.flipMemoryCard=flipMemoryCard;window.shareMemoryScore=shareMemoryScore;
-
 restoreSession();
 </script>
 <div id="inviteModal" class="invite-modal hidden" role="dialog" aria-modal="true">
@@ -2552,4 +2514,242 @@ restoreSession();
     <div id="inviteStats" class="invite-stats">👥 Joined through your link: 0</div>
   </div>
 </div>
+
+<div id="callModal" class="call-modal hidden">
+  <div class="call-card">
+    <div class="call-title" id="callTitle">PIXEL CALL</div>
+    <div class="call-status" id="callStatus">CONNECTING...</div>
+    <div id="callAvatar" class="call-avatar">👾</div>
+    <div class="call-videos">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <video id="localVideo" autoplay muted playsinline></video>
+    </div>
+    <div id="incomingActions" class="incoming-actions hidden">
+      <button class="primary" onclick="acceptIncomingCall()">✓ ACCEPT</button>
+      <button class="danger secondary" onclick="declineIncomingCall()">✕ DECLINE</button>
+    </div>
+    <div id="callControls" class="call-controls hidden">
+      <button id="muteBtn" class="secondary" onclick="toggleMute()">🎤 MUTE</button>
+      <button id="cameraBtn" class="secondary hidden" onclick="toggleCamera()">📷 CAMERA</button>
+      <button class="danger secondary" onclick="endCall(true)">📞 END</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+/* =========================================================
+   PIXEL-FRIEND VOICE / VIDEO CALLS
+   WebRTC media + Supabase Realtime Broadcast signaling.
+   ========================================================= */
+let callChannel = null;
+let peerConnection = null;
+let localStream = null;
+let activeCall = null;
+let incomingCall = null;
+let pendingIce = [];
+let callTimer = null;
+let callSeconds = 0;
+
+const RTC_CONFIG = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:stun1.l.google.com:19302" }
+  ]
+};
+
+function callUserName(){
+  if(!selectedUser) return "PIXEL FRIEND";
+  const item = document.querySelector(`.chat-user.active`);
+  return item?.querySelector("strong, .name, .chat-user-name")?.textContent?.trim() || "PIXEL FRIEND";
+}
+function showCallModal(mode, status){
+  $("callModal").classList.remove("hidden");
+  $("callTitle").textContent = mode === "video" ? "🎥 VIDEO CALL" : "📞 VOICE CALL";
+  $("callStatus").textContent = status || "CONNECTING...";
+  $("remoteVideo").style.display = mode === "video" ? "block" : "none";
+  $("localVideo").style.display = mode === "video" ? "block" : "none";
+  $("callAvatar").style.display = mode === "video" ? "none" : "grid";
+}
+function hideCallModal(){
+  $("callModal").classList.add("hidden");
+  $("incomingActions").classList.add("hidden");
+  $("callControls").classList.add("hidden");
+  $("remoteVideo").srcObject = null;
+  $("localVideo").srcObject = null;
+}
+function updateCallStatus(text){ $("callStatus").textContent = text; }
+
+function enableCallButtons(){
+  const ok = !!selectedUser && !!currentUser;
+  $("voiceCallBtn").disabled = !ok;
+  $("videoCallBtn").disabled = !ok;
+}
+
+async function setupCallSignaling(){
+  if(!currentUser || callChannel) return;
+  callChannel = sb.channel("pixel-call:" + currentUser.id, { config:{ broadcast:{ self:false } } });
+  callChannel
+    .on("broadcast", {event:"call-offer"}, ({payload}) => receiveCallOffer(payload))
+    .on("broadcast", {event:"call-answer"}, ({payload}) => receiveCallAnswer(payload))
+    .on("broadcast", {event:"call-ice"}, ({payload}) => receiveIce(payload))
+    .on("broadcast", {event:"call-decline"}, ({payload}) => receiveCallDecline(payload))
+    .on("broadcast", {event:"call-end"}, ({payload}) => receiveCallEnd(payload))
+    .subscribe();
+}
+
+async function sendCallSignal(targetUserId, event, payload){
+  if(!callChannel || !targetUserId) return;
+  const channel = sb.channel("pixel-call:" + targetUserId);
+  await new Promise(resolve => {
+    const timeout = setTimeout(resolve, 1200);
+    channel.subscribe(async status => {
+      if(status === "SUBSCRIBED"){
+        await channel.send({type:"broadcast", event, payload:{...payload, from:currentUser.id}});
+        clearTimeout(timeout); resolve();
+        sb.removeChannel(channel);
+      }
+    });
+  });
+}
+
+async function createPeer(mode){
+  peerConnection = new RTCPeerConnection(RTC_CONFIG);
+  peerConnection.onicecandidate = async e => {
+    if(e.candidate && activeCall?.peerId){
+      await sendCallSignal(activeCall.peerId, "call-ice", {candidate:e.candidate.toJSON(), callId:activeCall.id});
+    }
+  };
+  peerConnection.ontrack = e => {
+    $("remoteVideo").srcObject = e.streams[0];
+    updateCallStatus("CONNECTED");
+    startCallTimer();
+  };
+  peerConnection.onconnectionstatechange = () => {
+    const state = peerConnection?.connectionState;
+    if(state === "connected"){ updateCallStatus("CONNECTED"); startCallTimer(); }
+    if(["failed","disconnected","closed"].includes(state) && activeCall){ updateCallStatus("CALL ENDED"); }
+  };
+  localStream = await navigator.mediaDevices.getUserMedia({
+    audio:true,
+    video: mode === "video" ? {facingMode:"user"} : false
+  });
+  localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+  $("localVideo").srcObject = localStream;
+}
+
+async function startCall(mode){
+  if(!selectedUser || !currentUser) return toast("Select a friend first.");
+  if(!navigator.mediaDevices?.getUserMedia) return toast("Voice/video calling requires HTTPS or localhost.");
+  try{
+    activeCall = {id:crypto.randomUUID(), peerId:selectedUser, mode, outgoing:true};
+    showCallModal(mode, "CALLING " + callUserName().toUpperCase() + "...");
+    $("callControls").classList.remove("hidden");
+    $("cameraBtn").classList.toggle("hidden", mode !== "video");
+    await createPeer(mode);
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    await sendCallSignal(selectedUser, "call-offer", {
+      callId:activeCall.id, mode, offer:peerConnection.localDescription,
+      callerName: currentProfile?.username || "PIXEL FRIEND",
+      callerAvatar: currentProfile?.avatar || "👾"
+    });
+  }catch(e){
+    console.error(e); toast("❌ Unable to start call: " + (e.message || "permission denied"));
+    endCall(false);
+  }
+}
+
+async function receiveCallOffer(p){
+  if(!p?.from || p.from === currentUser?.id) return;
+  if(activeCall || incomingCall){
+    await sendCallSignal(p.from, "call-decline", {callId:p.callId, reason:"busy"});
+    return;
+  }
+  incomingCall = p;
+  activeCall = {id:p.callId, peerId:p.from, mode:p.mode, outgoing:false};
+  $("callAvatar").textContent = p.callerAvatar || "👾";
+  showCallModal(p.mode, (p.callerName || "PIXEL FRIEND") + " IS CALLING...");
+  $("incomingActions").classList.remove("hidden");
+  $("callControls").classList.add("hidden");
+}
+
+async function acceptIncomingCall(){
+  if(!incomingCall) return;
+  try{
+    $("incomingActions").classList.add("hidden");
+    $("callControls").classList.remove("hidden");
+    $("cameraBtn").classList.toggle("hidden", incomingCall.mode !== "video");
+    updateCallStatus("CONNECTING...");
+    await createPeer(incomingCall.mode);
+    await peerConnection.setRemoteDescription(incomingCall.offer);
+    for(const c of pendingIce.splice(0)) await peerConnection.addIceCandidate(c);
+    const answer = await peerConnection.createAnswer();
+    await peerConnection.setLocalDescription(answer);
+    await sendCallSignal(incomingCall.from, "call-answer", {callId:incomingCall.callId, answer:peerConnection.localDescription});
+    incomingCall = null;
+  }catch(e){ toast("❌ Could not accept call: " + (e.message || e)); endCall(false); }
+}
+
+async function declineIncomingCall(){
+  if(incomingCall) await sendCallSignal(incomingCall.from, "call-decline", {callId:incomingCall.callId});
+  endCall(false);
+}
+async function receiveCallAnswer(p){
+  if(!activeCall || p.callId !== activeCall.id || !peerConnection) return;
+  await peerConnection.setRemoteDescription(p.answer);
+  for(const c of pendingIce.splice(0)) await peerConnection.addIceCandidate(c);
+  updateCallStatus("CONNECTING...");
+}
+async function receiveIce(p){
+  if(!p?.candidate) return;
+  const c = new RTCIceCandidate(p.candidate);
+  if(peerConnection?.remoteDescription) await peerConnection.addIceCandidate(c);
+  else pendingIce.push(c);
+}
+function receiveCallDecline(p){
+  if(activeCall && p.callId === activeCall.id){ toast("📞 Call declined or user is busy."); endCall(false); }
+}
+function receiveCallEnd(p){
+  if(activeCall && p.callId === activeCall.id){ toast("📞 Call ended."); endCall(false); }
+}
+function toggleMute(){
+  if(!localStream) return;
+  const track = localStream.getAudioTracks()[0]; if(!track) return;
+  track.enabled = !track.enabled;
+  $("muteBtn").textContent = track.enabled ? "🎤 MUTE" : "🔇 UNMUTE";
+}
+function toggleCamera(){
+  if(!localStream) return;
+  const track = localStream.getVideoTracks()[0]; if(!track) return;
+  track.enabled = !track.enabled;
+  $("cameraBtn").textContent = track.enabled ? "📷 CAMERA" : "🚫 CAMERA";
+}
+function startCallTimer(){
+  if(callTimer) return;
+  callSeconds = 0;
+  callTimer = setInterval(() => {
+    callSeconds++;
+    const m = String(Math.floor(callSeconds/60)).padStart(2,"0");
+    const s = String(callSeconds%60).padStart(2,"0");
+    updateCallStatus("CONNECTED • " + m + ":" + s);
+  }, 1000);
+}
+async function endCall(notify=true){
+  const old = activeCall;
+  if(notify && old?.peerId) await sendCallSignal(old.peerId, "call-end", {callId:old.id});
+  clearInterval(callTimer); callTimer=null; callSeconds=0;
+  if(peerConnection){ peerConnection.ontrack=null; peerConnection.onicecandidate=null; peerConnection.close(); }
+  if(localStream) localStream.getTracks().forEach(t=>t.stop());
+  peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[];
+  hideCallModal();
+}
+window.startCall=startCall;
+window.acceptIncomingCall=acceptIncomingCall;
+window.declineIncomingCall=declineIncomingCall;
+window.endCall=endCall;
+window.toggleMute=toggleMute;
+window.toggleCamera=toggleCamera;
+</script>
+
 </body></html>
