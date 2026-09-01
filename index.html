@@ -2355,114 +2355,194 @@ async function sendVoiceMessage(blob) {
 window.toggleVoiceRecord = toggleVoiceRecord;
 window.stopVoiceRecord = stopVoiceRecord;
 
-function setupRealtime() {
-  // Clear any previous fallback timer before creating a new one.
-  if(feedRefreshTimer) {
-    clearInterval(feedRefreshTimer);
-    feedRefreshTimer = null;
+let realtimeFeedChannel = null;
+let realtimeMessageChannel = null;
+let realtimeReconnectTimer = null;
+let realtimeStarted = false;
+
+async function teardownRealtime(){
+  if(realtimeReconnectTimer){
+    clearTimeout(realtimeReconnectTimer);
+    realtimeReconnectTimer = null;
   }
-  if(messageRefreshTimer) {
-    clearInterval(messageRefreshTimer);
-    messageRefreshTimer = null;
+  for(const ch of [realtimeFeedChannel, realtimeMessageChannel]){
+    if(ch){
+      try { await sb.removeChannel(ch); } catch(e) {}
+    }
   }
-  if(notificationRefreshTimer) {
-    clearInterval(notificationRefreshTimer);
-    notificationRefreshTimer = null;
+  realtimeFeedChannel = null;
+  realtimeMessageChannel = null;
+}
+
+function scheduleRealtimeReconnect(reason){
+  console.warn('Pixel-Friend Realtime reconnect:', reason);
+  if(realtimeReconnectTimer || !currentUser) return;
+  realtimeReconnectTimer = setTimeout(async () => {
+    realtimeReconnectTimer = null;
+    if(!currentUser) return;
+    await setupRealtime(true);
+  }, 1000);
+}
+
+async function setupRealtime(force=false){
+  if(!currentUser) return;
+
+  if(force || realtimeStarted){
+    await teardownRealtime();
   }
 
-  const channel = sb.channel('pixel-friend-live-feed-' + currentUser.id)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
-      loadFeed(true);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'reactions' }, payload => {
-      loadFeed(true);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'comments' }, payload => {
-      loadFeed(true);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'stories' }, payload => {
-      loadStories();
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' }, payload => {
-      const r = payload.new || payload.old;
+  // Clear old polling fallbacks.
+  if(feedRefreshTimer){ clearInterval(feedRefreshTimer); feedRefreshTimer=null; }
+  if(messageRefreshTimer){ clearInterval(messageRefreshTimer); messageRefreshTimer=null; }
+  if(notificationRefreshTimer){ clearInterval(notificationRefreshTimer); notificationRefreshTimer=null; }
+
+  const uid = String(currentUser.id);
+
+  // LIVE FEED CHANNEL
+  realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
+    .on('postgres_changes', {event:'*', schema:'public', table:'posts'}, () => loadFeed(true))
+    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
+    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
+    .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
+    .on('postgres_changes', {event:'*', schema:'public', table:'message_reactions'}, payload => {
+      const r=payload.new || payload.old;
       if(r && selectedUser) loadMessages();
+    })
+    .subscribe(status => {
+      feedRealtimeStatus = status;
+      console.log('Pixel-Friend FEED Realtime:', status);
+      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend feed is LIVE');
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
+        scheduleRealtimeReconnect('feed ' + status);
+      }
     });
 
-  channel.subscribe(status => {
-    feedRealtimeStatus = status;
-    console.log('Pixel-Friend feed realtime:', status);
-  });
-
-  // Dedicated message channel: only subscribe to messages addressed to the
-  // current user. This keeps the notification path small and responsive.
-  const messageChannel = sb.channel('pixel-friend-messages-' + currentUser.id)
+  // DEDICATED LIVE MESSAGE/NOTIFICATION CHANNEL
+  realtimeMessageChannel = sb.channel('pixel-friend-messages-' + uid + '-' + Date.now())
     .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'messages',
-      filter: 'receiver_id=eq.' + currentUser.id
+      event:'INSERT', schema:'public', table:'messages',
+      filter:'receiver_id=eq.' + uid
     }, async payload => {
-      const msg = payload.new;
-      if(!msg || msg.sender_id === currentUser.id) return;
+      const msg=payload.new;
+      if(!msg || String(msg.sender_id) === uid) return;
 
-      // Realtime is the primary notification path. Do not wait for a
-      // database query before showing the sender/message/count/sound.
-      if(selectedUser === msg.sender_id) {
+      // This is the real-time notification path. No polling/query is needed.
+      if(selectedUser && String(selectedUser) === String(msg.sender_id)){
         await loadMessages();
         await markChatMessagesSeen();
         return;
       }
 
-      notifyIncomingMessage(msg);
+      await notifyIncomingMessage(msg);
     })
     .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'messages',
-      filter: 'receiver_id=eq.' + currentUser.id
+      event:'UPDATE', schema:'public', table:'messages',
+      filter:'receiver_id=eq.' + uid
     }, payload => {
-      const msg = payload.new;
+      const msg=payload.new;
       if(!msg) return;
-      if(msg.sender_id === currentUser.id && selectedUser === msg.receiver_id) loadMessages();
-      // Read-state changes are reconciled without triggering another sound.
-      if(msg.is_read === true) {
-        const id = String(msg.id);
+
+      if(String(msg.sender_id) === uid &&
+         selectedUser &&
+         String(selectedUser) === String(msg.receiver_id)){
+        loadMessages();
+      }
+
+      if(msg.is_read === true){
+        const id=String(msg.id);
         knownUnreadMessageIds.delete(id);
         notificationItems.delete(id);
         renderNotificationList();
-        renderNotificationBadge(Math.max(0, localUnreadCount - 1));
+        renderNotificationBadge(Math.max(0, localUnreadCount-1));
+      }
+    })
+    .subscribe(status => {
+      console.log('Pixel-Friend MESSAGE Realtime:', status);
+      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are LIVE');
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
+        scheduleRealtimeReconnect('messages ' + status);
       }
     });
 
-  messageChannel.subscribe(status => {
-    console.log('Pixel-Friend messages realtime:', status);
-  });
+  realtimeStarted=true;
 
-  // Reliable fallback: if Realtime is not enabled for posts/comments/reactions
-  // in the Supabase project, the feed still synchronizes automatically.
-  // loadFeed() uses a signature check, so unchanged data does not rebuild the UI.
-  // Fast fallback keeps the app responsive even when Postgres Realtime is
-  // not enabled for one of the tables. Queries are lightweight and unchanged
-  // data does not rebuild the DOM.
-  feedRefreshTimer = setInterval(() => {
-    if(document.visibilityState === 'visible') { loadFeed(false); loadStories(); }
-  }, 1500);
+  // Fallback only. Realtime remains the primary path.
+  feedRefreshTimer=setInterval(() => {
+    if(document.visibilityState==='visible') {
+      loadFeed(false);
+      loadStories();
+    }
+  }, 3000);
 
-  // Message rendering fallback is separate from notifications. It only keeps
-  // an open conversation fresh if its Realtime stream is temporarily unavailable.
-  messageRefreshTimer = setInterval(() => {
-    if(document.visibilityState === 'visible' && selectedUser) loadMessages();
-  }, 800);
+  messageRefreshTimer=setInterval(() => {
+    if(document.visibilityState==='visible' && selectedUser) loadMessages();
+  }, 3000);
 
-  // Notification reconciliation is intentionally slow and is NOT the primary
-  // notification path. New-message notifications are delivered by the dedicated
-  // Realtime channel above, so sound/count/detail are not held behind polling.
-  notificationRefreshTimer = setInterval(() => {
-    if(document.visibilityState === 'visible' && currentUser) {
+  // Slow reconciliation only; this does NOT control live notifications.
+  notificationRefreshTimer=setInterval(() => {
+    if(document.visibilityState==='visible' && currentUser){
       updateNotificationBadge({notify:false});
     }
-  }, 5000);
+  }, 15000);
 }
+
+// Reconnect immediately when the browser returns online or the tab becomes visible.
+window.addEventListener('online', () => scheduleRealtimeReconnect('browser online'));
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible' && currentUser){
+    scheduleRealtimeReconnect('tab visible');
+  }
+});
+
+async function restoreSession() {
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+
+    if (data?.session?.user) {
+      await startApp(data.session.user);
+    } else {
+      currentUser = null;
+      currentProfile = null;
+      $("authScreen").style.display = "grid";
+      $("app").style.display = "none";
+    }
+  } catch (err) {
+    console.error("Session restore failed:", err);
+    toast("⚠️ Unable to restore your session. Please log in again.");
+    $("authScreen").style.display = "grid";
+    $("app").style.display = "none";
+  }
+}
+
+// Keep the logged-in session when the page is refreshed.
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT" || !session) {
+    notificationInitialized = false;
+    knownUnreadMessageIds.clear();
+    notificationProfileCache.clear();
+    notificationItems.clear();
+    teardownRealtime();
+    if(presenceChannel) stopPresence();
+    currentUser = null;
+    currentProfile = null;
+    realtimeStarted = false;
+    $("authScreen").style.display = "grid";
+    $("app").style.display = "none";
+  }
+});
+
+async function logout() {
+  notificationInitialized = false;
+  knownUnreadMessageIds.clear();
+  notificationProfileCache.clear();
+  notificationItems.clear();
+  await teardownRealtime();
+  realtimeStarted = false;
+  await stopPresence();
+  await sb.auth.signOut();
+}
+window.logout = logout;
 
 async function restoreSession() {
   try {
