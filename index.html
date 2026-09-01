@@ -501,6 +501,11 @@ async function startApp(user){
   $("app").style.display = "block";
   playRetroSound('success');
   await loadProfile();
+  // IMPORTANT: subscribe to this user's call channel immediately.
+  // Supabase Broadcast messages are not stored, so a late subscription can miss
+  // an incoming call while the app is still loading friends/feed/stories.
+  const callSignalingStarted = await setupCallSignaling();
+  if(!callSignalingStarted) console.warn("Call signaling did not subscribe during app startup");
   await applyPendingInvite();
 
   if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
@@ -514,7 +519,7 @@ async function startApp(user){
 
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
-  await setupCallSignaling();
+  // Call signaling was started before the slower app data loads above.
   if("Notification" in window && Notification.permission==="default") Notification.requestPermission().catch(()=>{});
   await setupPresence();
   page("home");
@@ -2762,7 +2767,8 @@ async function sendCallSignal(targetUserId, event, payload){
       if(status === "SUBSCRIBED"){
         try{
           const result = await channel.send({type:"broadcast", event, payload:{...payload, from:currentUser.id}});
-          done(result === "ok" || result === "timed out" ? true : true);
+          // Only report success when Supabase confirms the broadcast was accepted.
+          done(result === "ok");
         }catch(e){ done(false); }
       } else if(status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED"){
         done(false);
@@ -2864,11 +2870,12 @@ async function startCall(mode){
     await createPeer(mode);
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-    await sendCallSignal(selectedUser, "call-offer", {
+    const offerSent = await sendCallSignal(selectedUser, "call-offer", {
       callId:activeCall.id, mode, offer:peerConnection.localDescription,
       callerName: currentProfile?.username || "PIXEL FRIEND",
       callerAvatar: currentProfile?.avatar || "👾"
     });
+    if(!offerSent) throw new Error("The call invitation could not be delivered. The other user may not be connected to Realtime.");
   }catch(e){
     console.error(e); toast("❌ Unable to start call: " + (e.message || "permission denied"));
     endCall(false);
