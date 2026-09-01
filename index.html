@@ -2575,6 +2575,8 @@ let ringAudioContext = null;
 let originalTitle = document.title;
 let titleTimer = null;
 let callTimeout = null;
+let callChannelReady = false;
+let remoteStream = new MediaStream();
 
 /* TURN-ready configuration.
    Replace the TURN values below with credentials from a TURN provider/server you own.
@@ -2641,7 +2643,8 @@ function notifyCall(title, body, tag="pixel-friend-call"){
 }
 function playRingTone(kind="incoming"){
   stopRingTone();
-  ringAudioContext = new (window.AudioContext||window.webkitAudioContext)();
+  ringAudioContext = (audioUnlocked && retroAudioCtx) ? retroAudioCtx : new (window.AudioContext||window.webkitAudioContext)();
+  if(ringAudioContext.state === "suspended") ringAudioContext.resume().catch(()=>{});
   const beep = ()=>{
     if(!ringAudioContext) return;
     const o=ringAudioContext.createOscillator(), g=ringAudioContext.createGain();
@@ -2658,7 +2661,7 @@ function playRingTone(kind="incoming"){
 }
 function stopRingTone(){
   if(ringTimer){clearInterval(ringTimer);ringTimer=null;}
-  if(ringAudioContext){ringAudioContext.close().catch(()=>{});ringAudioContext=null;}
+  if(ringAudioContext && ringAudioContext !== retroAudioCtx){ringAudioContext.close().catch(()=>{});} ringAudioContext=null;
   if(navigator.vibrate) navigator.vibrate(0);
 }
 function startTitleAlert(text){
@@ -2691,7 +2694,10 @@ function enableCallButtons(){
 }
 
 async function setupCallSignaling(){
-  if(!currentUser || callChannel) return;
+  if(!currentUser) return false;
+  if(callChannel && callChannelReady) return true;
+  if(callChannel){ try{ sb.removeChannel(callChannel); }catch(e){} }
+  callChannelReady = false;
   callChannel = sb.channel("pixel-call:" + currentUser.id, { config:{ broadcast:{ self:false } } });
   callChannel
     .on("broadcast", {event:"call-offer"}, ({payload}) => receiveCallOffer(payload))
@@ -2700,12 +2706,18 @@ async function setupCallSignaling(){
     .on("broadcast", {event:"call-ice"}, ({payload}) => receiveIce(payload))
     .on("broadcast", {event:"call-decline"}, ({payload}) => receiveCallDecline(payload))
     .on("broadcast", {event:"call-end"}, ({payload}) => receiveCallEnd(payload))
-    .on("broadcast", {event:"call-cancel"}, ({payload}) => receiveCallCancel(payload))
-    .subscribe();
+    .on("broadcast", {event:"call-cancel"}, ({payload}) => receiveCallCancel(payload));
+  return await new Promise(resolve => {
+    const timer=setTimeout(()=>resolve(false),6000);
+    callChannel.subscribe(status => {
+      if(status === "SUBSCRIBED"){ callChannelReady=true; clearTimeout(timer); resolve(true); }
+      if(status === "CHANNEL_ERROR" || status === "TIMED_OUT"){ clearTimeout(timer); resolve(false); }
+    });
+  });
 }
-
 async function sendCallSignal(targetUserId, event, payload){
-  if(!callChannel || !targetUserId) return;
+  if(!targetUserId) return;
+  if(!callChannelReady){ const ok = await setupCallSignaling(); if(!ok) return; }
   const channel = sb.channel("pixel-call:" + targetUserId);
   await new Promise(resolve => {
     const timeout = setTimeout(resolve, 1200);
@@ -2732,21 +2744,19 @@ async function createPeer(mode){
       await sendCallSignal(activeCall.peerId, "call-ice", {candidate:e.candidate.toJSON(), callId:activeCall.id});
     }
   };
+  remoteStream = new MediaStream();
   peerConnection.ontrack = async e => {
-    const stream = e.streams?.[0] || new MediaStream([e.track]);
-    if(e.track.kind === "audio"){
-      $("remoteAudio").srcObject = stream;
-      $("remoteAudio").muted = false;
-      $("remoteAudio").volume = 1;
-      await unlockRemoteAudio();
-    }
-    if(e.track.kind === "video") $("remoteVideo").srcObject = stream;
-    e.track.onunmute = async () => {
-      if(e.track.kind === "audio") await unlockRemoteAudio();
-    };
-    updateCallStatus("CONNECTED");
-    clearCallAlerts();
-    startCallTimer();
+    const track = e.track;
+    if(!remoteStream.getTracks().some(t=>t.id===track.id)) remoteStream.addTrack(track);
+    const audio = $("remoteAudio");
+    audio.srcObject = remoteStream;
+    audio.autoplay = true; audio.playsInline = true; audio.muted = false; audio.volume = 1;
+    $("remoteVideo").srcObject = remoteStream;
+    const forcePlay = async () => { try{ await audio.play(); }catch(err){ console.warn("Remote audio blocked", err); } };
+    track.onunmute = forcePlay;
+    audio.onloadedmetadata = forcePlay;
+    await forcePlay();
+    updateCallStatus("CONNECTED"); clearCallAlerts(); startCallTimer();
   };
   peerConnection.onconnectionstatechange = () => {
     const state = peerConnection?.connectionState;
@@ -2774,6 +2784,8 @@ async function startCall(mode){
   if(!selectedUser || !currentUser) return toast("Select a friend first.");
   if(!navigator.mediaDevices?.getUserMedia) return toast("Voice/video calling requires HTTPS or localhost.");
   try{
+    const signalingReady = await setupCallSignaling();
+    if(!signalingReady) return toast("❌ Call signaling is not connected yet. Please wait and try again.");
     activeCall = {id:crypto.randomUUID(), peerId:selectedUser, mode, outgoing:true};
     showCallModal(mode, "CALLING " + callUserName().toUpperCase() + "...");
     showCallAlert(mode==="video"?"🎥 Video Calling":"📞 Calling", "Calling " + callUserName() + "...", mode==="video"?"🎥":"📞");
@@ -2801,6 +2813,7 @@ async function receiveCallOffer(p){
     await sendCallSignal(p.from, "call-decline", {callId:p.callId, reason:"busy"});
     return;
   }
+  await setupCallSignaling();
   incomingCall = p;
   activeCall = {id:p.callId, peerId:p.from, mode:p.mode, outgoing:false};
   $("callAvatar").textContent = p.callerAvatar || "👾";
@@ -2895,7 +2908,7 @@ async function endCall(notify=true){
   const remoteAudio = $("remoteAudio");
   if(remoteAudio){ try{ remoteAudio.pause(); }catch(e){} remoteAudio.srcObject=null; }
   if(localStream) localStream.getTracks().forEach(t=>t.stop());
-  peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[];
+  peerConnection=null; localStream=null; activeCall=null; incomingCall=null; pendingIce=[]; remoteStream=new MediaStream();
   hideCallModal();
 }
 window.startCall=startCall;
