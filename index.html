@@ -2725,56 +2725,66 @@ function enableCallButtons(){
 }
 
 async function setupCallSignaling(){
-  if(!currentUser) return false;
+  if(!currentUser || !sb) return false;
   if(callChannel && callChannelReady) return true;
   if(callChannel){ try{ sb.removeChannel(callChannel); }catch(e){} }
   callChannelReady = false;
-  callChannel = sb.channel("pixel-call:" + currentUser.id, { config:{ broadcast:{ self:false } } });
+
+  // One shared signaling room is more reliable than creating/removing a new
+  // per-recipient channel for every signal. Each payload contains targetUserId
+  // and clients ignore signals not addressed to them.
+  callChannel = sb.channel("pixel-friend-calls", { config:{ broadcast:{ self:false } } });
+
+  const receive = (event, handler) => ({payload}) => {
+    if(!payload || payload.targetUserId !== currentUser?.id) return;
+    handler(payload);
+  };
+
   callChannel
-    .on("broadcast", {event:"call-offer"}, ({payload}) => receiveCallOffer(payload))
-    .on("broadcast", {event:"call-answer"}, ({payload}) => receiveCallAnswer(payload))
-    .on("broadcast", {event:"call-accepted"}, ({payload}) => receiveCallAccepted(payload))
-    .on("broadcast", {event:"call-ice"}, ({payload}) => receiveIce(payload))
-    .on("broadcast", {event:"call-decline"}, ({payload}) => receiveCallDecline(payload))
-    .on("broadcast", {event:"call-end"}, ({payload}) => receiveCallEnd(payload))
-    .on("broadcast", {event:"call-cancel"}, ({payload}) => receiveCallCancel(payload));
+    .on("broadcast", {event:"call-offer"}, receive("call-offer", receiveCallOffer))
+    .on("broadcast", {event:"call-answer"}, receive("call-answer", receiveCallAnswer))
+    .on("broadcast", {event:"call-accepted"}, receive("call-accepted", receiveCallAccepted))
+    .on("broadcast", {event:"call-ice"}, receive("call-ice", receiveIce))
+    .on("broadcast", {event:"call-decline"}, receive("call-decline", receiveCallDecline))
+    .on("broadcast", {event:"call-end"}, receive("call-end", receiveCallEnd))
+    .on("broadcast", {event:"call-cancel"}, receive("call-cancel", receiveCallCancel));
+
   return await new Promise(resolve => {
-    const timer=setTimeout(()=>resolve(false),6000);
+    const timer=setTimeout(()=>resolve(false),8000);
     callChannel.subscribe(status => {
-      if(status === "SUBSCRIBED"){ callChannelReady=true; clearTimeout(timer); resolve(true); }
-      if(status === "CHANNEL_ERROR" || status === "TIMED_OUT"){ clearTimeout(timer); resolve(false); }
+      if(status === "SUBSCRIBED"){
+        callChannelReady=true;
+        clearTimeout(timer);
+        console.log("Pixel-Friend call signaling ready", currentUser.id);
+        resolve(true);
+      }
+      if(status === "CHANNEL_ERROR" || status === "TIMED_OUT"){
+        clearTimeout(timer);
+        console.error("Pixel-Friend call signaling error", status);
+        resolve(false);
+      }
     });
   });
 }
+
 async function sendCallSignal(targetUserId, event, payload){
-  if(!targetUserId || !currentUser) return false;
+  if(!targetUserId || !currentUser || !sb) return false;
   if(!callChannelReady){
     const ok = await setupCallSignaling();
     if(!ok) return false;
   }
-  const channel = sb.channel("pixel-call:" + targetUserId, { config:{ broadcast:{ self:false } } });
-  return await new Promise(resolve => {
-    let finished = false;
-    const done = async ok => {
-      if(finished) return;
-      finished = true;
-      clearTimeout(timeout);
-      try { await sb.removeChannel(channel); } catch(e) {}
-      resolve(ok);
-    };
-    const timeout = setTimeout(() => done(false), 5000);
-    channel.subscribe(async status => {
-      if(status === "SUBSCRIBED"){
-        try{
-          const result = await channel.send({type:"broadcast", event, payload:{...payload, from:currentUser.id}});
-          // Only report success when Supabase confirms the broadcast was accepted.
-          done(result === "ok");
-        }catch(e){ done(false); }
-      } else if(status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED"){
-        done(false);
-      }
+  try{
+    const result = await callChannel.send({
+      type:"broadcast",
+      event,
+      payload:{...payload, from:currentUser.id, targetUserId}
     });
-  });
+    console.log("Call signal", event, "to", targetUserId, result);
+    return result === "ok";
+  }catch(e){
+    console.error("Call signal send failed", event, e);
+    return false;
+  }
 }
 
 async function unlockRemoteAudio(){
