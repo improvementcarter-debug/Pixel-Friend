@@ -1,451 +1,315 @@
-
-
-
-
-
-
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pixel-Friend</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-
-</script><style>@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');*{box-sizing:border-box}:root{  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;}html,body{margin:0;min-height:100%;background:var(--bg)}body{  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;  letter-spacing:.25px;  background:    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);  background-size:8px 8px,8px 8px,100% 100%;}body:before{  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);}button,input,textarea,select{font:inherit}button{cursor:pointer}h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{  font-family:"Press Start 2P",Consolas,monospace;}h1{font-size:20px;line-height:1.55}h2{font-size:15px;line-height:1.6}h3{font-size:13px}.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.auth-screen{  min-height:100vh;display:grid;place-items:center;padding:20px;  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;}.card,.auth-card{  background:linear-gradient(180deg,#111b2d,#0b1220);  border:2px solid var(--border);border-radius:4px;  box-shadow:6px 6px 0 var(--shadow);}.auth-card{width:min(460px,100%);padding:28px;}.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px}.tagline{text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}.tabs button,.menu button,.icon,.notification-button,.secondary{  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;  padding:11px 12px;box-shadow:3px 3px 0 #050912;}.tabs .active,.primary{  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;}.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}button:active{transform:translate(2px,2px)}input,textarea,select{  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;  padding:12px;margin-bottom:12px;outline:none;}input:focus,textarea:focus,select:focus{border-color:var(--cyan)}textarea{min-height:100px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}.app{display:none}.topbar{  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;}.brand{font-size:14px;cursor:pointer}.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:200px;margin:0}.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}.mini{text-align:center}.avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}.presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#667085;vertical-align:middle}.presence-dot.presence-online{position:static;width:8px;height:8px;border:0;background:var(--green);display:inline-block}.presence-label{font-size:11px;letter-spacing:.4px}.presence-label.online-label{color:var(--green)}.presence-label.offline-label{color:#8892a8}.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;  border:2px solid #36547d;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}.user-avatar{width:46px;height:46px;font-size:24px}.post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}.post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.post-author{display:flex;align-items:center;gap:12px}.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}.post-audio,.msg-audio{width:100%;margin-top:8px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}.react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}.react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}.comment-section{margin-top:14px;background:#09101d;padding:12px;border:1px solid #1c2c47;border-radius:2px}.comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}.comment-reply-preview{background:#060c16;border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.messages-layout{display:grid;grid-template-columns:280px 1fr;min-height:640px}.chat-users{border-right:2px solid var(--border);padding-right:15px}.chat-user{padding:12px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;position:relative}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}.message-wrap.mine{align-self:flex-end;align-items:flex-end}.message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}.message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}.message:not(.mine){border-bottom-left-radius:2px}.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}.typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}.chat-controls{display:flex;gap:8px;align-items:center}.chat-controls input{margin:0}.file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}.notification-wrap{position:relative}.notification-panel{position:absolute;right:0;top:50px;width:min(390px,calc(100vw - 30px));background:#0b1423;border:2px solid var(--border);box-shadow:5px 5px 0 #02050b;z-index:1000}.notification-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:2px solid var(--border);font-size:12px}.notification-clear{background:#15233a;border:1px solid #2b3d5d;color:#dce8ff;padding:5px 7px;font-size:10px}.notification-list{max-height:430px;overflow-y:auto}.notification-item{display:flex;gap:10px;padding:11px;border-bottom:1px solid #1c2c47;cursor:pointer;background:#0d1829}.notification-item:hover{background:#162945}.notification-item.unread{border-left:4px solid var(--cyan)}.notification-item-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;background:#16263e;border:1px solid #35517a}.notification-item-body{min-width:0}.notification-item-title{font-size:16px;font-weight:bold}.notification-item-text{font-size:16px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;margin-top:3px;color:#eaf2ff}.notification-item-time{font-size:12px;color:var(--muted);margin-top:4px}.notification-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:14px}@media(max-width:600px){.notification-panel{right:-48px}}.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}.recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}@keyframes pulse{from{opacity:1}to{opacity:0.5}}@media(max-width:850px){  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}}.message-status{display:block;margin-top:4px;text-align:right;font-size:11px;color:var(--muted);letter-spacing:.5px}.message-status.seen{color:var(--cyan);font-weight:bold}.message-wrap:not(.mine) .message-status{text-align:left}
-.message-tools{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;opacity:.9}
-.message-tool{background:#0b1729;border:1px solid #355174;color:#dce8ff;padding:4px 7px;border-radius:3px;font-size:13px;box-shadow:2px 2px 0 #050912}
-.message-tool:hover{border-color:var(--cyan);color:#fff}
-.message-reply-preview{background:#091321;border-left:3px solid var(--cyan);padding:6px 8px;margin-bottom:7px;font-size:14px;color:#bcd7f7;max-width:100%;overflow:hidden}
-.message-sticker{font-size:54px;line-height:1.1;text-align:center;padding:2px 4px}
-.message-reactions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.message-reaction{background:#0a1526;border:1px solid #355174;border-radius:10px;padding:2px 7px;font-size:14px;cursor:pointer}
-.message-reaction.mine{border-color:var(--cyan);background:#163451}
-.reply-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#091522;border:1px solid var(--cyan);padding:7px 10px;margin-bottom:4px;font-size:14px}
-.sticker-picker{display:flex;gap:6px;flex-wrap:wrap;background:#091522;border:2px solid #30415f;padding:9px;margin-bottom:5px}
-.sticker-picker button{background:#14233b;border:1px solid #355174;padding:6px 9px;font-size:25px;border-radius:3px}
-.account-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;margin-left:6px;border:1px solid #355174;border-radius:10px;font-size:11px;letter-spacing:.3px;vertical-align:middle}.account-badge.real{color:var(--cyan);border-color:#3574a8;background:#10263c}.account-badge.guest{color:var(--yellow);border-color:#735b28;background:#2a210f}.account-badge.small{font-size:10px;padding:2px 5px;margin-left:4px}.account-badge{font-family:"Press Start 2P",Consolas,monospace;font-weight:900;white-space:nowrap;box-shadow:2px 2px 0 #050912}.account-badge.guest{border-color:var(--yellow);box-shadow:0 0 0 1px rgba(255,211,78,.18),2px 2px 0 #050912}.account-badge.real{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(67,231,255,.15),2px 2px 0 #050912}.account-type-banner{margin:10px auto 14px;padding:10px 12px;border:2px solid var(--cyan);background:#0b1b2c;color:var(--cyan);font-family:"Press Start 2P",Consolas,monospace;font-size:11px;line-height:1.6;max-width:360px;box-shadow:3px 3px 0 #050912}.account-type-banner.guest{border-color:var(--yellow);background:#211b0b;color:var(--yellow)}.account-type-banner .sub{display:block;font-family:"VT323",Consolas,monospace;font-size:17px;letter-spacing:.3px;margin-top:4px;color:#dce8ff}.guest-user .avatar,.guest-user .user-avatar{border-color:var(--yellow)}.guest-user .topbar{border-bottom-color:#735b28}.guest-note{font-size:14px;color:var(--muted);text-align:center;margin:10px 0 0}.auth-guest{margin-top:10px;width:100%}
-/* STORY SYSTEM */
-.story-section{margin-bottom:20px;padding:16px;overflow:hidden}.story-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.story-row{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 10px;scrollbar-color:#36557c #08101d}.story-card{width:92px;min-width:92px;text-align:center;cursor:pointer}.story-ring{width:74px;height:74px;margin:0 auto 6px;padding:3px;border:2px solid var(--cyan);background:#101a2b;box-shadow:3px 3px 0 #02050b;position:relative}.story-ring.seen{border-color:#46546d;opacity:.75}.story-ring img,.story-ring video,.story-avatar-fallback{width:100%;height:100%;object-fit:cover;background:#17263f;display:grid;place-items:center;font-size:30px}.story-add{border-color:var(--green);display:grid;place-items:center;font-size:28px}.story-name{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* ===== STORY REACTIONS + CLICKABLE LINKS UPGRADE ===== */
-.story-reactions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:10px 14px 14px;border-top:1px solid rgba(255,255,255,.12);background:rgba(4,10,18,.28)}
-.story-react-btn{min-width:42px;padding:7px 9px;background:#13223a;border:1px solid #35557d;color:#e9f5ff;border-radius:999px;transition:.16s transform,.16s background,.16s border-color;font-size:16px;line-height:1}
-.story-react-btn:hover{transform:translateY(-2px);border-color:var(--cyan);background:#1a3456}.story-react-btn.active{background:#244f7e;border-color:var(--cyan);box-shadow:0 0 12px rgba(67,231,255,.25)}
-.story-react-count{font-size:13px;margin-left:3px;color:#cce7ff}.story-reaction-summary{margin-left:auto;color:var(--muted);font-size:13px}
-.clickable-link{color:#65caff;text-decoration:underline;text-underline-offset:3px;word-break:break-all}.clickable-link:hover{color:#9fe9ff}
-.story-view-body img{loading:lazy}.story-view-body video{preload:metadata}
-.story-modal{position:fixed;inset:0;background:rgba(1,4,10,.96);z-index:1200;display:grid;place-items:center;padding:16px}.story-viewer{width:min(470px,100%);height:min(760px,calc(100vh - 32px));background:#07101d;border:2px solid var(--border);display:flex;flex-direction:column;box-shadow:8px 8px 0 #000}.story-progress{display:flex;gap:4px;padding:8px}.story-progress span{height:4px;flex:1;background:#33445f}.story-progress span.active{background:var(--cyan)}.story-view-head{display:flex;align-items:center;gap:10px;padding:8px 12px}.story-view-user{flex:1;min-width:0}.story-view-body{flex:1;display:grid;place-items:center;overflow:hidden;position:relative;background:#030811}.story-view-body img,.story-view-body video{width:100%;height:100%;object-fit:contain}.story-text{padding:28px;text-align:center;font-size:30px;line-height:1.3;white-space:pre-wrap;word-break:break-word}.story-nav{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr}.story-nav button{border:0;background:transparent;color:transparent}.story-caption{padding:12px 16px;background:#09111f;min-height:58px}.story-empty{color:var(--muted);padding:12px;font-size:16px}.story-form{display:grid;gap:8px}.story-form textarea{margin:0}.story-upload-label{display:block;border:2px dashed #36547d;padding:12px;text-align:center;cursor:pointer;background:#0a1526}.story-upload-label input{display:none}.story-meta{font-size:13px;color:var(--muted)}
-
-/* FIXED APP LAYOUT: top bar and sidebar stay visible while main content scrolls */
-@media (min-width:851px){
-  html, body{height:100%;overflow:hidden;}
-  .app{height:100vh;overflow:hidden;}
-  .topbar{position:fixed;top:0;left:0;right:0;height:62px;z-index:100;box-sizing:border-box;}
-  .layout{height:100vh;padding-top:62px;min-height:0;overflow:hidden;}
-  .side{position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;overflow-x:hidden;}
-  main{height:calc(100vh - 62px);max-height:calc(100vh - 62px);overflow-y:auto;overflow-x:hidden;padding:24px;}
-  .menu .danger{position:sticky;bottom:0;background:#301629!important;z-index:2;}
-}
-@media (max-width:850px){
-  .topbar{position:sticky;top:0;z-index:100;}
-  html,body{overflow-x:hidden;}
-}
-
-/* ===== PIXEL-FRIEND NEXT-GEN DASHBOARD ===== */
-:root{--glow-blue:rgba(78,161,255,.34);--glow-purple:rgba(155,108,255,.32);--glow-pink:rgba(255,79,145,.24)}
-.topbar{background:linear-gradient(90deg,#070d18,#0a1120 55%,#10122a)!important;border-bottom:1px solid #263b60!important;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-.brand{font-size:18px!important;background:linear-gradient(90deg,var(--cyan),#82aaff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none!important}
-.brand-icon{color:#fff!important;background:#121c31;border:1px solid #35527c;padding:7px 10px;margin-right:7px;display:inline-block;box-shadow:0 0 18px var(--glow-purple)}
-.actions input{width:320px!important;background:#0a1120!important;border-color:#263c63!important;border-radius:10px!important;padding-left:15px!important}
-.side{background:linear-gradient(180deg,#0a1220,#090f1d)!important;border-right:1px solid #253958!important;box-shadow:10px 0 28px rgba(0,0,0,.2)}
-.mini{background:linear-gradient(135deg,rgba(30,52,86,.45),rgba(12,19,33,.6));border:1px solid #2a4166;border-radius:14px;padding:16px 10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
-.avatar{border-radius:18px!important;box-shadow:0 0 24px var(--glow-blue);border-color:#48698e!important}
-.menu{gap:8px!important}.menu button{border:1px solid transparent!important;border-radius:10px!important;padding:12px 13px!important;color:#aebcd2!important;transition:.18s ease!important}.menu button:hover{background:#131f35!important;color:#fff!important;border-color:#314b73!important}.menu button.active{background:linear-gradient(90deg,rgba(110,59,220,.34),rgba(34,39,94,.5))!important;border-color:#754bda!important;border-left:3px solid var(--pink)!important;box-shadow:0 0 20px rgba(122,72,255,.15)}
-.home-dashboard{display:grid;gap:16px}.home-welcome{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;background:linear-gradient(135deg,rgba(41,74,121,.45),rgba(18,25,55,.7) 55%,rgba(67,31,87,.55));border:1px solid #314b75;border-radius:14px;box-shadow:0 10px 28px rgba(0,0,0,.22)}.home-welcome h1{margin:0 0 8px;font-size:17px}.home-welcome p{margin:0;color:#91a3c1}.welcome-actions{display:flex;gap:8px;flex-wrap:wrap}.quick-btn{background:#111d32;border:1px solid #344f78;color:#cfe5ff;border-radius:9px;padding:9px 11px}.quick-btn:hover{border-color:var(--cyan);box-shadow:0 0 18px var(--glow-blue)}
-.home-columns{display:grid;grid-template-columns:minmax(280px,340px) minmax(420px,1fr) minmax(250px,300px);gap:16px;align-items:start}.home-left,.home-center,.home-right{min-width:0}.home-left{display:grid;gap:16px}.home-center{min-width:0}.home-right{display:grid;gap:14px;position:sticky;top:12px}
-.card,.user-card,.post-card{border:1px solid #2b4266!important;border-radius:12px!important;background:linear-gradient(180deg,#0e1829,#0a1220)!important;box-shadow:0 10px 28px rgba(0,0,0,.22)}
-.story-section{padding:15px!important;border-radius:14px!important;background:linear-gradient(90deg,#101a30,#0d1729)!important}.story-ring{width:76px!important;height:76px!important;border-radius:50%!important;border-width:3px!important;box-shadow:0 0 18px var(--glow-purple)}.story-card{width:94px!important;min-width:94px!important}.story-add{background:radial-gradient(circle,rgba(61,179,220,.22),#101a2b)!important}.story-name{color:#c8d7ec}
-.composer-card{padding:18px!important}.composer-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.composer-card textarea{border-radius:12px!important;min-height:135px!important;background:#09111f!important;border-color:#263d61!important}.media-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.media-actions button{padding:10px 6px!important;font-size:15px}.publish-wide{width:100%;margin-top:12px;padding:14px!important;border-radius:10px!important;background:linear-gradient(90deg,#7635e9,#3d9ef8)!important;color:white!important;border-color:#6baeff!important;box-shadow:0 8px 25px rgba(90,74,255,.28)!important}
-.feed-shell{padding:0!important;overflow:hidden}.feed-tabs{display:flex;align-items:center;gap:24px;padding:14px 18px;border-bottom:1px solid #243b5c}.feed-tabs button{background:transparent;border:0;color:#95a7c5;padding:6px 0}.feed-tabs button.active{color:#fff;border-bottom:2px solid var(--purple)}.feed-tabs .filter{margin-left:auto}.feed-shell #feed{padding:0 16px 16px}.post-card{margin-top:14px!important}.post-card:first-child{margin-top:16px!important}
-.rail-card{padding:16px;border:1px solid #2b4266;border-radius:12px;background:linear-gradient(135deg,#10192c,#0c1322);box-shadow:0 10px 24px rgba(0,0,0,.18)}.rail-title{font-family:"Press Start 2P",monospace;font-size:11px;color:#c8d4ef;margin-bottom:14px}.level-hero{display:flex;align-items:center;gap:12px}.level-orb{font-size:40px;width:60px;height:60px;display:grid;place-items:center;background:radial-gradient(circle,rgba(139,92,246,.32),#101b2e);border:1px solid #7a52d7;border-radius:50%;box-shadow:0 0 20px var(--glow-purple)}.rail-xp{height:9px;background:#172238;border-radius:999px;overflow:hidden;margin:10px 0}.rail-xp>span{display:block;height:100%;width:0%;background:linear-gradient(90deg,#7d4cff,#d6a8ff);border-radius:999px;transition:width .35s ease}.rank-row{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid #1d2c45}.rank-row:last-child{border-bottom:0}.rank-num{width:23px;color:#ffcc57;font-weight:bold}.rank-avatar{width:28px;height:28px;display:grid;place-items:center;background:#15233a;border:1px solid #365174;border-radius:8px}.rank-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trend{display:flex;justify-content:space-between;padding:6px 0;color:#7dd8ff}.trend small{color:#8292b3}.bonus-card{background:linear-gradient(135deg,rgba(97,30,108,.72),rgba(60,31,89,.8),rgba(160,84,24,.55));border-color:#b44dd8}.bonus-row{display:flex;align-items:center;justify-content:space-between}.bonus-xp{font-size:26px;color:#ffd34e;font-weight:bold}.bonus-chest{font-size:48px;filter:drop-shadow(0 0 14px rgba(255,174,55,.4))}.claim-btn{padding:7px 12px;background:#d248a2;border:1px solid #ff9bd3;color:#fff;border-radius:8px;font-weight:bold}.claim-btn.claimed{opacity:.65;filter:grayscale(.7)}
-.follow-list{display:grid;gap:8px}.follow-mini{display:flex;align-items:center;gap:9px;padding:8px;background:#0b1423;border:1px solid #213755;border-radius:9px}.follow-mini .mini-av{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;background:#17263f}.follow-mini .follow-name{flex:1;overflow:hidden}.follow-mini button{padding:5px 9px;background:#12233a;border:1px solid #365174;color:#9fd6ff;border-radius:7px}
-@media(max-width:1250px){.home-columns{grid-template-columns:minmax(270px,330px) minmax(420px,1fr)}.home-right{grid-column:1/-1;position:static;grid-template-columns:repeat(2,minmax(0,1fr));display:grid}.home-right .bonus-card{grid-column:span 2}.actions input{width:220px!important}}
-@media(max-width:950px){.home-columns{grid-template-columns:1fr}.home-right{grid-template-columns:1fr}.home-right .bonus-card{grid-column:auto}.home-welcome{align-items:flex-start;flex-direction:column}.actions input{width:160px!important}}
-@media(max-width:600px){.home-right{display:grid}.media-actions{grid-template-columns:1fr}.story-card{width:78px!important;min-width:78px!important}.story-ring{width:64px!important;height:64px!important}}
-
-
-/* POST VIEW + SHARE */
-.post-engagement{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid rgba(48,65,95,.55)}
-.post-action-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:105px;padding:8px 12px;background:#101d31;border:1px solid #314d73;border-radius:6px;color:#dce8ff;box-shadow:2px 2px 0 #050912;transition:transform .15s,border-color .15s,box-shadow .15s}
-.post-action-btn:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(67,231,255,.18),2px 2px 0 #050912;transform:translateY(-1px)}
-.post-action-btn.share{border-color:#7b55bf;color:#e2ccff;background:linear-gradient(135deg,#151431,#221635)}
-.post-action-btn.view{border-color:#356d9f;color:#a9d8ff}
-.post-view-count{font-size:15px;color:var(--muted);margin-left:auto}
-.post-view-modal{position:fixed;inset:0;background:rgba(2,6,15,.82);backdrop-filter:blur(8px);z-index:1500;display:grid;place-items:center;padding:20px}
-.post-view-dialog{width:min(760px,100%);max-height:calc(100vh - 40px);overflow:auto;background:linear-gradient(180deg,#111b2d,#08111f);border:2px solid #3c5b86;border-radius:10px;box-shadow:0 0 0 1px rgba(67,231,255,.12),10px 10px 0 #02050b}
-.post-view-head{position:sticky;top:0;z-index:2;background:#0b1423;border-bottom:1px solid #2b405f;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.post-view-body{padding:18px}
-.post-view-close{width:38px;height:38px;padding:0;display:grid;place-items:center;font-size:18px}
-.post-view-media{width:100%;max-height:520px;object-fit:contain;background:#030811;border:1px solid #314d73;border-radius:7px;margin-top:12px}
-.post-view-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:15px;margin-top:6px}
-.post-view-text{font-size:22px;line-height:1.35;white-space:pre-wrap;word-break:break-word;margin-top:14px}
-.post-view-footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid #223651}
-@media(max-width:650px){.post-action-btn{min-width:0;flex:1}.post-view-count{width:100%;margin-left:0}.post-view-dialog{max-height:calc(100vh - 20px)}.post-view-modal{padding:10px}}
-
-.follow-action-btn{min-height:34px;font-size:13px;font-weight:700;white-space:nowrap}
-.follow-action-btn[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--cyan)}
-
-
-/* INVITE FRIENDS */
-.invite-modal{position:fixed;inset:0;z-index:10000;background:rgba(2,7,18,.82);display:grid;place-items:center;padding:18px}.invite-card{width:min(560px,100%);background:#0b1423;border:1px solid #365174;border-radius:18px;padding:22px;box-shadow:0 0 32px rgba(0,229,255,.16)}.invite-card h2{margin:0 0 8px}.invite-link{width:100%;box-sizing:border-box;margin:12px 0;padding:13px;background:#07101d;border:1px solid #294968;border-radius:10px;color:#bfeaff;font-family:monospace}.invite-actions{display:flex;gap:10px;flex-wrap:wrap}.invite-actions button{flex:1;min-width:150px}.invite-stats{margin-top:12px;padding:10px;border:1px dashed #365174;border-radius:10px;color:#9db3c9}.invite-joined{margin-top:8px;color:#8fffc1}
-
-/* Telegram-style paste media */
-.paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
-
-/* ===== PIXEL-FRIEND ARCADE ===== */
-.arcade-page{padding:20px;max-width:1100px;margin:0 auto}.arcade-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;padding:22px;border:1px solid #34547e;border-radius:16px;background:linear-gradient(135deg,#111c31,#0a1220);box-shadow:0 0 30px rgba(67,231,255,.08)}
-.arcade-title{margin:0;font-size:28px}.arcade-sub{color:var(--muted);margin-top:8px}.game-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.game-card{border:1px solid #2d466a;border-radius:16px;background:linear-gradient(180deg,#101a2d,#09111e);padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
-.game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
-.pet-stage{min-height:180px;display:grid;place-items:center;border:1px solid #2d466a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#182b48,#08111d 70%);margin:12px 0}.pixel-pet{font-size:100px;filter:drop-shadow(0 0 18px rgba(67,231,255,.3));animation:pfPetBounce .7s infinite alternate}@keyframes pfPetBounce{to{transform:translateY(-8px) scale(1.03)}}
-.target-food{text-align:center;font-size:18px;margin:12px 0}.target-food span{font-size:36px}.food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.food-btn{min-height:76px;font-size:40px;border:1px solid #3a587f;border-radius:12px;background:#101d31;cursor:pointer}.food-btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(67,231,255,.18)}.food-btn:disabled{opacity:.45;cursor:not-allowed}
-.game-status{min-height:26px;text-align:center;margin-top:12px}.memory-card{margin-top:18px}.memory-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(52px,1fr));gap:10px;margin:18px 0}.memory-tile{min-height:72px;border:1px solid #34547e;background:#0a1423;border-radius:12px;color:#9eb2ce;font-size:28px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}.memory-tile:hover{transform:translateY(-2px);border-color:var(--cyan)}.memory-tile.revealed,.memory-tile.matched{background:linear-gradient(135deg,#12344b,#11243a);color:#fff}.memory-tile.matched{border-color:#48e0a4;box-shadow:0 0 14px rgba(72,224,164,.18)}.memory-status{min-height:24px;text-align:center;margin-top:10px}.game-switches{display:flex;gap:8px;flex-wrap:wrap}.game-switches button{padding:9px 12px}@media(max-width:520px){.memory-board{grid-template-columns:repeat(3,1fr)}.memory-tile{min-height:62px}}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
-</style>
-<script>
-
-/* ===== Telegram-style Copy/Paste for Posts and Messages ===== */
-function pfClipboardImageFile(items){
-  if(!items) return null;
-  for(const item of items){
-    if(item.kind === 'file' && item.type && item.type.startsWith('image/')){
-      const file = item.getAsFile();
-      if(file) return file;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel-Friend</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+    *{box-sizing:border-box}
+    :root{--bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#14202a;--cyan:#43e7ff;--green:#78ff43;--yellow:#ffd700;--pink:#ff5dae;--muted:#9db3c9;--border:#213755;--good:#43e7ff;--bad:#ff7795;--excellent:#78ff43}
+    body{margin:0;padding:0;background:var(--bg);color:#dce8ff;font-family:'VT323',monospace;overflow:hidden}
+    button{font-family:'VT323',monospace;cursor:pointer;border:none;transition:.2s}
+    input,textarea{font-family:'VT323',monospace}
+    .hidden{display:none!important}
+    button.primary{background:linear-gradient(135deg,#1a6b8c,#0f5673);border:1px solid var(--cyan);color:#43e7ff;padding:10px 16px;border-radius:6px;box-shadow:0 0 12px rgba(67,231,255,.2);font-weight:700}
+    button.primary:hover{box-shadow:0 0 20px rgba(67,231,255,.4);transform:translateY(-2px)}
+    button.secondary{background:#0b1729;border:1px solid #355174;color:#dce8ff;padding:8px 12px;border-radius:6px}
+    button.secondary:hover{border-color:var(--cyan);color:#43e7ff}
+    button.danger{background:rgba(255,93,174,.15);border:1px solid #ff5dae;color:#ff7795;padding:6px 10px;border-radius:4px}
+    button.danger:hover{background:rgba(255,93,174,.25)}
+    .auth-screen{position:fixed;inset:0;background:linear-gradient(135deg,#050a14,#0a1420);display:flex;align-items:center;justify-content:center;z-index:9999}
+    .auth-card{background:linear-gradient(180deg,#0d1423,#081018);border:2px solid #43e7ff;border-radius:12px;padding:32px;width:min(420px,90%);box-shadow:0 0 40px rgba(67,231,255,.15)}
+    .logo{font-size:24px;font-weight:700;text-align:center;margin-bottom:20px;background:linear-gradient(90deg,var(--cyan),#82aaff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .logo-icon{font-size:40px;margin-bottom:10px}
+    .auth-card input{width:100%;padding:10px 12px;margin-bottom:12px;background:#0a1423;border:1px solid #213755;border-radius:6px;color:#dce8ff}
+    .auth-card input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 12px rgba(67,231,255,.2)}
+    .auth-tabs{display:flex;gap:10px;margin-bottom:20px}
+    .auth-tabs button{flex:1;padding:8px;border-radius:4px;background:#0a1423;border:1px solid #213755;color:#9db3c9}
+    .auth-tabs button.active{background:linear-gradient(135deg,#1a6b8c,#0f5673);border-color:var(--cyan);color:#43e7ff}
+    .auth-pane{display:none}
+    .auth-pane.active{display:block}
+    .tagline{text-align:center;color:var(--muted);font-size:12px;margin-bottom:20px;letter-spacing:1px}
+    #authStatus{text-align:center;min-height:20px;margin-bottom:15px;font-size:12px}
+    .guest-btn{margin-top:10px;width:100%;padding:10px;background:#1a1f2e;border:1px solid #4a3f5f;border-radius:6px;color:#d9a8ff;cursor:pointer;font-family:'VT323',monospace}
+    .guest-btn:hover{border-color:#7b55bf;background:#23192f}
+    .app{display:none;height:100vh}
+    .topbar{background:linear-gradient(90deg,#070d18,#0a1120 55%,#10122a)!important;border-bottom:1px solid #263b60;box-shadow:0 8px 30px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:62px}
+    .brand{font-size:18px;font-weight:700;background:linear-gradient(90deg,var(--cyan),#82aaff,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer;display:flex;align-items:center;gap:8px}
+    .brand-icon{display:inline-flex;align-items:center;justify-content:center;background:#121c31;border:1px solid #35527c;width:32px;height:32px;border-radius:6px;font-size:16px;box-shadow:0 0 18px rgba(155,108,255,.3)}
+    .actions{display:flex;align-items:center;gap:20px;flex:1;justify-content:flex-end}
+    .actions input{width:280px;padding:8px 12px;background:#0a1120;border:1px solid #263c63;border-radius:10px;color:#dce8ff}
+    .actions input::placeholder{color:#5a7a9f}
+    .notification-button,.icon{width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#0a1423;border:1px solid #213755;border-radius:8px;color:#dce8ff;position:relative;cursor:pointer;font-size:16px}
+    .notification-button:hover,.icon:hover{border-color:var(--cyan);color:var(--cyan)}
+    .badge{position:absolute;top:2px;right:2px;background:#ff5dae;color:#fff;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+    .notification-panel{position:absolute;top:55px;right:0;background:#0d1422;border:1px solid #213755;border-radius:8px;width:350px;max-height:400px;overflow-y:auto;z-index:1000;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+    .notification-panel-head{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;border-bottom:1px solid #213755;font-weight:700}
+    .notification-list{max-height:350px;overflow-y:auto}
+    .notification-item{padding:12px 15px;border-bottom:1px solid #213755;cursor:pointer;transition:.2s}
+    .notification-item:hover{background:rgba(67,231,255,.05)}
+    .notification-item.unread{background:rgba(67,231,255,.1);border-left:3px solid var(--cyan)}
+    .notification-item-icon{font-size:18px;margin-bottom:6px}
+    .notification-item-title{font-weight:700;color:#43e7ff;font-size:12px}
+    .notification-item-text{color:#bcd7f7;font-size:11px;margin:4px 0}
+    .notification-item-time{color:var(--muted);font-size:10px}
+    .notification-empty{text-align:center;padding:20px;color:var(--muted);font-size:11px}
+    .layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 62px);gap:0}
+    .side{background:linear-gradient(180deg,#0a1220,#090f1d);border-right:1px solid #253958;overflow-y:auto;padding:20px}
+    main{overflow-y:auto;padding:24px}
+    .page{display:none;width:100%}
+    .page.active{display:block}
+    .mini{background:linear-gradient(135deg,rgba(30,52,86,.45),rgba(12,19,33,.6));border:1px solid #2a4166;border-radius:14px;padding:16px;margin-bottom:20px;text-align:center}
+    .avatar{width:80px;height:80px;border-radius:18px;background:#0a1423;border:2px solid #48698e;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;overflow:hidden;box-shadow:0 0 24px rgba(78,161,255,.3)}
+    .avatar img{width:100%;height:100%;object-fit:cover}
+    .online{position:absolute;bottom:0;right:0;width:12px;height:12px;background:#78ff43;border-radius:50%;border:2px solid #0a1423}
+    .menu{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+    .menu button{text-align:left;padding:12px 13px;border-radius:10px;border:1px solid transparent;background:linear-gradient(90deg,rgba(26,107,140,.3),rgba(15,86,115,.3));color:#aebcd2;transition:.18s;font-size:12px}
+    .menu button:hover{border-color:var(--cyan);color:#43e7ff;background:rgba(67,231,255,.1)}
+    .menu button.active{background:linear-gradient(90deg,rgba(67,231,255,.3),rgba(67,231,255,.15));border-color:var(--cyan);color:#43e7ff}
+    .card{border:1px solid #2b4266;border-radius:12px;background:linear-gradient(180deg,#0e1829,#0a1220);box-shadow:0 10px 28px rgba(0,0,0,.22);padding:18px;margin-bottom:16px}
+    h1{font-size:18px;margin-top:0;margin-bottom:12px;text-transform:uppercase;letter-spacing:1px}
+    h2{font-size:14px;margin:0 0 12px;text-transform:uppercase}
+    .tiny{font-size:11px;color:var(--muted)}
+    .rank-row{display:flex;align-items:center;gap:10px;padding:10px;background:#0a1423;border:1px solid #213755;border-radius:8px;margin-bottom:8px}
+    .rank-num{font-weight:700;min-width:20px;color:#78ff43;font-size:14px}
+    .rank-avatar{width:34px;height:34px;border-radius:8px;background:#0d1829;display:flex;align-items:center;justify-content:center;font-size:18px}
+    textarea{width:100%;padding:10px 12px;background:#0a1423;border:1px solid #213755;border-radius:8px;color:#dce8ff;min-height:80px;resize:vertical;margin-bottom:10px}
+    textarea:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 12px rgba(67,231,255,.2)}
+    .media-actions{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    input[type="file"]{display:none}
+    .file-pill{display:inline-block;background:#0b1729;border:1px solid #355174;padding:6px 10px;border-radius:4px;font-size:11px;color:#dce8ff}
+    .messages-layout{display:grid;grid-template-columns:240px 1fr;gap:16px;height:100%}
+    .chat-users{background:var(--panel);border-radius:8px;padding:12px;overflow-y:auto;border:1px solid var(--border)}
+    .chat-users h2{margin-top:0;margin-bottom:12px}
+    .chat-user{padding:10px;background:#0a1423;border:1px solid #213755;border-radius:6px;cursor:pointer;margin-bottom:6px;transition:.2s;font-size:12px}
+    .chat-user:hover{border-color:var(--cyan);background:rgba(67,231,255,.05)}
+    .chat-user.active{border-color:var(--cyan);background:rgba(67,231,255,.15)}
+    .chat-area{display:flex;flex-direction:column;gap:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .chat-header{background:var(--panel);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+    .chat-name{font-weight:700;font-size:13px}
+    .call-button-group{display:flex;gap:6px}
+    .call-button{padding:6px 10px;font-size:11px;border-radius:4px;border:1px solid #355174;background:#0b1729;color:#dce8ff;cursor:pointer;transition:.2s}
+    .call-button:hover{transform:translateY(-1px);box-shadow:0 0 12px rgba(67,231,255,.2)}
+    .call-button.video{border-color:#43e7ff;color:#43e7ff}
+    .call-button.audio{border-color:#78ff43;color:#78ff43}
+    .messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:rgba(0,0,0,.2)}
+    .message{display:flex;gap:8px;padding:10px;background:rgba(10,20,35,.6);border-radius:6px;border:1px solid #213755;animation:slideIn .3s ease-out}
+    @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .message-avatar{width:32px;height:32px;border-radius:6px;background:#0d1829;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .message-body{flex:1;min-width:0}
+    .message-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+    .message-sender{font-weight:700;color:#43e7ff;font-size:12px}
+    .message-time{font-size:10px;color:var(--muted)}
+    .message-content{color:#dce8ff;font-size:12px;line-height:1.4;word-break:break-word}
+    .message-image{max-width:200px;border-radius:4px;margin-top:6px}
+    .chat-input-bar{display:flex;align-items:flex-end;gap:8px;padding:12px;background:var(--panel);border-top:1px solid var(--border)}
+    .chat-input-bar input{flex:1;padding:8px 10px;background:#0a1423;border:1px solid #213755;border-radius:6px;color:#dce8ff}
+    .chat-input-bar input:focus{outline:none;border-color:var(--cyan)}
+    .chat-input-bar button{padding:8px 12px;min-width:80px}
+    .reply-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#091522;border:1px solid var(--cyan);padding:7px 10px;margin-bottom:4px;border-radius:4px}
+    .compose-area{background:var(--panel);border-radius:8px;padding:12px}
+    .sticker-picker{display:flex;gap:6px;flex-wrap:wrap;background:#091522;border:2px solid #30415f;padding:9px;margin-bottom:5px;border-radius:4px}
+    .sticker-picker button{background:#14233b;border:1px solid #355174;padding:6px 9px;font-size:18px;border-radius:3px;cursor:pointer}
+    .toast{position:fixed;bottom:20px;left:20px;background:#0d1422;border:1px solid #43e7ff;border-radius:6px;padding:12px 16px;color:#dce8ff;z-index:10000;box-shadow:0 0 20px rgba(67,231,255,.2)}
+    .call-history-item{display:flex;align-items:center;gap:10px;padding:10px;background:#0a1423;border:1px solid #213755;border-radius:8px;margin-bottom:8px;font-size:12px}
+    .call-history-icon{font-size:16px}
+    .call-history-details{flex:1;min-width:0}
+    .call-history-name{font-weight:700;overflow:hidden;text-overflow:ellipsis;color:#dce8ff}
+    .call-history-time{color:var(--muted);font-size:10px;margin-top:2px}
+    .call-history-duration{color:var(--green);font-size:11px;font-weight:700;margin-left:auto}
+    .call-status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:10px;font-size:10px}
+    .call-status-badge.missed{background:rgba(255,119,149,0.2);color:#ff7795}
+    .call-status-badge.received{background:rgba(120,255,67,0.2);color:#78ff43}
+    .call-status-badge.placed{background:rgba(67,231,255,0.2);color:#43e7ff}
+    @media (max-width:950px){
+      .layout{grid-template-columns:1fr}
+      .side{display:none}
     }
-  }
-  return null;
-}
-function pfImageName(file, prefix){
-  const ext = (file && file.type && file.type.split('/')[1]) || 'png';
-  return `${prefix}_${Date.now()}.${ext}`;
-}
-function pfAttachPastedPostImage(file){
-  if(!file) return;
-  postImageFile = file;
-  postVideoFile = null; postAudioFile = null;
-  const pill = $('postImagePill');
-  pill.textContent = '🖼️ PASTED IMAGE • ' + pfImageName(file,'screenshot');
-  pill.classList.remove('hidden');
-  $('postVideoPill').classList.add('hidden'); $('postAudioPill').classList.add('hidden');
-  $('postText').classList.add('paste-flash');
-  setTimeout(()=>$('postText').classList.remove('paste-flash'),700);
-  toast('🖼️ Screenshot/picture attached. Press PUBLISH POST when ready.');
-}
-function pfAttachPastedChatImage(file){
-  if(!file) return;
-  chatAttachmentFile = file;
-  chatAttachmentType = 'image';
-  $('chatAttachmentPill').textContent = '🖼️ PASTED IMAGE • ' + pfImageName(file,'screenshot');
-  $('chatAttachmentBar').classList.remove('hidden');
-  $('messageInput').classList.add('paste-flash');
-  setTimeout(()=>$('messageInput').classList.remove('paste-flash'),700);
-  toast('🖼️ Screenshot/picture attached. Press SEND when ready.');
-}
-function pfHandlePaste(e){
-  const target = e.target;
-  const image = pfClipboardImageFile(e.clipboardData && e.clipboardData.items);
-  if(!image) return;
-  if(target && target.id === 'postText'){
-    e.preventDefault();
-    pfAttachPastedPostImage(image);
-  } else if(target && target.id === 'messageInput'){
-    e.preventDefault();
-    pfAttachPastedChatImage(image);
-  }
-}
-document.addEventListener('paste', pfHandlePaste, true);
+  </style>
+</head>
+<body>
 
-// Drag & drop is also supported for quick screenshot sharing.
-function pfEnableDropPaste(el, handler){
-  if(!el) return;
-  el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('paste-ready'); });
-  el.addEventListener('dragleave', ()=>el.classList.remove('paste-ready'));
-  el.addEventListener('drop', e=>{
-    e.preventDefault(); el.classList.remove('paste-ready');
-    const file = Array.from(e.dataTransfer.files || []).find(f=>f.type && f.type.startsWith('image/'));
-    if(file) handler(file);
-  });
-}
-document.addEventListener('DOMContentLoaded', ()=>{
-  pfEnableDropPaste($('postText'), pfAttachPastedPostImage);
-  pfEnableDropPaste($('messageInput'), pfAttachPastedChatImage);
-});
-
-</script>
-
-<style id="telegram-style-notifications">
-/* Telegram-style live notification popup */
-.pf-live-notification-stack{
-  position:fixed;right:18px;top:18px;z-index:99999;
-  width:min(380px,calc(100vw - 28px));
-  display:flex;flex-direction:column;gap:10px;pointer-events:none;
-}
-.pf-live-notification{
-  pointer-events:auto;display:flex;gap:11px;align-items:flex-start;
-  padding:12px 13px;border-radius:15px;
-  background:rgba(25,31,42,.97);border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 12px 35px rgba(0,0,0,.38);
-  cursor:pointer;animation:pfNotifIn .24s ease-out;
-  backdrop-filter:blur(12px);
-}
-.pf-live-notification.removing{animation:pfNotifOut .2s ease-in forwards}
-.pf-live-notification-avatar{
-  width:44px;height:44px;min-width:44px;border-radius:50%;
-  overflow:hidden;display:grid;place-items:center;background:#303b50;
-  font-size:22px;border:1px solid rgba(255,255,255,.12);
-}
-.pf-live-notification-avatar img{width:100%;height:100%;object-fit:cover}
-.pf-live-notification-main{min-width:0;flex:1}
-.pf-live-notification-head{display:flex;gap:8px;align-items:center}
-.pf-live-notification-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pf-live-notification-time{margin-left:auto;font-size:11px;opacity:.55;white-space:nowrap}
-.pf-live-notification-text{font-size:13px;line-height:1.35;opacity:.88;margin-top:3px;word-break:break-word}
-.pf-live-notification-close{
-  border:0;background:transparent;color:inherit;opacity:.55;
-  cursor:pointer;font-size:16px;padding:0 2px;line-height:1
-}
-.pf-live-notification-close:hover{opacity:1}
-.pf-live-notification-progress{height:2px;margin-top:9px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
-.pf-live-notification-progress span{display:block;height:100%;width:100%;background:currentColor;transform-origin:left;animation:pfNotifProgress 7s linear forwards}
-.pf-notif-pulse{animation:pfNotifPulse .7s ease-out}
-@keyframes pfNotifIn{from{opacity:0;transform:translateX(35px) scale(.97)}to{opacity:1;transform:none}}
-@keyframes pfNotifOut{to{opacity:0;transform:translateX(35px) scale(.97)}}
-@keyframes pfNotifProgress{to{transform:scaleX(0)}}
-@keyframes pfNotifPulse{0%,100%{transform:none}35%{transform:scale(1.14)}}
-@media(max-width:600px){
-  .pf-live-notification-stack{top:10px;right:10px;left:10px;width:auto}
-  .pf-live-notification{border-radius:13px}
-}
-</style>
-
-
-<style id="instant-alert-effects">
-@keyframes pfBellFlash{0%,100%{filter:none}20%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}45%{filter:none}70%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}}
-.pf-live-notification{animation:pfNotifIn .22s ease-out,pfBellFlash .75s ease-out}
-</style>
-</head><body>
-<div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
-<div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
-<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
-      <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
-      <div id="notificationPanel" class="notification-panel hidden">
-        <div class="notification-panel-head"><strong>🔔 NOTIFICATIONS</strong><button class="notification-clear" onclick="markAllNotificationsRead(event)">MARK READ</button></div>
-        <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
-      </div>
-    </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('games',this)">🎮 GAMES</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
-<main><section id="home" class="page active">
-<div class="home-dashboard">
-  <div class="home-welcome">
-    <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>CONNECT • SHARE • CHAT • LEVEL UP</p></div>
-    <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 NEW STORY</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ CREATE POST</button><button class="quick-btn" onclick="page('friends')">👥 EXPLORE</button></div>
-  </div>
-  <div class="card story-section">
-    <div class="story-head"><div><h2 style="margin:0">✨ PIXEL STORIES</h2><div class="tiny">Share moments that disappear after 24 hours</div></div><button class="primary" style="padding:8px 12px;font-size:13px" onclick="openStoryCreator()">＋ ADD STORY</button></div>
-    <div id="storiesRow" class="story-row"><div class="story-empty">Loading stories...</div></div>
-  </div>
-  <div class="home-columns">
-    <div class="home-left">
-      <div class="card composer-card">
-        <div class="composer-title"><h2 style="margin:0">✍️ CREATE POST</h2><span class="tiny">+10 XP</span></div>
-        <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND? (Ctrl+V to paste text or screenshot)"></textarea><div class="tiny paste-hint">📋 Paste text, 🖼️ screenshots, or copied pictures directly here (Ctrl+V)</div>
-        <div class="media-actions"><button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ PHOTO</button><button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 VIDEO</button><button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 AUDIO</button></div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span id="postImagePill" class="file-pill hidden"></span><span id="postVideoPill" class="file-pill hidden"></span><span id="postAudioPill" class="file-pill hidden"></span></div>
-        <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')"><input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')"><input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">
-        <button class="primary publish-wide" onclick="createPost()">🚀 PUBLISH POST (+10 XP)</button><div id="postStatus" class="status"></div>
-      </div>
-      <div class="rail-card"><div class="rail-title">👥 WHO TO FOLLOW</div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card">
+    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>
+    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>
+    <div class="auth-tabs">
+      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>
+      <button id="regTab" onclick="authTab('register')">REGISTER</button>
     </div>
-    <div class="home-center">
-      <div class="card feed-shell"><div class="feed-tabs"><button class="active">ALL POSTS</button><button>FOLLOWING</button><button>FRIENDS</button><span class="filter">⚱</span></div><div id="feed"></div></div>
+    <div id="loginPane" class="auth-pane active">
+      <input id="loginEmail" type="email" placeholder="Email">
+      <input id="loginPass" type="password" placeholder="Password">
+      <button class="primary" onclick="login()" style="width:100%">🚀 ENTER PIXEL WORLD</button>
     </div>
-    <aside class="home-right">
-      <div class="rail-card"><div class="rail-title">🏅 LEVEL PROGRESS</div><div class="level-hero"><div class="level-orb">🏅</div><div style="flex:1"><strong>LEVEL <span id="railLevel">1</span></strong><div class="rail-xp"><span id="railXpBar"></span></div><div class="tiny"><span id="railXpText">0 / 100 XP</span></div></div></div></div>
-      <div class="rail-card"><div class="rail-title">🔥 RANKING THIS WEEK</div><div id="homeRankList"><div class="tiny">Loading ranking...</div></div><button class="secondary" style="width:100%;margin-top:10px" onclick="page('leaderboard')">VIEW FULL RANKING</button></div>
-      <div class="rail-card"><div class="rail-title">🔥 TRENDING HASHTAGS</div><div class="trend"><span>#PixelWorld</span><small>12.5K posts</small></div><div class="trend"><span>#Gaming</span><small>8.2K posts</small></div><div class="trend"><span>#Friends</span><small>6.7K posts</small></div><div class="trend"><span>#Adventure</span><small>5.1K posts</small></div></div>
-      <div class="rail-card bonus-card"><div class="rail-title">🎁 DAILY BONUS</div><div class="bonus-row"><div><div class="tiny">Claim your daily XP!</div><div class="bonus-xp">+50 XP</div><button id="dailyBonusBtn" class="claim-btn" onclick="claimDailyBonus()">CLAIM</button></div><div class="bonus-chest">🎁</div></div></div>
+    <div id="registerPane" class="auth-pane hidden">
+      <input id="regName" type="text" placeholder="Username (min 2 chars)">
+      <input id="regEmail" type="email" placeholder="Email">
+      <input id="regPass" type="password" placeholder="Password (min 6 chars)">
+      <input id="regAvatar" type="text" placeholder="Avatar (emoji)" value="👾">
+      <button class="primary" onclick="register()" style="width:100%">✨ CREATE ACCOUNT</button>
+    </div>
+    <div id="authStatus"></div>
+    <button class="guest-btn" onclick="guestLogin()">🎮 GUEST ACCESS</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app">
+  <header class="topbar">
+    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>
+    <div class="actions">
+      <input id="globalSearch" type="text" placeholder="Search users...">
+      <div style="position:relative">
+        <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">🔔<span id="notifBadge" class="badge" style="display:none">0</span></button>
+        <div id="notificationPanel" class="notification-panel hidden">
+          <div class="notification-panel-head"><strong>🔔 NOTIFICATIONS</strong><button class="secondary" onclick="markAllNotificationsRead(event)">MARK READ</button></div>
+          <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
+        </div>
+      </div>
+    </div>
+    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <div class="mini">
+        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>
+        <h3 id="sideName">PLAYER</h3>
+        <div id="sideAccountType"></div>
+        <div id="sideBio" class="tiny">PIXEL EXPLORER</div>
+      </div>
+      <div class="menu">
+        <button onclick="page('home', this)">🏠 HOME</button>
+        <button onclick="page('messages', this)">💬 MESSAGES</button>
+        <button onclick="page('friends', this)">👥 FRIENDS</button>
+        <button onclick="page('leaderboard', this)">🏆 LEADERBOARD</button>
+        <button onclick="page('games', this)">🎮 ARCADE</button>
+        <button id="navAdmin" class="hidden" onclick="page('adminPanel', this)">🛡️ ADMIN</button>
+        <button class="danger" onclick="logout()">🚪 LOGOUT</button>
+      </div>
     </aside>
+
+    <main>
+      <!-- HOME PAGE -->
+      <section id="home" class="page active">
+        <h1>WELCOME TO PIXEL WORLD 👾</h1>
+        <p>CONNECT • SHARE • CHAT • LEVEL UP</p>
+        <div class="card">
+          <h2>🏅 YOUR STATS</h2>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div><span class="tiny">LEVEL</span><div style="font-size:20px;font-weight:700;color:#78ff43" id="statLevel">1</div></div>
+            <div><span class="tiny">XP</span><div style="font-size:20px;font-weight:700;color:#43e7ff" id="statXP">0</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MESSAGES PAGE -->
+      <section id="messages" class="page">
+        <div class="messages-layout">
+          <div class="chat-users">
+            <h2>💬 CHATS</h2>
+            <div id="chatUsersList"></div>
+          </div>
+          <div class="chat-area">
+            <div class="chat-header">
+              <div><div class="chat-name" id="selectedUserName">Select a chat</div></div>
+              <div class="call-button-group">
+                <button class="call-button audio" id="voiceCallBtn" style="display:none" onclick="initiateVoiceCall()">📞 CALL</button>
+                <button class="call-button video" id="videoCallBtn" style="display:none" onclick="initiateVideoCall()">🎥 VIDEO</button>
+              </div>
+            </div>
+            <div class="messages" id="messagesList"></div>
+            <div class="compose-area">
+              <div id="replyBar" class="reply-bar hidden" style="margin-bottom:8px">
+                <span id="replyBarText"></span>
+                <button class="danger" style="padding:3px 7px;font-size:11px" onclick="cancelReply()">CANCEL</button>
+              </div>
+              <div class="sticker-picker" id="stickerPicker" style="display:none"></div>
+              <div class="chat-input-bar">
+                <input id="messageInput" type="text" placeholder="Type a message..." disabled>
+                <button class="secondary" id="stickerBtn" style="display:none" onclick="toggleStickerPicker()">😀</button>
+                <button class="secondary" id="imageBtn" style="display:none" onclick="document.getElementById('chatImageInput').click()">🖼️</button>
+                <button class="primary" id="sendBtn" style="display:none;min-width:60px" onclick="sendMessage()">SEND</button>
+              </div>
+              <input id="chatImageInput" type="file" accept="image/*" onchange="selectChatMedia('image')">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FRIENDS PAGE -->
+      <section id="friends" class="page">
+        <h1>👥 PIXEL COMMUNITY</h1>
+        <input type="text" id="friendSearch" placeholder="Search friends..." style="width:100%;padding:8px 10px;margin-bottom:12px;background:#0a1423;border:1px solid #213755;border-radius:6px;color:#dce8ff">
+        <div id="friendsList"></div>
+      </section>
+
+      <!-- LEADERBOARD PAGE -->
+      <section id="leaderboard" class="page">
+        <h1>🏆 PIXEL LEADERBOARD</h1>
+        <div id="leaderList"></div>
+      </section>
+
+      <!-- GAMES PAGE -->
+      <section id="games" class="page">
+        <h1>🎮 PIXEL ARCADE</h1>
+        <div class="card">
+          <h2>🐾 FEED THE PIXEL PET</h2>
+          <div style="text-align:center;font-size:40px;margin:20px 0">👾</div>
+          <button class="primary" style="width:100%;margin-bottom:10px">▶ START GAME</button>
+          <button class="secondary" style="width:100%">↗️ SHARE SCORE</button>
+        </div>
+        <div class="card">
+          <h2>🧠 MEMORY MATCH</h2>
+          <p class="tiny">Coming soon...</p>
+        </div>
+      </section>
+
+      <!-- ADMIN PANEL -->
+      <section id="adminPanel" class="page hidden">
+        <h1>🛡️ ADMIN CONTROL PANEL</h1>
+        <div id="adminUserList"></div>
+      </section>
+
+      <!-- PROFILE PAGE -->
+      <section id="profile" class="page">
+        <h1>👤 YOUR PROFILE</h1>
+        <div class="card" style="text-align:center;max-width:500px;margin:0 auto">
+          <div id="profileAvatar" class="avatar" style="width:100px;height:100px;margin:0 auto 12px">👾</div>
+          <div id="profileNameDisplay" style="font-size:16px;font-weight:700;margin-bottom:6px">PLAYER</div>
+          <div id="profileAccountType"></div>
+          <div id="profileBioDisplay" class="tiny" style="margin-top:8px;margin-bottom:15px">PIXEL EXPLORER</div>
+          <h2>⚙️ EDIT PROFILE</h2>
+          <input id="editUsernameInput" type="text" placeholder="Username" style="width:100%;margin-bottom:8px">
+          <textarea id="editBioInput" placeholder="Bio (optional)" style="margin-bottom:8px"></textarea>
+          <button class="primary" onclick="saveProfileInfo()" style="width:100%;margin-bottom:10px">✅ SAVE PROFILE</button>
+          <h2>🖼️ AVATAR</h2>
+          <input id="avatarUploadInput" type="file" accept="image/*">
+          <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()" style="width:100%;margin-bottom:6px">📤 UPLOAD AVATAR</button>
+          <button class="danger" onclick="removeAvatar()" style="width:100%">🗑️ REMOVE AVATAR</button>
+        </div>
+      </section>
+    </main>
   </div>
 </div>
-</section>
-<section id="friends" class="page">    <div class="card" style="padding:20px">        <h1>👥 PIXEL COMMUNITY</h1>        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">    </div>    <div id="searchResults" class="grid" style="margin-top:15px"></div>    <div class="card" style="padding:20px;margin-top:20px">        <h2>🤝 RECOMMENDED FRIENDS</h2>        <div id="friendsList" class="grid" style="margin-top:15px"></div>    </div></section>
-<section id="messages" class="page">    <div class="card" style="padding:20px">        <div class="messages-layout">            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
-        <div class="chat-input-bar">                    <div id="replyBar" class="reply-bar hidden"><span id="replyBarText"></span><button class="danger" style="padding:3px 7px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button></div>                    <div id="stickerPicker" class="sticker-picker hidden"></div>                    <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">                        <span id="chatAttachmentPill" class="file-pill"></span>                        <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>                    </div>          <div class="chat-controls" style="flex-wrap:wrap">                        <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>                        <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>                        <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>                        <button class="secondary" onclick="toggleStickerPicker()" title="Send Sticker" disabled id="btnSticker">😀</button>
-
-            <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="selectChatMedia('image')">                        <input id="chatVideoInput" type="file" accept="video/*" class="hidden" onchange="selectChatMedia('video')">
-
-            <input id="messageInput" placeholder="Type a message... (paste text or screenshot)" onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">                        <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>                    </div>                </div>      </div>        </div>    </div></section>
-<section id="leaderboard" class="page">    <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div></section>
-<section id="adminPanel" class="page">  <div class="card" style="padding:20px">    <h1>🛡️ ADMIN CONTROL PANEL</h1>    <p class="tiny">Manage user administrator and account verification statuses. 🎮 Guest and 👤 Real account types are visible to everyone.</p>    <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>  </div></section>
-<section id="profile" class="page">    <div class="card" style="padding:24px;max-width:540px;margin:0 auto">        <div style="text-align:center;margin-bottom:20px">      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>          <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1><div id="profileAccountType"></div>          <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">      <div class="card" style="padding:14px;text-align:center">        <div class="tiny" style="margin-bottom:4px">CURRENT LEVEL</div>        <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong>      </div>      <div class="card" style="padding:14px;text-align:center">        <div class="tiny" style="margin-bottom:4px">TOTAL XP</div>        <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong>      </div>    </div>
-
-    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">      <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>      <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>      <input id="editUsernameInput" placeholder="Enter new username...">            <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>      <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>            <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>    </div>
-
-    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div></section>
-
-<section id="games" class="page">
-  <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button></div></div>
-    <div class="game-grid">
-      <div class="game-card">
-        <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
-        <div class="game-stats"><div class="game-stat">SCORE<b id="petScore">0</b></div><div class="game-stat">TIME<b id="petTimer">20</b></div><div class="game-stat">COMBO<b id="petCombo">0</b></div><div class="game-stat">BEST<b id="petBest">0</b></div></div>
-        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👾</div></div>
-        <div class="target-food">PET WANTS: <span id="desiredFood">🍪</span></div>
-        <div id="foodGrid" class="food-grid"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">Press PLAY NOW to start!</div></div>
-        <div class="game-actions"><button id="petStartBtn" class="primary" onclick="startPetGame()">▶ START GAME</button><button class="secondary" onclick="sharePetScore()">↗️ SHARE SCORE</button></div>
-        <div id="petGameStatus" class="game-status tiny"></div>
-      </div>
-      <aside class="arcade-list">
-        <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
-        <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
-        <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>COMING NEXT</h3><p>⚔️ Pixel Battle<br>🎯 Fast Click Challenge<br>🏎️ Pixel Racing</p></div>
-      </aside>
-    </div>
-    <div class="game-card memory-card">
-      <div class="memory-header"><div><h2 style="margin:0">🧠 PIXEL MEMORY MATCH</h2><p class="tiny" style="margin:7px 0 0">Match all the cute pairs before time runs out!</p></div><button id="memoryStartBtn" class="primary" onclick="startMemoryGame()">▶ START MEMORY GAME</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">PAIRS<b id="memoryMatches">0/6</b></div><div class="game-stat">TIME<b id="memoryTimer">30</b></div><div class="game-stat">MOVES<b id="memoryMoves">0</b></div><div class="game-stat">BEST<b id="memoryBest">—</b></div></div>
-      <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
-      <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
-      <div id="memoryStatus" class="memory-status tiny"></div>
-    </div>
-  </div>
-</section>
-</main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
-<div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
-
-<div id="postViewModal" class="post-view-modal hidden" onclick="if(event.target===this)closePostView()">
-  <div class="post-view-dialog" role="dialog" aria-modal="true" aria-label="Post viewer">
-    <div class="post-view-head">
-      <strong>👁️ VIEW POST</strong>
-      <button class="secondary post-view-close" onclick="closePostView()">✕</button>
-    </div>
-    <div id="postViewContent" class="post-view-body"></div>
-  </div>
-</div>
 <div id="toast" class="toast hidden"></div>
+
 <script>
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
 
 let currentUser = null, currentProfile = null, selectedUser = null;
-let presenceChannel = null;
-let onlineUserIds = new Set();
-let presenceReconnectTimer = null;
-let presenceStarted = false;
-let postImageFile = null, postVideoFile = null, postAudioFile = null;
-let chatAttachmentFile = null, chatAttachmentType = null;
-let replyingToMessageId = null, replyingToMessagePreview = '';
-const STICKERS = ['😀','😂','😍','🥰','😎','😭','😡','😴','🤔','👍','❤️','🔥','🎉','💯','👏','🙏','✨','💖','🤣','😇','🥳','🤩'];
-let mediaRecorder = null, voiceChunks = [], isRecordingVoice = false, voiceStream = null;
-let activeReplyTargets = {}; // Stores comment reply context per post { postId: { commentId, username } }
+const STICKERS = ['😀','😂','😍','🥰','😎','😭','😡','😴','🤔','👍','❤️','🔥','🎉','💯','👏','🙏','✨','💖'];
+let callHistory = JSON.parse(localStorage.getItem('pixelFriendCallHistory')) || [];
 
-const ADMIN_EMAIL = "admin@pixel.com";
 const $ = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-// Convert safe plain-text URLs into clickable links without allowing HTML injection.
-function linkify(value){
-  const safe=esc(value);
-  return safe.replace(/((?:https?:\/\/|www\.)[^\s<]+)/gi,(raw)=>{
-    const trailing=(raw.match(/[.,!?;:]+$/)||[''])[0];
-    const core=trailing?raw.slice(0,-trailing.length):raw;
-    const href=core.startsWith('www.')?'https://'+core:core;
-    return `<a class="clickable-link" href="${href}" target="_blank" rel="noopener noreferrer">${core}</a>${trailing}`;
-  });
-}
-
-
-function isGuestProfile(profile){
-  // Primary source: database flag. Fallback keeps previously-created guest
-  // profiles correctly identified even if their profile row was created by an
-  // older trigger before is_guest was saved.
-  if(profile?.is_guest === true) return true;
-  const username = String(profile?.username || '');
-  return /^GUEST-/i.test(username);
-}
-
-function accountBadge(profile, small=false){
-  const guest = isGuestProfile(profile);
-  return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}</span>`;
-}
-
-function accountTypeBanner(profile){
-  const guest = isGuestProfile(profile);
-  return `<div class="account-type-banner ${guest ? 'guest' : 'real'}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}<span class="sub">${guest ? 'This user entered using Guest Access' : 'Registered Pixel-Friend account'}</span></div>`;
-}
-
-let retroAudioCtx = null;
-let audioUnlocked = false;
-
-function unlockRetroAudio() {
-  try {
-    if(!retroAudioCtx) retroAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if(retroAudioCtx.state === 'suspended') retroAudioCtx.resume();
-    audioUnlocked = retroAudioCtx.state === 'running';
-  } catch(e) {
-    audioUnlocked = false;
-  }
-}
-
-window.addEventListener('pointerdown', unlockRetroAudio, { once:false, passive:true });
-window.addEventListener('keydown', unlockRetroAudio, { once:false, passive:true });
-
-function playRetroSound(type = 'click') {
-  try {
-    if(!retroAudioCtx) retroAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if(retroAudioCtx.state === 'suspended') retroAudioCtx.resume();
-    const audioCtx = retroAudioCtx;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    const now = audioCtx.currentTime;
-    if (type === 'click') {
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(220, now + 0.05);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } else if (type === 'message') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(587.33, now);
-      osc.frequency.setValueAtTime(880, now + 0.08);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } else if (type === 'success') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.setValueAtTime(554.37, now + 0.08);
-      osc.frequency.setValueAtTime(659.25, now + 0.16);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-      osc.start(now);
-      osc.stop(now + 0.3);
-    }  } catch (e) {
-    console.warn("Web Audio API not supported or blocked", e);
-  }
-}
-
-document.addEventListener('click', (e) => {
-  if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-    playRetroSound('click');
-  }
-});
-
-function isAdmin(){
-  return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
-}
 
 function toast(m){
   const e = $("toast");
@@ -455,25 +319,235 @@ function toast(m){
   window.__toast = setTimeout(()=>e.classList.add("hidden"), 4000);
 }
 
-function status(id, m, err=false){
-  if($(id)){
-    $(id).textContent = m;
-    $(id).style.color = err ? "#ff7795" : "var(--green)";
+function page(name){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  $(name)?.classList.add("active");
+}
+
+async function register(){
+  const username = $("regName").value.trim();
+  const email = $("regEmail").value.trim().toLowerCase();
+  const password = $("regPass").value;
+  const avatar = $("regAvatar").value;
+  if(username.length < 2 || !email.includes("@") || password.length < 6) return toast("Check input fields.");
+  const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});
+  if(r.error) return toast(r.error.message);
+  const loginRes = await sb.auth.signInWithPassword({email, password});
+  if(!loginRes.error) await startApp(loginRes.data.user);
+}
+
+async function login(){
+  const email = $("loginEmail").value.trim().toLowerCase();
+  const password = $("loginPass").value;
+  if(!email || !password) return toast("Enter email & password.");
+  const r = await sb.auth.signInWithPassword({email, password});
+  if(r.error) return toast(r.error.message);
+  await startApp(r.data.user);
+}
+
+async function guestLogin(){
+  const r = await sb.auth.signInAnonymously({options:{data:{username:"GUEST-" + Math.random().toString(36).slice(2,7).toUpperCase(), avatar:"🎮", is_guest:true}}});
+  if(r.error) return toast("Guest login failed: " + r.error.message);
+  await startApp(r.data.user);
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  location.reload();
+}
+
+async function startApp(user){
+  currentUser = user;
+  $("authScreen").style.display = "none";
+  $("app").style.display = "block";
+  await loadProfile();
+  loadFriends();
+  loadMessages();
+  loadLeaderboard();
+  page("home");
+}
+
+async function loadProfile(){
+  const r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+  if(!r.data){
+    const fallback = {id: currentUser.id, username: currentUser.user_metadata?.username || "PLAYER", avatar: currentUser.user_metadata?.avatar || "👾", xp: 0};
+    await sb.from("profiles").upsert(fallback);
+    currentProfile = fallback;
+  } else {
+    currentProfile = r.data;
+  }
+  $("sideName").textContent = currentProfile.username;
+  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("profileNameDisplay").textContent = currentProfile.username;
+  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("editUsernameInput").value = currentProfile.username;
+  $("editBioInput").value = currentProfile.bio || "";
+  $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
+  $("statXP").textContent = currentProfile.xp || 0;
+  if(currentProfile.avatar_url) {
+    $("sideAvatar").innerHTML = `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover"><span class="online"></span>`;
+    $("profileAvatar").innerHTML = `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover"><span class="online"></span>`;
+    $("headAvatar").innerHTML = `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`;
+  } else {
+    $("sideAvatar").innerHTML = currentProfile.avatar + '<span class="online"></span>';
+    $("profileAvatar").innerHTML = currentProfile.avatar + '<span class="online"></span>';
+    $("headAvatar").textContent = currentProfile.avatar;
   }
 }
 
-function page(name, btn){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const target = $(name);
-  if(target) target.classList.add("active");
-  if(btn){
-    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-  }
-  if(name === 'messages') updateNotificationBadge();
-  if(name === 'adminPanel' && isAdmin()) loadAdminUsers();
+async function saveProfileInfo(){
+  const username = $("editUsernameInput").value.trim();
+  const bio = $("editBioInput").value.trim();
+  if(!username) return toast("Username cannot be empty");
+  const r = await sb.from("profiles").update({username, bio}).eq("id", currentUser.id);
+  if(r.error) return toast("Error updating profile");
+  currentProfile.username = username;
+  currentProfile.bio = bio;
+  await loadProfile();
+  toast("✅ Profile updated!");
 }
-window.page = page;
+
+async function uploadAvatar(){
+  const file = $("avatarUploadInput").files[0];
+  if(!file) return;
+  try{
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/avatar_${Date.now()}.${ext}`;
+    const u = await sb.storage.from("avatars").upload(path, file, {upsert:true});
+    if(u.error) throw u.error;
+    const avatar_url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+    await sb.from("profiles").update({avatar_url}).eq("id", currentUser.id);
+    currentProfile.avatar_url = avatar_url;
+    await loadProfile();
+    toast("✅ Avatar uploaded!");
+  } catch(err){
+    toast("❌ Upload failed");
+  }
+}
+
+async function removeAvatar(){
+  await sb.from("profiles").update({avatar_url: null}).eq("id", currentUser.id);
+  currentProfile.avatar_url = null;
+  await loadProfile();
+  toast("🗑️ Avatar removed");
+}
+
+async function loadFriends(){
+  const r = await sb.from("profiles").select("id,username,avatar,avatar_url,xp").order("username").limit(20);
+  if(!r.data) return;
+  $("friendsList").innerHTML = r.data.filter(u => u.id !== currentUser.id).map(u => `
+    <div class="card" style="display:flex;align-items:center;gap:10px;padding:12px;cursor:pointer" onclick="openChat('${u.id}','${esc(u.username)}')">
+      <div style="width:40px;height:40px;border-radius:6px;background:#0d1829;display:flex;align-items:center;justify-content:center;font-size:18px">${u.avatar_url ? `<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">` : esc(u.avatar || '👾')}</div>
+      <div style="flex:1">
+        <div style="font-weight:700">${esc(u.username)}</div>
+        <div class="tiny">Level ${Math.floor((u.xp || 0) / 100) + 1}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadMessages(){
+  if(!currentUser) return;
+  const r = await sb.from("messages").select("sender_id,receiver_id,created_at").eq("receiver_id", currentUser.id).order("created_at", {ascending:false}).limit(20);
+  if(!r.data) return;
+  const userIds = [...new Set(r.data.map(m => String(m.sender_id)))];
+  if(userIds.length === 0) { $("chatUsersList").innerHTML = '<div class="tiny">No conversations yet</div>'; return; }
+  const users = await sb.from("profiles").select("id,username,avatar,avatar_url").in("id", userIds);
+  $("chatUsersList").innerHTML = (users.data || []).map(u => `
+    <div class="chat-user" onclick="openChat('${u.id}','${esc(u.username)}')">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:4px;background:#0d1829;display:flex;align-items:center;justify-content:center;font-size:14px">${u.avatar_url ? `<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">` : esc(u.avatar || '👾')}</div>
+        <div style="flex:1">${esc(u.username)}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function openChat(userId, username){
+  selectedUser = userId;
+  $("selectedUserName").textContent = esc(username);
+  $("messageInput").disabled = false;
+  $("sendBtn").style.display = "inline-block";
+  $("stickerBtn").style.display = "inline-block";
+  $("imageBtn").style.display = "inline-block";
+  $("voiceCallBtn").style.display = "inline-block";
+  $("videoCallBtn").style.display = "inline-block";
+  const r = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).order("created_at");
+  $("messagesList").innerHTML = (r.data || []).map(m => `
+    <div class="message" style="justify-content:${m.sender_id === currentUser.id ? 'flex-end' : 'flex-start'}">
+      <div class="message-body" style="max-width:70%">
+        <div class="message-content">${esc(m.content || '')}</div>
+        <div class="message-time">${new Date(m.created_at).toLocaleTimeString()}</div>
+      </div>
+    </div>
+  `).join('');
+  $("messagesList").scrollTop = $("messagesList").scrollHeight;
+}
+
+async function sendMessage(){
+  if(!selectedUser || !$("messageInput").value.trim()) return;
+  const content = $("messageInput").value.trim();
+  await sb.from("messages").insert({sender_id: currentUser.id, receiver_id: selectedUser, content, created_at: new Date().toISOString(), is_read: false});
+  $("messageInput").value = "";
+  await openChat(selectedUser, $("selectedUserName").textContent);
+}
+
+function toggleStickerPicker(){
+  const picker = $("stickerPicker");
+  picker.style.display = picker.style.display === "none" ? "flex" : "none";
+  if(picker.style.display === "flex" && picker.innerHTML === ""){
+    picker.innerHTML = STICKERS.map(s => `<button class="sticker-picker" style="font-size:20px;padding:6px;border:none;background:transparent;cursor:pointer" onclick="sendSticker('${s}')">${s}</button>`).join('');
+  }
+}
+
+async function sendSticker(emoji){
+  if(!selectedUser) return;
+  await sb.from("messages").insert({sender_id: currentUser.id, receiver_id: selectedUser, content: emoji, created_at: new Date().toISOString(), is_read: false});
+  await openChat(selectedUser, $("selectedUserName").textContent);
+}
+
+async function selectChatMedia(type){
+  const input = type === 'image' ? $("chatImageInput") : null;
+  if(!input || !input.files[0]) return;
+  const file = input.files[0];
+  try{
+    const ext = file.name.split('.').pop();
+    const path = `${currentUser.id}/${type}_${Date.now()}.${ext}`;
+    const u = await sb.storage.from("messages").upload(path, file);
+    if(u.error) throw u.error;
+    const url = sb.storage.from("messages").getPublicUrl(path).data.publicUrl;
+    await sb.from("messages").insert({sender_id: currentUser.id, receiver_id: selectedUser, content: `[${type}]`, image_url: type === 'image' ? url : null, created_at: new Date().toISOString(), is_read: false});
+    await openChat(selectedUser, $("selectedUserName").textContent);
+  } catch(err){
+    toast("❌ Upload failed");
+  }
+}
+
+async function loadLeaderboard(){
+  const r = await sb.from("profiles").select("id,username,avatar,avatar_url,xp").order("xp", {ascending:false}).limit(20);
+  $("leaderList").innerHTML = (r.data || []).map((u, i) => `
+    <div class="rank-row">
+      <div class="rank-num">#${i+1}</div>
+      <div class="rank-avatar">${u.avatar_url ? `<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">` : esc(u.avatar || '👾')}</div>
+      <div style="flex:1"><div style="font-weight:700">${esc(u.username)}</div><div class="tiny">Level ${Math.floor((u.xp || 0) / 100) + 1}</div></div>
+      <div style="text-align:right"><div style="font-weight:700;color:#78ff43">${u.xp || 0} XP</div></div>
+    </div>
+  `).join('');
+}
+
+function initiateVoiceCall(){
+  const now = new Date();
+  callHistory.push({type: 'voice', with: $("selectedUserName").textContent, time: now.toLocaleTimeString(), date: now.toLocaleDateString(), direction: 'placed'});
+  localStorage.setItem('pixelFriendCallHistory', JSON.stringify(callHistory));
+  toast("📞 Voice call initiated to " + $("selectedUserName").textContent);
+}
+
+function initiateVideoCall(){
+  const now = new Date();
+  callHistory.push({type: 'video', with: $("selectedUserName").textContent, time: now.toLocaleTimeString(), date: now.toLocaleDateString(), direction: 'placed'});
+  localStorage.setItem('pixelFriendCallHistory', JSON.stringify(callHistory));
+  toast("🎥 Video call initiated to " + $("selectedUserName").textContent);
+}
 
 function authTab(t){
   const l = t === "login";
@@ -482,2294 +556,29 @@ function authTab(t){
   $("loginTab").classList.toggle("active", l);
   $("regTab").classList.toggle("active", !l);
 }
+
 window.authTab = authTab;
-
-async function register(){
-  const username = $("regName").value.trim();
-  const email = $("regEmail").value.trim().toLowerCase();
-  const password = $("regPass").value;
-  const avatar = $("regAvatar").value;
-  if(username.length < 2 || !email.includes("@") || password.length < 6) return status("authStatus","Check input fields.",true);
-  status("authStatus","Creating account...");
-  const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});
-  if(r.error) return status("authStatus", r.error.message, true);
-  const loginRes = await sb.auth.signInWithPassword({email, password});
-  if(loginRes.error){
-    status("authStatus", "Account created! Please log in.");
-    authTab('login');
-  } else {
-    await startApp(loginRes.data.user);
-  }
-}
 window.register = register;
-
-async function guestLogin(){
-  status("authStatus","Creating guest account...");
-  const r = await sb.auth.signInAnonymously({
-    options:{data:{username:"GUEST-" + Math.random().toString(36).slice(2,7).toUpperCase(), avatar:"🎮", is_guest:true}}
-  });
-  if(r.error) return status("authStatus", "Guest login failed: " + r.error.message, true);
-  await startApp(r.data.user);
-}
-window.guestLogin = guestLogin;
-
-async function login(){
-  const email = $("loginEmail").value.trim().toLowerCase();
-  const password = $("loginPass").value;
-  if(!email || !password) return status("authStatus","Enter email & password.",true);
-  status("authStatus","Logging in...");
-  const r = await sb.auth.signInWithPassword({email, password});
-  if(r.error) return status("authStatus", r.error.message, true);
-  await startApp(r.data.user);
-}
 window.login = login;
-
-async function startApp(user){
-  currentUser = user;
-  $("authScreen").style.display = "none";
-  $("app").style.display = "block";
-  playRetroSound('success');
-  await loadProfile();
-  await applyPendingInvite();
-
-  if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
-    await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);
-    currentProfile.is_admin = true;
-  }
-
-  if(isAdmin()){
-    $("navAdmin").classList.remove("hidden");
-  }
-
-  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
-  setupRealtime();
-  await setupPresence();
-  page("home");
-}
-
-async function refreshHomeDashboard(){
-  if(!currentProfile) return;
-  if(currentUser) await loadFollowingState();
-  const xp = Number(currentProfile.xp || 0), level = Math.floor(xp / 100) + 1, progress = xp % 100;
-  const setText=(id,v)=>{const e=$(id); if(e)e.textContent=v};
-  setText('railLevel', level); setText('railXpText', `${progress} / 100 XP`);
-  const bar=$('railXpBar'); if(bar) bar.style.width = progress + '%';
-  try{
-    const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
-    const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.avatar||'👾')}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
-    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
-  }catch(e){ console.warn('Dashboard widgets:',e); }
-  const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
-}
-async function claimDailyBonus(){
-  if(!currentUser || !currentProfile) return;
-  const key='pixelFriendDailyBonus', today=new Date().toDateString();
-  if(localStorage.getItem(key)===today) return toast('🎁 Daily bonus already claimed! Come back tomorrow.');
-  const newXP=Number(currentProfile.xp||0)+50;
-  const {error}=await sb.from('profiles').update({xp:newXP}).eq('id',currentUser.id);
-  if(error) return toast('❌ Unable to claim bonus: '+error.message);
-  currentProfile.xp=newXP; localStorage.setItem(key,today); toast('🎉 +50 XP claimed!'); await loadProfile(); await refreshHomeDashboard();
-}
-window.claimDailyBonus=claimDailyBonus;
-
-async function loadProfile(){
-  const authGuest = currentUser?.is_anonymous === true || currentUser?.user_metadata?.is_guest === true;
-  let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
-
-  if(!r.data){
-    const fallback = {
-      id: currentUser.id,
-      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
-      avatar: currentUser.user_metadata?.avatar || (authGuest ? "🎮" : "👾"),
-      xp: 0,
-      is_verified: false,
-      is_guest: authGuest
-    };
-    r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
-  } else if(authGuest && r.data.is_guest !== true){
-    // A database trigger may already have created this profile with the default
-    // is_guest=false. Correct it immediately for every anonymous login.
-    const {data: fixedProfile, error: fixError} = await sb
-      .from("profiles")
-      .update({is_guest:true})
-      .eq("id", currentUser.id)
-      .select("*")
-      .maybeSingle();
-    if(!fixError && fixedProfile) r.data = fixedProfile;
-    else r.data = {...r.data, is_guest:true}; // still identify correctly in this session
-  }
-
-  currentProfile = r.data;
-  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
-  $("sideName").textContent = currentProfile.username + verifiedBadge;
-  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
-  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
-  document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
-  $("editUsernameInput").value = currentProfile.username || "";
-  $("editBioInput").value = currentProfile.bio || "";
-  $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
-  $("statXP").textContent = currentProfile.xp || 0;
-  renderAvatarDisplay();
-  refreshHomeDashboard();
-}
-
-function renderAvatarDisplay(){
-  const html = currentProfile.avatar_url
-    ? `<img src="${esc(currentProfile.avatar_url)}"><span class="online"></span>`
-    : `${esc(currentProfile.avatar||"👾")}<span class="online"></span>`;
-  $("sideAvatar").innerHTML = html;
-  $("profileAvatar").innerHTML = html;
-  $("headAvatar").innerHTML = currentProfile.avatar_url
-    ? `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`
-    : esc(currentProfile.avatar||"👾");
-}
-
-async function saveProfileInfo(){
-  const username = $("editUsernameInput").value.trim();
-  const bio = $("editBioInput").value.trim();
-  if(!username) return toast("Username cannot be empty");
-  const r = await sb.from("profiles").update({ username, bio }).eq("id", currentUser.id);
-  if(r.error) return toast("❌ Error updating profile: " + r.error.message);
-  currentProfile.username = username;
-  currentProfile.bio = bio;
-  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
-  $("sideName").textContent = username + verifiedBadge;
-  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = bio || "PIXEL EXPLORER";
-  $("profileNameDisplay").textContent = username + verifiedBadge;
-  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
-  playRetroSound('success');
-  toast("✅ Profile details updated!");
-}
-window.saveProfileInfo = saveProfileInfo;
-
-async function uploadAvatar(){
-  const file = $("avatarUploadInput").files[0];
-  if(!file) return;
-  toast("Uploading avatar...");
-  try{
-    const ext = file.name.split('.').pop();
-    const path = `${currentUser.id}/avatar_${Date.now()}.${ext}`;
-    const u = await sb.storage.from("avatars").upload(path, file, {upsert:true});
-    if(u.error) throw u.error;
-    const avatar_url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
-    await sb.from("profiles").update({ avatar_url }).eq("id", currentUser.id);
-    currentProfile.avatar_url = avatar_url;
-    renderAvatarDisplay();
-    playRetroSound('success');
-    toast("✅ Avatar uploaded!");  } catch(err){
-    toast("❌ Avatar upload failed: " + err.message);
-  }
-}
-window.uploadAvatar = uploadAvatar;
-
-async function removeAvatar(){
-  try{
-    await sb.from("profiles").update({ avatar_url: null }).eq("id", currentUser.id);
-    currentProfile.avatar_url = null;
-    renderAvatarDisplay();
-    toast("🗑️ Avatar removed!");  } catch(err){
-    toast("❌ Error removing avatar");  }
-}
-window.removeAvatar = removeAvatar;
-
-async function loadAdminUsers(){
-  if(!isAdmin()) return toast("❌ Unauthorized access");
-  const r = await sb.from("profiles").select("*").order("username", {ascending: true});
-  if(!r.data) return;
-
-  $("adminUserList").innerHTML = r.data.map(u => {
-    const isUserAdmin = u.is_admin === true;
-    const isVerified = u.is_verified === true;
-    return `
-      <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div class="row" style="gap:12px; align-items:center;">
-          <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-          <div>
-            <strong>${esc(u.username)}</strong>
-            ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
-            ${isVerified ? '<span style="color:var(--green);font-size:14px;">✅ [VERIFIED]</span>' : ''} ${accountBadge(u, true)}
-            <div class="tiny">ID: ${u.id}</div>
-          </div>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">
-            ${isVerified ? '❌ Unverify' : '✅ Verify Account'}
-          </button>
-          <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">
-            ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}
-          </button>
-        </div>
-      </div>    `;
-  }).join('');
-}
-window.loadAdminUsers = loadAdminUsers;
-
-async function toggleUserAdmin(targetUserId, currentStatus){
-  if(!isAdmin()) return toast("❌ Admin privileges required.");
-  const newStatus = !currentStatus;
-  const r = await sb.from("profiles").update({ is_admin: newStatus }).eq("id", targetUserId);
-  if(r.error){
-    toast("❌ Error: " + r.error.message);
-  } else {
-    toast(newStatus ? "✅ User promoted to Admin!" : "ℹ️ Admin role revoked.");
-    playRetroSound('success');
-    loadAdminUsers();
-  }
-}
-window.toggleUserAdmin = toggleUserAdmin;
-
-async function toggleUserVerify(targetUserId, currentStatus){
-  if(!isAdmin()) return toast("❌ Admin privileges required.");
-  const newStatus = !currentStatus;
-  const r = await sb.from("profiles").update({ is_verified: newStatus }).eq("id", targetUserId);
-  if(r.error){
-    toast("❌ Error: " + r.error.message);
-  } else {
-    toast(newStatus ? "✅ Account verified successfully!" : "ℹ️ Account verification removed.");
-    playRetroSound('success');
-    loadAdminUsers();
-  }
-}
-window.toggleUserVerify = toggleUserVerify;
-
-let notificationInitialized = false;
-let knownUnreadMessageIds = new Set();
-let notificationCheckInFlight = false;
-let localUnreadCount = 0;
-let notificationProfileCache = new Map();
-let notificationProfileDataCache = new Map();
-let notificationItems = new Map();
-
-function renderNotificationBadge(count){
-  localUnreadCount = Math.max(0, Number(count) || 0);
-  const badge = $("notifBadge");
-  if(!badge) return;
-  badge.textContent = localUnreadCount > 99 ? '99+' : String(localUnreadCount);
-  badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
-}
-
-function notificationDetail(message){
-  const text = (message?.content || '').trim();
-  if(text) return text;
-  if(message?.sticker) return '🎟️ Sent a sticker';
-  if(message?.image_url) return '🖼️ Sent an image';
-  if(message?.video_url) return '📹 Sent a video';
-  if(message?.audio_url) return '🎤 Sent a voice message';
-  return '📩 Sent a message';
-}
-
-function notificationIcon(message){
-  if((message?.content || '').trim()) return '💬';
-  if(message?.sticker) return '🎟️';
-  if(message?.image_url) return '🖼️';
-  if(message?.video_url) return '📹';
-  if(message?.audio_url) return '🎤';
-  return '🔔';
-}
-
-function renderNotificationList(){
-  const list = $("notificationList");
-  if(!list) return;
-  const rows = Array.from(notificationItems.values()).sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)).slice(0,50);
-  if(!rows.length){ list.innerHTML = '<div class="notification-empty">NO NEW NOTIFICATIONS</div>'; return; }
-  list.innerHTML = rows.map(n => `
-    <div class="notification-item ${n.unread ? 'unread' : ''}" onclick="openNotification('${esc(String(n.id))}','${esc(String(n.sender_id))}','${esc(n.senderName || 'PIXEL USER')}')">
-      <div class="notification-item-icon">${notificationIcon(n)}</div>
-      <div class="notification-item-body">
-        <div class="notification-item-title">${esc(n.senderName || 'PIXEL USER')}</div>
-        <div class="notification-item-text">${esc(notificationDetail(n))}</div>
-        <div class="notification-item-time">${n.created_at ? new Date(n.created_at).toLocaleString() : 'Just now'}</div>
-      </div>
-    </div>`).join('');
-}
-
-function addNotificationItem(message, senderName, unread=true){
-  if(!message?.id) return;
-  notificationItems.set(String(message.id), {...message, senderName: senderName || 'PIXEL USER', unread});
-  renderNotificationList();
-}
-
-function toggleNotifications(e){
-  if(e) e.stopPropagation();
-  const panel = $("notificationPanel");
-  if(!panel) return;
-  panel.classList.toggle('hidden');
-  if(!panel.classList.contains('hidden')) updateNotificationBadge({details:true});
-}
-window.toggleNotifications = toggleNotifications;
-
-document.addEventListener('click', e => {
-  const wrap = document.querySelector('.notification-wrap');
-  const panel = $("notificationPanel");
-  if(panel && wrap && !wrap.contains(e.target)) panel.classList.add('hidden');
-});
-
-async function openNotification(id, senderId, senderName){
-  const item = notificationItems.get(String(id));
-  if(item) item.unread = false;
-  renderNotificationList();
-  try { await sb.from('messages').update({is_read:true, read_at:new Date().toISOString()}).eq('id', id).eq('receiver_id', currentUser.id); } catch(e) {}
-  knownUnreadMessageIds.delete(String(id));
-  await updateNotificationBadge({details:true});
-  $("notificationPanel")?.classList.add('hidden');
-  openChat(senderId, senderName);
-}
-window.openNotification = openNotification;
-
-async function markAllNotificationsRead(e){
-  if(e) e.stopPropagation();
-  if(!currentUser) return;
-  try { await sb.from('messages').update({is_read:true, read_at:new Date().toISOString()}).eq('receiver_id', currentUser.id).eq('is_read', false); } catch(e) {}
-  notificationItems.clear();
-  knownUnreadMessageIds.clear();
-  renderNotificationBadge(0);
-  renderNotificationList();
-  toast('✅ Notifications marked as read');
-}
-window.markAllNotificationsRead = markAllNotificationsRead;
-
-function notifyIncomingMessage(message){
-  if(!currentUser || !message?.id || String(message.receiver_id) !== String(currentUser.id)) return;
-
-  const id = String(message.id);
-  if(knownUnreadMessageIds.has(id)) return;
-  knownUnreadMessageIds.add(id);
-
-  const senderId = String(message.sender_id || '');
-  const senderName = notificationProfileCache.get(senderId) || 'PIXEL USER';
-  const cachedProfile = notificationProfileDataCache.get(senderId);
-  const senderAvatar = cachedProfile
-    ? (cachedProfile.avatar_url
-        ? `<img src="${esc(cachedProfile.avatar_url)}" alt="">`
-        : esc(cachedProfile.avatar || '👾'))
-    : '👾';
-
-  // IMMEDIATE UI + SOUND — no await, no database lookup.
-  renderNotificationBadge(localUnreadCount + 1);
-  addNotificationItem(message, senderName, true);
-  showTelegramNotification(message, senderName, senderAvatar);
-  playRetroSound('notification');
-
-  if('Notification' in window && Notification.permission === 'granted'){
-    try{
-      new Notification(`💬 ${senderName}`, {
-        body: notificationDetail(message),
-        tag:'pixel-friend-'+id,
-        renotify:true
-      });
-    }catch(e){}
-  }
-
-  // Profile lookup happens AFTER the alert is already visible/audible.
-  if(!notificationProfileCache.has(senderId) && message.sender_id){
-    sb.from('profiles')
-      .select('username,avatar,avatar_url')
-      .eq('id', message.sender_id)
-      .maybeSingle()
-      .then(({data}) => {
-        const resolved = data?.username || 'PIXEL USER';
-        notificationProfileCache.set(senderId, resolved);
-        notificationProfileDataCache.set(senderId, data || {});
-        const existing = notificationItems.get(id);
-        if(existing){
-          existing.senderName = resolved;
-          renderNotificationList();
-        }
-      })
-      .catch(()=>{});
-  }
-}
-
-function showTelegramNotification(message, senderName, senderAvatar='👾'){
-  const stack = $("pfLiveNotificationStack");
-  if(!stack || !message?.id) return;
-
-  const id = String(message.id);
-  // Prevent duplicate popups for the same message.
-  if(stack.querySelector(`[data-pf-notification-id="${CSS.escape(id)}"]`)) return;
-
-  const item = document.createElement('div');
-  item.className = 'pf-live-notification';
-  item.dataset.pfNotificationId = id;
-  item.setAttribute('role','button');
-  item.innerHTML = `
-    <div class="pf-live-notification-avatar">${senderAvatar || '👾'}</div>
-    <div class="pf-live-notification-main">
-      <div class="pf-live-notification-head">
-        <div class="pf-live-notification-name">${esc(senderName || 'PIXEL USER')}</div>
-        <div class="pf-live-notification-time">now</div>
-      </div>
-      <div class="pf-live-notification-text">${esc(notificationDetail(message))}</div>
-      <div class="pf-live-notification-progress"><span></span></div>
-    </div>
-    <button class="pf-live-notification-close" type="button" aria-label="Close">×</button>
-  `;
-
-  const open = () => {
-    item.classList.add('removing');
-    setTimeout(() => item.remove(), 200);
-    openNotification(id, message.sender_id, senderName);
-  };
-
-  item.addEventListener('click', e => {
-    if(e.target.closest('.pf-live-notification-close')) return;
-    open();
-  });
-
-  item.querySelector('.pf-live-notification-close')?.addEventListener('click', e => {
-    e.stopPropagation();
-    item.classList.add('removing');
-    setTimeout(() => item.remove(), 200);
-  });
-
-  stack.prepend(item);
-
-  // Keep the stack compact.
-  while(stack.children.length > 4) stack.lastElementChild.remove();
-
-  // Auto-dismiss after 5 seconds, like a chat notification preview.
-  setTimeout(() => {
-    if(!item.isConnected) return;
-    item.classList.add('removing');
-    setTimeout(() => item.remove(), 200);
-  }, 7000);
-}
-
-function requestNotificationPermission(){
-  if('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(()=>{});
-}
-window.requestNotificationPermission = requestNotificationPermission;
-document.addEventListener('click', () => requestNotificationPermission(), {once:true});
-
-async function updateNotificationBadge(options = {}){
-  if(!currentUser || notificationCheckInFlight) return;
-  notificationCheckInFlight = true;
-  try {
-    const {data,error} = await sb.from('messages').select('id,sender_id,receiver_id,content,sticker,image_url,video_url,audio_url,created_at,is_read').eq('receiver_id', currentUser.id).eq('is_read', false).order('created_at', {ascending:false});
-    if(error) throw error;
-    const unreadRows = data || [];
-    const unreadIds = new Set(unreadRows.map(m => String(m.id)));
-    for(const m of unreadRows){
-      const name = notificationProfileCache.get(String(m.sender_id)) || 'PIXEL USER';
-      addNotificationItem(m, name, true);
-    }
-    for(const id of Array.from(notificationItems.keys())) if(!unreadIds.has(id)) notificationItems.delete(id);
-    knownUnreadMessageIds = unreadIds;
-    notificationInitialized = true;
-    renderNotificationBadge(unreadRows.length);
-    renderNotificationList();
-  } catch(e){ console.warn('Notification badge:', e); }
-  finally { notificationCheckInFlight = false; }
-}
-
-function previewPostFile(type){
-  if(type==='image'){
-    postImageFile = $("postImageInput").files[0];
-    if(postImageFile){ $("postImagePill").textContent = "🖼️ " + postImageFile.name; $("postImagePill").classList.remove("hidden"); }
-  } else if(type==='video'){
-    postVideoFile = $("postVideoInput").files[0];
-    if(postVideoFile){ $("postVideoPill").textContent = "📹 " + postVideoFile.name; $("postVideoPill").classList.remove("hidden"); }
-  } else if(type==='audio'){
-    postAudioFile = $("postAudioInput").files[0];
-    if(postAudioFile){ $("postAudioPill").textContent = "🎵 " + postAudioFile.name; $("postAudioPill").classList.remove("hidden"); }
-  }
-}
-window.previewPostFile = previewPostFile;
-
-async function createPost(){
-  const text = $("postText").value.trim();
-  if(!text && !postImageFile && !postVideoFile && !postAudioFile) return toast("Write content or attach media to post.");
-  status("postStatus", "Publishing post...");
-
-  let image_url = null, video_url = null, audio_url = null;
-
-  try {
-    if(postImageFile){
-      const ext = postImageFile.name.split('.').pop();
-      const path = `${currentUser.id}/post_img_${Date.now()}.${ext}`;
-      const u = await sb.storage.from("posts").upload(path, postImageFile);
-      if(u.error) throw u.error;
-      image_url = sb.storage.from("posts").getPublicUrl(path).data.publicUrl;
-    }
-
-    if(postVideoFile){
-      const ext = postVideoFile.name.split('.').pop();
-      const path = `${currentUser.id}/post_vid_${Date.now()}.${ext}`;
-      const u = await sb.storage.from("posts").upload(path, postVideoFile);
-      if(u.error) throw u.error;
-      video_url = sb.storage.from("posts").getPublicUrl(path).data.publicUrl;
-    }
-
-    if(postAudioFile){
-      const ext = postAudioFile.name.split('.').pop();
-      const path = `${currentUser.id}/post_aud_${Date.now()}.${ext}`;
-      const u = await sb.storage.from("posts").upload(path, postAudioFile);
-      if(u.error) throw u.error;
-      audio_url = sb.storage.from("posts").getPublicUrl(path).data.publicUrl;
-    }
-
-    const { error } = await sb.from("posts").insert({
-      user_id: currentUser.id,
-      content: text,
-      image_url,
-      video_url,
-      audio_url
-    });
-
-    if(error) throw error;
-
-    const newXP = (currentProfile.xp || 0) + 10;
-    await sb.from("profiles").update({ xp: newXP }).eq("id", currentUser.id);
-    currentProfile.xp = newXP;
-
-    $("postText").value = "";
-    postImageFile = null; postVideoFile = null; postAudioFile = null;
-    $("postImagePill").classList.add("hidden");
-    $("postVideoPill").classList.add("hidden");
-    $("postAudioPill").classList.add("hidden");
-    $("postImageInput").value = "";
-    $("postVideoInput").value = "";
-    $("postAudioInput").value = "";
-
-    status("postStatus", "✅ Post published successfully!");
-    playRetroSound('success');
-    await loadFeed();
-    await loadProfile();
-  } catch(err){
-    status("postStatus", "❌ Error publishing post: " + err.message, true);
-  }
-}
-window.createPost = createPost;
-
-let feedRenderSignature = "";
-let feedRefreshTimer = null;
-let messageRefreshTimer = null;
-let notificationRefreshTimer = null;
-let feedRealtimeStatus = "DISCONNECTED";
-let feedLoadInFlight = false;
-let messageLoadInFlight = false;
-let messageRenderSignature = "";
-
-
-function getPostViewCount(postId){
-  try { return Number(localStorage.getItem('pf_post_views_' + postId) || 0); }
-  catch(e){ return 0; }
-}
-
-function recordPostView(postId){
-  let count = getPostViewCount(postId) + 1;
-  try { localStorage.setItem('pf_post_views_' + postId, String(count)); } catch(e) {}
-  const el = document.getElementById('postViews_' + postId);
-  if(el) el.textContent = `👁️ ${count} VIEWS`;
-  return count;
-}
-
-async function viewPost(postId){
-  if(!postId) return;
-  const modal = $('postViewModal');
-  const box = $('postViewContent');
-  if(!modal || !box) return;
-
-  box.innerHTML = '<div class="tiny">Loading post...</div>';
-  modal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  recordPostView(postId);
-
-  try{
-    const {data: post, error} = await sb
-      .from('posts')
-      .select('*, profiles(username, avatar, avatar_url, is_verified, is_guest)')
-      .eq('id', postId)
-      .maybeSingle();
-    if(error) throw error;
-    if(!post) throw new Error('Post not found.');
-
-    const u = post.profiles || {};
-    const avatar = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || '👾');
-    const verified = u.is_verified ? ' ✅' : '';
-    const badge = accountBadge(u, true);
-
-    box.innerHTML = `
-      <div class="post-author">
-        <div class="user-avatar">${avatar}</div>
-        <div>
-          <strong>${esc(u.username || 'PLAYER')}${verified}${badge}</strong>
-          <div class="post-view-meta">${new Date(post.created_at).toLocaleString()} • 👁️ ${getPostViewCount(postId)} local views</div>
-        </div>
-      </div>
-      ${post.content ? `<div class="post-view-text">${esc(post.content)}</div>` : ''}
-      ${post.image_url ? `<img src="${esc(post.image_url)}" class="post-view-media" loading="lazy" decoding="async">` : ''}
-      ${post.video_url ? `<video src="${esc(post.video_url)}" controls autoplay preload="metadata" class="post-view-media"></video>` : ''}
-      ${post.audio_url ? `<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>` : ''}
-      <div class="post-view-footer">
-        <button class="post-action-btn share" onclick="sharePost('${post.id}')">↗️ SHARE POST</button>
-        <button class="post-action-btn view" onclick="closePostView()">← BACK TO FEED</button>
-      </div>
-    `;
-  }catch(e){
-    box.innerHTML = `<div class="tiny" style="color:#ff86ac">❌ Unable to load post: ${esc(e.message || 'Unknown error')}</div>`;
-  }
-}
-window.viewPost = viewPost;
-
-function closePostView(){
-  const modal = $('postViewModal');
-  if(modal) modal.classList.add('hidden');
-  document.body.style.overflow = '';
-}
-window.closePostView = closePostView;
-
-
-function getInviteUrl(userId=currentUser?.id){
-  const base = window.location.origin + window.location.pathname;
-  return base + '?invite=' + encodeURIComponent(userId || '');
-}
-function readInviteFromUrl(){
-  try{
-    const id = new URLSearchParams(window.location.search).get('invite');
-    if(id && /^[0-9a-fA-F-]{20,}$/.test(id)){
-      localStorage.setItem('pf_pending_inviter', id);
-      return id;
-    }
-  }catch(e){}
-  return localStorage.getItem('pf_pending_inviter') || '';
-}
-function clearInviteFromUrl(){
-  try{
-    const u=new URL(window.location.href);
-    u.searchParams.delete('invite');
-    history.replaceState({},'',u.pathname+u.search+u.hash);
-  }catch(e){}
-}
-async function openInviteModal(){
-  if(!currentUser) return toast('Please log in first.');
-  const link=getInviteUrl();
-  const input=$('inviteLink'); if(input) input.value=link;
-  const stat=$('inviteStats');
-  if(stat){
-    let count=0;
-    try{
-      const {count:c,error}=await sb.from('profiles').select('*',{count:'exact',head:true}).eq('invited_by',currentUser.id);
-      if(!error) count=c||0;
-    }catch(e){}
-    stat.textContent='👥 Joined through your link: '+count;
-  }
-  $('inviteModal')?.classList.remove('hidden');
-}
-function closeInviteModal(){ $('inviteModal')?.classList.add('hidden'); }
-async function copyInviteLink(){
-  const link=$('inviteLink')?.value || getInviteUrl();
-  const ok=await copyShareText(link);
-  toast(ok?'🔗 Invite link copied!':'Copy this invite link manually.');
-  if(!ok) window.prompt('Copy your invite link:',link);
-}
-async function shareInviteLink(){
-  const link=$('inviteLink')?.value || getInviteUrl();
-  const title='Join me on Pixel-Friend!';
-  const text='👾 Join me on Pixel-Friend and let’s connect!';
-  if(navigator.share){
-    try{ await navigator.share({title,text,url:link}); toast('🚀 Invite shared successfully!'); return; }
-    catch(e){ if(e?.name==='AbortError') return; }
-  }
-  const ok=await copyShareText(link);
-  if(ok) toast('🔗 Invite link copied! Paste it anywhere to invite friends.');
-  else window.prompt('Copy your invite link:',link);
-}
-async function applyPendingInvite(){
-  if(!currentUser) return;
-  const inviterId=readInviteFromUrl();
-  if(!inviterId || inviterId===currentUser.id) return;
-  // Try to remember the referral in the profile. If the column is not configured, follow fallback still works.
-  try{ await sb.from('profiles').update({invited_by:inviterId}).eq('id',currentUser.id).is('invited_by',null); }catch(e){}
-  // Automatically follow the inviter when the follows table is available.
-  try{
-    const {error}=await sb.from('follows').insert({follower_id:currentUser.id,following_id:inviterId});
-    if(error && !String(error.message||'').toLowerCase().includes('duplicate')) console.warn('Invite follow:',error.message);
-  }catch(e){}
-  localStorage.removeItem('pf_pending_inviter');
-  clearInviteFromUrl();
-  toast('🎉 You joined Pixel-Friend through a friend’s invite!');
-}
-window.openInviteModal=openInviteModal; window.closeInviteModal=closeInviteModal;
-window.copyInviteLink=copyInviteLink; window.shareInviteLink=shareInviteLink;
-
-async function copyShareText(value){
-  if(navigator.clipboard && window.isSecureContext){
-    await navigator.clipboard.writeText(value);
-    return true;
-  }
-  const ta = document.createElement('textarea');
-  ta.value = value;
-  ta.setAttribute('readonly','');
-  ta.style.position = 'fixed';
-  ta.style.left = '-9999px';
-  document.body.appendChild(ta);
-  ta.select();
-  ta.setSelectionRange(0, ta.value.length);
-  let copied = false;
-  try { copied = document.execCommand('copy'); } catch(e) { copied = false; }
-  document.body.removeChild(ta);
-  return copied;
-}
-
-async function sharePost(postId){
-  if(!postId) return;
-  const shareUrl = window.location.origin + window.location.pathname + '#post=' + encodeURIComponent(postId);
-  let title = 'Pixel-Friend Post';
-  let text = 'Check out this post on Pixel-Friend!';
-
-  try{
-    const {data} = await sb.from('posts').select('content, profiles(username)').eq('id', postId).maybeSingle();
-    if(data){
-      title = `${data.profiles?.username || 'Pixel-Friend'} on Pixel-Friend`;
-      if(data.content) text = data.content.slice(0, 180);
-    }
-  }catch(e){
-    console.warn('Could not load post details for sharing:', e);
-  }
-
-  // Native share first. If it is unavailable or fails, continue to copy fallback.
-  if(navigator.share){
-    try{
-      await navigator.share({title, text, url: shareUrl});
-      toast('🚀 Post shared successfully!');
-      return;
-    }catch(e){
-      // User cancelling the share sheet is not an error.
-      if(e?.name === 'AbortError') return;
-      console.warn('Native share failed, using copy fallback:', e);
-    }
-  }
-
-  try{
-    const copied = await copyShareText(shareUrl);
-    if(copied){
-      toast('🔗 Post link copied! You can now paste and share it anywhere.');
-      return;
-    }
-  }catch(e){
-    console.warn('Clipboard fallback failed:', e);
-  }
-
-  // Final fallback works even when Clipboard API is blocked.
-  window.prompt('Copy this post link and share it:', shareUrl);
-}
-window.copyShareText = copyShareText;
-window.sharePost = sharePost;
-
-document.addEventListener('keydown', e => {
-  if(e.key === 'Escape') closePostView();
-});
-
-async function loadFeed(forceRender = false) {
-  if (feedLoadInFlight) return;
-  feedLoadInFlight = true;
-
-  try {
-    // Fetch the three feed datasets in parallel. The old version fetched
-    // posts -> reactions -> comments sequentially, which made updates feel
-    // noticeably delayed even when Supabase responded quickly.
-    const [postsResult, reactionsResult, commentsResult] = await Promise.all([
-      sb.from("posts")
-        .select("*, profiles(username, avatar, avatar_url, is_verified, is_guest)")
-        .order("created_at", { ascending: false })
-        .limit(20),
-      sb.from("reactions").select("*"),
-      sb.from("comments")
-        .select("*, profiles(username, avatar, avatar_url, is_verified, is_guest)")
-        .order("created_at", { ascending: true })
-    ]);
-
-    const { data: posts, error } = postsResult;
-    const { data: reactions, error: reactionsError } = reactionsResult;
-    const { data: comments, error: commentsError } = commentsResult;
-
-    if(error || !posts) {
-      console.warn("Feed posts error:", error?.message || error);
-      return;
-    }
-
-    if(reactionsError) console.warn("Feed reactions error:", reactionsError.message);
-    if(commentsError) console.warn("Feed comments error:", commentsError.message);
-
-    // Build a stable signature. The page is only re-rendered when something
-    // actually changes, so users can type comments without the input being reset.
-    const signature = JSON.stringify({
-      posts: posts.map(p => ({
-        id:p.id, content:p.content, created_at:p.created_at,
-        user_id:p.user_id, image_url:p.image_url, video_url:p.video_url, audio_url:p.audio_url
-      })),
-      reactions: (reactions || []).map(r => ({ id:r.id, post_id:r.post_id, user_id:r.user_id, emoji:r.emoji })),
-      comments: (comments || []).map(c => ({
-        id:c.id, post_id:c.post_id, user_id:c.user_id, content:c.content,
-        parent_id:c.parent_id, created_at:c.created_at
-      }))
-    });
-
-    if(!forceRender && signature === feedRenderSignature) return;
-    feedRenderSignature = signature;
-
-    $("feed").innerHTML = posts.map(p => {
-      const u = p.profiles || {};
-      const verified = u.is_verified ? ' ✅' : '';
-      const userTypeBadge = accountBadge(u, true);
-      const avatarHtml = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || "👾");
-
-      const postReactions = (reactions || []).filter(r => r.post_id === p.id);
-      const postComments = (comments || []).filter(c => c.post_id === p.id);
-
-      const counts = { '👍': 0, '❤️': 0, '🔥': 0, '👾': 0 };
-      const userReacted = { '👍': false, '❤️': false, '🔥': false, '👾': false };
-
-      postReactions.forEach(r => {
-        if(counts[r.emoji] !== undefined) counts[r.emoji]++;
-        if(r.user_id === currentUser.id && userReacted[r.emoji] !== undefined) userReacted[r.emoji] = true;
-      });
-
-      const replyContext = activeReplyTargets[p.id];
-
-      return `
-        <div class="post-card">
-          <div class="post-header">
-            <div class="post-author">
-              <div class="user-avatar">${avatarHtml}</div>
-              <div><strong>${esc(u.username || "PLAYER")}${verified}${userTypeBadge}</strong><div class="tiny">${new Date(p.created_at).toLocaleString()}</div></div>
-            </div>
-            ${String(p.user_id) !== String(currentUser.id) ? `
-              <div class="post-author-actions" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                <button class="${followButtonClass(p.user_id)} follow-action-btn" data-follow-user-id="${esc(p.user_id)}" onclick="toggleFollow('${esc(p.user_id)}')">${followButtonLabel(p.user_id)}</button>
-                <button class="secondary" style="padding:6px 9px;font-size:12px" onclick="openChat('${esc(p.user_id)}','${esc(u.username || 'PIXEL USER')}')">💬</button>
-              </div>
-            ` : `<span class="tiny">YOUR POST</span>`}
-          </div>
-          <div style="word-break:break-word">${linkify(p.content)}</div>
-          ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img" loading="lazy" decoding="async">` : ''}
-          ${p.video_url ? `<video src="${esc(p.video_url)}" controls preload="metadata" class="post-media-img"></video>` : ''}
-          ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
-
-          <div class="post-actions">
-            <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
-            <button class="react-btn ${userReacted['❤️'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '❤️')">❤️ ${counts['❤️']}</button>
-            <button class="react-btn ${userReacted['🔥'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '🔥')">🔥 ${counts['🔥']}</button>
-            <button class="react-btn ${userReacted['👾'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👾')">👾 ${counts['👾']}</button>
-            ${p.user_id === currentUser.id ? `
-              <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
-            ` : ''}
-          </div>
-
-          <div class="post-engagement">
-            <button class="post-action-btn view" onclick="viewPost('${p.id}')">👁️ VIEW</button>
-            <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
-            <span id="postViews_${p.id}" class="post-view-count">👁️ ${getPostViewCount('${p.id}')} VIEWS</span>
-          </div>
-
-          <div class="comment-section">
-            <h3>💬 COMMENTS (${postComments.length})</h3>
-
-            ${replyContext ? `
-              <div class="comment-reply-preview">
-                <span>Replying to <strong>@${esc(replyContext.username)}</strong></span>
-                <button class="danger" style="padding:1px 6px;font-size:12px;" onclick="cancelReply('${p.id}')">✕</button>
-              </div>
-            ` : ''}
-
-            <div style="display:flex;gap:6px;margin-bottom:10px;">
-              <input id="commentInput_${p.id}" placeholder="${replyContext ? 'Type a reply to @' + esc(replyContext.username) + '...' : 'Write a comment...'}" onkeydown="if(event.key==='Enter')addComment('${p.id}')">
-              <button class="primary" style="padding:6px 12px;font-size:14px;" onclick="addComment('${p.id}')">SEND</button>
-            </div>
-            <div>
-              ${postComments.map(c => {
-                const cu = c.profiles || {};
-                const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👾");
-                return `
-                  <div class="comment-item">
-                    <div class="user-avatar" style="width:30px;height:30px;font-size:16px">${cAvatar}</div>
-                    <div style="flex:1;word-break:break-word;">
-                      <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div><strong>${esc(cu.username || "PLAYER")}${accountBadge(cu, true)}</strong><span class="tiny" style="margin-left:8px">${new Date(c.created_at).toLocaleTimeString()}</span></div>
-                        <button class="secondary" style="padding:2px 6px;font-size:12px;" onclick="setReplyTarget('${p.id}', '${c.id}', '${esc(cu.username || "PLAYER")}')">💬 Reply</button>
-                      </div>
-                      <div>${linkify(c.content)}</div>
-                    </div>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  } finally {
-    feedLoadInFlight = false;
-  }
-}
-
-function setReplyTarget(postId, commentId, username) {
-  activeReplyTargets[postId] = { commentId, username };
-  loadFeed();
-  const input = $(`commentInput_${postId}`);
-  if(input) input.focus();
-}
-window.setReplyTarget = setReplyTarget;
-
-function cancelReply(postId) {
-  delete activeReplyTargets[postId];
-  loadFeed();
-}
-window.cancelReply = cancelReply;
-
-async function toggleReaction(postId, emoji) {
-  if(!currentUser) return;
-
-  const { data, error: findError } = await sb
-    .from("reactions")
-    .select("id")
-    .eq("post_id", postId)
-    .eq("user_id", currentUser.id)
-    .eq("emoji", emoji)
-    .maybeSingle();
-
-  if(findError) return toast("❌ Reaction error: " + findError.message);
-
-  if(data) {
-    const { error } = await sb.from("reactions").delete().eq("id", data.id);
-    if(error) return toast("❌ Unable to remove reaction: " + error.message);
-  } else {
-    const { error } = await sb.from("reactions").insert({
-      post_id: postId,
-      user_id: currentUser.id,
-      emoji
-    });
-    if(error) return toast("❌ Unable to add reaction: " + error.message);
-  }
-
-  playRetroSound('message');
-  // Refresh immediately for this user. Realtime/polling updates everyone else.
-  await loadFeed(true);
-}
-window.toggleReaction = toggleReaction;
-
-async function deletePost(postId) {
-  if(!currentUser || !postId) return;
-  const ok = window.confirm('Delete this post? This will permanently remove the post and its comments/reactions.');
-  if(!ok) return;
-  try {
-    const reactionDelete = await sb.from('reactions').delete().eq('post_id', postId);
-    if(reactionDelete.error) throw reactionDelete.error;
-
-    const commentDelete = await sb.from('comments').delete().eq('post_id', postId);
-    if(commentDelete.error) throw commentDelete.error;
-
-    const { error } = await sb.from('posts').delete().eq('id', postId).eq('user_id', currentUser.id);
-    if(error) throw error;
-
-    playRetroSound('message');
-    toast('🗑️ Post deleted successfully!');
-    await loadFeed();
-  } catch(e) {
-    toast('❌ Delete failed: ' + (e?.message || 'Database error') + '. Please check the Posts DELETE policy in Supabase.');
-  }
-}
-window.deletePost = deletePost;
-
-async function addComment(postId) {
-  const input = $(`commentInput_${postId}`);
-  if(!input || !currentUser) return;
-
-  let content = input.value.trim();
-  if(!content) return;
-
-  const replyInfo = activeReplyTargets[postId];
-  if(replyInfo) content = `@${replyInfo.username} ${content}`;
-
-  const { error } = await sb.from("comments").insert({
-    post_id: postId,
-    user_id: currentUser.id,
-    content,
-    parent_id: replyInfo ? replyInfo.commentId : null
-  });
-
-  if(error) return toast("❌ Error adding comment: " + error.message);
-
-  delete activeReplyTargets[postId];
-  input.value = "";
-  playRetroSound('message');
-  // Immediately update the sender's feed. Other users receive the same update
-  // through Supabase Realtime or the short polling fallback below.
-  await loadFeed(true);
-}
-window.addComment = addComment;
-
-async function loadLeaderboard() {
-  const { data } = await sb.from("profiles").select("*").order("xp", { ascending: false }).limit(10);
-  if(!data) return;
-  $("leaders").innerHTML = data.map((u, i) => `
-    <div class="card" style="padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-      <div class="row" style="gap:10px;align-items:center;">
-        <strong>#${i+1}</strong>
-        <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-        <span>${esc(u.username)}${u.is_verified?' ✅':''}</span>
-      </div>
-      <div><strong>${u.xp || 0} XP</strong></div>
-    </div>
-  `).join('');
-}
-
-
-function isUserOnline(userId){
-  return !!userId && onlineUserIds.has(String(userId));
-}
-
-function presenceMarkup(userId){
-  const online = isUserOnline(userId);
-  return `<span class="presence-label ${online ? 'online-label' : 'offline-label'}"><span class="presence-dot ${online ? 'presence-online' : ''}"></span>${online ? 'ONLINE' : 'OFFLINE'}</span>`;
-}
-
-function refreshPresenceUI(){
-  document.querySelectorAll('[data-presence-user-id]').forEach(el => {
-    el.innerHTML = presenceMarkup(el.dataset.presenceUserId);
-  });
-  if(selectedUser){
-    const online = isUserOnline(selectedUser);
-    const indicator = $("reachIndicator");
-    indicator.classList.remove('hidden');
-    indicator.innerHTML = `📡 STATUS: ${presenceMarkup(selectedUser)}`;
-  }
-}
-
-async function setupPresence(){
-  if(!currentUser) return;
-
-  if(presenceReconnectTimer){
-    clearTimeout(presenceReconnectTimer);
-    presenceReconnectTimer = null;
-  }
-
-  // Remove an older presence channel before creating a new one.
-  if(presenceChannel){
-    try { await presenceChannel.untrack(); } catch(e) {}
-    try { await sb.removeChannel(presenceChannel); } catch(e) {}
-    presenceChannel = null;
-  }
-
-  onlineUserIds = new Set();
-  presenceStarted = false;
-  refreshPresenceUI();
-
-  const channelName = 'pixel-friend-presence';
-  presenceChannel = sb.channel(channelName, {
-    config: { presence: { key: String(currentUser.id) } }
-  });
-
-  const updatePresenceState = () => {
-    if(!presenceChannel) return;
-    const state = presenceChannel.presenceState() || {};
-    onlineUserIds = new Set(Object.keys(state).map(String));
-    refreshPresenceUI();
-  };
-
-  presenceChannel
-    .on('presence', { event: 'sync' }, updatePresenceState)
-    .on('presence', { event: 'join' }, updatePresenceState)
-    .on('presence', { event: 'leave' }, updatePresenceState);
-
-  presenceChannel.subscribe(async status => {
-    console.log('Pixel-Friend presence:', status);
-
-    if(status === 'SUBSCRIBED'){
-      presenceStarted = true;
-      try{
-        await presenceChannel.track({
-          user_id: String(currentUser.id),
-          username: currentProfile?.username || currentUser.user_metadata?.username || 'PLAYER',
-          online_at: new Date().toISOString()
-        });
-        updatePresenceState();
-      }catch(e){
-        console.warn('Presence track failed:', e);
-        onlineUserIds.delete(String(currentUser.id));
-        refreshPresenceUI();
-      }
-      return;
-    }
-
-    if(status === 'CHANNEL_ERROR' || status === 'TIMED_OUT'){
-      console.warn('Presence channel unavailable:', status);
-      presenceStarted = false;
-      onlineUserIds = new Set();
-      refreshPresenceUI();
-
-      // Retry without creating duplicate channels.
-      if(currentUser && !presenceReconnectTimer){
-        presenceReconnectTimer = setTimeout(() => {
-          presenceReconnectTimer = null;
-          if(currentUser) setupPresence();
-        }, 3000);
-      }
-    }
-  });
-}
-
-async function stopPresence(){
-  if(presenceReconnectTimer){
-    clearTimeout(presenceReconnectTimer);
-    presenceReconnectTimer = null;
-  }
-
-  const channel = presenceChannel;
-  presenceChannel = null;
-  presenceStarted = false;
-  onlineUserIds = new Set();
-  refreshPresenceUI();
-
-  if(!channel) return;
-  try { await channel.untrack(); } catch(e) {}
-  try { await sb.removeChannel(channel); } catch(e) {}
-}
-
-// Browser lifecycle cleanup. Supabase also detects dropped connections,
-// but explicitly untracking makes logout/page-close status transitions cleaner.
-window.addEventListener('pagehide', () => {
-  try {
-    if(presenceChannel) presenceChannel.untrack();
-  } catch(e) {}
-});
-
-window.addEventListener('pageshow', () => {
-  if(currentUser && !presenceStarted) setupPresence();
-});
-
-
-// ===================== PIXEL STORIES (24-HOUR + REACTIONS) =====================
-let storyMediaFile = null;
-let storiesCache = [];
-let activeStoryIndex = 0;
-let storyReactionsCache = new Map();
-let storyReactionsDbAvailable = null;
-const STORY_EMOJIS = ['❤️','🔥','😂','😮','😢','👾'];
-
-function storySeenKey(id){ return `pixel_story_seen_${id}`; }
-function isStorySeen(id){ return localStorage.getItem(storySeenKey(id)) === '1'; }
-function markStorySeen(id){ try{ localStorage.setItem(storySeenKey(id),'1'); }catch(e){} }
-function storyAvatarHtml(u){ return u?.avatar_url ? `<img src="${esc(u.avatar_url)}" loading="lazy" decoding="async">` : esc(u?.avatar || '👾'); }
-function storyTimeLabel(date){ const ms=Date.now()-new Date(date).getTime(); const h=Math.max(0,Math.floor(ms/3600000)); const m=Math.max(0,Math.floor(ms/60000)); return h<1?(m<1?'JUST NOW':`${m}M AGO`):`${h}H AGO`; }
-function storyLocalReactionKey(id){ return `pixel_story_reactions_${id}`; }
-function getLocalStoryReactions(id){ try{return JSON.parse(localStorage.getItem(storyLocalReactionKey(id))||'[]');}catch(e){return [];} }
-function setLocalStoryReactions(id,rows){ try{localStorage.setItem(storyLocalReactionKey(id),JSON.stringify(rows));}catch(e){} }
-function buildStoryReactionSummary(rows){
-  const counts=Object.fromEntries(STORY_EMOJIS.map(x=>[x,0]));
-  const mine=new Set();
-  (rows||[]).forEach(r=>{ if(counts[r.emoji]!==undefined) counts[r.emoji]++; if(r.user_id===currentUser?.id) mine.add(r.emoji); });
-  return {counts,mine,total:(rows||[]).length};
-}
-async function loadStoryReactions(storyIds){
-  storyReactionsCache=new Map();
-  if(!storyIds.length) return;
-  try{
-    const {data,error}=await sb.from('story_reactions').select('story_id,user_id,emoji').in('story_id',storyIds);
-    if(error) throw error;
-    storyReactionsDbAvailable=true;
-    (data||[]).forEach(r=>{const a=storyReactionsCache.get(r.story_id)||[];a.push(r);storyReactionsCache.set(r.story_id,a);});
-  }catch(err){
-    storyReactionsDbAvailable=false;
-    storyIds.forEach(id=>storyReactionsCache.set(id,getLocalStoryReactions(id)));
-  }
-}
-async function loadStories(){
-  if(!currentUser) return;
-  try{
-    const now = new Date().toISOString();
-    const {data,error}=await sb.from('stories')
-      .select('id,user_id,content,media_url,media_type,created_at,expires_at')
-      .gt('expires_at',now).order('created_at',{ascending:false}).limit(100);
-    if(error) throw error;
-    const rows=data||[];
-    const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
-    let profileMap=new Map();
-    if(ids.length){
-      const pr=await sb.from('profiles').select('id,username,avatar,avatar_url,is_verified,is_guest').in('id',ids);
-      if(pr.error) throw pr.error;
-      profileMap=new Map((pr.data||[]).map(u=>[String(u.id),u]));
-    }
-    storiesCache=rows.map(st=>({...st,profiles:profileMap.get(String(st.user_id))||{username:'PIXEL USER',avatar:'👾'}}));
-    // Load reactions separately so a missing optional table never blocks stories.
-    loadStoryReactions(rows.map(x=>x.id)).then(()=>{renderStories(); if(!$('storyViewerModal').classList.contains('hidden')) renderActiveStoryReactions();});
-    renderStories();
-  }catch(err){
-    const message=err?.message||String(err);
-    const row=$('storiesRow');
-    if(row) row.innerHTML=`<div class="story-empty">❌ STORIES ERROR: ${esc(message)}<br><br>Check the stories table, RLS policies, and storage bucket.</div>`;
-    console.warn('Stories:',err);
-  }
-}
-function renderStories(){
-  const row=$('storiesRow'); if(!row) return;
-  const cards=[`<div class="story-card" onclick="openStoryCreator()"><div class="story-ring story-add">＋</div><div class="story-name">YOUR STORY</div></div>`];
-  storiesCache.forEach((st,i)=>{
-    const u=st.profiles||{};
-    const preview=st.media_url ? (st.media_type==='video'?`<video src="${esc(st.media_url)}" muted preload="metadata"></video>`:`<img src="${esc(st.media_url)}" loading="lazy" decoding="async">`) : `<div class="story-avatar-fallback">${storyAvatarHtml(u)}</div>`;
-    const reactionTotal=(storyReactionsCache.get(st.id)||[]).length;
-    cards.push(`<div class="story-card" onclick="openStoryViewer(${i})"><div class="story-ring ${isStorySeen(st.id)?'seen':''}">${preview}</div><div class="story-name">${esc(u.username||'PIXEL USER')}</div>${reactionTotal?`<div class="tiny" style="font-size:12px">❤️ ${reactionTotal}</div>`:''}</div>`);
-  });
-  row.innerHTML=cards.join('');
-}
-function openStoryCreator(){ $('storyCreatorModal').classList.remove('hidden'); $('storyStatus').textContent=''; }
-function closeStoryCreator(){ $('storyCreatorModal').classList.add('hidden'); }
-function previewStoryMedia(){ const f=$('storyMediaInput').files[0]; storyMediaFile=f||null; $('storyMediaPreview').textContent=f?`Selected: ${f.name}`:''; }
-async function publishStory(){
-  const text=$('storyText').value.trim();
-  if(!text && !storyMediaFile) return status('storyStatus','Add text, a photo, or a video.',true);
-  status('storyStatus','Publishing story...');
-  try{
-    let media_url=null,media_type=null;
-    if(storyMediaFile){
-      media_type=storyMediaFile.type.startsWith('video/')?'video':'image';
-      const ext=(storyMediaFile.name.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'');
-      const path=`${currentUser.id}/story_${Date.now()}.${ext}`;
-      const up=await sb.storage.from('stories').upload(path,storyMediaFile,{upsert:false,contentType:storyMediaFile.type});
-      if(up.error) throw up.error;
-      media_url=sb.storage.from('stories').getPublicUrl(path).data.publicUrl;
-    }
-    const created_at=new Date(); const expires_at=new Date(created_at.getTime()+24*60*60*1000);
-    const {error}=await sb.from('stories').insert({user_id:currentUser.id,content:text,media_url,media_type,expires_at:expires_at.toISOString()});
-    if(error) throw error;
-    $('storyText').value=''; $('storyMediaInput').value=''; storyMediaFile=null; $('storyMediaPreview').textContent='';
-    closeStoryCreator(); playRetroSound('success'); toast('📸 Story published for 24 hours!'); await loadStories();
-  }catch(err){
-    console.error('Publish story failed:',err);
-    status('storyStatus','❌ Story publish failed: '+(err?.message||String(err)),true);
-  }
-}
-function openStoryViewer(index){
-  if(!storiesCache[index]) return;
-  activeStoryIndex=index;
-  const st=storiesCache[index],u=st.profiles||{};
-  markStorySeen(st.id);
-  $('storyViewAvatar').innerHTML=storyAvatarHtml(u);
-  $('storyViewName').innerHTML=`${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}`;
-  $('storyViewTime').textContent=storyTimeLabel(st.created_at)+' • EXPIRES '+new Date(st.expires_at).toLocaleTimeString();
-  $('storyCaption').innerHTML=linkify(st.content||'');
-  $('storyViewBody').innerHTML=st.media_url ? (st.media_type==='video'?`<video src="${esc(st.media_url)}" controls autoplay playsinline preload="metadata"></video>`:`<img src="${esc(st.media_url)}" loading="eager" decoding="async">`) : `<div class="story-text">${linkify(st.content||'PIXEL STORY')}</div>`;
-  $('storyViewBody').insertAdjacentHTML('beforeend',`<div class="story-nav"><button aria-label="Previous story" onclick="storyPrev()"></button><button aria-label="Next story" onclick="storyNext()"></button></div>`);
-  $('storyProgress').innerHTML=storiesCache.map((_,i)=>`<span class="${i===index?'active':''}"></span>`).join('');
-  $('storyDeleteBtn').classList.toggle('hidden',st.user_id!==currentUser.id);
-  $('storyViewerModal').classList.remove('hidden');
-  renderActiveStoryReactions();
-  renderStories();
-}
-function renderActiveStoryReactions(){
-  const st=storiesCache[activeStoryIndex]; if(!st) return;
-  const viewer=$('storyViewerModal'); if(!viewer) return;
-  viewer.querySelector('.story-reactions')?.remove();
-  const summary=buildStoryReactionSummary(storyReactionsCache.get(st.id)||[]);
-  const html=`<div class="story-reactions">${STORY_EMOJIS.map(e=>`<button class="story-react-btn ${summary.mine.has(e)?'active':''}" onclick="toggleStoryReaction('${st.id}','${e}')">${e}<span class="story-react-count">${summary.counts[e]||0}</span></button>`).join('')}<span class="story-reaction-summary">${summary.total?`${summary.total} reaction${summary.total===1?'':'s'}`:'Be the first to react'}</span></div>`;
-  $('storyViewBody').insertAdjacentHTML('afterend',html);
-}
-async function toggleStoryReaction(storyId,emoji){
-  if(!currentUser) return toast('Please log in first.');
-  let rows=storyReactionsCache.get(storyId)||[];
-  const mine=rows.find(r=>r.user_id===currentUser.id && r.emoji===emoji);
-  if(storyReactionsDbAvailable){
-    try{
-      if(mine){
-        const {error}=await sb.from('story_reactions').delete().eq('story_id',storyId).eq('user_id',currentUser.id).eq('emoji',emoji);
-        if(error) throw error;
-        rows=rows.filter(r=>!(r.user_id===currentUser.id&&r.emoji===emoji));
-      }else{
-        const {data,error}=await sb.from('story_reactions').insert({story_id:storyId,user_id:currentUser.id,emoji}).select('story_id,user_id,emoji').single();
-        if(error) throw error;
-        rows=[...rows,data];
-      }
-      storyReactionsCache.set(storyId,rows);
-    }catch(err){
-      storyReactionsDbAvailable=false;
-      rows=getLocalStoryReactions(storyId);
-    }
-  }
-  if(!storyReactionsDbAvailable){
-    if(mine) rows=rows.filter(r=>!(r.user_id===currentUser.id&&r.emoji===emoji));
-    else rows=[...rows,{story_id:storyId,user_id:currentUser.id,emoji}];
-    setLocalStoryReactions(storyId,rows);
-    storyReactionsCache.set(storyId,rows);
-  }
-  renderActiveStoryReactions(); renderStories(); playRetroSound('success');
-}
-function closeStoryViewer(){ $('storyViewerModal').classList.add('hidden'); }
-function storyPrev(){ openStoryViewer((activeStoryIndex-1+storiesCache.length)%storiesCache.length); }
-function storyNext(){ openStoryViewer((activeStoryIndex+1)%storiesCache.length); }
-async function deleteCurrentStory(){
-  const st=storiesCache[activeStoryIndex]; if(!st||st.user_id!==currentUser.id) return;
-  if(!confirm('Delete this story?')) return;
-  const {error}=await sb.from('stories').delete().eq('id',st.id).eq('user_id',currentUser.id);
-  if(error) return toast('❌ '+error.message);
-  closeStoryViewer(); toast('🗑️ Story deleted'); await loadStories();
-}
-window.openStoryCreator=openStoryCreator; window.closeStoryCreator=closeStoryCreator; window.previewStoryMedia=previewStoryMedia; window.publishStory=publishStory; window.openStoryViewer=openStoryViewer; window.closeStoryViewer=closeStoryViewer; window.storyPrev=storyPrev; window.storyNext=storyNext; window.deleteCurrentStory=deleteCurrentStory; window.toggleStoryReaction=toggleStoryReaction;
-
-// ============================================================
-// FOLLOWING + FRIEND SYSTEM
-// Uses Supabase table "follows" when available:
-// follower_id -> following_id
-// If the table has not been created yet, buttons still work in
-// this browser using local storage as a safe fallback.
-// ============================================================
-let followingIds = new Set();
-let followBackIds = new Set();
-let followsDbAvailable = null;
-
-function followStorageKey(){
-  return currentUser ? `pixelFriendFollowing_${currentUser.id}` : 'pixelFriendFollowing_guest';
-}
-
-function loadLocalFollowing(){
-  try{
-    const saved = JSON.parse(localStorage.getItem(followStorageKey()) || '[]');
-    followingIds = new Set((Array.isArray(saved) ? saved : []).map(String));
-  }catch(e){
-    followingIds = new Set();
-  }
-}
-
-function saveLocalFollowing(){
-  try{ localStorage.setItem(followStorageKey(), JSON.stringify([...followingIds])); }catch(e){}
-}
-
-function isMissingFollowsTable(error){
-  const msg = String(error?.message || error || '').toLowerCase();
-  return error?.code === 'PGRST205' ||
-    msg.includes('relation') && msg.includes('follows') ||
-    msg.includes('could not find the table') ||
-    msg.includes('schema cache');
-}
-
-async function loadFollowingState(){
-  if(!currentUser) return;
-  loadLocalFollowing();
-
-  try{
-    const [mine, back] = await Promise.all([
-      sb.from('follows').select('following_id').eq('follower_id', currentUser.id),
-      sb.from('follows').select('follower_id').eq('following_id', currentUser.id)
-    ]);
-
-    if(mine.error) throw mine.error;
-    if(back.error) throw back.error;
-
-    followingIds = new Set((mine.data || []).map(r => String(r.following_id)));
-    followBackIds = new Set((back.data || []).map(r => String(r.follower_id)));
-    followsDbAvailable = true;
-    saveLocalFollowing();
-  }catch(e){
-    followsDbAvailable = false;
-    followBackIds = new Set();
-    loadLocalFollowing();
-    if(!isMissingFollowsTable(e)) console.warn('Follow system database unavailable:', e);
-  }
-}
-
-function followButtonLabel(userId){
-  const id = String(userId);
-  if(!followingIds.has(id)) return '➕ FOLLOW';
-  if(followsDbAvailable && followBackIds.has(id)) return '🤝 FRIEND';
-  return '✓ FOLLOWING';
-}
-
-function followButtonClass(userId){
-  return followingIds.has(String(userId)) ? 'secondary' : 'primary';
-}
-
-async function toggleFollow(userId){
-  if(!currentUser || !userId || String(userId) === String(currentUser.id)) return;
-  const targetId = String(userId);
-  const wasFollowing = followingIds.has(targetId);
-
-  // Update the UI state immediately so the button feels responsive.
-  if(wasFollowing) followingIds.delete(targetId);
-  else followingIds.add(targetId);
-  saveLocalFollowing();
-  renderFollowButtons();
-  await loadFriends();
-
-  if(followsDbAvailable === false){
-    toast(wasFollowing ? '↩️ Unfollowed (saved on this device)' : '⭐ Following (saved on this device)');
-    return;
-  }
-
-  try{
-    if(wasFollowing){
-      const {error} = await sb.from('follows')
-        .delete()
-        .eq('follower_id', currentUser.id)
-        .eq('following_id', targetId);
-      if(error) throw error;
-      followBackIds.delete(targetId);
-      toast('↩️ Unfollowed');
-    }else{
-      const {error} = await sb.from('follows').insert({
-        follower_id: currentUser.id,
-        following_id: targetId
-      });
-      if(error) throw error;
-      toast('⭐ Now following this user!');
-    }
-
-    followsDbAvailable = true;
-    await loadFollowingState();
-  }catch(e){
-    // If the follows table does not exist, keep the local fallback.
-    if(isMissingFollowsTable(e)){
-      followsDbAvailable = false;
-      toast(wasFollowing ? '↩️ Unfollowed (saved on this device)' : '⭐ Following (saved on this device)');
-      return;
-    }
-
-    // Revert on real database errors so the UI stays truthful.
-    if(wasFollowing) followingIds.add(targetId);
-    else followingIds.delete(targetId);
-    saveLocalFollowing();
-    renderFollowButtons();
-    await loadFriends();
-    toast('❌ Follow failed: ' + (e?.message || 'Database permission error'));
-  }
-}
-
-function renderFollowButtons(){
-  document.querySelectorAll('[data-follow-user-id]').forEach(btn => {
-    const id = String(btn.dataset.followUserId || '');
-    btn.textContent = followButtonLabel(id);
-    btn.className = `${followButtonClass(id)} follow-action-btn`;
-    btn.setAttribute('aria-pressed', followingIds.has(id) ? 'true' : 'false');
-  });
-}
-
-window.toggleFollow = toggleFollow;
-
-function renderUserCard(u, options = {}){
-  const following = followingIds.has(String(u.id));
-  const mutual = followsDbAvailable && following && followBackIds.has(String(u.id));
-  const relation = mutual ? '<div class="tiny" style="margin-top:4px">🤝 MUTUAL FRIEND</div>' :
-                   following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
-  return `
-    <div class="user-card">
-      <div class="user-avatar" style="margin-bottom:8px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-      <strong>${esc(u.username || 'PIXEL USER')}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
-      ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
-      ${relation}
-      <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel Explorer")}</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
-        <button class="${followButtonClass(u.id)} follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button>
-        <button class="secondary" onclick="openChat('${esc(u.id)}', '${esc(u.username || 'PIXEL USER')}')">💬 MESSAGE</button>
-      </div>
-    </div>
-  `;
-}
-
-async function loadFriends() {
-  if(!currentUser) return;
-  await loadFollowingState();
-
-  const { data, error } = await sb.from("profiles")
-    .select("*")
-    .neq("id", currentUser.id)
-    .limit(30);
-
-  if(error){
-    console.warn('Load community:', error);
-    return;
-  }
-
-  const users = data || [];
-  const following = users.filter(u => followingIds.has(String(u.id)));
-  const others = users.filter(u => !followingIds.has(String(u.id)));
-
-  // Keep followed users first so FRIENDS has useful meaning.
-  const ordered = [...following, ...others];
-  $("friendsList").innerHTML = ordered.length
-    ? ordered.map(u => renderUserCard(u, {presence:true})).join('')
-    : '<div class="tiny">No other Pixel users found yet.</div>';
-
-  renderFollowButtons();
-}
-
-async function searchUsers(isGlobal) {
-  const q = $(isGlobal ? 'globalSearch' : 'friendSearch').value.trim();
-  const target = $("searchResults");
-  if(!target) return;
-
-  if(!q){
-    target.innerHTML = '';
-    return;
-  }
-
-  const { data, error } = await sb.from("profiles")
-    .select("*")
-    .ilike("username", `%${q}%`)
-    .neq("id", currentUser.id)
-    .limit(30);
-
-  if(error){
-    target.innerHTML = `<div class="tiny">❌ Search failed: ${esc(error.message)}</div>`;
-    return;
-  }
-
-  target.innerHTML = (data || []).length
-    ? data.map(u => renderUserCard(u)).join('')
-    : '<div class="tiny">No users found.</div>';
-
-  renderFollowButtons();
-}
-window.searchUsers = searchUsers;
-
-async function loadMessageUsers() {
-  const { data } = await sb.from("profiles").select("*").neq("id", currentUser.id);
-  if(!data) return;
-  notificationProfileCache = new Map(data.map(u => [String(u.id), u.username || 'PIXEL USER']));
-  $("messageUsers").innerHTML = data.map(u => `
-    <div class="chat-user" onclick="openChat('${u.id}', '${esc(u.username)}')">
-      <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
-      <div><strong>${esc(u.username)}${accountBadge(u, true)}</strong><div data-presence-user-id="${esc(u.id)}">${presenceMarkup(u.id)}</div></div>
-    </div>
-  `).join('');
-}
-
-function openChat(id, name) {
-  selectedUser = id;
-  messageRenderSignature = "";
-  $("chatTitle").textContent = name;
-  $("reachIndicator").classList.remove("hidden");
-  $("reachIndicator").innerHTML = `📡 STATUS: ${presenceMarkup(id)}`;
-  $("messageInput").removeAttribute("disabled");
-  $("sendButton").removeAttribute("disabled");
-  $("voiceRecordBtn").removeAttribute("disabled");
-  $("btnImg").removeAttribute("disabled");
-  $("btnVid").removeAttribute("disabled");
-  $("btnSticker").removeAttribute("disabled");
-  buildStickerPicker();
-  page("messages");
-  loadMessages();
-}
+window.guestLogin = guestLogin;
+window.logout = logout;
 window.openChat = openChat;
-
-async function markChatMessagesSeen() {
-  if(!currentUser || !selectedUser) return;
-  try {
-    const { error } = await sb.from("messages")
-      .update({ is_read: true, read_at: new Date().toISOString() })
-      .eq("sender_id", selectedUser)
-      .eq("receiver_id", currentUser.id)
-      .eq("is_read", false);
-    if(error) console.warn("Seen update:", error.message);
-    await updateNotificationBadge();
-  } catch(e) {
-    console.warn("Seen update failed:", e);
-  }
-}
-window.markChatMessagesSeen = markChatMessagesSeen;
-
-async function loadMessages() {
-  if(!selectedUser || messageLoadInFlight) return;
-  messageLoadInFlight = true;
-  try {
-    const { data, error } = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", { ascending: true });
-    if(error) { console.warn("Load messages:", error.message); return; }
-    if(!data) return;
-
-    const basicSignature = JSON.stringify(data.map(m => ({
-      id:m.id, created_at:m.created_at, content:m.content, sticker:m.sticker,
-      sender_id:m.sender_id, receiver_id:m.receiver_id, is_read:m.is_read,
-      image_url:m.image_url, video_url:m.video_url, audio_url:m.audio_url, reply_to_id:m.reply_to_id
-    })));
-
-    if(data.length === 0){
-      if(messageRenderSignature !== 'EMPTY') {
-        $("messagesList").innerHTML = `<div class="empty">💬 NO MESSAGES YET — START THE CHAT!</div>`;
-        messageRenderSignature = 'EMPTY';
-      }
-      await markChatMessagesSeen();
-      return;
-    }
-
-  const ids = data.map(m => m.id).filter(Boolean);
-  let reactionRows = [];
-  if(ids.length){
-    const rr = await sb.from('message_reactions').select('message_id,user_id,reaction').in('message_id', ids);
-    if(rr.error) console.warn('Load message reactions:', rr.error.message);
-    reactionRows = rr.data || [];
-  }
-  const reactionsByMessage = {};
-  reactionRows.forEach(r => {
-    (reactionsByMessage[r.message_id] ||= []).push(r);
-  });
-
-  const fullMessageSignature = basicSignature + '|' + JSON.stringify(reactionRows);
-  if(fullMessageSignature === messageRenderSignature) {
-    await markChatMessagesSeen();
-    return;
-  }
-  messageRenderSignature = fullMessageSignature;
-
-  $("messagesList").innerHTML = data.map(m => {
-    const mine = m.sender_id === currentUser.id;
-    const seen = mine && m.is_read === true;
-    const status = mine ? `<span class="message-status ${seen ? 'seen' : ''}">${seen ? '✓✓ SEEN' : '✓ SENT'}</span>` : '';
-    const original = m.reply_to_id ? data.find(x => String(x.id) === String(m.reply_to_id)) : null;
-    const replyPreview = original ? `<div class="message-reply-preview">↩️ <strong>REPLY</strong>: ${esc((original.content || original.sticker || 'Attachment').slice(0,120))}</div>` : '';
-    const rows = reactionsByMessage[m.id] || [];
-    const reactionCounts = {};
-    const myReactions = {};
-    rows.forEach(r => {
-      reactionCounts[r.reaction] = (reactionCounts[r.reaction] || 0) + 1;
-      if(r.user_id === currentUser.id) myReactions[r.reaction] = true;
-    });
-    const reactionHtml = Object.entries(reactionCounts).map(([emoji,count]) => `<button class="message-reaction ${myReactions[emoji] ? 'mine' : ''}" onclick="toggleMessageReaction('${esc(m.id)}','${esc(emoji)}')">${emoji} ${count}</button>`).join('');
-    const body = m.sticker ? `<div class="message-sticker">${esc(m.sticker)}</div>` : `<div>${esc(m.content || '')}</div>`;
-    return `
-      <div class="message-wrap ${mine ? 'mine' : ''}" data-message-id="${esc(m.id || '')}">
-        <div class="message ${mine ? 'mine' : ''}">
-          ${replyPreview}
-          ${body}
-          ${m.image_url ? `<img src="${esc(m.image_url)}" class="msg-media-img">` : ''}
-          ${m.video_url ? `<video src="${esc(m.video_url)}" controls class="msg-media-video"></video>` : ''}
-          ${m.audio_url ? `<audio src="${esc(m.audio_url)}" controls preload="metadata" class="msg-audio"></audio>` : ''}
-          ${reactionHtml ? `<div class="message-reactions">${reactionHtml}</div>` : ''}
-          <div class="message-tools">
-            <button class="message-tool" onclick="replyToMessage('${esc(m.id)}')">↩ REPLY</button>
-            <button class="message-tool" onclick="quickReact('${esc(m.id)}','❤️')">❤️</button>
-            <button class="message-tool" onclick="quickReact('${esc(m.id)}','👍')">👍</button>
-            <button class="message-tool" onclick="toggleReactionPicker('${esc(m.id)}')">➕ REACT</button>
-            ${mine ? `<button class="message-tool message-delete-tool" onclick="deleteMessage('${esc(m.id)}')">🗑 DELETE</button>` : ''}
-          </div>
-          ${status}
-        </div>
-      </div>`;
-  }).join('');
-
-  $("messagesList").scrollTop = $("messagesList").scrollHeight;
-  await markChatMessagesSeen();
-  } finally {
-    messageLoadInFlight = false;
-  }
-}
-
-function buildStickerPicker(){
-  const box = $("stickerPicker");
-  if(!box || box.dataset.ready === '1') return;
-  box.innerHTML = STICKERS.map(st => `<button type="button" onclick="sendStickerMessage('${esc(st)}')">${st}</button>`).join('');
-  box.dataset.ready = '1';
-}
-window.buildStickerPicker = buildStickerPicker;
-
-function toggleStickerPicker(){
-  buildStickerPicker();
-  $("stickerPicker").classList.toggle('hidden');
-}
-window.toggleStickerPicker = toggleStickerPicker;
-
-function replyToMessage(id){
-  const el = document.querySelector(`[data-message-id="${CSS.escape(String(id))}"] .message`);
-  if(!el) return;
-  const source = el.querySelector('.message-sticker')?.textContent || el.querySelector('.message-reply-preview')?.textContent || el.querySelector(':scope > div')?.textContent || 'Attachment';
-  replyingToMessageId = id;
-  replyingToMessagePreview = source.replace(/^↩️ REPLY:?\s*/,'').trim().slice(0,140);
-  $("replyBarText").textContent = '↩️ Replying to: ' + replyingToMessagePreview;
-  $("replyBar").classList.remove('hidden');
-  $("stickerPicker").classList.add('hidden');
-  $("messageInput").focus();
-}
-window.replyToMessage = replyToMessage;
-
-function cancelReply(){
-  replyingToMessageId = null;
-  replyingToMessagePreview = '';
-  $("replyBar").classList.add('hidden');
-  $("replyBarText").textContent = '';
-}
-window.cancelReply = cancelReply;
-
-function toggleReactionPicker(id){
-  const existing = document.getElementById('reaction-picker-' + id);
-  if(existing){ existing.remove(); return; }
-  const wrap = document.querySelector(`[data-message-id="${CSS.escape(String(id))}"] .message`);
-  if(!wrap) return;
-  const box = document.createElement('div');
-  box.id = 'reaction-picker-' + id;
-  box.className = 'sticker-picker';
-  box.innerHTML = ['❤️','👍','😂','😍','🔥','🎉','👏','🙏','😮','😢','😡','💯'].map(e => `<button type="button" onclick="toggleMessageReaction('${esc(id)}','${esc(e)}');document.getElementById('reaction-picker-${esc(id)}')?.remove()">${e}</button>`).join('');
-  wrap.appendChild(box);
-}
-window.toggleReactionPicker = toggleReactionPicker;
-
-async function quickReact(id, emoji){
-  await toggleMessageReaction(id, emoji);
-}
-window.quickReact = quickReact;
-
-async function deleteMessage(messageId){
-  if(!currentUser || !selectedUser || !messageId) return;
-  const ok = window.confirm('Delete this message? This will remove it from the conversation.');
-  if(!ok) return;
-  try{
-    // Remove reactions first so the deleted message leaves no orphaned reactions.
-    const reactionDelete = await sb.from('message_reactions').delete().eq('message_id', messageId);
-    if(reactionDelete.error) throw reactionDelete.error;
-
-    // Only the original sender can delete their own message.
-    const { error } = await sb.from('messages')
-      .delete()
-      .eq('id', messageId)
-      .eq('sender_id', currentUser.id);
-    if(error) throw error;
-
-    playRetroSound('message');
-    await loadMessages();
-  }catch(e){
-    toast('❌ Delete failed: ' + (e?.message || 'Database error') + '. Please check the Messages DELETE policy in Supabase.');
-  }
-}
-window.deleteMessage = deleteMessage;
-
-async function toggleMessageReaction(messageId, reaction){
-  if(!currentUser) return;
-  try{
-    const existing = await sb.from('message_reactions').select('message_id,user_id,reaction').eq('message_id', messageId).eq('user_id', currentUser.id).eq('reaction', reaction).maybeSingle();
-    if(existing.error) throw existing.error;
-    if(existing.data){
-      const { error } = await sb.from('message_reactions').delete().eq('message_id', messageId).eq('user_id', currentUser.id).eq('reaction', reaction);
-      if(error) throw error;
-    } else {
-      const { error } = await sb.from('message_reactions').insert({message_id: messageId, user_id: currentUser.id, reaction});
-      if(error) throw error;
-    }
-    await loadMessages();
-  }catch(e){ toast('❌ Reaction failed: ' + (e?.message || 'Database error') + '. Please run the Pixel-Friend chat SQL setup.'); }
-}
-window.toggleMessageReaction = toggleMessageReaction;
-
-async function sendStickerMessage(sticker){
-  if(!selectedUser || !currentUser) return;
-  try{
-    const { error } = await sb.from('messages').insert({
-      sender_id: currentUser.id,
-      receiver_id: selectedUser,
-      content: '',
-      sticker,
-      reply_to_id: replyingToMessageId || null,
-      image_url: null,
-      video_url: null,
-      audio_url: null
-    });
-    if(error) throw error;
-    cancelReply();
-    $("stickerPicker").classList.add('hidden');
-    playRetroSound('message');
-    await loadMessages();
-  }catch(e){ toast('❌ Sticker failed: ' + e.message); }
-}
-window.sendStickerMessage = sendStickerMessage;
-
-function selectChatMedia(type) {
-  const input = $(type === 'image' ? 'chatImageInput' : 'chatVideoInput');
-  chatAttachmentFile = input.files[0];
-  chatAttachmentType = type;
-  if(chatAttachmentFile) {
-    $("chatAttachmentPill").textContent = (type === 'image' ? '🖼️ ' : '📹 ') + chatAttachmentFile.name;
-    $("chatAttachmentBar").classList.remove("hidden");
-  }
-}
-window.selectChatMedia = selectChatMedia;
-
-function clearChatAttachment() {
-  chatAttachmentFile = null;
-  chatAttachmentType = null;
-  $("chatAttachmentBar").classList.add("hidden");
-  $("chatImageInput").value = "";
-  $("chatVideoInput").value = "";
-}
-window.clearChatAttachment = clearChatAttachment;
-
-async function sendMessage() {
-  const text = $("messageInput").value.trim();
-  if(!text && !chatAttachmentFile) return;
-  if(!selectedUser) return;
-
-  let image_url = null, video_url = null, audio_url = null;
-  try {
-    if(chatAttachmentFile) {
-      const ext = chatAttachmentFile.name.split('.').pop();
-      const path = `${currentUser.id}/chat_${Date.now()}.${ext}`;
-      const u = await sb.storage.from("posts").upload(path, chatAttachmentFile);
-      if(u.error) throw u.error;
-      const url = sb.storage.from("posts").getPublicUrl(path).data.publicUrl;
-      if(chatAttachmentType === 'image') image_url = url;
-      if(chatAttachmentType === 'video') video_url = url;
-      if(chatAttachmentType === 'audio') audio_url = url;
-    }
-
-    const { error: sendError } = await sb.from("messages").insert({
-      sender_id: currentUser.id,
-      receiver_id: selectedUser,
-      content: text,
-      sticker: null,
-      reply_to_id: replyingToMessageId || null,
-      image_url,
-      video_url,
-      audio_url
-    });
-    if(sendError) throw sendError;
-
-    $("messageInput").value = "";
-    cancelReply();
-    $("stickerPicker").classList.add('hidden');
-    clearChatAttachment();
-    playRetroSound('message');
-    loadMessages();
-  } catch(e) {
-    toast("❌ Error sending message: " + e.message);
-  }
-}
 window.sendMessage = sendMessage;
+window.toggleStickerPicker = toggleStickerPicker;
+window.sendSticker = sendSticker;
+window.selectChatMedia = selectChatMedia;
+window.page = page;
+window.saveProfileInfo = saveProfileInfo;
+window.uploadAvatar = uploadAvatar;
+window.removeAvatar = removeAvatar;
+window.initiateVoiceCall = initiateVoiceCall;
+window.initiateVideoCall = initiateVideoCall;
 
-function getSupportedAudioMimeType() {
-  const types = [
-    'audio/webm;codecs=opus',
-    'audio/webm',
-    'audio/ogg;codecs=opus',
-    'audio/ogg',
-    'audio/mp4'
-  ];
-  return types.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
-}
-
-async function getVoiceInputStream() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    throw new Error('Microphone API is unavailable. Open Pixel-Friend on HTTPS or localhost.');
-  }
-
-  // Use the simplest request first. Some browsers/devices reject an
-  // advanced audio constraint object with "Requested device not found".
-  try {
-    return await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch (firstError) {
-    // Retry with conservative constraints for browsers that support them.
-    try {
-      return await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
-    } catch (secondError) {
-      let detail = secondError && secondError.name ? secondError.name : 'UnknownError';
-      if (detail === 'NotFoundError' || detail === 'DevicesNotFoundError') {
-        throw new Error('No microphone was detected. Connect/enable a microphone, then reload the page.');
-      }
-      if (detail === 'NotAllowedError' || detail === 'PermissionDeniedError') {
-        throw new Error('Microphone permission is blocked. Allow Microphone for this site, then reload.');
-      }
-      if (detail === 'NotReadableError' || detail === 'TrackStartError') {
-        throw new Error('The microphone is busy or unavailable. Close other apps using it and try again.');
-      }
-      throw new Error('Microphone could not be opened (' + detail + ').');
-    }
-  }
-}
-
-async function toggleVoiceRecord() {
-  if (isRecordingVoice) {
-    stopVoiceRecord();
-    return;
-  }
-
-  if (!window.MediaRecorder || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    toast('❌ Voice recording is unavailable. Use Chrome/Edge on HTTPS or localhost.');
-    return;
-  }
-  if (!selectedUser || !currentUser) {
-    toast('👈 Select a friend before recording voice.');
-    return;
-  }
-
-  const btn = $('voiceRecordBtn');
-  const originalText = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = '🎙️ CONNECTING...';
-
-  try {
-    voiceStream = await getVoiceInputStream();
-    const activeTrack = voiceStream.getAudioTracks()[0];
-    if (!activeTrack) throw new Error('No audio input track was created.');
-
-    voiceChunks = [];
-    const mimeType = getSupportedAudioMimeType();
-    mediaRecorder = mimeType ? new MediaRecorder(voiceStream, { mimeType }) : new MediaRecorder(voiceStream);
-
-    mediaRecorder.ondataavailable = e => {
-      if (e.data && e.data.size > 0) voiceChunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = async () => {
-      try {
-        const finalType = mediaRecorder.mimeType || mimeType || 'audio/webm';
-        const blob = new Blob(voiceChunks, { type: finalType });
-        voiceChunks = [];
-        if (blob.size < 1000) {
-          toast('⚠️ Recording was too short.');
-          return;
-        }
-        await sendVoiceMessage(blob);
-      } catch (e) {
-        toast('❌ Voice upload failed: ' + e.message);
-      } finally {
-        if (voiceStream) voiceStream.getTracks().forEach(t => t.stop());
-        voiceStream = null;
-        mediaRecorder = null;
-      }
-    };
-
-    mediaRecorder.start(100);
-    isRecordingVoice = true;
-    btn.disabled = false;
-    btn.classList.add('recording-active');
-    btn.textContent = '⏹️ STOP & SEND';
-    toast('🎙️ Recording... click STOP & SEND when finished.');
-  } catch (e) {
-    if (voiceStream) voiceStream.getTracks().forEach(t => t.stop());
-    voiceStream = null;
-    mediaRecorder = null;
-    btn.disabled = false;
-    btn.textContent = originalText;
-    toast('❌ ' + (e.message || 'Microphone access failed.'));
-  }
-}
-
-function stopVoiceRecord() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-    mediaRecorder.stop();
-  }
-  isRecordingVoice = false;
-  const btn = $('voiceRecordBtn');
-  btn.classList.remove('recording-active');
-  btn.disabled = false;
-  btn.textContent = '🎤 VOICE';
-}
-
-async function sendVoiceMessage(blob) {
-  if (!selectedUser || !currentUser) return;
-  const mime = blob.type || 'audio/webm';
-  const ext = mime.includes('ogg') ? 'ogg' : mime.includes('mp4') ? 'm4a' : 'webm';
-  const path = `${currentUser.id}/chat_voice_${Date.now()}.${ext}`;
-  const upload = await sb.storage.from('posts').upload(path, blob, {
-    contentType: mime,
-    upsert: false
-  });
-  if (upload.error) throw upload.error;
-
-  const audio_url = sb.storage.from('posts').getPublicUrl(path).data.publicUrl;
-  const { error } = await sb.from('messages').insert({
-    sender_id: currentUser.id,
-    receiver_id: selectedUser,
-    content: '',
-    sticker: null,
-    reply_to_id: replyingToMessageId || null,
-    image_url: null,
-    video_url: null,
-    audio_url
-  });
-  if (error) throw error;
-
-  cancelReply();
-  playRetroSound('message');
-  await loadMessages();
-}
-
-window.toggleVoiceRecord = toggleVoiceRecord;
-window.stopVoiceRecord = stopVoiceRecord;
-
-let realtimeFeedChannel = null;
-let realtimeMessageChannel = null;
-let realtimeReconnectTimer = null;
-let realtimeStarted = false;
-
-async function teardownRealtime(){
-  if(realtimeReconnectTimer){
-    clearTimeout(realtimeReconnectTimer);
-    realtimeReconnectTimer = null;
-  }
-  for(const ch of [realtimeFeedChannel, realtimeMessageChannel]){
-    if(ch){
-      try { await sb.removeChannel(ch); } catch(e) {}
-    }
-  }
-  realtimeFeedChannel = null;
-  realtimeMessageChannel = null;
-}
-
-function scheduleRealtimeReconnect(reason){
-  console.warn('Pixel-Friend Realtime reconnect:', reason);
-  if(realtimeReconnectTimer || !currentUser) return;
-  realtimeReconnectTimer = setTimeout(async () => {
-    realtimeReconnectTimer = null;
-    if(!currentUser) return;
-    await setupRealtime(true);
-  }, 1000);
-}
-
-async function setupRealtime(force=false){
-  if(!currentUser) return;
-
-  if(force || realtimeStarted){
-    await teardownRealtime();
-  }
-
-  // Clear old polling fallbacks.
-  if(feedRefreshTimer){ clearInterval(feedRefreshTimer); feedRefreshTimer=null; }
-  if(messageRefreshTimer){ clearInterval(messageRefreshTimer); messageRefreshTimer=null; }
-  if(notificationRefreshTimer){ clearInterval(notificationRefreshTimer); notificationRefreshTimer=null; }
-
-  const uid = String(currentUser.id);
-
-  // LIVE FEED CHANNEL
-  realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
-    .on('postgres_changes', {event:'*', schema:'public', table:'posts'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
-    .on('postgres_changes', {event:'*', schema:'public', table:'message_reactions'}, payload => {
-      const r=payload.new || payload.old;
-      if(r && selectedUser) loadMessages();
-    })
-    .subscribe(status => {
-      feedRealtimeStatus = status;
-      console.log('Pixel-Friend FEED Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend feed is LIVE');
-      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
-        scheduleRealtimeReconnect('feed ' + status);
-      }
-    });
-
-  // DEDICATED LIVE MESSAGE/NOTIFICATION CHANNEL
-  realtimeMessageChannel = sb.channel('pixel-friend-messages-' + uid + '-' + Date.now())
-    .on('postgres_changes', {
-      event:'INSERT', schema:'public', table:'messages',
-      filter:'receiver_id=eq.' + uid
-    }, async payload => {
-      const msg=payload.new;
-      if(!msg || String(msg.sender_id) === uid) return;
-
-      // This is the real-time notification path. No polling/query is needed.
-      // NEVER wait for UI/database refresh before firing the alert.
-      // The notification must be the first action on the Realtime event.
-      notifyIncomingMessage(msg);
-
-      if(selectedUser && String(selectedUser) === String(msg.sender_id)){
-        loadMessages();
-        markChatMessagesSeen();
-      }
-    })
-    .on('postgres_changes', {
-      event:'UPDATE', schema:'public', table:'messages',
-      filter:'receiver_id=eq.' + uid
-    }, payload => {
-      const msg=payload.new;
-      if(!msg) return;
-
-      if(String(msg.sender_id) === uid &&
-         selectedUser &&
-         String(selectedUser) === String(msg.receiver_id)){
-        loadMessages();
-      }
-
-      if(msg.is_read === true){
-        const id=String(msg.id);
-        knownUnreadMessageIds.delete(id);
-        notificationItems.delete(id);
-        renderNotificationList();
-        renderNotificationBadge(Math.max(0, localUnreadCount-1));
-      }
-    })
-    .subscribe(status => {
-      console.log('Pixel-Friend MESSAGE Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are LIVE');
-      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
-        scheduleRealtimeReconnect('messages ' + status);
-      }
-    });
-
-  realtimeStarted=true;
-
-  // Fallback only. Realtime remains the primary path.
-  feedRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible') {
-      loadFeed(false);
-      loadStories();
-    }
-  }, 3000);
-
-  messageRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible' && selectedUser) loadMessages();
-  }, 3000);
-
-  // Slow reconciliation only; this does NOT control live notifications.
-  notificationRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible' && currentUser){
-      updateNotificationBadge({notify:false});
-    }
-  }, 15000);
-}
-
-// Reconnect immediately when the browser returns online or the tab becomes visible.
-window.addEventListener('online', () => scheduleRealtimeReconnect('browser online'));
-document.addEventListener('visibilitychange', () => {
-  if(document.visibilityState === 'visible' && currentUser){
-    scheduleRealtimeReconnect('tab visible');
-  }
+// Auto-load if logged in
+sb.auth.getSession().then(({data}) => {
+  if(data.session) startApp(data.session.user);
 });
-
-async function restoreSession() {
-  try {
-    const { data, error } = await sb.auth.getSession();
-    if (error) throw error;
-
-    if (data?.session?.user) {
-      await startApp(data.session.user);
-    } else {
-      currentUser = null;
-      currentProfile = null;
-      $("authScreen").style.display = "grid";
-      $("app").style.display = "none";
-    }
-  } catch (err) {
-    console.error("Session restore failed:", err);
-    toast("⚠️ Unable to restore your session. Please log in again.");
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-}
-
-// Keep the logged-in session when the page is refreshed.
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_OUT" || !session) {
-    notificationInitialized = false;
-    knownUnreadMessageIds.clear();
-    notificationProfileCache.clear();
-    if(typeof notificationProfileDataCache !== 'undefined') notificationProfileDataCache.clear();
-    notificationItems.clear();
-    teardownRealtime();
-    if(presenceChannel) stopPresence();
-    currentUser = null;
-    currentProfile = null;
-    realtimeStarted = false;
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-});
-
-async function logout() {
-  notificationInitialized = false;
-  knownUnreadMessageIds.clear();
-  notificationProfileCache.clear();
-  notificationItems.clear();
-  await teardownRealtime();
-  realtimeStarted = false;
-  await stopPresence();
-  await sb.auth.signOut();
-}
-window.logout = logout;
-
-async function restoreSession() {
-  try {
-    const { data, error } = await sb.auth.getSession();
-    if (error) throw error;
-
-    if (data?.session?.user) {
-      await startApp(data.session.user);
-    } else {
-      currentUser = null;
-      currentProfile = null;
-      $("authScreen").style.display = "grid";
-      $("app").style.display = "none";
-    }
-  } catch (err) {
-    console.error("Session restore failed:", err);
-    toast("⚠️ Unable to restore your session. Please log in again.");
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-}
-
-// Keep the logged-in session when the page is refreshed.
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_OUT" || !session) {
-    notificationInitialized = false;
-    knownUnreadMessageIds.clear();
-    notificationProfileCache.clear();
-    if(typeof notificationProfileDataCache !== 'undefined') notificationProfileDataCache.clear();
-    notificationItems.clear();
-    if(presenceChannel) stopPresence();
-    currentUser = null;
-    currentProfile = null;
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-});
-
-async function logout() {
-  notificationInitialized = false;
-  knownUnreadMessageIds.clear();
-  notificationProfileCache.clear();
-  notificationItems.clear();
-  await stopPresence();
-  await sb.auth.signOut();
-}
-window.logout = logout;
-
-
-/* ===== PIXEL-FRIEND ARCADE: FEED THE PET ===== */
-const pfPets=['👾','🦊','🐱','🤖','🐼','🐸'];
-const pfFoods=['🍪','⭐','🍎','🍰','🍕','🍬','🥕','🧁'];
-let petGameScore=0,petGameTime=20,petGameCombo=0,petGameTarget='🍪',petGamePlaying=false,petGameInterval=null;
-function pfBestKey(){return 'pf_pet_best_'+(currentUser?.id||'guest');}
-function renderPetBest(){const b=Number(localStorage.getItem(pfBestKey())||0); const e=$('petBest'); if(e)e.textContent=b; const t=$('petBestText'); if(t)t.textContent=b?`Your personal best is ${b} points. Can you beat it?`:'Play your first game and set a high score!';}
-function startPetGame(){clearInterval(petGameInterval);petGameScore=0;petGameTime=20;petGameCombo=0;petGamePlaying=true;updatePetStats();$('petStartBtn').textContent='🔄 RESTART GAME';$('petGameStatus').textContent='🔥 GO! Feed the pet the correct food.';nextPetRound();petGameInterval=setInterval(()=>{petGameTime--;updatePetStats();if(petGameTime<=0)endPetGame();},1000);}
-function updatePetStats(){if($('petScore'))$('petScore').textContent=petGameScore;if($('petTimer'))$('petTimer').textContent=petGameTime;if($('petCombo'))$('petCombo').textContent=petGameCombo;renderPetBest();}
-function nextPetRound(){if(!petGamePlaying)return;petGameTarget=pfFoods[Math.floor(Math.random()*pfFoods.length)];$('desiredFood').textContent=petGameTarget;$('petAvatar').textContent=pfPets[Math.floor(Math.random()*pfPets.length)];let choices=[petGameTarget];while(choices.length<4){let f=pfFoods[Math.floor(Math.random()*pfFoods.length)];if(!choices.includes(f))choices.push(f);}choices.sort(()=>Math.random()-.5);$('foodGrid').innerHTML=choices.map(f=>`<button class="food-btn" onclick="checkPetFood('${f}')">${f}</button>`).join('');}
-function checkPetFood(food){if(!petGamePlaying)return;if(food===petGameTarget){petGameCombo++;const bonus=Math.min(20,(petGameCombo-1)*2);petGameScore+=10+bonus;$('petGameStatus').innerHTML=`✅ YUMMY! <span class="combo">COMBO x${petGameCombo}</span> +${10+bonus}`;nextPetRound();}else{petGameScore=Math.max(0,petGameScore-5);petGameCombo=0;$('petGameStatus').textContent='❌ Wrong food! -5 points. Try again!';}updatePetStats();}
-function endPetGame(){petGamePlaying=false;clearInterval(petGameInterval);$('foodGrid').innerHTML='<div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">⏰ TIME’S UP!</div>';const old=Number(localStorage.getItem(pfBestKey())||0);let msg=`🎉 Game over! You scored ${petGameScore} points.`;if(petGameScore>old){localStorage.setItem(pfBestKey(),String(petGameScore));msg+=' 🏆 NEW PERSONAL BEST!';} $('petGameStatus').textContent=msg;$('petStartBtn').textContent='▶ PLAY AGAIN';updatePetStats();if(typeof toast==='function')toast(msg);}
-async function sharePetScore(){const text=`🎮 I scored ${petGameScore} points in Feed the Pixel Pet on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Arcade',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Score challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
-window.startPetGame=startPetGame;window.checkPetFood=checkPetFood;window.sharePetScore=sharePetScore;
-
-/* ===== PIXEL-FRIEND ARCADE: MEMORY MATCH ===== */
-const memoryIcons=['🐱','🐶','🐰','🦊','🐼','🐨'];
-let memoryCards=[],memoryFlipped=[],memoryMatches=0,memoryMoves=0,memoryTime=30,memoryPlaying=false,memoryCanFlip=true,memoryInterval=null;
-function memoryBestKey(){return 'pf_memory_best_'+(currentUser?.id||'guest');}
-function renderMemoryBest(){const v=localStorage.getItem(memoryBestKey()); const el=$('memoryBest'); if(el)el.textContent=v?v+'s':'—';}
-function updateMemoryStats(){if($('memoryMatches'))$('memoryMatches').textContent=memoryMatches+'/6';if($('memoryTimer'))$('memoryTimer').textContent=memoryTime;if($('memoryMoves'))$('memoryMoves').textContent=memoryMoves;renderMemoryBest();}
-function renderMemoryBoard(){const board=$('memoryBoard');if(!board)return;board.innerHTML=memoryCards.map((c,i)=>`<button class="memory-tile ${c.flipped?'revealed':''} ${c.matched?'matched':''}" onclick="flipMemoryCard(${i})">${(c.flipped||c.matched)?c.icon:'❓'}</button>`).join('');}
-function startMemoryGame(){clearInterval(memoryInterval);memoryMatches=0;memoryMoves=0;memoryTime=30;memoryFlipped=[];memoryPlaying=true;memoryCanFlip=true;memoryCards=[...memoryIcons,...memoryIcons].sort(()=>Math.random()-.5).map((icon,i)=>({id:i,icon,flipped:false,matched:false}));$('memoryStartBtn').textContent='🔄 RESTART MEMORY GAME';$('memoryStatus').textContent='🧠 GO! Find all matching pairs.';updateMemoryStats();renderMemoryBoard();memoryInterval=setInterval(()=>{memoryTime--;updateMemoryStats();if(memoryTime<=0)endMemoryGame(false);},1000);}
-function flipMemoryCard(index){if(!memoryPlaying||!memoryCanFlip)return;const card=memoryCards[index];if(card.flipped||card.matched)return;card.flipped=true;memoryFlipped.push(index);renderMemoryBoard();if(memoryFlipped.length===2){memoryCanFlip=false;memoryMoves++;const [a,b]=memoryFlipped;if(memoryCards[a].icon===memoryCards[b].icon){memoryCards[a].matched=true;memoryCards[b].matched=true;memoryMatches++;memoryFlipped=[];memoryCanFlip=true;updateMemoryStats();renderMemoryBoard();if(memoryMatches===memoryIcons.length)endMemoryGame(true);}else{updateMemoryStats();setTimeout(()=>{memoryCards[a].flipped=false;memoryCards[b].flipped=false;memoryFlipped=[];memoryCanFlip=true;renderMemoryBoard();},650);}}}
-function endMemoryGame(won){memoryPlaying=false;clearInterval(memoryInterval);let msg='⏰ Time is up! Try again and beat your best.';if(won){const used=30-memoryTime;const old=Number(localStorage.getItem(memoryBestKey())||9999);msg=`🌟 Amazing! You matched all pairs in ${used} seconds and ${memoryMoves} moves!`;if(used<old){localStorage.setItem(memoryBestKey(),String(used));msg+=' 🏆 NEW PERSONAL BEST!';}}$('memoryStatus').textContent=msg;$('memoryStartBtn').textContent='▶ PLAY AGAIN';updateMemoryStats();if(typeof toast==='function')toast(msg);}
-async function shareMemoryScore(){const text=`🧠 I completed Pixel Memory Match in ${30-memoryTime} seconds with ${memoryMoves} moves on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Memory Match',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Memory challenge copied!');}catch(e){window.prompt('Copy and share your result:',text+' '+location.href);}}
-window.startMemoryGame=startMemoryGame;window.flipMemoryCard=flipMemoryCard;window.shareMemoryScore=shareMemoryScore;
-
-restoreSession();
 </script>
-<div id="inviteModal" class="invite-modal hidden" role="dialog" aria-modal="true">
-  <div class="invite-card">
-    <h2>🔗 INVITE FRIENDS</h2>
-    <div class="tiny">Share your personal Pixel-Friend invite link. Friends who join through it can be connected to you automatically.</div>
-    <input id="inviteLink" class="invite-link" readonly>
-    <div class="invite-actions">
-      <button class="primary" onclick="shareInviteLink()">📤 SHARE INVITE</button>
-      <button class="secondary" onclick="copyInviteLink()">📋 COPY LINK</button>
-      <button class="secondary" onclick="closeInviteModal()">✖ CLOSE</button>
-    </div>
-    <div id="inviteStats" class="invite-stats">👥 Joined through your link: 0</div>
-  </div>
-</div>
-</body></html>
+
+</body>
+</html>
