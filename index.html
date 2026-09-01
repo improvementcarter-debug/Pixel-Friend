@@ -277,9 +277,35 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </div>
 <div id="toast" class="toast hidden"></div>
 <script>
+// Emergency UI navigation bootstrap. This is intentionally independent of Supabase/WebRTC.
+window.__pixelShowPage = function(name, btn){
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var target = document.getElementById(name);
+  if(target) target.classList.add('active');
+  if(btn){
+    document.querySelectorAll('.menu button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+  }
+};
+window.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.menu button').forEach(function(btn){
+    var raw = btn.getAttribute('onclick') || '';
+    var m = raw.match(/page\('([^']+)'/);
+    if(m){
+      btn.addEventListener('click', function(ev){
+        window.__pixelShowPage(m[1], btn);
+      }, true);
+    }
+  });
+});
+</script>
+<script>
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
+const sb = (window.supabase && typeof window.supabase.createClient === 'function')
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}})
+  : null;
+if(!sb) console.error('Supabase library failed to load. Check your internet connection or CDN access.');
 
 let currentUser = null, currentProfile = null, selectedUser = null;
 let presenceChannel = null;
@@ -405,12 +431,15 @@ function status(id, m, err=false){
 }
 
 function page(name, btn){
-  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-  const target = $(name);
-  if(target) target.classList.add("active");
-  if(btn){
-    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
+  if(window.__pixelShowPage) window.__pixelShowPage(name, btn);
+  else {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    const target = $(name);
+    if(target) target.classList.add("active");
+    if(btn){
+      document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    }
   }
   if(name === 'messages') updateNotificationBadge();
   if(name === 'adminPanel' && isAdmin()) loadAdminUsers();
