@@ -261,6 +261,11 @@ input,textarea,select{background:rgba(5,12,26,.80)!important;border-color:rgba(6
 @media(min-width:851px){main{background:transparent!important;}}
 @media(max-width:850px){.side,.topbar{backdrop-filter:blur(12px);}}
 </style>
+
+<style id="pf-user-summary-dashboard">
+/* ===== LIVE USER SUMMARY DASHBOARD ===== */
+.user-summary-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 18px}.summary-card{position:relative;overflow:hidden;min-height:122px;padding:16px;border:1px solid rgba(102,166,235,.34);border-radius:14px;background:linear-gradient(145deg,rgba(16,29,51,.92),rgba(8,16,31,.82));box-shadow:0 10px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(10px)}.summary-card:before{content:"";position:absolute;inset:auto -28px -40px auto;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(67,231,255,.18),transparent 68%);pointer-events:none}.summary-card.register:before{background:radial-gradient(circle,rgba(85,243,154,.18),transparent 68%)}.summary-card.login:before{background:radial-gradient(circle,rgba(155,108,255,.22),transparent 68%)}.summary-card.online:before{background:radial-gradient(circle,rgba(67,231,255,.24),transparent 68%)}.summary-card.offline:before{background:radial-gradient(circle,rgba(130,146,179,.18),transparent 68%)}.summary-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.summary-label{font-family:"Press Start 2P",monospace;font-size:10px;line-height:1.55;color:#b9c8df}.summary-icon{width:36px;height:36px;display:grid;place-items:center;border:1px solid #36547d;border-radius:10px;background:rgba(7,17,32,.78);font-size:19px}.summary-value{margin-top:12px;font-size:38px;line-height:1;font-weight:700;color:#f4f8ff;text-shadow:0 0 18px rgba(150,210,255,.20)}.summary-sub{margin-top:7px;font-size:14px;color:#8fa4c2}.summary-live{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:#75f6bb}.summary-live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pfSummaryPulse 1.4s infinite}.summary-live .offline-dot{background:#75839a;box-shadow:none}.user-summary-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-5px 0 12px;color:#7f94b3;font-size:13px}.user-summary-foot strong{color:#bcdfff;font-weight:600}@keyframes pfSummaryPulse{0%,100%{transform:scale(1);opacity:.65}50%{transform:scale(1.45);opacity:1}}@media(max-width:1050px){.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.user-summary-dashboard{grid-template-columns:1fr;gap:10px}.summary-card{min-height:106px}.summary-value{font-size:34px}}
+</style>
 </head><body>
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
 <div id="pfSpaceGlow" aria-hidden="true"></div>
@@ -281,6 +286,14 @@ input,textarea,select{background:rgba(5,12,26,.80)!important;border-color:rgba(6
     <div><h1>WELCOME TO PIXEL WORLD 👾</h1><p>CONNECT • SHARE • CHAT • LEVEL UP</p></div>
     <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 NEW STORY</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ CREATE POST</button><button class="quick-btn" onclick="page('friends')">👥 EXPLORE</button></div>
   </div>
+
+  <div class="user-summary-dashboard" id="userSummaryDashboard">
+    <div class="summary-card register"><div class="summary-top"><span class="summary-label">NEW REGISTER</span><span class="summary-icon">🆕</span></div><div id="summaryNewRegister" class="summary-value">—</div><div class="summary-sub">New accounts today</div></div>
+    <div class="summary-card login"><div class="summary-top"><span class="summary-label">LOGIN USERS</span><span class="summary-icon">🔐</span></div><div id="summaryLoginUsers" class="summary-value">—</div><div class="summary-sub">Registered real accounts</div></div>
+    <div class="summary-card online"><div class="summary-top"><span class="summary-label">ONLINE USERS</span><span class="summary-icon">🟢</span></div><div id="summaryOnlineUsers" class="summary-value">0</div><div class="summary-live"><i></i> LIVE NOW</div></div>
+    <div class="summary-card offline"><div class="summary-top"><span class="summary-label">OFFLINE USERS</span><span class="summary-icon">🌙</span></div><div id="summaryOfflineUsers" class="summary-value">—</div><div class="summary-live"><i class="offline-dot"></i> NOT CONNECTED</div></div>
+  </div>
+  <div class="user-summary-foot"><span>📊 COMMUNITY SUMMARY</span><span id="summaryUpdatedAt">Updating...</span></div>
   <div class="card story-section">
     <div class="story-head"><div><h2 style="margin:0">✨ PIXEL STORIES</h2><div class="tiny">Share moments that disappear after 24 hours</div></div><button class="primary" style="padding:8px 12px;font-size:13px" onclick="openStoryCreator()">＋ ADD STORY</button></div>
     <div id="storiesRow" class="story-row"><div class="story-empty">Loading stories...</div></div>
@@ -588,7 +601,53 @@ async function startApp(user){
   await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
   setupRealtime();
   await setupPresence();
+  startUserSummaryDashboard();
   page("home");
+}
+
+
+let userSummaryRefreshTimer = null;
+let userSummaryRefreshInFlight = false;
+let userSummaryTotalUsers = 0;
+
+function setSummaryValue(id, value){ const el=$(id); if(el) el.textContent = Number.isFinite(Number(value)) ? Number(value).toLocaleString() : value; }
+
+function refreshPresenceSummary(){
+  setSummaryValue('summaryOnlineUsers', onlineUserIds.size);
+  if(userSummaryTotalUsers >= 0) setSummaryValue('summaryOfflineUsers', Math.max(0, userSummaryTotalUsers - onlineUserIds.size));
+  const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='LIVE • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+async function loadUserSummaryDashboard(){
+  if(!currentUser || userSummaryRefreshInFlight) return;
+  userSummaryRefreshInFlight = true;
+  try{
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayISO = today.toISOString();
+    const [totalRes, guestRes, newRes] = await Promise.all([
+      sb.from('profiles').select('*',{count:'exact',head:true}),
+      sb.from('profiles').select('*',{count:'exact',head:true}).eq('is_guest',true),
+      sb.from('profiles').select('*',{count:'exact',head:true}).gte('created_at',todayISO)
+    ]);
+    const total = Number(totalRes.count || 0);
+    userSummaryTotalUsers = total;
+    const guests = guestRes.error ? 0 : Number(guestRes.count || 0);
+    const realUsers = Math.max(0,total-guests);
+    setSummaryValue('summaryLoginUsers', realUsers);
+    setSummaryValue('summaryNewRegister', newRes.error ? 0 : Number(newRes.count || 0));
+    setSummaryValue('summaryOnlineUsers', onlineUserIds.size);
+    setSummaryValue('summaryOfflineUsers', Math.max(0,total-onlineUserIds.size));
+    const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='UPDATED • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }catch(e){
+    console.warn('User summary dashboard:',e);
+    refreshPresenceSummary();
+  }finally{ userSummaryRefreshInFlight=false; }
+}
+
+function startUserSummaryDashboard(){
+  if(userSummaryRefreshTimer) clearInterval(userSummaryRefreshTimer);
+  loadUserSummaryDashboard();
+  userSummaryRefreshTimer=setInterval(loadUserSummaryDashboard,30000);
 }
 
 async function refreshHomeDashboard(){
@@ -1575,6 +1634,7 @@ function presenceMarkup(userId){
 }
 
 function refreshPresenceUI(){
+  refreshPresenceSummary();
   document.querySelectorAll('[data-presence-user-id]').forEach(el => {
     el.innerHTML = presenceMarkup(el.dataset.presenceUserId);
   });
@@ -1660,6 +1720,7 @@ async function setupPresence(){
 }
 
 async function stopPresence(){
+  if(userSummaryRefreshTimer){ clearInterval(userSummaryRefreshTimer); userSummaryRefreshTimer=null; }
   if(presenceReconnectTimer){
     clearTimeout(presenceReconnectTimer);
     presenceReconnectTimer = null;
