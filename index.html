@@ -225,7 +225,46 @@ document.addEventListener('DOMContentLoaded', ()=>{
 @keyframes pfBellFlash{0%,100%{filter:none}20%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}45%{filter:none}70%{filter:brightness(1.8) drop-shadow(0 0 10px currentColor)}}
 .pf-live-notification{animation:pfNotifIn .22s ease-out,pfBellFlash .75s ease-out}
 </style>
+
+<style id="pf-live-space-theme">
+/* ===== PIXEL-FRIEND LIVE SPACE THEME ===== */
+html,body{background:#050914!important;}
+body{background:radial-gradient(circle at 20% 15%,rgba(39,72,132,.22),transparent 28%),radial-gradient(circle at 84% 68%,rgba(91,44,136,.16),transparent 32%),#050914!important;overflow-x:hidden;}
+body:before{background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.012) 4px)!important;opacity:.55;}
+#pfSpaceCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 0%,rgba(22,37,76,.48),transparent 45%),#050914;}
+#pfSpaceGlow{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;background:
+ radial-gradient(circle at 12% 35%,rgba(41,123,255,.13),transparent 18%),
+ radial-gradient(circle at 86% 24%,rgba(118,70,255,.12),transparent 19%),
+ radial-gradient(circle at 72% 78%,rgba(86,40,161,.12),transparent 24%);
+ filter:blur(10px);animation:pfNebulaDrift 16s ease-in-out infinite alternate;}
+@keyframes pfNebulaDrift{0%{transform:scale(1) translate3d(-1%,0,0);opacity:.72}100%{transform:scale(1.06) translate3d(1.2%,-.8%,0);opacity:1}}
+#authScreen,.app{position:relative;z-index:2;} .app,.layout,main{background:transparent!important;}
+.topbar{background:linear-gradient(90deg,rgba(5,11,24,.96),rgba(9,16,34,.92) 55%,rgba(13,15,37,.92))!important;border-bottom-color:rgba(88,124,181,.48)!important;box-shadow:0 8px 30px rgba(0,0,0,.48),0 1px 0 rgba(108,188,255,.10) inset!important;backdrop-filter:blur(16px) saturate(125%);}
+.side{background:linear-gradient(180deg,rgba(8,16,31,.93),rgba(5,10,21,.88))!important;border-right-color:rgba(83,121,178,.42)!important;backdrop-filter:blur(14px) saturate(120%);}
+.mini,.card,.user-card,.post-card,.rail-card,.game-card,.invite-card{background:linear-gradient(135deg,rgba(13,25,47,.88),rgba(7,14,29,.86))!important;border-color:rgba(74,116,174,.52)!important;box-shadow:0 12px 30px rgba(0,0,0,.30),0 0 0 1px rgba(88,168,255,.035) inset!important;backdrop-filter:blur(12px) saturate(115%);}
+.home-welcome,.story-section,.feed-shell{background:linear-gradient(135deg,rgba(17,31,59,.88),rgba(8,15,31,.84))!important;border-color:rgba(73,116,178,.54)!important;backdrop-filter:blur(12px);}
+.rail-card{background:linear-gradient(135deg,rgba(13,25,46,.90),rgba(7,13,27,.87))!important;}
+.chat-user:hover,.chat-user.active,.notification-item:hover{background:linear-gradient(90deg,rgba(57,92,153,.30),rgba(33,48,90,.28))!important;}
+.menu button{position:relative;overflow:hidden;text-shadow:0 1px 0 #000;}
+.menu button:before{content:"";position:absolute;left:0;top:12%;bottom:12%;width:2px;background:transparent;box-shadow:none;transition:.2s ease;}
+.menu button.active{background:linear-gradient(90deg,rgba(103,61,196,.45),rgba(43,53,111,.34))!important;box-shadow:0 0 20px rgba(116,83,255,.16),inset 0 0 18px rgba(105,55,202,.10)!important;}
+.menu button.active:before{background:var(--cyan);box-shadow:0 0 12px var(--cyan);}
+.brand{filter:drop-shadow(0 0 10px rgba(92,164,255,.24));}
+.brand-icon{box-shadow:0 0 18px rgba(93,124,255,.32)!important;}
+input,textarea,select{background:rgba(5,12,26,.80)!important;border-color:rgba(68,110,170,.56)!important;box-shadow:inset 0 1px 12px rgba(0,0,0,.18);}
+.notification-panel{background:rgba(7,14,28,.96)!important;border-color:rgba(76,120,181,.58)!important;backdrop-filter:blur(16px);}
+.post-card,.message{position:relative;overflow:hidden;}
+.post-card:before,.rail-card:before,.game-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.025),transparent 22%,transparent 75%,rgba(78,161,255,.025));}
+.story-ring{box-shadow:0 0 22px rgba(93,127,255,.34),0 0 0 1px rgba(255,255,255,.04) inset!important;}
+.level-orb,.bonus-chest{filter:drop-shadow(0 0 15px rgba(113,109,255,.28));}
+.xp>div,#xpBar,.rail-xp>span{box-shadow:0 0 12px rgba(135,102,255,.55);}
+@media(min-width:851px){main{background:transparent!important;}}
+@media(max-width:850px){.side,.topbar{backdrop-filter:blur(12px);}}
+</style>
 </head><body>
+<canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
+<div id="pfSpaceGlow" aria-hidden="true"></div>
+
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">👾</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
@@ -2777,4 +2816,16 @@ restoreSession();
     <div id="inviteStats" class="invite-stats">👥 Joined through your link: 0</div>
   </div>
 </div>
+
+<script id="pf-live-space-animation">
+(function(){
+  const c=document.getElementById('pfSpaceCanvas'); if(!c) return;
+  const ctx=c.getContext('2d'); let w=0,h=0,dpr=1,stars=[]; let raf=null;
+  function resize(){dpr=Math.min(window.devicePixelRatio||1,2);w=window.innerWidth;h=window.innerHeight;c.width=Math.floor(w*dpr);c.height=Math.floor(h*dpr);c.style.width=w+'px';c.style.height=h+'px';ctx.setTransform(dpr,0,0,dpr,0,0);const n=Math.min(260,Math.max(110,Math.floor((w*h)/7000)));stars=Array.from({length:n},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.55+.25,a:Math.random()*.7+.18,v:Math.random()*.22+.04,p:Math.random()*Math.PI*2}));}
+  function drawGrid(){ctx.save();ctx.globalAlpha=.12;ctx.strokeStyle='#3d7bb6';ctx.lineWidth=1;const step=10;for(let x=0;x<w;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}for(let y=0;y<h;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}ctx.restore();}
+  function drawConstellations(t){ctx.save();ctx.globalAlpha=.20;ctx.strokeStyle='#78baff';ctx.fillStyle='#a8dcff';ctx.lineWidth=.7;const groups=[[[.43,.11],[.47,.08],[.50,.14],[.55,.10],[.58,.17]],[[.18,.34],[.23,.29],[.28,.36],[.34,.31]],[[.77,.22],[.81,.15],[.86,.24],[.90,.18]]];groups.forEach((g,gi)=>{ctx.beginPath();g.forEach((p,i)=>{const x=p[0]*w+Math.sin(t*.00035+gi+i)*2;const y=p[1]*h+Math.cos(t*.0003+gi+i)*2;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();g.forEach((p,i)=>{const x=p[0]*w+Math.sin(t*.00035+gi+i)*2;const y=p[1]*h+Math.cos(t*.0003+gi+i)*2;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fill();});});ctx.restore();}
+  function frame(t){ctx.clearRect(0,0,w,h);const g=ctx.createRadialGradient(w*.2,h*.2,0,w*.2,h*.2,Math.max(w,h)*.75);g.addColorStop(0,'rgba(25,53,103,.28)');g.addColorStop(.48,'rgba(8,16,36,.08)');g.addColorStop(1,'rgba(2,6,15,.04)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);drawGrid();drawConstellations(t);for(const s of stars){s.y-=s.v*.25;if(s.y<-3){s.y=h+3;s.x=Math.random()*w;}const a=s.a*(.62+.38*Math.sin(t*.002+s.p));ctx.fillStyle='rgba(180,220,255,'+a+')';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();if(s.r>1.25){ctx.strokeStyle='rgba(100,200,255,'+(a*.35)+')';ctx.beginPath();ctx.moveTo(s.x-s.r*3,s.y);ctx.lineTo(s.x+s.r*3,s.y);ctx.moveTo(s.x,s.y-s.r*3);ctx.lineTo(s.x,s.y+s.r*3);ctx.stroke();}}raf=requestAnimationFrame(frame);}
+  resize();window.addEventListener('resize',resize,{passive:true});raf=requestAnimationFrame(frame);
+})();
+</script>
 </body></html>
