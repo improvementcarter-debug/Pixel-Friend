@@ -416,6 +416,10 @@ main{padding:18px 22px 28px!important}
 @media(max-width:1180px){.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}.user-summary-dashboard>.summary-card{height:176px!important}}
 @media(max-width:850px){.user-summary-dashboard{grid-template-columns:1fr!important}.user-summary-dashboard>.summary-card{height:164px!important;min-height:164px!important}}
 </style>
+
+<style id="pf-world-clock-style">
+.world-clock-page{padding:4px 0 24px}.wc-hero{padding:22px;border:1px solid rgba(67,231,255,.28);border-radius:18px;background:linear-gradient(135deg,rgba(10,26,48,.92),rgba(16,10,44,.82));box-shadow:0 12px 40px rgba(0,0,0,.28);margin-bottom:18px}.wc-hero h1{margin:0;font-size:28px}.wc-sub{margin-top:8px;color:#9fb1cc}.wc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.wc-card{position:relative;overflow:hidden;min-height:145px;padding:18px;border-radius:16px;border:1px solid rgba(72,145,255,.34);background:linear-gradient(145deg,rgba(12,26,48,.94),rgba(7,15,29,.94));box-shadow:0 10px 30px rgba(0,0,0,.24);transition:.2s}.wc-card:hover{transform:translateY(-3px);border-color:rgba(67,231,255,.72);box-shadow:0 0 24px rgba(67,231,255,.12),0 14px 36px rgba(0,0,0,.3)}.wc-card:before{content:'';position:absolute;inset:auto -30px -50px auto;width:130px;height:130px;background:radial-gradient(circle,rgba(91,110,255,.16),transparent 68%)}.wc-head,.wc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}.wc-name{font-weight:800;letter-spacing:.6px}.wc-status{font-size:22px}.wc-time{margin-top:20px;font-size:34px;font-weight:900;letter-spacing:1px;color:#65eaff;text-shadow:0 0 18px rgba(101,234,255,.22);font-variant-numeric:tabular-nums}.wc-meta{margin-top:12px;color:#93a7c5;font-size:12px}.wc-offset{padding:4px 8px;border-radius:999px;border:1px solid rgba(67,231,255,.22);color:#b7f7ff;background:rgba(67,231,255,.06)}@media(max-width:700px){.wc-time{font-size:28px}.wc-hero h1{font-size:23px}}
+</style>
 </head><body>
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
 <div id="pfSpaceGlow" aria-hidden="true"></div>
@@ -429,7 +433,7 @@ main{padding:18px 22px 28px!important}
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👾</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('games',this)">🎮 GAMES</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👾<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('games',this)">🎮 GAMES</button>        <button onclick="page('worldClock',this)">🌍 WORLD CLOCK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -534,6 +538,13 @@ main{padding:18px 22px 28px!important}
         </aside>
       </div>
     </div>
+  </div>
+</section>
+
+<section id="worldClock" class="page">
+  <div class="world-clock-page">
+    <div class="wc-hero"><h1>🌍 GLOBAL WORLD CLOCK</h1><div class="wc-sub">Live synchronized time for Pixel-Friend community regions.</div></div>
+    <div id="pfWorldClockGrid" class="wc-grid"></div>
   </div>
 </section>
 </main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
@@ -3118,6 +3129,16 @@ restoreSession();
   function drawConstellations(t){ctx.save();ctx.globalAlpha=.20;ctx.strokeStyle='#78baff';ctx.fillStyle='#a8dcff';ctx.lineWidth=.7;const groups=[[[.43,.11],[.47,.08],[.50,.14],[.55,.10],[.58,.17]],[[.18,.34],[.23,.29],[.28,.36],[.34,.31]],[[.77,.22],[.81,.15],[.86,.24],[.90,.18]]];groups.forEach((g,gi)=>{ctx.beginPath();g.forEach((p,i)=>{const x=p[0]*w+Math.sin(t*.00035+gi+i)*2;const y=p[1]*h+Math.cos(t*.0003+gi+i)*2;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);});ctx.stroke();g.forEach((p,i)=>{const x=p[0]*w+Math.sin(t*.00035+gi+i)*2;const y=p[1]*h+Math.cos(t*.0003+gi+i)*2;ctx.beginPath();ctx.arc(x,y,1.4,0,Math.PI*2);ctx.fill();});});ctx.restore();}
   function frame(t){ctx.clearRect(0,0,w,h);const g=ctx.createRadialGradient(w*.2,h*.2,0,w*.2,h*.2,Math.max(w,h)*.75);g.addColorStop(0,'rgba(25,53,103,.28)');g.addColorStop(.48,'rgba(8,16,36,.08)');g.addColorStop(1,'rgba(2,6,15,.04)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);drawGrid();drawConstellations(t);for(const s of stars){s.y-=s.v*.25;if(s.y<-3){s.y=h+3;s.x=Math.random()*w;}const a=s.a*(.62+.38*Math.sin(t*.002+s.p));ctx.fillStyle='rgba(180,220,255,'+a+')';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();if(s.r>1.25){ctx.strokeStyle='rgba(100,200,255,'+(a*.35)+')';ctx.beginPath();ctx.moveTo(s.x-s.r*3,s.y);ctx.lineTo(s.x+s.r*3,s.y);ctx.moveTo(s.x,s.y-s.r*3);ctx.lineTo(s.x,s.y+s.r*3);ctx.stroke();}}raf=requestAnimationFrame(frame);}
   resize();window.addEventListener('resize',resize,{passive:true});raf=requestAnimationFrame(frame);
+})();
+</script>
+
+<script id="pf-world-clock-script">
+(function(){
+ const zones=[['Cambodia (KH)','Asia/Phnom_Penh'],['China (CN)','Asia/Shanghai'],['Philippines (PH)','Asia/Manila'],['Brazil (BR)','America/Sao_Paulo'],['Bangladesh (BD)','Asia/Dhaka'],['Mexico (MX)','America/Mexico_City'],['Indonesia (ID)','Asia/Jakarta'],['Malaysia (MY)','Asia/Kuala_Lumpur'],['Myanmar (MM)','Asia/Yangon'],['Madagascar (MG)','Indian/Antananarivo']];
+ const grid=document.getElementById('pfWorldClockGrid'); if(!grid) return;
+ grid.innerHTML=zones.map((z,i)=>`<div class="wc-card"><div class="wc-head"><div class="wc-name">${z[0]}</div><div class="wc-status" id="wcIcon${i}">☀️</div></div><div class="wc-time" id="wcTime${i}">--:--:--</div><div class="wc-row wc-meta"><span id="wcDate${i}">--</span><span class="wc-offset" id="wcOffset${i}">UTC</span></div></div>`).join('');
+ function update(){const now=new Date(); zones.forEach((z,i)=>{try{const parts=new Intl.DateTimeFormat('en-US',{timeZone:z[1],hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).formatToParts(now);const get=t=>parts.find(x=>x.type===t)?.value||'';document.getElementById('wcTime'+i).textContent=`${get('hour')}:${get('minute')}:${get('second')} ${get('dayPeriod')}`;document.getElementById('wcDate'+i).textContent=new Intl.DateTimeFormat('en-US',{timeZone:z[1],month:'short',day:'numeric',weekday:'short'}).format(now);const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:z[1],hour:'numeric',hourCycle:'h23'}).format(now));document.getElementById('wcIcon'+i).textContent=h>=6&&h<18?'☀️':'🌙';const tz=new Intl.DateTimeFormat('en-US',{timeZone:z[1],timeZoneName:'longOffset'}).formatToParts(now).find(x=>x.type==='timeZoneName')?.value||'UTC';document.getElementById('wcOffset'+i).textContent=tz.replace('GMT','UTC ');}catch(e){}})}
+ update();setInterval(update,1000);
 })();
 </script>
 </body></html>
