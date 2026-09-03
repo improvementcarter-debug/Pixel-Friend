@@ -97,6 +97,8 @@
 .paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
 /* ===== PIXEL-FRIEND ARCADE ===== */
+/* ===== PIXEL-FRIEND ARCADE: BUNNY HOP ===== */
+.bunny-card{margin-top:18px}.bunny-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.bunny-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start;margin-top:16px}.bunny-canvas-wrap{position:relative;border:1px solid #2d466a;border-radius:16px;padding:12px;background:radial-gradient(circle at 50% 0%,rgba(75,50,180,.18),transparent 42%),linear-gradient(180deg,#081426,#050b15);box-shadow:inset 0 0 30px rgba(67,231,255,.05)}#bunnyCanvas{display:block;width:100%;max-width:620px;height:auto;margin:0 auto;border:1px solid #3a5f92;border-radius:12px;background:#071322;touch-action:manipulation;cursor:pointer;image-rendering:pixelated}.bunny-side{display:grid;gap:10px}.bunny-tip{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.bunny-tip h3{margin:0 0 7px;font-size:15px}.bunny-tip p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.bunny-status{min-height:24px;text-align:center;margin-top:12px}.bunny-live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#48e0a4;box-shadow:0 0 12px rgba(72,224,164,.8);margin-right:7px}.bunny-controls{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}.bunny-controls b{color:var(--cyan)}@media(max-width:800px){.bunny-layout{grid-template-columns:1fr}.bunny-side{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.bunny-side{grid-template-columns:1fr}.bunny-canvas-wrap{padding:7px}}
 .arcade-page{padding:20px;max-width:1100px;margin:0 auto}.arcade-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;padding:22px;border:1px solid #34547e;border-radius:16px;background:linear-gradient(135deg,#111c31,#0a1220);box-shadow:0 0 30px rgba(67,231,255,.08)}
 .arcade-title{margin:0;font-size:28px}.arcade-sub{color:var(--muted);margin-top:8px}.game-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.game-card{border:1px solid #2d466a;border-radius:16px;background:linear-gradient(180deg,#101a2d,#09111e);padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
 .game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
@@ -490,7 +492,7 @@ main{padding:18px 22px 28px!important}
 
 <section id="games" class="page">
   <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button></div></div>
+    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button><button class="secondary" onclick="startBunnyHop()">🐰 BUNNY HOP</button></div></div>
     <div class="game-grid">
       <div class="game-card">
         <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
@@ -505,7 +507,7 @@ main{padding:18px 22px 28px!important}
         <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
         <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
         <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>COMING NEXT</h3><p>⚔️ Pixel Battle<br>🎯 Fast Click Challenge<br>🏎️ Pixel Racing</p></div>
+        <div class="arcade-mini"><h3>🐰 NEW: BUNNY HOP</h3><p>Jump over obstacles, survive longer, and beat your personal high score!</p></div>
       </aside>
     </div>
     <div class="game-card memory-card">
@@ -514,6 +516,23 @@ main{padding:18px 22px 28px!important}
       <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
       <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
       <div id="memoryStatus" class="memory-status tiny"></div>
+    </div>
+    <div class="game-card bunny-card" id="bunnyHopGame">
+      <div class="bunny-header"><div><h2 style="margin:0">🐰 BUNNY HOP!</h2><p class="tiny" style="margin:7px 0 0">Help Pixel Friend's bunny dodge cactus obstacles and survive as the speed increases.</p></div><button id="bunnyStartBtn" class="primary" onclick="startBunnyHop()">▶ START BUNNY HOP</button></div>
+      <div class="game-stats" style="margin-top:16px"><div class="game-stat">SCORE<b id="bunnyScore">0</b></div><div class="game-stat">BEST<b id="bunnyBest">0</b></div><div class="game-stat">SPEED<b id="bunnySpeed">1.0x</b></div><div class="game-stat">STATUS<b id="bunnyLive">READY</b></div></div>
+      <div class="bunny-layout">
+        <div>
+          <div class="bunny-canvas-wrap"><canvas id="bunnyCanvas" width="640" height="300" aria-label="Bunny Hop game"></canvas></div>
+          <div class="bunny-controls">Press <b>SPACE</b>, <b>↑</b>, or tap the game arena to jump.</div>
+          <div class="game-actions"><button class="primary" onclick="startBunnyHop()">🐰 PLAY / RESTART</button><button class="secondary" onclick="shareBunnyScore()">↗️ SHARE SCORE</button></div>
+          <div id="bunnyStatus" class="bunny-status tiny">🐾 Ready to hop! Press START to play.</div>
+        </div>
+        <aside class="bunny-side">
+          <div class="bunny-tip"><h3>⚡ HOW TO PLAY</h3><p>Jump over every cactus. The game becomes faster the longer you survive.</p></div>
+          <div class="bunny-tip"><h3>🏆 HIGH SCORE</h3><p>Your best score is saved locally for your Pixel-Friend account.</p></div>
+          <div class="bunny-tip"><h3><span class="bunny-live-dot"></span>LIVE RUN</h3><p>Each obstacle passed gives points. Keep hopping and beat your best!</p></div>
+        </aside>
+      </div>
     </div>
   </div>
 </section>
@@ -3009,6 +3028,70 @@ function flipMemoryCard(index){if(!memoryPlaying||!memoryCanFlip)return;const ca
 function endMemoryGame(won){memoryPlaying=false;clearInterval(memoryInterval);let msg='⏰ Time is up! Try again and beat your best.';if(won){const used=30-memoryTime;const old=Number(localStorage.getItem(memoryBestKey())||9999);msg=`🌟 Amazing! You matched all pairs in ${used} seconds and ${memoryMoves} moves!`;if(used<old){localStorage.setItem(memoryBestKey(),String(used));msg+=' 🏆 NEW PERSONAL BEST!';}}$('memoryStatus').textContent=msg;$('memoryStartBtn').textContent='▶ PLAY AGAIN';updateMemoryStats();if(typeof toast==='function')toast(msg);}
 async function shareMemoryScore(){const text=`🧠 I completed Pixel Memory Match in ${30-memoryTime} seconds with ${memoryMoves} moves on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Memory Match',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Memory challenge copied!');}catch(e){window.prompt('Copy and share your result:',text+' '+location.href);}}
 window.startMemoryGame=startMemoryGame;window.flipMemoryCard=flipMemoryCard;window.shareMemoryScore=shareMemoryScore;
+
+/* ===== PIXEL-FRIEND ARCADE: BUNNY HOP ===== */
+const bunnyCanvas=$('bunnyCanvas');
+const bunnyCtx=bunnyCanvas?bunnyCanvas.getContext('2d'):null;
+let bunnyHopPlaying=false,bunnyHopRAF=null,bunnyHopLast=0,bunnyHopScore=0,bunnyHopSpeed=1,bunnyHopSpawn=0,bunnyHopObstacles=[];
+let bunnyHopPlayer={x:78,y:218,w:38,h:42,vy:0,onGround:true};
+const BUNNY_GROUND=260;
+function bunnyBestKey(){return 'pf_bunny_hop_best_'+(currentUser?.id||'guest');}
+function bunnySetText(id,v){const e=$(id);if(e)e.textContent=v;}
+function bunnyUpdateStats(){bunnySetText('bunnyScore',Math.floor(bunnyHopScore));bunnySetText('bunnyBest',Number(localStorage.getItem(bunnyBestKey())||0));bunnySetText('bunnySpeed',bunnyHopSpeed.toFixed(1)+'x');bunnySetText('bunnyLive',bunnyHopPlaying?'LIVE':'READY');}
+function drawBunnyBackground(t){
+  if(!bunnyCtx||!bunnyCanvas)return;
+  const c=bunnyCtx,w=bunnyCanvas.width,h=bunnyCanvas.height;
+  c.clearRect(0,0,w,h);
+  const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#091a31');g.addColorStop(.62,'#0a1b2c');g.addColorStop(1,'#07101c');c.fillStyle=g;c.fillRect(0,0,w,h);
+  c.fillStyle='rgba(100,170,255,.18)';
+  for(let i=0;i<42;i++){const x=(i*83+Math.floor(t*.012)*(i%3+1))%w;const y=18+(i*47)%150;const r=(i%4===0)?1.6:.8;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
+  c.strokeStyle='rgba(78,137,190,.5)';c.lineWidth=2;c.beginPath();c.moveTo(0,BUNNY_GROUND);c.lineTo(w,BUNNY_GROUND);c.stroke();
+  c.fillStyle='rgba(37,73,100,.35)';for(let x=-40;x<w+40;x+=40){c.fillRect(x,BUNNY_GROUND+1,20,h-BUNNY_GROUND);}
+}
+function drawPixelBunny(){
+  const c=bunnyCtx,p=bunnyHopPlayer,x=p.x,y=p.y;
+  c.save();c.translate(x,y);
+  c.fillStyle='#d9d3ff';c.fillRect(10,10,24,24);c.fillRect(8,16,28,22);
+  c.fillStyle='#b49cff';c.fillRect(11,0,7,16);c.fillRect(26,0,7,16);
+  c.fillStyle='#ff8ec7';c.fillRect(13,3,3,10);c.fillRect(28,3,3,10);
+  c.fillStyle='#1b2440';c.fillRect(15,18,4,4);c.fillRect(28,18,4,4);c.fillRect(21,26,5,3);
+  c.fillStyle='#ffffff';c.fillRect(18,16,3,3);c.fillRect(31,16,3,3);
+  c.restore();
+}
+function drawCactus(o){const c=bunnyCtx;c.save();c.translate(o.x,o.y);c.fillStyle='#48d38b';c.fillRect(8,8,15,32);c.fillRect(3,17,8,8);c.fillRect(0,12,7,10);c.fillRect(20,13,8,8);c.fillRect(25,8,6,11);c.fillStyle='#8af0b8';c.fillRect(12,11,2,24);c.restore();}
+function drawBunnyHop(t){drawBunnyBackground(t);bunnyHopObstacles.forEach(drawCactus);drawPixelBunny();}
+function bunnyJump(){
+  if(!bunnyHopPlaying){startBunnyHop();return;}
+  if(bunnyHopPlayer.onGround){bunnyHopPlayer.vy=-14.2*bunnyHopSpeed**.05;bunnyHopPlayer.onGround=false;}
+}
+function bunnyRectHit(p,o){return p.x+6<o.x+o.w-4&&p.x+p.w-6>o.x+4&&p.y+7<o.y+o.h&&p.y+p.h-4>o.y+4;}
+function bunnyLoop(ts){
+  if(!bunnyHopPlaying)return;
+  const dt=Math.min(32,ts-(bunnyHopLast||ts));bunnyHopLast=ts;const step=dt/16.67;
+  bunnyHopSpeed=Math.min(3.2,1+bunnyHopScore/280);
+  bunnyHopPlayer.vy+=0.82*step;bunnyHopPlayer.y+=bunnyHopPlayer.vy*step;
+  if(bunnyHopPlayer.y>=BUNNY_GROUND-bunnyHopPlayer.h){bunnyHopPlayer.y=BUNNY_GROUND-bunnyHopPlayer.h;bunnyHopPlayer.vy=0;bunnyHopPlayer.onGround=true;}
+  bunnyHopSpawn-=dt;
+  if(bunnyHopSpawn<=0){const size=34+Math.random()*10;bunnyHopObstacles.push({x:bunnyCanvas.width+20,y:BUNNY_GROUND-size,w:30,h:size,scored:false});bunnyHopSpawn=Math.max(580,1250-bunnyHopSpeed*210+Math.random()*380);}
+  for(let i=bunnyHopObstacles.length-1;i>=0;i--){const o=bunnyHopObstacles[i];o.x-=6.1*bunnyHopSpeed*step;if(bunnyRectHit(bunnyHopPlayer,o)){endBunnyHop();return;}if(o.x+o.w<0){bunnyHopObstacles.splice(i,1);bunnyHopScore+=10;}}
+  bunnyHopScore+=0.045*step;bunnyUpdateStats();drawBunnyHop(ts);bunnyHopRAF=requestAnimationFrame(bunnyLoop);
+}
+function startBunnyHop(){
+  if(!bunnyCanvas||!bunnyCtx)return;
+  cancelAnimationFrame(bunnyHopRAF);bunnyHopPlaying=true;bunnyHopLast=0;bunnyHopScore=0;bunnyHopSpeed=1;bunnyHopSpawn=900;bunnyHopObstacles=[];bunnyHopPlayer={x:78,y:BUNNY_GROUND-42,w:38,h:42,vy:0,onGround:true};
+  bunnySetText('bunnyStatus','⚡ GO! Jump over the cactus obstacles.');const b=$('bunnyStartBtn');if(b)b.textContent='🔄 RESTART BUNNY HOP';bunnyUpdateStats();bunnyHopRAF=requestAnimationFrame(bunnyLoop);
+}
+function endBunnyHop(){
+  bunnyHopPlaying=false;cancelAnimationFrame(bunnyHopRAF);const score=Math.floor(bunnyHopScore);const old=Number(localStorage.getItem(bunnyBestKey())||0);let msg=`🐾 Game over! Final score: ${score}.`;
+  if(score>old){localStorage.setItem(bunnyBestKey(),String(score));msg+=' 🏆 NEW PERSONAL BEST!';}
+  bunnySetText('bunnyStatus',msg);const b=$('bunnyStartBtn');if(b)b.textContent='▶ PLAY AGAIN';bunnyUpdateStats();drawBunnyHop(performance.now());
+  if(typeof toast==='function')toast(msg);
+}
+async function shareBunnyScore(){const score=Math.floor(bunnyHopScore);const text=`🐰 I scored ${score} in Bunny Hop on Pixel-Friend! Can you beat my high score? 🎮`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Bunny Hop',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Bunny Hop challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
+function initBunnyHop(){if(!bunnyCtx)return;drawBunnyHop(performance.now());bunnyUpdateStats();}
+if(bunnyCanvas){bunnyCanvas.addEventListener('pointerdown',e=>{e.preventDefault();bunnyJump();});}
+window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&!e.repeat){const page=$('games');if(page&&page.classList.contains('active')){e.preventDefault();bunnyJump();}}});
+window.startBunnyHop=startBunnyHop;window.shareBunnyScore=shareBunnyScore;window.addEventListener('load',initBunnyHop);
 
 restoreSession();
 </script>
