@@ -427,7 +427,7 @@ main{padding:18px 22px 28px!important}
 
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
-<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">🎮</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
+<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">🔔<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
       <div id="notificationPanel" class="notification-panel hidden">
         <div class="notification-panel-head"><strong>🔔 NOTIFICATIONS</strong><button class="notification-clear" onclick="markAllNotificationsRead(event)">MARK READ</button></div>
@@ -497,12 +497,12 @@ main{padding:18px 22px 28px!important}
 
 <section id="games" class="page">
   <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">🎮 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button><button class="secondary" onclick="startBunnyHop()">🐰 BUNNY HOP</button></div></div>
+    <div class="arcade-hero"><div><h1 class="arcade-title">👤 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button><button class="secondary" onclick="startBunnyHop()">🐰 BUNNY HOP</button></div></div>
     <div class="game-grid">
       <div class="game-card">
         <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
         <div class="game-stats"><div class="game-stat">SCORE<b id="petScore">0</b></div><div class="game-stat">TIME<b id="petTimer">20</b></div><div class="game-stat">COMBO<b id="petCombo">0</b></div><div class="game-stat">BEST<b id="petBest">0</b></div></div>
-        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👾</div></div>
+        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👤</div></div>
         <div class="target-food">PET WANTS: <span id="desiredFood">🍪</span></div>
         <div id="foodGrid" class="food-grid"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">Press PLAY NOW to start!</div></div>
         <div class="game-actions"><button id="petStartBtn" class="primary" onclick="startPetGame()">▶ START GAME</button><button class="secondary" onclick="sharePetScore()">↗️ SHARE SCORE</button></div>
@@ -604,12 +604,12 @@ function isGuestProfile(profile){
 
 function accountBadge(profile, small=false){
   const guest = isGuestProfile(profile);
-  return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}</span>`;
+  return `<span class="account-badge ${guest ? 'guest' : 'real'}${small ? ' small' : ''}">${guest ? '👤 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}</span>`;
 }
 
 function accountTypeBanner(profile){
   const guest = isGuestProfile(profile);
-  return `<div class="account-type-banner ${guest ? 'guest' : 'real'}">${guest ? '🎮 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}<span class="sub">${guest ? 'This user entered using Guest Access' : 'Registered Pixel-Friend account'}</span></div>`;
+  return `<div class="account-type-banner ${guest ? 'guest' : 'real'}">${guest ? '👤 GUEST ACCOUNT' : '👤 REAL ACCOUNT'}<span class="sub">${guest ? 'This user entered using Guest Access' : 'Registered Pixel-Friend account'}</span></div>`;
 }
 
 let retroAudioCtx = null;
@@ -742,7 +742,7 @@ window.register = register;
 async function guestLogin(){
   status("authStatus","Creating guest account...");
   const r = await sb.auth.signInAnonymously({
-    options:{data:{username:"GUEST-" + Math.random().toString(36).slice(2,7).toUpperCase(), avatar:"🎮", is_guest:true}}
+    options:{data:{username:"GUEST-" + Math.random().toString(36).slice(2,7).toUpperCase(), avatar:"👤", is_guest:true}}
   });
   if(r.error) return status("authStatus", "Guest login failed: " + r.error.message, true);
   await startApp(r.data.user);
