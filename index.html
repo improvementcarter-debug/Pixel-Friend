@@ -969,7 +969,7 @@ main{
 <div class="home-left">
 <div class="card composer-card">
 <div class="composer-title"><h2 style="margin:0">✍️ New post</h2><span class="tiny">+10 xp</span></div>
-<textarea id="postText" maxlength="1000" placeholder="Feed me your thoughts!"></div>
+<textarea id="postText" maxlength="1000" placeholder="Feed me your thoughts"></textarea><div class="tiny paste-hint">Paste text, screenshots, or copied pictures directly here)</div>
 <div class="media-actions"><button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ Photo</button><button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 Video</button><button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 Audio</button></div>
 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span class="file-pill hidden" id="postImagePill"></span><span class="file-pill hidden" id="postVideoPill"></span><span class="file-pill hidden" id="postAudioPill"></span></div>
 <input accept="image/*" class="hidden" id="postImageInput" onchange="previewPostFile('image')" type="file"/><input accept="video/*" class="hidden" id="postVideoInput" onchange="previewPostFile('video')" type="file"/><input accept="audio/*" class="hidden" id="postAudioInput" onchange="previewPostFile('audio')" type="file"/>
