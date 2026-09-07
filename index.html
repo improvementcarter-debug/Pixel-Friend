@@ -952,7 +952,7 @@ main{
 <div class="home-dashboard">
 <div class="home-welcome">
 <div><h1>Welcome to pixel-friend</h1><p>Connect • share • chat</p></div>
-<div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 New story</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ create post</button><button class="quick-btn" onclick="page('friends')">👥 explore</button></div>
+<div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 New story</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ Create post</button><button class="quick-btn" onclick="page('friends')">👥 explore</button></div>
 </div>
 <div class="user-summary-dashboard" id="userSummaryDashboard">
 <div class="summary-card register"><div class="summary-top"><span class="summary-label">New register</span><span class="summary-icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M10 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-6 17v-1c0-3.1 2.6-5.5 6-5.5s6 2.4 6 5.5v1H4Zm14-8v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3Z" fill="currentColor"></path></svg></span></div><div class="summary-value" id="summaryNewRegister">—</div><div class="summary-sub">New accounts today</div></div>
@@ -1632,8 +1632,8 @@ function notifyIncomingMessage(message){
   const senderAvatar = cachedProfile
     ? (cachedProfile.avatar_url
         ? `<img src="${esc(cachedProfile.avatar_url)}" alt="">`
-        : esc(cachedProfile.avatar || '👾'))
-    : '👾';
+        : esc(cachedProfile.avatar || '👤'))
+    : '👤';
 
   // IMMEDIATE UI + SOUND — no await, no database lookup.
   renderNotificationBadge(localUnreadCount + 1);
@@ -1671,7 +1671,7 @@ function notifyIncomingMessage(message){
   }
 }
 
-function showTelegramNotification(message, senderName, senderAvatar='👾'){
+function showTelegramNotification(message, senderName, senderAvatar='👤'){
   const stack = $("pfLiveNotificationStack");
   if(!stack || !message?.id) return;
 
@@ -1684,7 +1684,7 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
   item.dataset.pfNotificationId = id;
   item.setAttribute('role','button');
   item.innerHTML = `
-    <div class="pf-live-notification-avatar">${senderAvatar || '👾'}</div>
+    <div class="pf-live-notification-avatar">${senderAvatar || '👤'}</div>
     <div class="pf-live-notification-main">
       <div class="pf-live-notification-head">
         <div class="pf-live-notification-name">${esc(senderName || 'Pixel user')}</div>
@@ -1876,7 +1876,7 @@ async function viewPost(postId){
     if(!post) throw new Error('Post not found.');
 
     const u = post.profiles || {};
-    const avatar = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || '👾');
+    const avatar = u.avatar_url ? `<img src="${esc(u.avatar_url)}">` : esc(u.avatar || '👤');
     const verified = u.is_verified ? ' ✅' : '';
     const badge = accountBadge(u, true);
 
@@ -1957,7 +1957,7 @@ async function copyInviteLink(){
 async function shareInviteLink(){
   const link=$('inviteLink')?.value || getInviteUrl();
   const title='Join me on Pixel-Friend!';
-  const text='👾 Join me on Pixel-Friend and let’s connect!';
+  const text='👤 Join me on Pixel-Friend and let’s connect!';
   if(navigator.share){
     try{ await navigator.share({title,text,url:link}); toast('🚀 Invite shared successfully!'); return; }
     catch(e){ if(e?.name==='AbortError') return; }
@@ -2171,7 +2171,7 @@ async function loadFeed(forceRender = false) {
             <div>
               ${postComments.map(c => {
                 const cu = c.profiles || {};
-                const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👾");
+                const cAvatar = cu.avatar_url ? `<img src="${esc(cu.avatar_url)}">` : esc(cu.avatar || "👤");
                 return `
                   <div class="comment-item">
                     <div class="user-avatar" style="width:30px;height:30px;font-size:16px">${cAvatar}</div>
@@ -2298,7 +2298,7 @@ async function loadLeaderboard() {
     <div class="card" style="padding:10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
       <div class="row" style="gap:10px;align-items:center;">
         <strong>#${i+1}</strong>
-        <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+        <div class="user-avatar" style="width:32px;height:32px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👤")}</div>
         <span>${esc(u.username)}${u.is_verified?' ✅':''}</span>
       </div>
       <div><strong>${u.xp || 0} XP</strong></div>
@@ -2444,7 +2444,7 @@ const STORY_EMOJIS = ['❤️','🔥','😂','😮','😢','👾'];
 function storySeenKey(id){ return `pixel_story_seen_${id}`; }
 function isStorySeen(id){ return localStorage.getItem(storySeenKey(id)) === '1'; }
 function markStorySeen(id){ try{ localStorage.setItem(storySeenKey(id),'1'); }catch(e){} }
-function storyAvatarHtml(u){ return u?.avatar_url ? `<img src="${esc(u.avatar_url)}" loading="lazy" decoding="async">` : esc(u?.avatar || '👾'); }
+function storyAvatarHtml(u){ return u?.avatar_url ? `<img src="${esc(u.avatar_url)}" loading="lazy" decoding="async">` : esc(u?.avatar || '👤'); }
 function storyTimeLabel(date){ const ms=Date.now()-new Date(date).getTime(); const h=Math.max(0,Math.floor(ms/3600000)); const m=Math.max(0,Math.floor(ms/60000)); return h<1?(m<1?'Just now':`${m}M AGO`):`${h}H AGO`; }
 function storyLocalReactionKey(id){ return `pixel_story_reactions_${id}`; }
 function getLocalStoryReactions(id){ try{return JSON.parse(localStorage.getItem(storyLocalReactionKey(id))||'[]');}catch(e){return [];} }
@@ -2484,7 +2484,7 @@ async function loadStories(){
       if(pr.error) throw pr.error;
       profileMap=new Map((pr.data||[]).map(u=>[String(u.id),u]));
     }
-    storiesCache=rows.map(st=>({...st,profiles:profileMap.get(String(st.user_id))||{username:'Pixel user',avatar:'👾'}}));
+    storiesCache=rows.map(st=>({...st,profiles:profileMap.get(String(st.user_id))||{username:'Pixel user',avatar:'👤'}}));
     // Load reactions separately so a missing optional table never blocks stories.
     loadStoryReactions(rows.map(x=>x.id)).then(()=>{renderStories(); if(!$('storyViewerModal').classList.contains('hidden')) renderActiveStoryReactions();});
     renderStories();
@@ -2744,7 +2744,7 @@ function renderUserCard(u, options = {}){
                    following ? '<div class="tiny" style="margin-top:4px">⭐ You follow this user</div>' : '';
   return `
     <div class="user-card">
-      <div class="user-avatar" style="margin-bottom:8px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+      <div class="user-avatar" style="margin-bottom:8px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👤")}</div>
       <strong>${esc(u.username || 'Pixel user')}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
       ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
       ${relation}
@@ -2819,7 +2819,7 @@ async function loadMessageUsers() {
   notificationProfileCache = new Map(data.map(u => [String(u.id), u.username || 'Pixel user']));
   $("messageUsers").innerHTML = data.map(u => `
     <div class="chat-user" onclick="openChat('${u.id}', '${esc(u.username)}')">
-      <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
+      <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👤")}</div>
       <div><strong>${esc(u.username)}${accountBadge(u, true)}</strong><div data-presence-user-id="${esc(u.id)}">${presenceMarkup(u.id)}</div></div>
     </div>
   `).join('');
