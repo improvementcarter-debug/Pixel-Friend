@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pixel-Friend</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 
 </script><style>@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');*{box-sizing:border-box}:root{  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;}html,body{margin:0;min-height:100%;background:var(--bg)}body{  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;  letter-spacing:.25px;  background:    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);  background-size:8px 8px,8px 8px,100% 100%;}body:before{  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);}button,input,textarea,select{font:inherit}button{cursor:pointer}h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{  font-family:"Press Start 2P",Consolas,monospace;}h1{font-size:20px;line-height:1.55}h2{font-size:15px;line-height:1.6}h3{font-size:13px}.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.auth-screen{  min-height:100vh;display:grid;place-items:center;padding:20px;  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;}.card,.auth-card{  background:linear-gradient(180deg,#111b2d,#0b1220);  border:2px solid var(--border);border-radius:4px;  box-shadow:6px 6px 0 var(--shadow);}.auth-card{width:min(460px,100%);padding:28px;}.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px}.tagline{text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}.tabs button,.menu button,.icon,.notification-button,.secondary{  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;  padding:11px 12px;box-shadow:3px 3px 0 #050912;}.tabs .active,.primary{  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;}.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}button:active{transform:translate(2px,2px)}input,textarea,select{  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;  padding:12px;margin-bottom:12px;outline:none;}input:focus,textarea:focus,select:focus{border-color:var(--cyan)}textarea{min-height:100px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}.app{display:none}.topbar{  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;}.brand{font-size:14px;cursor:pointer}.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:200px;margin:0}.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}.mini{text-align:center}.avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}.presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#667085;vertical-align:middle}.presence-dot.presence-online{position:static;width:8px;height:8px;border:0;background:var(--green);display:inline-block}.presence-label{font-size:11px;letter-spacing:.4px}.presence-label.online-label{color:var(--green)}.presence-label.offline-label{color:#8892a8}.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;  border:2px solid #36547d;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}.user-avatar{width:46px;height:46px;font-size:24px}.post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}.post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.post-author{display:flex;align-items:center;gap:12px}.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}.post-audio,.msg-audio{width:100%;margin-top:8px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}.react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}.react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}.comment-section{margin-top:14px;background:#09101d;padding:12px;border:1px solid #1c2c47;border-radius:2px}.comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}.comment-reply-preview{background:#060c16;border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.messages-layout{display:grid;grid-template-columns:280px 1fr;min-height:640px}.chat-users{border-right:2px solid var(--border);padding-right:15px}.chat-user{padding:12px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;position:relative}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}.message-wrap.mine{align-self:flex-end;align-items:flex-end}.message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}.message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}.message:not(.mine){border-bottom-left-radius:2px}.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}.typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}.chat-controls{display:flex;gap:8px;align-items:center}.chat-controls input{margin:0}.file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}.notification-wrap{position:relative}.notification-panel{position:absolute;right:0;top:50px;width:min(390px,calc(100vw - 30px));background:#0b1423;border:2px solid var(--border);box-shadow:5px 5px 0 #02050b;z-index:1000}.notification-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:2px solid var(--border);font-size:12px}.notification-clear{background:#15233a;border:1px solid #2b3d5d;color:#dce8ff;padding:5px 7px;font-size:10px}.notification-list{max-height:430px;overflow-y:auto}.notification-item{display:flex;gap:10px;padding:11px;border-bottom:1px solid #1c2c47;cursor:pointer;background:#0d1829}.notification-item:hover{background:#162945}.notification-item.unread{border-left:4px solid var(--cyan)}.notification-item-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;background:#16263e;border:1px solid #35517a}.notification-item-body{min-width:0}.notification-item-title{font-size:16px;font-weight:bold}.notification-item-text{font-size:16px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;margin-top:3px;color:#eaf2ff}.notification-item-time{font-size:12px;color:var(--muted);margin-top:4px}.notification-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:14px}@media(max-width:600px){.notification-panel{right:-48px}}.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}.recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}@keyframes pulse{from{opacity:1}to{opacity:0.5}}@media(max-width:850px){  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}}.message-status{display:block;margin-top:4px;text-align:right;font-size:11px;color:var(--muted);letter-spacing:.5px}.message-status.seen{color:var(--cyan);font-weight:bold}.message-wrap:not(.mine) .message-status{text-align:left}
@@ -95,18 +96,7 @@
 .invite-modal{position:fixed;inset:0;z-index:10000;background:rgba(2,7,18,.82);display:grid;place-items:center;padding:18px}.invite-card{width:min(560px,100%);background:#0b1423;border:1px solid #365174;border-radius:18px;padding:22px;box-shadow:0 0 32px rgba(0,229,255,.16)}.invite-card h2{margin:0 0 8px}.invite-link{width:100%;box-sizing:border-box;margin:12px 0;padding:13px;background:#07101d;border:1px solid #294968;border-radius:10px;color:#bfeaff;font-family:monospace}.invite-actions{display:flex;gap:10px;flex-wrap:wrap}.invite-actions button{flex:1;min-width:150px}.invite-stats{margin-top:12px;padding:10px;border:1px dashed #365174;border-radius:10px;color:#9db3c9}.invite-joined{margin-top:8px;color:#8fffc1}
 
 /* Telegram-style paste media */
-.paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
-
-/* ===== PIXEL-FRIEND ARCADE ===== */
-/* ===== PIXEL-FRIEND ARCADE: BUNNY HOP ===== */
-.bunny-card{margin-top:18px}.bunny-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.bunny-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start;margin-top:16px}.bunny-canvas-wrap{position:relative;border:1px solid #2d466a;border-radius:16px;padding:12px;background:radial-gradient(circle at 50% 0%,rgba(75,50,180,.18),transparent 42%),linear-gradient(180deg,#081426,#050b15);box-shadow:inset 0 0 30px rgba(67,231,255,.05)}#bunnyCanvas{display:block;width:100%;max-width:620px;height:auto;margin:0 auto;border:1px solid #3a5f92;border-radius:12px;background:#071322;touch-action:manipulation;cursor:pointer;image-rendering:pixelated}.bunny-side{display:grid;gap:10px}.bunny-tip{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.bunny-tip h3{margin:0 0 7px;font-size:15px}.bunny-tip p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.bunny-status{min-height:24px;text-align:center;margin-top:12px}.bunny-live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#48e0a4;box-shadow:0 0 12px rgba(72,224,164,.8);margin-right:7px}.bunny-controls{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}.bunny-controls b{color:var(--cyan)}@media(max-width:800px){.bunny-layout{grid-template-columns:1fr}.bunny-side{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.bunny-side{grid-template-columns:1fr}.bunny-canvas-wrap{padding:7px}}
-.arcade-page{padding:20px;max-width:1100px;margin:0 auto}.arcade-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;padding:22px;border:1px solid #34547e;border-radius:16px;background:linear-gradient(135deg,#111c31,#0a1220);box-shadow:0 0 30px rgba(67,231,255,.08)}
-.arcade-title{margin:0;font-size:28px}.arcade-sub{color:var(--muted);margin-top:8px}.game-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.game-card{border:1px solid #2d466a;border-radius:16px;background:linear-gradient(180deg,#101a2d,#09111e);padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
-.game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
-.pet-stage{min-height:180px;display:grid;place-items:center;border:1px solid #2d466a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#182b48,#08111d 70%);margin:12px 0}.pixel-pet{font-size:100px;filter:drop-shadow(0 0 18px rgba(67,231,255,.3));animation:pfPetBounce .7s infinite alternate}@keyframes pfPetBounce{to{transform:translateY(-8px) scale(1.03)}}
-.target-food{text-align:center;font-size:18px;margin:12px 0}.target-food span{font-size:36px}.food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.food-btn{min-height:76px;font-size:40px;border:1px solid #3a587f;border-radius:12px;background:#101d31;cursor:pointer}.food-btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(67,231,255,.18)}.food-btn:disabled{opacity:.45;cursor:not-allowed}
-.game-status{min-height:26px;text-align:center;margin-top:12px}.memory-card{margin-top:18px}.memory-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(52px,1fr));gap:10px;margin:18px 0}.memory-tile{min-height:72px;border:1px solid #34547e;background:#0a1423;border-radius:12px;color:#9eb2ce;font-size:28px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}.memory-tile:hover{transform:translateY(-2px);border-color:var(--cyan)}.memory-tile.revealed,.memory-tile.matched{background:linear-gradient(135deg,#12344b,#11243a);color:#fff}.memory-tile.matched{border-color:#48e0a4;box-shadow:0 0 14px rgba(72,224,164,.18)}.memory-status{min-height:24px;text-align:center;margin-top:10px}.game-switches{display:flex;gap:8px;flex-wrap:wrap}.game-switches button{padding:9px 12px}@media(max-width:520px){.memory-board{grid-template-columns:repeat(3,1fr)}.memory-tile{min-height:62px}}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
-</style>
+.paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}</style>
 <script>
 
 /* ===== Telegram-style Copy/Paste for Posts and Messages ===== */
@@ -418,15 +408,477 @@ main{padding:18px 22px 28px!important}
 @media(max-width:850px){.user-summary-dashboard{grid-template-columns:1fr!important}.user-summary-dashboard>.summary-card{height:164px!important;min-height:164px!important}}
 </style>
 
-<style id="pf-world-clock-style">
-.world-clock-page{padding:4px 0 24px}.wc-hero{padding:22px;border:1px solid rgba(67,231,255,.28);border-radius:18px;background:linear-gradient(135deg,rgba(10,26,48,.92),rgba(16,10,44,.82));box-shadow:0 12px 40px rgba(0,0,0,.28);margin-bottom:18px}.wc-hero h1{margin:0;font-size:28px}.wc-sub{margin-top:8px;color:#9fb1cc}.wc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.wc-card{position:relative;overflow:hidden;min-height:145px;padding:18px;border-radius:16px;border:1px solid rgba(72,145,255,.34);background:linear-gradient(145deg,rgba(12,26,48,.94),rgba(7,15,29,.94));box-shadow:0 10px 30px rgba(0,0,0,.24);transition:.2s}.wc-card:hover{transform:translateY(-3px);border-color:rgba(67,231,255,.72);box-shadow:0 0 24px rgba(67,231,255,.12),0 14px 36px rgba(0,0,0,.3)}.wc-card:before{content:'';position:absolute;inset:auto -30px -50px auto;width:130px;height:130px;background:radial-gradient(circle,rgba(91,110,255,.16),transparent 68%)}.wc-head,.wc-row{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}.wc-name{font-weight:800;letter-spacing:.6px}.wc-status{font-size:22px}.wc-time{margin-top:20px;font-size:34px;font-weight:900;letter-spacing:1px;color:#65eaff;text-shadow:0 0 18px rgba(101,234,255,.22);font-variant-numeric:tabular-nums}.wc-meta{margin-top:12px;color:#93a7c5;font-size:12px}.wc-offset{padding:4px 8px;border-radius:999px;border:1px solid rgba(67,231,255,.22);color:#b7f7ff;background:rgba(67,231,255,.06)}@media(max-width:700px){.wc-time{font-size:28px}.wc-hero h1{font-size:23px}}
+<!-- Pixel-Friend Modern Social UI Upgrade -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style id="pixel-friend-modern-facebook-upgrade">
+/* =========================================================
+   PIXEL-FRIEND MODERN SOCIAL UI
+   Keeps existing IDs, classes and JavaScript functionality.
+   ========================================================= */
+:root{
+  --pf-bg:#f0f2f5;
+  --pf-card:#ffffff;
+  --pf-soft:#f0f2f5;
+  --pf-line:#e4e6eb;
+  --pf-text:#050505;
+  --pf-muted:#65676b;
+  --pf-blue:#0866ff;
+  --pf-blue-hover:#075ce8;
+  --pf-green:#31a24c;
+  --pf-danger:#e41e3f;
+  --bg:var(--pf-bg)!important;
+  --panel:var(--pf-card)!important;
+  --panel2:#fff!important;
+  --panel3:#f7f8fa!important;
+  --border:var(--pf-line)!important;
+  --blue:var(--pf-blue)!important;
+  --cyan:#0866ff!important;
+  --green:var(--pf-green)!important;
+  --text:var(--pf-text)!important;
+  --muted:var(--pf-muted)!important;
+  --shadow:rgba(0,0,0,.08)!important;
+}
+
+html,body{background:var(--pf-bg)!important;color:var(--pf-text)!important;}
+body,button,input,textarea,select{
+  font-family:Inter,Arial,sans-serif!important;
+  letter-spacing:normal!important;
+}
+body:before,#pfSpaceCanvas,#pfSpaceGlow{display:none!important;}
+
+h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong,
+.summary-label,.rail-title,.account-badge,.account-type-banner{
+  font-family:Inter,Arial,sans-serif!important;
+}
+
+/* Authentication */
+.auth-screen{
+  background:linear-gradient(180deg,#f7f9fc 0%,#edf1f7 100%)!important;
+}
+.auth-card,.card{
+  background:#fff!important;
+  border:1px solid var(--pf-line)!important;
+  border-radius:14px!important;
+  box-shadow:0 2px 12px rgba(0,0,0,.08)!important;
+}
+.auth-card{max-width:440px!important;}
+.logo{font-size:30px!important;color:var(--pf-blue)!important;text-shadow:none!important;}
+.logo-icon{font-size:44px!important;}
+.tagline{color:var(--pf-muted)!important;}
+
+input,textarea,select{
+  background:#f0f2f5!important;
+  color:var(--pf-text)!important;
+  border:1px solid #ccd0d5!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--pf-blue)!important;
+  box-shadow:0 0 0 2px rgba(8,102,255,.12)!important;
+}
+.primary,.tabs .active{
+  background:var(--pf-blue)!important;
+  border:0!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  border-radius:8px!important;
+}
+.primary:hover{background:var(--pf-blue-hover)!important;}
+.secondary,.tabs button{
+  background:#e4e6eb!important;
+  color:#050505!important;
+  border:0!important;
+  box-shadow:none!important;
+  border-radius:8px!important;
+}
+.danger{background:#ffe8ed!important;color:#c01c36!important;border:0!important;}
+
+/* Top navigation */
+.topbar{
+  height:56px!important;
+  min-height:56px!important;
+  padding:6px 18px!important;
+  background:rgba(255,255,255,.96)!important;
+  border-bottom:1px solid var(--pf-line)!important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08)!important;
+  backdrop-filter:blur(12px)!important;
+}
+.brand{
+  color:var(--pf-blue)!important;
+  background:none!important;
+  -webkit-text-fill-color:var(--pf-blue)!important;
+  font-size:21px!important;
+  font-weight:800!important;
+}
+.brand-icon{
+  background:transparent!important;
+  color:var(--pf-blue)!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:0 6px!important;
+}
+.actions input{
+  width:300px!important;
+  height:40px!important;
+  background:#f0f2f5!important;
+  border:0!important;
+  border-radius:999px!important;
+}
+.icon,.notification-button{
+  width:40px!important;height:40px!important;
+  background:#e4e6eb!important;
+  color:#050505!important;
+  border:0!important;
+  border-radius:50%!important;
+  box-shadow:none!important;
+}
+.icon:hover,.notification-button:hover{background:#d8dadf!important;}
+
+/* Main app shell */
+.layout{grid-template-columns:280px minmax(0,1fr)!important;background:var(--pf-bg)!important;}
+.side{
+  background:transparent!important;
+  border-right:0!important;
+  box-shadow:none!important;
+  padding:14px 12px!important;
+}
+.side .mini{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  padding:10px!important;
+}
+.avatar,.user-avatar{
+  border-radius:50%!important;
+  border:0!important;
+  background:#e4e6eb!important;
+  box-shadow:none!important;
+}
+.menu{margin-top:10px!important;gap:2px!important;}
+.menu button{
+  min-height:50px!important;
+  padding:0 12px!important;
+  border:0!important;
+  border-radius:8px!important;
+  color:#050505!important;
+  background:transparent!important;
+  font-size:15px!important;
+  font-weight:600!important;
+  box-shadow:none!important;
+}
+.menu button:hover{background:#e4e6eb!important;border:0!important;}
+.menu button.active{
+  color:var(--pf-blue)!important;
+  background:#e7f0ff!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+main{
+  max-width:1280px!important;
+  padding:18px 20px 32px!important;
+}
+
+/* Modern feed cards */
+.card,.user-card,.post-card,.rail-card,.game-card,.invite-card,
+.story-section,.feed-shell,.home-welcome{
+  background:var(--pf-card)!important;
+  color:var(--pf-text)!important;
+  border:1px solid var(--pf-line)!important;
+  border-radius:10px!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.08)!important;
+}
+.home-welcome{
+  min-height:auto!important;
+  background:#fff!important;
+}
+.home-welcome h1{font-size:22px!important;color:#050505!important;}
+.home-welcome p{color:var(--pf-muted)!important;}
+.home-columns{
+  grid-template-columns:260px minmax(460px,680px) 280px!important;
+  justify-content:center!important;
+  gap:18px!important;
+}
+.home-left,.home-right{position:sticky!important;top:76px!important;}
+.home-right{display:grid!important;gap:12px!important;}
+.home-right .bonus-card{grid-column:auto!important;}
+
+/* Stories */
+.story-section{padding:12px!important;}
+.story-head{margin-bottom:8px!important;}
+.story-ring{
+  width:64px!important;height:64px!important;
+  padding:3px!important;border:3px solid var(--pf-blue)!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  box-shadow:none!important;
+}
+.story-ring.seen{border-color:#bcc0c4!important;}
+.story-card{width:82px!important;min-width:82px!important;}
+.story-name{color:#050505!important;font-size:12px!important;font-weight:500!important;}
+.story-add{background:#e7f0ff!important;color:var(--pf-blue)!important;}
+
+/* Composer */
+.composer-card{padding:14px!important;}
+.composer-title{font-weight:700!important;}
+.composer-card textarea{
+  min-height:90px!important;
+  background:#f0f2f5!important;
+  border:0!important;
+  border-radius:10px!important;
+}
+.media-actions{display:flex!important;gap:6px!important;}
+.media-actions button{
+  background:transparent!important;
+  color:#65676b!important;
+  border:0!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+}
+.media-actions button:hover{background:#f0f2f5!important;}
+.publish-wide{
+  background:var(--pf-blue)!important;
+  border:0!important;
+  border-radius:8px!important;
+  box-shadow:none!important;
+}
+
+/* Feed */
+.feed-shell{overflow:visible!important;}
+.feed-tabs{
+  padding:10px 14px!important;
+  border-bottom:1px solid var(--pf-line)!important;
+}
+.feed-tabs button{font-weight:600!important;color:#65676b!important;}
+.feed-tabs button.active{color:var(--pf-blue)!important;border-bottom:3px solid var(--pf-blue)!important;}
+.post-card{
+  padding:16px!important;
+  margin-top:14px!important;
+  overflow:visible!important;
+}
+.post-card:before,.rail-card:before,.game-card:before{display:none!important;}
+.post-header{margin-bottom:10px!important;}
+.post-author{gap:10px!important;}
+.post-actions,.post-engagement{
+  border-top:1px solid var(--pf-line)!important;
+  gap:4px!important;
+}
+.react-btn,.post-action-btn{
+  flex:1!important;
+  min-width:0!important;
+  background:transparent!important;
+  color:#65676b!important;
+  border:0!important;
+  border-radius:7px!important;
+  box-shadow:none!important;
+  font-weight:600!important;
+}
+.react-btn:hover,.post-action-btn:hover{
+  background:#f0f2f5!important;
+  color:#050505!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+.react-btn.active{color:var(--pf-blue)!important;background:#e7f0ff!important;}
+.post-media-img,.msg-media-img,.post-view-media,.msg-media-video{
+  border:0!important;border-radius:8px!important;
+}
+.comment-section{background:#f7f8fa!important;border:0!important;border-radius:8px!important;}
+.comment-item{border-bottom:1px solid var(--pf-line)!important;}
+
+/* Right rail */
+.rail-card{padding:14px!important;}
+.rail-title{font-size:14px!important;color:#050505!important;font-weight:700!important;}
+.level-orb,.rank-avatar,.follow-mini .mini-av{
+  border:0!important;background:#e7f0ff!important;color:var(--pf-blue)!important;
+  box-shadow:none!important;
+}
+.rail-xp{background:#e4e6eb!important;}
+.rail-xp>span{background:var(--pf-blue)!important;box-shadow:none!important;}
+.bonus-card{background:#fff!important;border-color:var(--pf-line)!important;}
+.follow-mini{background:transparent!important;border:0!important;border-radius:8px!important;}
+.follow-mini button{background:#e7f0ff!important;color:var(--pf-blue)!important;border:0!important;}
+
+/* Messaging */
+.messages-layout{background:#fff!important;border-radius:10px!important;overflow:hidden;}
+.chat-users{border-right:1px solid var(--pf-line)!important;}
+.chat-user{border-radius:8px!important;}
+.chat-user:hover,.chat-user.active{
+  background:#e7f0ff!important;border-color:transparent!important;
+}
+.chat-header{border-bottom:1px solid var(--pf-line)!important;}
+.messages-list{scrollbar-color:#bcc0c4 transparent!important;}
+.message{
+  background:#e4e6eb!important;
+  color:#050505!important;
+  border:0!important;
+  border-radius:18px!important;
+  box-shadow:none!important;
+}
+.message.mine{
+  background:var(--pf-blue)!important;
+  color:#fff!important;
+  border:0!important;
+}
+.message-tool,.message-reaction,.sticker-picker{
+  box-shadow:none!important;
+}
+.message-tool{background:#f0f2f5!important;border:0!important;color:#050505!important;}
+.chat-input-bar,.chat-controls input{background:transparent!important;}
+.reply-bar{background:#f0f2f5!important;border:0!important;border-radius:8px!important;}
+
+/* Notifications */
+.notification-panel{
+  background:#fff!important;
+  border:1px solid var(--pf-line)!important;
+  border-radius:12px!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.18)!important;
+}
+.notification-item{background:#fff!important;border-bottom:1px solid var(--pf-line)!important;}
+.notification-item:hover{background:#f7f8fa!important;}
+.notification-item.unread{border-left:4px solid var(--pf-blue)!important;background:#f0f6ff!important;}
+.notification-item-icon{background:#e7f0ff!important;border:0!important;border-radius:50%!important;}
+.notification-item-title,.notification-item-text{color:#050505!important;}
+.notification-item-time{color:#65676b!important;}
+
+/* Modal + profile */
+.story-modal,.post-view-modal,.invite-modal{background:rgba(0,0,0,.65)!important;}
+.story-viewer,.post-view-dialog,.invite-card{
+  background:#fff!important;color:#050505!important;
+  border:0!important;border-radius:12px!important;
+  box-shadow:0 10px 40px rgba(0,0,0,.3)!important;
+}
+.story-view-head,.post-view-head{background:#fff!important;color:#050505!important;border-bottom:1px solid var(--pf-line)!important;}
+.story-caption{background:#fff!important;color:#050505!important;}
+
+/* Summary/dashboard */
+.summary-card{
+  background:#fff!important;
+  border:1px solid var(--pf-line)!important;
+  box-shadow:0 1px 2px rgba(0,0,0,.08)!important;
+}
+.summary-label,.summary-sub,.user-summary-foot{color:#65676b!important;}
+.summary-value{color:#050505!important;text-shadow:none!important;}
+.summary-card.online .summary-value{color:var(--pf-green)!important;text-shadow:none!important;}
+
+/* Mobile */
+@media(max-width:1250px){
+  .home-columns{grid-template-columns:minmax(0,680px) 280px!important;}
+  .home-left{display:none!important;}
+}
+@media(max-width:950px){
+  .topbar{padding:6px 10px!important;}
+  .actions input{display:none!important;}
+  .home-columns{grid-template-columns:1fr!important;}
+  .home-right{position:static!important;}
+  main{padding:12px!important;}
+}
+@media(max-width:850px){
+  .layout{grid-template-columns:1fr!important;}
+  .side{display:none!important;}
+  .topbar{position:sticky!important;height:56px!important;}
+}
+@media(max-width:600px){
+  .brand{font-size:18px!important;}
+  .icon,.notification-button{width:38px!important;height:38px!important;}
+  .home-welcome{padding:14px!important;}
+  .story-row{gap:10px!important;}
+  .post-card{border-radius:0!important;margin-left:-12px!important;margin-right:-12px!important;}
+}
+
+/* Remove remaining arcade/pixel visual effects without removing features */
+.arcade-page,.game-card,.bunny-canvas-wrap,.bunny-tip,.game-stat,.memory-tile,.food-btn{
+  box-shadow:none!important;
+  border-radius:10px!important;
+}
+</style>
+
+
+<style id="pf-social-cleanup">
+/* Removed from the modern social version: Games, World Clock and Ranking */
+#games,#worldClock,#leaderboard,
+#homeRankList,[data-page="games"],[data-page="worldClock"],[data-page="leaderboard"]{
+  display:none!important;
+}
+</style>
+
+<!-- Editable Profile Information Upgrade -->
+<style id="pf-editable-profile-style">
+.profile-info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-top:14px;
+}
+.profile-info-item{
+  background:#f7f8fa;
+  border:1px solid #e4e6eb;
+  border-radius:10px;
+  padding:12px 14px;
+}
+.profile-info-label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:#65676b;
+  margin-bottom:5px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.profile-info-value{
+  display:block;
+  font-size:14px;
+  color:#050505;
+  font-weight:600;
+  word-break:break-word;
+}
+.profile-edit-form{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+  margin-top:16px;
+}
+.profile-edit-form .full{grid-column:1/-1;}
+.profile-edit-form label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  font-weight:700;
+  color:#050505;
+}
+.profile-edit-form input,.profile-edit-form select{
+  width:100%;
+  box-sizing:border-box;
+}
+.profile-edit-actions{
+  display:flex;
+  gap:10px;
+  margin-top:16px;
+}
+.profile-edit-actions button{min-width:120px;}
+.profile-joined-note{
+  margin-top:10px;
+  font-size:12px;
+  color:#65676b;
+}
+.profile-id-code{
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace!important;
+  font-size:12px!important;
+}
+@media(max-width:650px){
+  .profile-info-grid,.profile-edit-form{grid-template-columns:1fr;}
+}
 </style>
 </head><body>
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
 <div id="pfSpaceGlow" aria-hidden="true"></div>
 
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
-<div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">🎮 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
+<div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL-FRIEND</button><button class="secondary auth-guest" onclick="guestLogin()">CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="SEARCH FRIENDS..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">📢<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
       <div id="notificationPanel" class="notification-panel hidden">
@@ -434,11 +886,11 @@ main{padding:18px 22px 28px!important}
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👤</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('leaderboard',this)">🏆 RANK</button>        <button onclick="page('games',this)">🎮 GAMES</button>        <button onclick="page('worldClock',this)">🌍 WORLD CLOCK</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 HOME</button>        <button id="navFriends" onclick="page('friends',this)">👥 FRIENDS</button>        <button onclick="page('messages',this)">💬 MESSAGES</button>        <button onclick="page('profile',this)">👤 PROFILE</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ ADMIN PANEL</button>        <button onclick="openInviteModal()">🔗 INVITE FRIENDS</button>    <button class="danger" onclick="logout()">🚪 LOGOUT</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
-    <div><h1>WELCOME TO PIXEL WORLD 🌍</h1><p>CONNECT • SHARE • CHAT • LEVEL UP</p></div>
+    <div><h1>WELCOME TO PIXEL-FRIEND</h1><p>CONNECT • SHARE • CHAT</p></div>
     <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸 NEW STORY</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ CREATE POST</button><button class="quick-btn" onclick="page('friends')">👥 EXPLORE</button></div>
   </div>
 
@@ -470,7 +922,6 @@ main{padding:18px 22px 28px!important}
     </div>
     <aside class="home-right">
       <div class="rail-card"><div class="rail-title">🏅 LEVEL PROGRESS</div><div class="level-hero"><div class="level-orb">🏅</div><div style="flex:1"><strong>LEVEL <span id="railLevel">1</span></strong><div class="rail-xp"><span id="railXpBar"></span></div><div class="tiny"><span id="railXpText">0 / 100 XP</span></div></div></div></div>
-      <div class="rail-card"><div class="rail-title">🔥 RANKING THIS WEEK</div><div id="homeRankList"><div class="tiny">Loading ranking...</div></div><button class="secondary" style="width:100%;margin-top:10px" onclick="page('leaderboard')">VIEW FULL RANKING</button></div>
       <div class="rail-card"><div class="rail-title">🔥 TRENDING HASHTAGS</div><div class="trend"><span>#PixelWorld</span><small>12.5K posts</small></div><div class="trend"><span>#Gaming</span><small>8.2K posts</small></div><div class="trend"><span>#Friends</span><small>6.7K posts</small></div><div class="trend"><span>#Adventure</span><small>5.1K posts</small></div></div>
       <div class="rail-card bonus-card"><div class="rail-title">🎁 DAILY BONUS</div><div class="bonus-row"><div><div class="tiny">Claim your daily XP!</div><div class="bonus-xp">+50 XP</div><button id="dailyBonusBtn" class="claim-btn" onclick="claimDailyBonus()">CLAIM</button></div><div class="bonus-chest">🎁</div></div></div>
     </aside>
@@ -485,7 +936,6 @@ main{padding:18px 22px 28px!important}
             <input id="chatImageInput" type="file" accept="image/*" class="hidden" onchange="selectChatMedia('image')">                        <input id="chatVideoInput" type="file" accept="video/*" class="hidden" onchange="selectChatMedia('video')">                        <input id="chatFileInput" type="file" accept="*/*" class="hidden" onchange="selectChatMedia('file')">
 
             <input id="messageInput" placeholder="Type a message... (paste text or screenshot)" onkeydown="if(event.key==='Enter')sendMessage()" disabled style="flex:1">                        <button id="sendButton" class="primary" onclick="sendMessage()" disabled>SEND</button>                    </div>                </div>      </div>        </div>    </div></section>
-<section id="leaderboard" class="page">    <div class="card" style="padding:20px"><h1>🏆 PIXEL LEADERBOARD</h1><div id="leaders" style="margin-top:15px"></div></div></section>
 <section id="adminPanel" class="page">  <div class="card" style="padding:20px">    <h1>🛡️ ADMIN CONTROL PANEL</h1>    <p class="tiny">Manage user administrator and account verification statuses. 🎮 Guest and 👤 Real account types are visible to everyone.</p>    <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>  </div></section>
 <section id="profile" class="page">    <div class="card" style="padding:24px;max-width:540px;margin:0 auto">        <div style="text-align:center;margin-bottom:20px">      <div id="profileAvatar" class="avatar profile-large-avatar">👾<span class="online"></span></div>          <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">PLAYER</h1><div id="profileAccountType"></div>          <p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p>    </div>
 
@@ -493,59 +943,62 @@ main{padding:18px 22px 28px!important}
 
     <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px">      <h2 style="margin-top:0;margin-bottom:12px">⚙️ EDIT PROFILE</h2>      <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label>      <input id="editUsernameInput" placeholder="Enter new username...">            <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label>      <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea>            <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 SAVE PROFILE DETAILS</button>    </div>
 
-    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div></section>
+    <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div>
+  <div class="card" id="pfProfileInfoCard">
+    <div class="section-head">
+      <h2>About</h2>
+      <button class="secondary" id="pfEditProfileBtn" type="button" onclick="pfToggleProfileEdit()">✏️ Edit Profile</button>
+    </div>
 
-<section id="games" class="page">
-  <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">👤 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button><button class="secondary" onclick="startBunnyHop()">🐰 BUNNY HOP</button></div></div>
-    <div class="game-grid">
-      <div class="game-card">
-        <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
-        <div class="game-stats"><div class="game-stat">SCORE<b id="petScore">0</b></div><div class="game-stat">TIME<b id="petTimer">20</b></div><div class="game-stat">COMBO<b id="petCombo">0</b></div><div class="game-stat">BEST<b id="petBest">0</b></div></div>
-        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👤</div></div>
-        <div class="target-food">PET WANTS: <span id="desiredFood">🍪</span></div>
-        <div id="foodGrid" class="food-grid"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">Press PLAY NOW to start!</div></div>
-        <div class="game-actions"><button id="petStartBtn" class="primary" onclick="startPetGame()">▶ START GAME</button><button class="secondary" onclick="sharePetScore()">↗️ SHARE SCORE</button></div>
-        <div id="petGameStatus" class="game-status tiny"></div>
-      </div>
-      <aside class="arcade-list">
-        <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
-        <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
-        <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>🐰 NEW: BUNNY HOP</h3><p>Jump over obstacles, survive longer, and beat your personal high score!</p></div>
-      </aside>
-    </div>
-    <div class="game-card memory-card">
-      <div class="memory-header"><div><h2 style="margin:0">🧠 PIXEL MEMORY MATCH</h2><p class="tiny" style="margin:7px 0 0">Match all the cute pairs before time runs out!</p></div><button id="memoryStartBtn" class="primary" onclick="startMemoryGame()">▶ START MEMORY GAME</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">PAIRS<b id="memoryMatches">0/6</b></div><div class="game-stat">TIME<b id="memoryTimer">30</b></div><div class="game-stat">MOVES<b id="memoryMoves">0</b></div><div class="game-stat">BEST<b id="memoryBest">—</b></div></div>
-      <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
-      <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
-      <div id="memoryStatus" class="memory-status tiny"></div>
-    </div>
-    <div class="game-card bunny-card" id="bunnyHopGame">
-      <div class="bunny-header"><div><h2 style="margin:0">🐰 BUNNY HOP!</h2><p class="tiny" style="margin:7px 0 0">Help Pixel Friend's bunny dodge cactus obstacles and survive as the speed increases.</p></div><button id="bunnyStartBtn" class="primary" onclick="startBunnyHop()">▶ START BUNNY HOP</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">SCORE<b id="bunnyScore">0</b></div><div class="game-stat">BEST<b id="bunnyBest">0</b></div><div class="game-stat">SPEED<b id="bunnySpeed">1.0x</b></div><div class="game-stat">STATUS<b id="bunnyLive">READY</b></div></div>
-      <div class="bunny-layout">
-        <div>
-          <div class="bunny-canvas-wrap"><canvas id="bunnyCanvas" width="640" height="300" aria-label="Bunny Hop game"></canvas></div>
-          <div class="bunny-controls">Press <b>SPACE</b>, <b>↑</b>, or tap the game arena to jump.</div>
-          <div class="game-actions"><button class="primary" onclick="startBunnyHop()">🐰 PLAY / RESTART</button><button class="secondary" onclick="shareBunnyScore()">↗️ SHARE SCORE</button></div>
-          <div id="bunnyStatus" class="bunny-status tiny">🐾 Ready to hop! Press START to play.</div>
+    <div id="pfProfileView">
+      <div class="profile-info-grid">
+        <div class="profile-info-item">
+          <span class="profile-info-label">Gender</span>
+          <span class="profile-info-value" id="pfProfileGender">Not set</span>
         </div>
-        <aside class="bunny-side">
-          <div class="bunny-tip"><h3>⚡ HOW TO PLAY</h3><p>Jump over every cactus. The game becomes faster the longer you survive.</p></div>
-          <div class="bunny-tip"><h3>🏆 HIGH SCORE</h3><p>Your best score is saved locally for your Pixel-Friend account.</p></div>
-          <div class="bunny-tip"><h3><span class="bunny-live-dot"></span>LIVE RUN</h3><p>Each obstacle passed gives points. Keep hopping and beat your best!</p></div>
-        </aside>
+        <div class="profile-info-item">
+          <span class="profile-info-label">Status</span>
+          <span class="profile-info-value" id="pfProfileStatus">Active</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="profile-info-label">Join Date</span>
+          <span class="profile-info-value" id="pfProfileJoinDate">—</span>
+        </div>
+        <div class="profile-info-item">
+          <span class="profile-info-label">User ID</span>
+          <span class="profile-info-value profile-id-code" id="pfProfileUserId">—</span>
+        </div>
+      </div>
+      <div class="profile-joined-note">Your User ID and Join Date are account information and are shown automatically.</div>
+    </div>
+
+    <div id="pfProfileEdit" style="display:none">
+      <div class="profile-edit-form">
+        <label>
+          Gender
+          <select id="pfEditGender">
+            <option value="">Prefer not to say</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </label>
+        <label>
+          Status
+          <select id="pfEditStatus">
+            <option value="Active">Active</option>
+            <option value="Single">Single</option>
+            <option value="In a relationship">In a relationship</option>
+            <option value="Married">Married</option>
+            <option value="Busy">Busy</option>
+          </select>
+        </label>
+      </div>
+      <div class="profile-edit-actions">
+        <button class="primary" type="button" onclick="pfSaveProfileInfo()">Save Changes</button>
+        <button class="secondary" type="button" onclick="pfToggleProfileEdit(false)">Cancel</button>
       </div>
     </div>
-  </div>
-</section>
-
-<section id="worldClock" class="page">
-  <div class="world-clock-page">
-    <div class="wc-hero"><h1>🌍 GLOBAL WORLD CLOCK</h1><div class="wc-sub">Live synchronized time for Pixel-Friend community regions.</div></div>
-    <div id="pfWorldClockGrid" class="wc-grid"></div>
   </div>
 </section>
 </main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
@@ -777,7 +1230,7 @@ async function startApp(user){
     $("navAdmin").classList.remove("hidden");
   }
 
-  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
+  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), updateNotificationBadge()]);
   setupRealtime();
   await setupPresence();
   startUserSummaryDashboard();
@@ -3054,102 +3507,7 @@ async function logout() {
   await stopPresence();
   await sb.auth.signOut();
 }
-window.logout = logout;
-
-
-/* ===== PIXEL-FRIEND ARCADE: FEED THE PET ===== */
-const pfPets=['👾','🦊','🐱','🤖','🐼','🐸'];
-const pfFoods=['🍪','⭐','🍎','🍰','🍕','🍬','🥕','🧁'];
-let petGameScore=0,petGameTime=20,petGameCombo=0,petGameTarget='🍪',petGamePlaying=false,petGameInterval=null;
-function pfBestKey(){return 'pf_pet_best_'+(currentUser?.id||'guest');}
-function renderPetBest(){const b=Number(localStorage.getItem(pfBestKey())||0); const e=$('petBest'); if(e)e.textContent=b; const t=$('petBestText'); if(t)t.textContent=b?`Your personal best is ${b} points. Can you beat it?`:'Play your first game and set a high score!';}
-function startPetGame(){clearInterval(petGameInterval);petGameScore=0;petGameTime=20;petGameCombo=0;petGamePlaying=true;updatePetStats();$('petStartBtn').textContent='🔄 RESTART GAME';$('petGameStatus').textContent='🔥 GO! Feed the pet the correct food.';nextPetRound();petGameInterval=setInterval(()=>{petGameTime--;updatePetStats();if(petGameTime<=0)endPetGame();},1000);}
-function updatePetStats(){if($('petScore'))$('petScore').textContent=petGameScore;if($('petTimer'))$('petTimer').textContent=petGameTime;if($('petCombo'))$('petCombo').textContent=petGameCombo;renderPetBest();}
-function nextPetRound(){if(!petGamePlaying)return;petGameTarget=pfFoods[Math.floor(Math.random()*pfFoods.length)];$('desiredFood').textContent=petGameTarget;$('petAvatar').textContent=pfPets[Math.floor(Math.random()*pfPets.length)];let choices=[petGameTarget];while(choices.length<4){let f=pfFoods[Math.floor(Math.random()*pfFoods.length)];if(!choices.includes(f))choices.push(f);}choices.sort(()=>Math.random()-.5);$('foodGrid').innerHTML=choices.map(f=>`<button class="food-btn" onclick="checkPetFood('${f}')">${f}</button>`).join('');}
-function checkPetFood(food){if(!petGamePlaying)return;if(food===petGameTarget){petGameCombo++;const bonus=Math.min(20,(petGameCombo-1)*2);petGameScore+=10+bonus;$('petGameStatus').innerHTML=`✅ YUMMY! <span class="combo">COMBO x${petGameCombo}</span> +${10+bonus}`;nextPetRound();}else{petGameScore=Math.max(0,petGameScore-5);petGameCombo=0;$('petGameStatus').textContent='❌ Wrong food! -5 points. Try again!';}updatePetStats();}
-function endPetGame(){petGamePlaying=false;clearInterval(petGameInterval);$('foodGrid').innerHTML='<div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">⏰ TIME’S UP!</div>';const old=Number(localStorage.getItem(pfBestKey())||0);let msg=`🎉 Game over! You scored ${petGameScore} points.`;if(petGameScore>old){localStorage.setItem(pfBestKey(),String(petGameScore));msg+=' 🏆 NEW PERSONAL BEST!';} $('petGameStatus').textContent=msg;$('petStartBtn').textContent='▶ PLAY AGAIN';updatePetStats();if(typeof toast==='function')toast(msg);}
-async function sharePetScore(){const text=`🎮 I scored ${petGameScore} points in Feed the Pixel Pet on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Arcade',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Score challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
-window.startPetGame=startPetGame;window.checkPetFood=checkPetFood;window.sharePetScore=sharePetScore;
-
-/* ===== PIXEL-FRIEND ARCADE: MEMORY MATCH ===== */
-const memoryIcons=['🐱','🐶','🐰','🦊','🐼','🐨'];
-let memoryCards=[],memoryFlipped=[],memoryMatches=0,memoryMoves=0,memoryTime=30,memoryPlaying=false,memoryCanFlip=true,memoryInterval=null;
-function memoryBestKey(){return 'pf_memory_best_'+(currentUser?.id||'guest');}
-function renderMemoryBest(){const v=localStorage.getItem(memoryBestKey()); const el=$('memoryBest'); if(el)el.textContent=v?v+'s':'—';}
-function updateMemoryStats(){if($('memoryMatches'))$('memoryMatches').textContent=memoryMatches+'/6';if($('memoryTimer'))$('memoryTimer').textContent=memoryTime;if($('memoryMoves'))$('memoryMoves').textContent=memoryMoves;renderMemoryBest();}
-function renderMemoryBoard(){const board=$('memoryBoard');if(!board)return;board.innerHTML=memoryCards.map((c,i)=>`<button class="memory-tile ${c.flipped?'revealed':''} ${c.matched?'matched':''}" onclick="flipMemoryCard(${i})">${(c.flipped||c.matched)?c.icon:'❓'}</button>`).join('');}
-function startMemoryGame(){clearInterval(memoryInterval);memoryMatches=0;memoryMoves=0;memoryTime=30;memoryFlipped=[];memoryPlaying=true;memoryCanFlip=true;memoryCards=[...memoryIcons,...memoryIcons].sort(()=>Math.random()-.5).map((icon,i)=>({id:i,icon,flipped:false,matched:false}));$('memoryStartBtn').textContent='🔄 RESTART MEMORY GAME';$('memoryStatus').textContent='🧠 GO! Find all matching pairs.';updateMemoryStats();renderMemoryBoard();memoryInterval=setInterval(()=>{memoryTime--;updateMemoryStats();if(memoryTime<=0)endMemoryGame(false);},1000);}
-function flipMemoryCard(index){if(!memoryPlaying||!memoryCanFlip)return;const card=memoryCards[index];if(card.flipped||card.matched)return;card.flipped=true;memoryFlipped.push(index);renderMemoryBoard();if(memoryFlipped.length===2){memoryCanFlip=false;memoryMoves++;const [a,b]=memoryFlipped;if(memoryCards[a].icon===memoryCards[b].icon){memoryCards[a].matched=true;memoryCards[b].matched=true;memoryMatches++;memoryFlipped=[];memoryCanFlip=true;updateMemoryStats();renderMemoryBoard();if(memoryMatches===memoryIcons.length)endMemoryGame(true);}else{updateMemoryStats();setTimeout(()=>{memoryCards[a].flipped=false;memoryCards[b].flipped=false;memoryFlipped=[];memoryCanFlip=true;renderMemoryBoard();},650);}}}
-function endMemoryGame(won){memoryPlaying=false;clearInterval(memoryInterval);let msg='⏰ Time is up! Try again and beat your best.';if(won){const used=30-memoryTime;const old=Number(localStorage.getItem(memoryBestKey())||9999);msg=`🌟 Amazing! You matched all pairs in ${used} seconds and ${memoryMoves} moves!`;if(used<old){localStorage.setItem(memoryBestKey(),String(used));msg+=' 🏆 NEW PERSONAL BEST!';}}$('memoryStatus').textContent=msg;$('memoryStartBtn').textContent='▶ PLAY AGAIN';updateMemoryStats();if(typeof toast==='function')toast(msg);}
-async function shareMemoryScore(){const text=`🧠 I completed Pixel Memory Match in ${30-memoryTime} seconds with ${memoryMoves} moves on Pixel-Friend! Can you beat me? 👾`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Memory Match',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Memory challenge copied!');}catch(e){window.prompt('Copy and share your result:',text+' '+location.href);}}
-window.startMemoryGame=startMemoryGame;window.flipMemoryCard=flipMemoryCard;window.shareMemoryScore=shareMemoryScore;
-
-/* ===== PIXEL-FRIEND ARCADE: BUNNY HOP ===== */
-const bunnyCanvas=$('bunnyCanvas');
-const bunnyCtx=bunnyCanvas?bunnyCanvas.getContext('2d'):null;
-let bunnyHopPlaying=false,bunnyHopRAF=null,bunnyHopLast=0,bunnyHopScore=0,bunnyHopSpeed=1,bunnyHopSpawn=0,bunnyHopObstacles=[];
-let bunnyHopPlayer={x:78,y:218,w:38,h:42,vy:0,onGround:true};
-const BUNNY_GROUND=260;
-function bunnyBestKey(){return 'pf_bunny_hop_best_'+(currentUser?.id||'guest');}
-function bunnySetText(id,v){const e=$(id);if(e)e.textContent=v;}
-function bunnyUpdateStats(){bunnySetText('bunnyScore',Math.floor(bunnyHopScore));bunnySetText('bunnyBest',Number(localStorage.getItem(bunnyBestKey())||0));bunnySetText('bunnySpeed',bunnyHopSpeed.toFixed(1)+'x');bunnySetText('bunnyLive',bunnyHopPlaying?'LIVE':'READY');}
-function drawBunnyBackground(t){
-  if(!bunnyCtx||!bunnyCanvas)return;
-  const c=bunnyCtx,w=bunnyCanvas.width,h=bunnyCanvas.height;
-  c.clearRect(0,0,w,h);
-  const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#091a31');g.addColorStop(.62,'#0a1b2c');g.addColorStop(1,'#07101c');c.fillStyle=g;c.fillRect(0,0,w,h);
-  c.fillStyle='rgba(100,170,255,.18)';
-  for(let i=0;i<42;i++){const x=(i*83+Math.floor(t*.012)*(i%3+1))%w;const y=18+(i*47)%150;const r=(i%4===0)?1.6:.8;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();}
-  c.strokeStyle='rgba(78,137,190,.5)';c.lineWidth=2;c.beginPath();c.moveTo(0,BUNNY_GROUND);c.lineTo(w,BUNNY_GROUND);c.stroke();
-  c.fillStyle='rgba(37,73,100,.35)';for(let x=-40;x<w+40;x+=40){c.fillRect(x,BUNNY_GROUND+1,20,h-BUNNY_GROUND);}
-}
-function drawPixelBunny(){
-  const c=bunnyCtx,p=bunnyHopPlayer,x=p.x,y=p.y;
-  c.save();c.translate(x,y);
-  c.fillStyle='#d9d3ff';c.fillRect(10,10,24,24);c.fillRect(8,16,28,22);
-  c.fillStyle='#b49cff';c.fillRect(11,0,7,16);c.fillRect(26,0,7,16);
-  c.fillStyle='#ff8ec7';c.fillRect(13,3,3,10);c.fillRect(28,3,3,10);
-  c.fillStyle='#1b2440';c.fillRect(15,18,4,4);c.fillRect(28,18,4,4);c.fillRect(21,26,5,3);
-  c.fillStyle='#ffffff';c.fillRect(18,16,3,3);c.fillRect(31,16,3,3);
-  c.restore();
-}
-function drawCactus(o){const c=bunnyCtx;c.save();c.translate(o.x,o.y);c.fillStyle='#48d38b';c.fillRect(8,8,15,32);c.fillRect(3,17,8,8);c.fillRect(0,12,7,10);c.fillRect(20,13,8,8);c.fillRect(25,8,6,11);c.fillStyle='#8af0b8';c.fillRect(12,11,2,24);c.restore();}
-function drawBunnyHop(t){drawBunnyBackground(t);bunnyHopObstacles.forEach(drawCactus);drawPixelBunny();}
-function bunnyJump(){
-  if(!bunnyHopPlaying){startBunnyHop();return;}
-  if(bunnyHopPlayer.onGround){bunnyHopPlayer.vy=-14.2*bunnyHopSpeed**.05;bunnyHopPlayer.onGround=false;}
-}
-function bunnyRectHit(p,o){return p.x+6<o.x+o.w-4&&p.x+p.w-6>o.x+4&&p.y+7<o.y+o.h&&p.y+p.h-4>o.y+4;}
-function bunnyLoop(ts){
-  if(!bunnyHopPlaying)return;
-  const dt=Math.min(32,ts-(bunnyHopLast||ts));bunnyHopLast=ts;const step=dt/16.67;
-  bunnyHopSpeed=Math.min(3.2,1+bunnyHopScore/280);
-  bunnyHopPlayer.vy+=0.82*step;bunnyHopPlayer.y+=bunnyHopPlayer.vy*step;
-  if(bunnyHopPlayer.y>=BUNNY_GROUND-bunnyHopPlayer.h){bunnyHopPlayer.y=BUNNY_GROUND-bunnyHopPlayer.h;bunnyHopPlayer.vy=0;bunnyHopPlayer.onGround=true;}
-  bunnyHopSpawn-=dt;
-  if(bunnyHopSpawn<=0){const size=34+Math.random()*10;bunnyHopObstacles.push({x:bunnyCanvas.width+20,y:BUNNY_GROUND-size,w:30,h:size,scored:false});bunnyHopSpawn=Math.max(580,1250-bunnyHopSpeed*210+Math.random()*380);}
-  for(let i=bunnyHopObstacles.length-1;i>=0;i--){const o=bunnyHopObstacles[i];o.x-=6.1*bunnyHopSpeed*step;if(bunnyRectHit(bunnyHopPlayer,o)){endBunnyHop();return;}if(o.x+o.w<0){bunnyHopObstacles.splice(i,1);bunnyHopScore+=10;}}
-  bunnyHopScore+=0.045*step;bunnyUpdateStats();drawBunnyHop(ts);bunnyHopRAF=requestAnimationFrame(bunnyLoop);
-}
-function startBunnyHop(){
-  if(!bunnyCanvas||!bunnyCtx)return;
-  cancelAnimationFrame(bunnyHopRAF);bunnyHopPlaying=true;bunnyHopLast=0;bunnyHopScore=0;bunnyHopSpeed=1;bunnyHopSpawn=900;bunnyHopObstacles=[];bunnyHopPlayer={x:78,y:BUNNY_GROUND-42,w:38,h:42,vy:0,onGround:true};
-  bunnySetText('bunnyStatus','⚡ GO! Jump over the cactus obstacles.');const b=$('bunnyStartBtn');if(b)b.textContent='🔄 RESTART BUNNY HOP';bunnyUpdateStats();bunnyHopRAF=requestAnimationFrame(bunnyLoop);
-}
-function endBunnyHop(){
-  bunnyHopPlaying=false;cancelAnimationFrame(bunnyHopRAF);const score=Math.floor(bunnyHopScore);const old=Number(localStorage.getItem(bunnyBestKey())||0);let msg=`🐾 Game over! Final score: ${score}.`;
-  if(score>old){localStorage.setItem(bunnyBestKey(),String(score));msg+=' 🏆 NEW PERSONAL BEST!';}
-  bunnySetText('bunnyStatus',msg);const b=$('bunnyStartBtn');if(b)b.textContent='▶ PLAY AGAIN';bunnyUpdateStats();drawBunnyHop(performance.now());
-  if(typeof toast==='function')toast(msg);
-}
-async function shareBunnyScore(){const score=Math.floor(bunnyHopScore);const text=`🐰 I scored ${score} in Bunny Hop on Pixel-Friend! Can you beat my high score? 🎮`;try{if(navigator.share){await navigator.share({title:'Pixel-Friend Bunny Hop',text,url:location.href});return;}}catch(e){if(e?.name==='AbortError')return;}try{await navigator.clipboard.writeText(text+' '+location.href);if(typeof toast==='function')toast('🔗 Bunny Hop challenge copied!');}catch(e){window.prompt('Copy and share your score:',text+' '+location.href);}}
-function initBunnyHop(){if(!bunnyCtx)return;drawBunnyHop(performance.now());bunnyUpdateStats();}
-if(bunnyCanvas){bunnyCanvas.addEventListener('pointerdown',e=>{e.preventDefault();bunnyJump();});}
-window.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='ArrowUp')&&!e.repeat){const page=$('games');if(page&&page.classList.contains('active')){e.preventDefault();bunnyJump();}}});
-window.startBunnyHop=startBunnyHop;window.shareBunnyScore=shareBunnyScore;window.addEventListener('load',initBunnyHop);
-
-restoreSession();
-</script>
+window.logout = logout;</script>
 <div id="inviteModal" class="invite-modal hidden" role="dialog" aria-modal="true">
   <div class="invite-card">
     <h2>🔗 INVITE FRIENDS</h2>
@@ -3176,16 +3534,6 @@ restoreSession();
 })();
 </script>
 
-<script id="pf-world-clock-script">
-(function(){
- const zones=[['Cambodia (KH)','Asia/Phnom_Penh'],['China (CN)','Asia/Shanghai'],['Philippines (PH)','Asia/Manila'],['Brazil (BR)','America/Sao_Paulo'],['Bangladesh (BD)','Asia/Dhaka'],['Mexico (MX)','America/Mexico_City'],['Indonesia (ID)','Asia/Jakarta'],['Malaysia (MY)','Asia/Kuala_Lumpur'],['Myanmar (MM)','Asia/Yangon'],['Madagascar (MG)','Indian/Antananarivo']];
- const grid=document.getElementById('pfWorldClockGrid'); if(!grid) return;
- grid.innerHTML=zones.map((z,i)=>`<div class="wc-card"><div class="wc-head"><div class="wc-name">${z[0]}</div><div class="wc-status" id="wcIcon${i}">☀️</div></div><div class="wc-time" id="wcTime${i}">--:--:--</div><div class="wc-row wc-meta"><span id="wcDate${i}">--</span><span class="wc-offset" id="wcOffset${i}">UTC</span></div></div>`).join('');
- function update(){const now=new Date(); zones.forEach((z,i)=>{try{const parts=new Intl.DateTimeFormat('en-US',{timeZone:z[1],hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true}).formatToParts(now);const get=t=>parts.find(x=>x.type===t)?.value||'';document.getElementById('wcTime'+i).textContent=`${get('hour')}:${get('minute')}:${get('second')} ${get('dayPeriod')}`;document.getElementById('wcDate'+i).textContent=new Intl.DateTimeFormat('en-US',{timeZone:z[1],month:'short',day:'numeric',weekday:'short'}).format(now);const h=Number(new Intl.DateTimeFormat('en-US',{timeZone:z[1],hour:'numeric',hourCycle:'h23'}).format(now));document.getElementById('wcIcon'+i).textContent=h>=6&&h<18?'☀️':'🌙';const tz=new Intl.DateTimeFormat('en-US',{timeZone:z[1],timeZoneName:'longOffset'}).formatToParts(now).find(x=>x.type==='timeZoneName')?.value||'UTC';document.getElementById('wcOffset'+i).textContent=tz.replace('GMT','UTC ');}catch(e){}})}
- update();setInterval(update,1000);
-})();
-</script>
-
 <style>
 .clickable-media{cursor:zoom-in}.pf-file-download{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px 12px;border:1px solid #4ea1ff;background:#0a1628;color:#dcecff;text-decoration:none;border-radius:8px}.pf-file-download span{margin-left:auto;font-size:11px;color:#65caff}.pf-media-modal{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);display:grid;place-items:center;padding:20px}.pf-media-modal .pf-media-box{width:min(1200px,96vw);height:min(92vh,900px);position:relative;display:grid;place-items:center}.pf-media-modal img,.pf-media-modal video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}.pf-media-close{position:absolute;top:-4px;right:-4px;z-index:2;width:46px;height:46px;font-size:20px}.pf-media-hint{position:absolute;bottom:-28px;color:#9fb6d3;font-size:14px}
 </style>
@@ -3206,4 +3554,116 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
     </div>
   </div>
 </footer>
+
+<script id="pf-editable-profile-script">
+/* Pixel-Friend editable profile information */
+(function(){
+  const PF_PROFILE_KEY = "pf_profile_extra_v1";
+
+  function getCurrentUser(){
+    try{
+      if (window.currentUser) return window.currentUser;
+      if (window.supabaseClient && window.supabaseClient.auth && window.supabaseClient.auth.getUser) {
+        // Async API cannot be used here synchronously; page initialization below also retries.
+      }
+    }catch(e){}
+    return null;
+  }
+
+  function readLocal(){
+    try{return JSON.parse(localStorage.getItem(PF_PROFILE_KEY) || "{}");}
+    catch(e){return {};}
+  }
+
+  function writeLocal(data){
+    localStorage.setItem(PF_PROFILE_KEY, JSON.stringify(data));
+  }
+
+  function formatDate(value){
+    if(!value) return "—";
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  }
+
+  async function resolveUser(){
+    try{
+      if(window.currentUser && window.currentUser.id) return window.currentUser;
+      if(window.supabaseClient && window.supabaseClient.auth){
+        const r = await window.supabaseClient.auth.getUser();
+        if(r && r.data && r.data.user) return r.data.user;
+      }
+    }catch(e){}
+    return null;
+  }
+
+  async function refresh(){
+    const saved = readLocal();
+    const user = await resolveUser();
+
+    const gender = saved.gender || "Not set";
+    const status = saved.status || "Active";
+
+    let joinDate = saved.joinDate || "";
+    let userId = saved.userId || "";
+
+    if(user){
+      userId = user.id || userId;
+      joinDate = user.created_at || joinDate;
+    }
+
+    // Guest users also receive a persistent generated ID and join date.
+    if(!userId){
+      userId = "PF-" + Math.random().toString(36).slice(2,8).toUpperCase() + "-" +
+               Math.random().toString(36).slice(2,6).toUpperCase();
+    }
+    if(!joinDate) joinDate = new Date().toISOString();
+
+    const merged = {...saved, gender, status, userId, joinDate};
+    writeLocal(merged);
+
+    const setText = (id,val)=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=val;
+    };
+    setText("pfProfileGender", gender);
+    setText("pfProfileStatus", status);
+    setText("pfProfileJoinDate", formatDate(joinDate));
+    setText("pfProfileUserId", userId);
+
+    const g=document.getElementById("pfEditGender");
+    const s=document.getElementById("pfEditStatus");
+    if(g) g.value = saved.gender || "";
+    if(s) s.value = status;
+  }
+
+  window.pfToggleProfileEdit = function(show=true){
+    const view=document.getElementById("pfProfileView");
+    const edit=document.getElementById("pfProfileEdit");
+    const btn=document.getElementById("pfEditProfileBtn");
+    if(view) view.style.display = show ? "none" : "";
+    if(edit) edit.style.display = show ? "" : "none";
+    if(btn) btn.style.display = show ? "none" : "";
+    if(show) refresh();
+  };
+
+  window.pfSaveProfileInfo = function(){
+    const saved=readLocal();
+    const gender=document.getElementById("pfEditGender");
+    const status=document.getElementById("pfEditStatus");
+
+    saved.gender = gender ? gender.value : "";
+    saved.status = status ? status.value : "Active";
+    writeLocal(saved);
+    pfToggleProfileEdit(false);
+  };
+
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(refresh, 400);
+    setTimeout(refresh, 1500);
+  });
+
+  window.addEventListener("storage", refresh);
+})();
+</script>
 </body></html>
