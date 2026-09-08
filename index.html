@@ -15,7 +15,7 @@ document.addEventListener('click', function(event) {
       fileInput.type = 'file';
       fileInput.id = 'runtimeAvatarInput';
       fileInput.accept = 'image/*';
-      fileInput.style.display = 'none';
+      fileInput.style.display = 'none';const SUPABASE_UR
       
       fileInput.addEventListener('change', function(e) {
         const file = e.target.files[0];
@@ -4491,7 +4491,7 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
   }
 
   async function openPublicProfile(userId){
-    if(!userId || !window.sb) return;
+    if(!userId || typeof sb === 'undefined') { console.warn('Profile cannot open: Supabase is not initialized yet.'); return; }
     const m=modal(), box=content();
     if(!m || !box) return;
     m.classList.remove('hidden'); m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden';
@@ -4531,7 +4531,7 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
       box.innerHTML=`
         <div class="pf-profile-cover">${cover}${isMe?'<button class="pf-cover-edit" onclick="document.getElementById(\'pfCoverInput\').click()">📷 Change cover</button>':''}</div>
         <div class="pf-profile-head">
-          ${profileAvatarP(user,'pf-profile-avatar')}
+          <div class="pf-profile-avatar">${user.avatar_url ? `<img src="${escP(user.avatar_url)}" alt="Profile picture">` : escP(user.avatar || '👤')}${isOnlineP(user.id)?'<span class="pf-profile-online"></span>':''}${isMe?'<button class="pf-avatar-edit" onclick="document.getElementById(\'pfAvatarInput\').click()" title="Change profile picture">📷</button>':''}</div>
           <div class="pf-profile-title-row">
             <div style="min-width:0"><div class="pf-profile-title">${escP(user.username||'Player')}${verified} ${badge}</div><div class="pf-profile-bio">${escP(user.bio||'Pixel explorer')}</div></div>
             <div class="pf-profile-actions">${followBtn}${chatBtn}${editBtn}<button class="pf-profile-btn close" onclick="closePublicProfile()" aria-label="Close">×</button></div>
@@ -4547,7 +4547,7 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
           </aside>
           <section class="pf-profile-posts"><div class="pf-profile-section-title">${isMe?'Your posts':escP(user.username||'Player')+'’s posts'}</div>${postsHtml}</section>
         </div></div>
-        ${isMe?'<input id="pfCoverInput" class="hidden" type="file" accept="image/*" onchange="uploadPublicProfileCover(this)">':''}
+        ${isMe?'<input id="pfCoverInput" class="hidden" type="file" accept="image/*" onchange="uploadPublicProfileCover(this)"><input id="pfAvatarInput" class="hidden" type="file" accept="image/*" onchange="uploadPublicProfileAvatar(this)">':''}
       `;
     }catch(e){ box.innerHTML=`<div style="padding:40px;text-align:center;color:#c01c36">Unable to load profile: ${escP(e.message||'Unknown error')}<br><button class="pf-profile-btn" style="margin-top:15px" onclick="closePublicProfile()">Close</button></div>`; }
   }
@@ -4555,7 +4555,7 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
   function closePublicProfile(){const m=modal();if(m){m.classList.add('hidden');m.setAttribute('aria-hidden','true');}document.body.style.overflow='';}
 
   async function uploadPublicProfileCover(input){
-    const file=input?.files?.[0]; if(!file || !currentUser || !window.sb) return;
+    const file=input?.files?.[0]; if(!file || !currentUser || typeof sb === 'undefined') return;
     try{
       const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
       const path=`${currentUser.id}/cover_${Date.now()}.${ext}`;
@@ -4570,9 +4570,28 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
     }catch(e){ toast('Cover upload failed: '+(e.message||'The cover_url profile field may need to be added in Supabase.')); }
   }
 
+  async function uploadPublicProfileAvatar(input){
+    const file=input?.files?.[0]; if(!file || !currentUser || typeof sb === 'undefined') return;
+    try{
+      const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+      const path=`${currentUser.id}/avatar_${Date.now()}.${ext}`;
+      const u=await sb.storage.from('avatars').upload(path,file,{upsert:true});
+      if(u.error) throw u.error;
+      const avatar_url=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+      const r=await sb.from('profiles').update({avatar_url}).eq('id',currentUser.id);
+      if(r.error) throw r.error;
+      if(currentProfile) currentProfile.avatar_url=avatar_url;
+      // Refresh all common avatar locations immediately.
+      ['sideAvatar','profileAvatar','headAvatar'].forEach(id=>{const el=document.getElementById(id);if(el) el.innerHTML=`<img src="${escP(avatar_url)}" style="width:100%;height:100%;object-fit:cover">`;});
+      toast('Profile picture updated!');
+      openPublicProfile(currentUser.id);
+    }catch(e){ toast('Profile picture upload failed: '+(e.message||'Please check Supabase Storage permissions.')); }
+  }
+
   window.openPublicProfile=openPublicProfile;
   window.closePublicProfile=closePublicProfile;
   window.uploadPublicProfileCover=uploadPublicProfileCover;
+  window.uploadPublicProfileAvatar=uploadPublicProfileAvatar;
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closePublicProfile();});
 })();
 </script>
@@ -4671,4 +4690,164 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
 
 })();
 </script>
+
+<style id="pf-facebook-profile-layout-final">
+/* FINAL FACEBOOK-LIKE PROFILE LAYOUT */
+.pf-profile-modal{background:#f0f2f5!important;padding:0!important;overflow-y:auto!important;display:block!important;}
+.pf-profile-dialog,.pf-profile-modal .pf-profile-shell,#publicProfileModal .pf-profile-shell{width:min(1120px,100%)!important;max-width:1120px!important;min-height:100vh!important;max-height:none!important;margin:0 auto!important;border-radius:0!important;overflow:visible!important;background:#f0f2f5!important;box-shadow:none!important;}
+.pf-profile-cover{height:360px!important;max-width:1120px!important;margin:0 auto!important;border-radius:0 0 10px 10px!important;background:#dbeafe!important;}
+.pf-profile-cover img{width:100%!important;height:100%!important;object-fit:cover!important;}
+.pf-profile-head{background:#fff!important;padding:0 32px 18px!important;border-bottom:1px solid #dddfe2!important;}
+.pf-profile-avatar{width:176px!important;height:176px!important;margin-top:-88px!important;border:5px solid #fff!important;box-shadow:0 2px 10px rgba(0,0,0,.18)!important;z-index:5!important;}
+.pf-profile-title-row{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:end!important;gap:20px!important;margin-top:12px!important;}
+.pf-profile-title{font-size:32px!important;font-weight:800!important;letter-spacing:-.4px!important;}
+.pf-profile-bio{font-size:16px!important;max-width:680px!important;}
+.pf-profile-actions{justify-content:flex-end!important;align-items:center!important;}
+.pf-profile-tabs{background:#fff!important;padding:0 32px!important;border-top:0!important;gap:0!important;position:sticky!important;top:0!important;z-index:20!important;box-shadow:0 1px 2px rgba(0,0,0,.08)!important;}
+.pf-profile-tab{padding:16px 20px!important;min-width:84px!important;text-align:center!important;}
+.pf-profile-body{padding:18px 0 40px!important;background:#f0f2f5!important;}
+.pf-profile-grid{grid-template-columns:380px minmax(0,680px)!important;justify-content:center!important;gap:18px!important;align-items:start!important;}
+.pf-profile-about{position:sticky!important;top:58px!important;padding:20px!important;border-radius:10px!important;background:#fff!important;}
+.pf-profile-posts{background:transparent!important;padding:0!important;box-shadow:none!important;}
+.pf-profile-post{background:#fff!important;border-radius:10px!important;padding:18px!important;margin-bottom:16px!important;border:0!important;box-shadow:0 1px 2px rgba(0,0,0,.12)!important;}
+.pf-profile-section-title{font-size:20px!important;font-weight:800!important;}
+.pf-cover-edit{right:24px!important;bottom:18px!important;background:#fff!important;color:#050505!important;}
+@media(max-width:800px){.pf-profile-cover{height:250px!important}.pf-profile-head{padding:0 16px 16px!important}.pf-profile-avatar{width:140px!important;height:140px!important;margin-top:-70px!important}.pf-profile-title-row{grid-template-columns:1fr!important;align-items:start!important}.pf-profile-title{font-size:26px!important}.pf-profile-actions{justify-content:flex-start!important;width:100%!important}.pf-profile-tabs{padding:0 8px!important;overflow-x:auto!important}.pf-profile-body{padding:12px!important}.pf-profile-grid{grid-template-columns:1fr!important}.pf-profile-about{position:static!important}.pf-profile-dialog,.pf-profile-modal .pf-profile-shell,#publicProfileModal .pf-profile-shell{width:100%!important}.pf-profile-modal{padding:0!important}}
+</style>
+
+<style id="pf-final-profile-layout-fix">
+/* Final profile layout fix: one consistent Facebook-style profile shell */
+.pf-profile-modal{position:fixed!important;inset:0!important;z-index:999999!important;overflow-y:auto!important;background:rgba(0,0,0,.58)!important;padding:0!important;display:block!important;}
+.pf-profile-modal.hidden{display:none!important;}
+#pfPublicProfileModal .pf-profile-dialog{width:100%!important;max-width:none!important;min-height:100%!important;margin:0!important;border:0!important;border-radius:0!important;background:#f0f2f5!important;color:#050505!important;box-shadow:none!important;overflow:visible!important;}
+#pfPublicProfileContent{max-width:1120px!important;margin:0 auto!important;background:#f0f2f5!important;min-height:100vh!important;}
+#pfPublicProfileModal .pf-profile-cover{height:360px!important;max-width:1120px!important;margin:0 auto!important;border-radius:0 0 12px 12px!important;overflow:hidden!important;background:#dbeafe!important;position:relative!important;}
+#pfPublicProfileModal .pf-profile-cover img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;}
+#pfPublicProfileModal .pf-profile-head{max-width:1120px!important;margin:0 auto!important;padding:0 32px 18px!important;background:#fff!important;border-bottom:1px solid #d1d5db!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-avatar{width:168px!important;height:168px!important;margin-top:-84px!important;border:5px solid #fff!important;border-radius:50%!important;background:#e4e6eb!important;overflow:hidden!important;position:relative!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important;}
+#pfPublicProfileModal .pf-profile-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
+#pfPublicProfileModal .pf-profile-title-row{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:18px!important;margin-top:-2px!important;padding-left:188px!important;min-height:84px!important;}
+#pfPublicProfileModal .pf-profile-title{font-family:Arial,sans-serif!important;font-size:32px!important;font-weight:700!important;line-height:1.15!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-bio{font-family:Arial,sans-serif!important;color:#65676b!important;font-size:15px!important;margin-top:5px!important;}
+#pfPublicProfileModal .pf-profile-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important;justify-content:flex-end!important;padding-bottom:4px!important;}
+#pfPublicProfileModal .pf-profile-btn{font-family:Arial,sans-serif!important;border:0!important;border-radius:7px!important;background:#e4e6eb!important;color:#050505!important;padding:9px 14px!important;font-weight:700!important;box-shadow:none!important;}
+#pfPublicProfileModal .pf-profile-btn.primary{background:#0866ff!important;color:#fff!important;}
+#pfPublicProfileModal .pf-profile-btn.close{min-width:40px!important;font-size:22px!important;line-height:1!important;}
+#pfPublicProfileModal .pf-cover-edit,#pfPublicProfileModal .pf-avatar-edit{font-family:Arial,sans-serif!important;background:#e4e6eb!important;color:#050505!important;border:0!important;border-radius:7px!important;font-weight:700!important;}
+#pfPublicProfileModal .pf-profile-tabs{max-width:1120px!important;margin:0 auto!important;padding:0 24px!important;background:#fff!important;border-bottom:1px solid #d1d5db!important;display:flex!important;gap:6px!important;}
+#pfPublicProfileModal .pf-profile-tab{font-family:Arial,sans-serif!important;background:transparent!important;border:0!important;color:#65676b!important;padding:16px 18px!important;font-weight:700!important;}
+#pfPublicProfileModal .pf-profile-tab.active{color:#0866ff!important;border-bottom:3px solid #0866ff!important;}
+#pfPublicProfileModal .pf-profile-body{max-width:1120px!important;margin:0 auto!important;padding:16px 0 32px!important;background:#f0f2f5!important;}
+#pfPublicProfileModal .pf-profile-grid{display:grid!important;grid-template-columns:380px minmax(0,1fr)!important;gap:16px!important;align-items:start!important;}
+#pfPublicProfileModal .pf-profile-about,#pfPublicProfileModal .pf-profile-posts{min-width:0!important;}
+#pfPublicProfileModal .pf-profile-about{position:sticky!important;top:12px!important;background:#fff!important;border-radius:8px!important;padding:16px!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-post{background:#fff!important;border-radius:8px!important;padding:16px!important;margin-bottom:16px!important;color:#050505!important;box-shadow:0 1px 2px rgba(0,0,0,.12)!important;}
+#pfPublicProfileModal .pf-profile-section-title{font-family:Arial,sans-serif!important;font-size:20px!important;font-weight:700!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-stat{font-family:Arial,sans-serif!important;color:#050505!important;}
+@media(max-width:800px){#pfPublicProfileModal .pf-profile-cover{height:250px!important;border-radius:0!important;}#pfPublicProfileModal .pf-profile-head{padding:0 16px 16px!important;}#pfPublicProfileModal .pf-profile-avatar{width:140px!important;height:140px!important;margin-top:-70px!important;}#pfPublicProfileModal .pf-profile-title-row{padding-left:0!important;margin-top:12px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;}#pfPublicProfileModal .pf-profile-actions{justify-content:flex-start!important;width:100%!important;}#pfPublicProfileModal .pf-profile-grid{grid-template-columns:1fr!important;padding:0 12px!important;}#pfPublicProfileModal .pf-profile-about{position:static!important;}#pfPublicProfileModal .pf-profile-tabs{overflow-x:auto!important;padding:0 8px!important;}#pfPublicProfileModal .pf-profile-body{padding-top:12px!important;}}
+</style>
+
+<style id="pf-final-profile-layout-fix">
+/* Final profile layout fix: one consistent Facebook-style profile shell */
+.pf-profile-modal{position:fixed!important;inset:0!important;z-index:999999!important;overflow-y:auto!important;background:rgba(0,0,0,.58)!important;padding:0!important;display:block!important;}
+.pf-profile-modal.hidden{display:none!important;}
+#pfPublicProfileModal .pf-profile-dialog{width:100%!important;max-width:none!important;min-height:100%!important;margin:0!important;border:0!important;border-radius:0!important;background:#f0f2f5!important;color:#050505!important;box-shadow:none!important;overflow:visible!important;}
+#pfPublicProfileContent{max-width:1120px!important;margin:0 auto!important;background:#f0f2f5!important;min-height:100vh!important;}
+#pfPublicProfileModal .pf-profile-cover{height:360px!important;max-width:1120px!important;margin:0 auto!important;border-radius:0 0 12px 12px!important;overflow:hidden!important;background:#dbeafe!important;position:relative!important;}
+#pfPublicProfileModal .pf-profile-cover img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;}
+#pfPublicProfileModal .pf-profile-head{max-width:1120px!important;margin:0 auto!important;padding:0 32px 18px!important;background:#fff!important;border-bottom:1px solid #d1d5db!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-avatar{width:168px!important;height:168px!important;margin-top:-84px!important;border:5px solid #fff!important;border-radius:50%!important;background:#e4e6eb!important;overflow:hidden!important;position:relative!important;box-shadow:0 1px 3px rgba(0,0,0,.25)!important;}
+#pfPublicProfileModal .pf-profile-avatar img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;}
+#pfPublicProfileModal .pf-profile-title-row{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:18px!important;margin-top:-2px!important;padding-left:188px!important;min-height:84px!important;}
+#pfPublicProfileModal .pf-profile-title{font-family:Arial,sans-serif!important;font-size:32px!important;font-weight:700!important;line-height:1.15!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-bio{font-family:Arial,sans-serif!important;color:#65676b!important;font-size:15px!important;margin-top:5px!important;}
+#pfPublicProfileModal .pf-profile-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important;justify-content:flex-end!important;padding-bottom:4px!important;}
+#pfPublicProfileModal .pf-profile-btn{font-family:Arial,sans-serif!important;border:0!important;border-radius:7px!important;background:#e4e6eb!important;color:#050505!important;padding:9px 14px!important;font-weight:700!important;box-shadow:none!important;}
+#pfPublicProfileModal .pf-profile-btn.primary{background:#0866ff!important;color:#fff!important;}
+#pfPublicProfileModal .pf-profile-btn.close{min-width:40px!important;font-size:22px!important;line-height:1!important;}
+#pfPublicProfileModal .pf-cover-edit,#pfPublicProfileModal .pf-avatar-edit{font-family:Arial,sans-serif!important;background:#e4e6eb!important;color:#050505!important;border:0!important;border-radius:7px!important;font-weight:700!important;}
+#pfPublicProfileModal .pf-profile-tabs{max-width:1120px!important;margin:0 auto!important;padding:0 24px!important;background:#fff!important;border-bottom:1px solid #d1d5db!important;display:flex!important;gap:6px!important;}
+#pfPublicProfileModal .pf-profile-tab{font-family:Arial,sans-serif!important;background:transparent!important;border:0!important;color:#65676b!important;padding:16px 18px!important;font-weight:700!important;}
+#pfPublicProfileModal .pf-profile-tab.active{color:#0866ff!important;border-bottom:3px solid #0866ff!important;}
+#pfPublicProfileModal .pf-profile-body{max-width:1120px!important;margin:0 auto!important;padding:16px 0 32px!important;background:#f0f2f5!important;}
+#pfPublicProfileModal .pf-profile-grid{display:grid!important;grid-template-columns:380px minmax(0,1fr)!important;gap:16px!important;align-items:start!important;}
+#pfPublicProfileModal .pf-profile-about,#pfPublicProfileModal .pf-profile-posts{min-width:0!important;}
+#pfPublicProfileModal .pf-profile-about{position:sticky!important;top:12px!important;background:#fff!important;border-radius:8px!important;padding:16px!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-post{background:#fff!important;border-radius:8px!important;padding:16px!important;margin-bottom:16px!important;color:#050505!important;box-shadow:0 1px 2px rgba(0,0,0,.12)!important;}
+#pfPublicProfileModal .pf-profile-section-title{font-family:Arial,sans-serif!important;font-size:20px!important;font-weight:700!important;color:#050505!important;}
+#pfPublicProfileModal .pf-profile-stat{font-family:Arial,sans-serif!important;color:#050505!important;}
+@media(max-width:800px){#pfPublicProfileModal .pf-profile-cover{height:250px!important;border-radius:0!important;}#pfPublicProfileModal .pf-profile-head{padding:0 16px 16px!important;}#pfPublicProfileModal .pf-profile-avatar{width:140px!important;height:140px!important;margin-top:-70px!important;}#pfPublicProfileModal .pf-profile-title-row{padding-left:0!important;margin-top:12px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;}#pfPublicProfileModal .pf-profile-actions{justify-content:flex-start!important;width:100%!important;}#pfPublicProfileModal .pf-profile-grid{grid-template-columns:1fr!important;padding:0 12px!important;}#pfPublicProfileModal .pf-profile-about{position:static!important;}#pfPublicProfileModal .pf-profile-tabs{overflow-x:auto!important;padding:0 8px!important;}#pfPublicProfileModal .pf-profile-body{padding-top:12px!important;}}
+</style>
+
+<!-- Pixel-Friend profile fix: Supabase client is shared globally and public profile opening no longer checks a missing window.sb -->
+
+<style id="pf-real-facebook-profile">
+#pfPublicProfileModal{position:fixed!important;inset:0!important;z-index:2147483000!important;background:#f0f2f5!important;overflow:auto!important;padding:0!important}
+#pfPublicProfileModal.hidden{display:none!important}
+#pfPublicProfileModal .pf-profile-dialog{width:100%!important;max-width:none!important;min-height:100%!important;margin:0!important;border:0!important;border-radius:0!important;background:#f0f2f5!important}
+#pfPublicProfileContent{width:min(1120px,100%)!important;margin:0 auto!important;min-height:100vh!important;background:#f0f2f5!important}
+.pf-profile-cover{height:360px!important;position:relative!important;overflow:hidden!important;background:#dfe3ee!important;border-radius:0 0 12px 12px!important}
+.pf-profile-cover>img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.pf-profile-head{background:#fff!important;padding:0 32px 18px!important;border-bottom:1px solid #ddd!important;position:relative!important}
+.pf-profile-avatar{width:168px!important;height:168px!important;margin-top:-84px!important;border-radius:50%!important;border:5px solid #fff!important;background:#e4e6eb!important;overflow:hidden!important;position:relative!important;z-index:2!important;display:grid!important;place-items:center!important;font-size:60px!important}
+.pf-profile-avatar img{width:100%!important;height:100%!important;object-fit:cover!important}
+.pf-profile-title-row{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:20px!important;margin-top:-60px!important;padding-left:190px!important;min-height:130px!important}
+.pf-profile-title{font:700 32px Arial,sans-serif!important;color:#050505!important}
+.pf-profile-bio{font:15px Arial,sans-serif!important;color:#65676b!important;margin-top:6px!important}
+.pf-profile-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+.pf-profile-btn{border:0!important;border-radius:7px!important;padding:10px 14px!important;font-weight:700!important;background:#e4e6eb!important;color:#050505!important;cursor:pointer!important}
+.pf-profile-btn.primary{background:#0866ff!important;color:#fff!important}
+.pf-profile-tabs{display:flex!important;gap:8px!important;background:#fff!important;border-bottom:1px solid #ddd!important;padding:0 24px!important}
+.pf-profile-tab{border:0!important;background:transparent!important;padding:16px 18px!important;font-weight:700!important;color:#65676b!important}
+.pf-profile-tab.active{color:#0866ff!important;border-bottom:3px solid #0866ff!important}
+.pf-profile-body{padding:16px 0 40px!important;background:#f0f2f5!important}
+.pf-profile-grid{display:grid!important;grid-template-columns:360px minmax(0,1fr)!important;gap:16px!important}
+.pf-profile-about,.pf-profile-post{background:#fff!important;border-radius:10px!important;padding:18px!important}
+.pf-profile-post{margin-bottom:16px!important}
+.pf-profile-section-title{font-size:20px!important;font-weight:700!important;margin-bottom:14px!important}
+.pf-profile-stat{display:flex!important;justify-content:space-between!important;padding:10px 0!important;border-bottom:1px solid #eee!important}
+.pf-profile-post-head{display:flex!important;gap:10px!important;align-items:center!important;margin-bottom:12px!important}
+.pf-profile-post-avatar{width:40px!important;height:40px!important;border-radius:50%!important;overflow:hidden!important;background:#eee!important}
+.pf-profile-post-avatar img{width:100%!important;height:100%!important;object-fit:cover!important}
+.pf-profile-post-media{width:100%!important;max-height:620px!important;object-fit:cover!important;border-radius:8px!important;margin-top:12px!important}
+.pf-own-profile-card{max-width:900px!important;margin:auto!important;padding:0!important;overflow:hidden!important}
+.pf-own-cover{height:260px;background:#dfe3ee center/cover no-repeat;position:relative}
+.pf-own-cover-actions{position:absolute;right:16px;bottom:16px}
+.pf-own-profile-main{display:flex;gap:16px;align-items:center;padding:0 24px 20px;margin-top:-45px;background:#fff}
+.pf-own-profile-main .avatar{width:120px;height:120px;border:5px solid #fff;border-radius:50%;background:#e4e6eb;display:grid;place-items:center;font-size:48px}
+.pf-own-profile-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:24px;background:#fff}
+.pf-own-profile-form label{display:grid;gap:6px;font-weight:600}.pf-own-profile-form input,.pf-own-profile-form textarea,.pf-own-profile-form select{padding:10px;border:1px solid #ccd0d5;border-radius:6px}
+@media(max-width:700px){.pf-profile-cover{height:220px!important}.pf-profile-head{padding:0 16px 16px!important}.pf-profile-avatar{width:130px!important;height:130px!important;margin-top:-65px!important}.pf-profile-title-row{margin-top:8px!important;padding-left:0!important;min-height:0!important;display:block!important}.pf-profile-actions{margin-top:14px!important}.pf-profile-grid{grid-template-columns:1fr!important;padding:0 12px!important}.pf-own-profile-main{flex-wrap:wrap;padding:0 14px 18px}.pf-own-profile-form{grid-template-columns:1fr}}
+</style>
+<script id="pf-real-public-profile">
+(function(){
+ const esc2=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function modal(){return document.getElementById('pfPublicProfileModal')}
+ function content(){return document.getElementById('pfPublicProfileContent')}
+ window.closePublicProfile=function(){const m=modal(); if(m){m.classList.add('hidden');m.setAttribute('aria-hidden','true')} document.body.style.overflow=''}
+ window.openPublicProfile=async function(userId){
+   const m=modal(), box=content();
+   if(!m||!box){alert('Profile viewer is missing from this page.');return}
+   m.classList.remove('hidden');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+   box.innerHTML='<div style="padding:60px;text-align:center">Loading profile…</div>';
+   try{
+     const client=window.sb || (typeof sb!=='undefined'?sb:null);
+     if(!client) throw new Error('Supabase is not initialized.');
+     let ur=await client.from('profiles').select('*').eq('id',userId).maybeSingle();
+     if(ur.error) throw new Error('Cannot read this user profile: '+ur.error.message);
+     if(!ur.data) throw new Error('Profile not found.');
+     const user=ur.data;
+     let pr=await client.from('posts').select('*').eq('user_id',userId).order('created_at',{ascending:false}).limit(30);
+     const posts=pr.error?[]:(pr.data||[]);
+     const me=String(user.id)===String(window.currentUser?.id);
+     const av=user.avatar_url?`<img src="${esc2(user.avatar_url)}">`:esc2(user.avatar||'👤');
+     const cover=user.cover_url?`<img src="${esc2(user.cover_url)}">`:'<div style="height:100%;display:grid;place-items:center;font-size:80px">✨</div>';
+     const postHtml=posts.length?posts.map(p=>`<article class="pf-profile-post"><div class="pf-profile-post-head"><div class="pf-profile-post-avatar">${av}</div><div><b>${esc2(user.username||'Player')}</b><div class="tiny">${p.created_at?new Date(p.created_at).toLocaleString():''}</div></div></div>${p.content?`<div style="white-space:pre-wrap">${esc2(p.content)}</div>`:''}${p.image_url?`<img class="pf-profile-post-media" src="${esc2(p.image_url)}">`:''}</article>`).join(''):'<article class="pf-profile-post">No posts yet.</article>';
+     box.innerHTML=`<div class="pf-profile-cover">${cover}</div><div class="pf-profile-head"><div class="pf-profile-avatar">${av}</div><div class="pf-profile-title-row"><div><div class="pf-profile-title">${esc2(user.username||'Player')}</div><div class="pf-profile-bio">${esc2(user.bio||'Pixel explorer')}</div></div><div class="pf-profile-actions">${me?'<button class="pf-profile-btn primary" onclick="closePublicProfile();page(\'profile\')">Edit profile</button>':`<button class="pf-profile-btn primary" onclick="toggleFollow&&toggleFollow('${esc2(user.id)}')">Follow</button><button class="pf-profile-btn" onclick="closePublicProfile();openChat('${esc2(user.id)}','${esc2(user.username||'Player')}')">Message</button>`}<button class="pf-profile-btn" onclick="closePublicProfile()">Close</button></div></div></div><div class="pf-profile-tabs"><button class="pf-profile-tab active">Posts</button><button class="pf-profile-tab">About</button></div><div class="pf-profile-body"><div class="pf-profile-grid"><aside class="pf-profile-about"><div class="pf-profile-section-title">About</div><div class="pf-profile-stat"><span>Level</span><b>${Math.floor(Number(user.xp||0)/100)+1}</b></div><div class="pf-profile-stat"><span>Total XP</span><b>${Number(user.xp||0).toLocaleString()}</b></div><div class="pf-profile-stat"><span>Account</span><b>${user.is_guest?'Guest':'Registered'}</b></div></aside><section><div class="pf-profile-section-title">${me?'Your posts':esc2(user.username||'Player')+"'s posts"}</div>${postHtml}</section></div></div>`;
+   }catch(e){box.innerHTML=`<div style="padding:60px;text-align:center;color:#b42318"><h2>Unable to open profile</h2><p>${esc2(e.message||'Unknown error')}</p><p class="tiny">If this says permission denied, the Supabase profiles/posts SELECT policy must allow authenticated users to read public profiles.</p><button class="pf-profile-btn" onclick="closePublicProfile()">Close</button></div>`}
+ }
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-profile-user-id]');if(b){e.preventDefault();window.openPublicProfile(b.dataset.profileUserId)}})
+})();
+</script>
+
 </body></html>
