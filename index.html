@@ -3848,5 +3848,62 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
   }
 })();
 </script>
+<script id="pf-facebook-profile-enhancement">
+(function(){
 
+  function setup(){
+
+    document.querySelectorAll('.pf-profile-tabs').forEach(function(tabs){
+
+      if(tabs.dataset.fbEnhanced) return;
+
+      tabs.dataset.fbEnhanced='1';
+
+      var btns=tabs.querySelectorAll('.pf-profile-tab');
+
+      btns.forEach(function(btn){
+
+        btn.addEventListener('click',function(){
+
+          btns.forEach(function(b){
+            b.classList.remove('active');
+          });
+
+          btn.classList.add('active');
+
+          if(btn.textContent.trim().toLowerCase()==='about'){
+
+            var about =
+              btn.closest('.pf-profile-shell')
+              ?.querySelector('.pf-profile-about');
+
+            if(about){
+              about.scrollIntoView({
+                behavior:'smooth',
+                block:'nearest'
+              });
+            }
+
+          }
+
+        });
+
+      });
+
+    });
+
+  }
+
+  new MutationObserver(setup).observe(
+    document.documentElement,
+    {
+      childList:true,
+      subtree:true
+    }
+  );
+
+  setup();
+
+})();
+</script>
 </body></html>
