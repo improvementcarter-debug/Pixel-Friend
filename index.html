@@ -1715,6 +1715,7 @@ input,textarea,select,button{max-width:100%}
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
+window.sb = sb; // Make the shared Supabase client available to profile modules and inline handlers.
 
 let currentUser = null, currentProfile = null, selectedUser = null;
 let presenceChannel = null;
