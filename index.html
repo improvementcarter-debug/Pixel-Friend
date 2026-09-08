@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2146,12 +2147,19 @@ async function createPost(){
     $("postVideoInput").value = "";
     $("postAudioInput").value = "";
 
+    // The database insert succeeded. Do not turn a UI refresh problem into
+    // a false "publishing failed" message.
     status("postStatus", "✅ Post published successfully!");
     playRetroSound('success');
-    await loadFeed();
-    await loadProfile();
+
+    try { await loadFeed(true); }
+    catch(refreshErr) { console.warn("Feed refresh after post:", refreshErr); }
+
+    try { await loadProfile(); }
+    catch(refreshErr) { console.warn("Profile refresh after post:", refreshErr); }
   } catch(err){
-    status("postStatus", "❌ Error publishing post: " + err.message, true);
+    status("postStatus", "❌ Error publishing post: " + (err?.message || "Unknown error"), true);
+    console.error("createPost:", err);
   }
 }
 window.createPost = createPost;
@@ -2162,7 +2170,9 @@ let messageRefreshTimer = null;
 let notificationRefreshTimer = null;
 let feedRealtimeStatus = "DISCONNECTED";
 let feedLoadInFlight = false;
+let feedReloadQueued = false;
 let messageLoadInFlight = false;
+let messageReloadQueued = false;
 let messageRenderSignature = "";
 
 
@@ -2377,7 +2387,10 @@ document.addEventListener('keydown', e => {
 });
 
 async function loadFeed(forceRender = false) {
-  if (feedLoadInFlight) return;
+  if (feedLoadInFlight) {
+    if (forceRender) feedReloadQueued = true;
+    return;
+  }
   feedLoadInFlight = true;
 
   try {
@@ -2424,7 +2437,15 @@ async function loadFeed(forceRender = false) {
     if(!forceRender && signature === feedRenderSignature) return;
     feedRenderSignature = signature;
 
-    $("feed").innerHTML = posts.map(p => {
+    // Guard against the feed container being temporarily unavailable while
+    // navigating between pages. The post is already safely stored in Supabase.
+    const feedEl = $("feed");
+    if(!feedEl) {
+      console.warn("Feed container #feed is not available; skipping render.");
+      return;
+    }
+
+    feedEl.innerHTML = posts.map(p => {
       const u = p.profiles || {};
       const verified = u.is_verified ? ' ✅' : '';
       const userTypeBadge = accountBadge(u, true);
@@ -2516,6 +2537,10 @@ async function loadFeed(forceRender = false) {
     }).join('');
   } finally {
     feedLoadInFlight = false;
+    if(feedReloadQueued){
+      feedReloadQueued = false;
+      queueMicrotask(() => loadFeed(true));
+    }
   }
 }
 
@@ -3186,7 +3211,8 @@ async function markChatMessagesSeen() {
 window.markChatMessagesSeen = markChatMessagesSeen;
 
 async function loadMessages() {
-  if(!selectedUser || messageLoadInFlight) return;
+  if(!selectedUser) return;
+  if(messageLoadInFlight){ messageReloadQueued = true; return; }
   messageLoadInFlight = true;
   try {
     const { data, error } = await sb.from("messages").select("*").or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${currentUser.id})`).order("created_at", { ascending: true });
@@ -3277,6 +3303,10 @@ async function loadMessages() {
   await markChatMessagesSeen();
   } finally {
     messageLoadInFlight = false;
+    if(messageReloadQueued && selectedUser){
+      messageReloadQueued = false;
+      queueMicrotask(() => loadMessages());
+    }
   }
 }
 
@@ -3648,134 +3678,147 @@ window.stopVoiceRecord = stopVoiceRecord;
 
 let realtimeFeedChannel = null;
 let realtimeMessageChannel = null;
+let realtimeProfileChannel = null;
 let realtimeReconnectTimer = null;
 let realtimeStarted = false;
+let realtimeGeneration = 0;
 
 async function teardownRealtime(){
-  if(realtimeReconnectTimer){
-    clearTimeout(realtimeReconnectTimer);
-    realtimeReconnectTimer = null;
+  if(realtimeReconnectTimer){ clearTimeout(realtimeReconnectTimer); realtimeReconnectTimer=null; }
+  for(const ch of [realtimeFeedChannel,realtimeMessageChannel,realtimeProfileChannel]){
+    if(ch){ try{ await sb.removeChannel(ch); }catch(e){} }
   }
-  for(const ch of [realtimeFeedChannel, realtimeMessageChannel]){
-    if(ch){
-      try { await sb.removeChannel(ch); } catch(e) {}
-    }
-  }
-  realtimeFeedChannel = null;
-  realtimeMessageChannel = null;
+  realtimeFeedChannel=null;
+  realtimeMessageChannel=null;
+  realtimeProfileChannel=null;
+  realtimeStarted=false;
 }
 
 function scheduleRealtimeReconnect(reason){
-  console.warn('Pixel-Friend Realtime reconnect:', reason);
+  console.warn('Pixel-Friend Realtime reconnect:',reason);
   if(realtimeReconnectTimer || !currentUser) return;
-  realtimeReconnectTimer = setTimeout(async () => {
-    realtimeReconnectTimer = null;
-    if(!currentUser) return;
-    await setupRealtime(true);
-  }, 1000);
+  realtimeReconnectTimer=setTimeout(async()=>{
+    realtimeReconnectTimer=null;
+    if(currentUser) await setupRealtime(true);
+  },1000);
+}
+
+function safeRealtimeLoad(fn){
+  try{ const p=fn(); if(p?.catch) p.catch(e=>console.warn('Realtime refresh:',e)); }
+  catch(e){ console.warn('Realtime refresh:',e); }
 }
 
 async function setupRealtime(force=false){
   if(!currentUser) return;
+  if(force || realtimeStarted) await teardownRealtime();
 
-  if(force || realtimeStarted){
-    await teardownRealtime();
-  }
+  if(feedRefreshTimer){clearInterval(feedRefreshTimer);feedRefreshTimer=null;}
+  if(messageRefreshTimer){clearInterval(messageRefreshTimer);messageRefreshTimer=null;}
+  if(notificationRefreshTimer){clearInterval(notificationRefreshTimer);notificationRefreshTimer=null;}
 
-  // Clear old polling fallbacks.
-  if(feedRefreshTimer){ clearInterval(feedRefreshTimer); feedRefreshTimer=null; }
-  if(messageRefreshTimer){ clearInterval(messageRefreshTimer); messageRefreshTimer=null; }
-  if(notificationRefreshTimer){ clearInterval(notificationRefreshTimer); notificationRefreshTimer=null; }
+  const uid=String(currentUser.id);
+  const generation=++realtimeGeneration;
+  const channelSuffix=uid+'-'+generation+'-'+Date.now();
 
-  const uid = String(currentUser.id);
-
-  // Live FEED CHANNEL
-  realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
-    .on('postgres_changes', {event:'*', schema:'public', table:'posts'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
-    .on('postgres_changes', {event:'*', schema:'public', table:'message_reactions'}, payload => {
-      const r=payload.new || payload.old;
-      if(r && selectedUser) loadMessages();
-    })
-    .subscribe(status => {
-      feedRealtimeStatus = status;
-      console.log('Pixel-Friend FEED Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend feed is Live');
-      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
-        scheduleRealtimeReconnect('feed ' + status);
-      }
+  // HOME FEED: posts, reactions, comments and stories update immediately.
+  realtimeFeedChannel=sb.channel('pixel-friend-feed-'+channelSuffix)
+    .on('postgres_changes',{event:'*',schema:'public',table:'posts'},()=>safeRealtimeLoad(()=>loadFeed(true)))
+    .on('postgres_changes',{event:'*',schema:'public',table:'reactions'},()=>safeRealtimeLoad(()=>loadFeed(true)))
+    .on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>safeRealtimeLoad(()=>loadFeed(true)))
+    .on('postgres_changes',{event:'*',schema:'public',table:'stories'},()=>safeRealtimeLoad(()=>loadStories()))
+    .on('postgres_changes',{event:'*',schema:'public',table:'story_reactions'},()=>safeRealtimeLoad(()=>loadStories()))
+    .subscribe(status=>{
+      console.log('Pixel-Friend FEED Realtime:',status);
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)) scheduleRealtimeReconnect('feed '+status);
     });
 
-  // DEDICATED Live Message/NOTIFICATION CHANNEL
-  realtimeMessageChannel = sb.channel('pixel-friend-messages-' + uid + '-' + Date.now())
-    .on('postgres_changes', {
-      event:'INSERT', schema:'public', table:'messages',
-      filter:'receiver_id=eq.' + uid
-    }, async payload => {
+  // MESSAGES: listen for BOTH directions. The old version listened mainly for
+  // receiver_id, so sent-message updates/read receipts could be missed live.
+  realtimeMessageChannel=sb.channel('pixel-friend-chat-'+channelSuffix)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+uid},payload=>{
       const msg=payload.new;
-      if(!msg || String(msg.sender_id) === uid) return;
-
-      // This is the real-time notification path. No polling/query is needed.
-      // NEVER wait for UI/database refresh before firing the alert.
-      // The notification must be the first action on the Realtime event.
+      if(!msg || String(msg.sender_id)===uid) return;
       notifyIncomingMessage(msg);
-
-      if(selectedUser && String(selectedUser) === String(msg.sender_id)){
-        loadMessages();
-        markChatMessagesSeen();
+      if(selectedUser && String(selectedUser)===String(msg.sender_id)){
+        safeRealtimeLoad(()=>loadMessages());
+        safeRealtimeLoad(()=>markChatMessagesSeen());
       }
     })
-    .on('postgres_changes', {
-      event:'UPDATE', schema:'public', table:'messages',
-      filter:'receiver_id=eq.' + uid
-    }, payload => {
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'sender_id=eq.'+uid},payload=>{
       const msg=payload.new;
       if(!msg) return;
-
-      if(String(msg.sender_id) === uid &&
-         selectedUser &&
-         String(selectedUser) === String(msg.receiver_id)){
-        loadMessages();
-      }
-
-      if(msg.is_read === true){
+      if(selectedUser && String(selectedUser)===String(msg.receiver_id)) safeRealtimeLoad(()=>loadMessages());
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'receiver_id=eq.'+uid},payload=>{
+      const msg=payload.new;
+      if(!msg) return;
+      if(selectedUser && String(selectedUser)===String(msg.sender_id)) safeRealtimeLoad(()=>loadMessages());
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:'sender_id=eq.'+uid},payload=>{
+      const msg=payload.new;
+      if(!msg) return;
+      if(selectedUser && String(selectedUser)===String(msg.receiver_id)) safeRealtimeLoad(()=>loadMessages());
+      if(msg.is_read===true){
         const id=String(msg.id);
         knownUnreadMessageIds.delete(id);
         notificationItems.delete(id);
         renderNotificationList();
-        renderNotificationBadge(Math.max(0, localUnreadCount-1));
+        renderNotificationBadge(Math.max(0,localUnreadCount-1));
       }
     })
-    .subscribe(status => {
-      console.log('Pixel-Friend Message Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are Live');
-      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
-        scheduleRealtimeReconnect('messages ' + status);
+    .on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'},payload=>{
+      const old=payload.old||{};
+      if((String(old.sender_id)===uid || String(old.receiver_id)===uid) && selectedUser &&
+         (String(old.sender_id)===String(selectedUser) || String(old.receiver_id)===String(selectedUser)))
+        safeRealtimeLoad(()=>loadMessages());
+    })
+    .on('postgres_changes',{event:'*',schema:'public',table:'message_reactions'},payload=>{
+      const r=payload.new||payload.old;
+      if(r && selectedUser) safeRealtimeLoad(()=>loadMessages());
+    })
+    .subscribe(status=>{
+      console.log('Pixel-Friend Message Realtime:',status);
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)) scheduleRealtimeReconnect('messages '+status);
+    });
+
+  // PROFILE changes: avatar/name/bio/cover changes propagate without reload.
+  realtimeProfileChannel=sb.channel('pixel-friend-profiles-'+channelSuffix)
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'profiles'},payload=>{
+      const profile=payload.new;
+      if(!profile) return;
+      if(String(profile.id)===uid){
+        currentProfile={...currentProfile,...profile};
+        safeRealtimeLoad(()=>loadProfile());
       }
+      safeRealtimeLoad(()=>loadMessageUsers());
+      const modal=document.getElementById('pfPublicProfileModal');
+      if(modal && !modal.classList.contains('hidden')){
+        const content=modal.querySelector('[data-profile-user-id]');
+        if(content && String(content.dataset.profileUserId)===String(profile.id)) safeRealtimeLoad(()=>openPublicProfile(profile.id));
+      }
+    })
+    .subscribe(status=>{
+      console.log('Pixel-Friend Profile Realtime:',status);
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)) scheduleRealtimeReconnect('profiles '+status);
     });
 
   realtimeStarted=true;
 
-  // Fallback only. Realtime remains the primary path.
-  feedRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible') {
-      loadFeed(false);
-      loadStories();
-    }
-  }, 3000);
-
-  messageRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible' && selectedUser) loadMessages();
-  }, 3000);
-
-  // Slow reconciliation only; this does NOT control live notifications.
-  notificationRefreshTimer=setInterval(() => {
+  // Realtime is primary. These are only reconciliation fallbacks, not the live path.
+  feedRefreshTimer=setInterval(()=>{
     if(document.visibilityState==='visible' && currentUser){
-      updateNotificationBadge({notify:false});
+      safeRealtimeLoad(()=>loadFeed(false));
+      safeRealtimeLoad(()=>loadStories());
     }
-  }, 15000);
+  },15000);
+  messageRefreshTimer=setInterval(()=>{
+    if(document.visibilityState==='visible' && selectedUser) safeRealtimeLoad(()=>loadMessages());
+  },15000);
+  notificationRefreshTimer=setInterval(()=>{
+    if(document.visibilityState==='visible' && currentUser) safeRealtimeLoad(()=>updateNotificationBadge({notify:false}));
+  },30000);
+
+  console.log('✅ Pixel-Friend realtime listeners started for generation',generation);
 }
 
 // Reconnect immediately when the browser returns online or the tab becomes visible.
@@ -4008,7 +4051,7 @@ document.addEventListener('click', function(event) {
 });
 
 // Automatically load the saved avatar when the page opens
-window.addEventListener('DOMContentLoaded', (postStatus) => {
+window.addEventListener('DOMContentLoaded', () => {
   const savedAvatar = localStorage.getItem('user_avatar_photo');
   if (savedAvatar) {
     const images = document.querySelectorAll('img');
