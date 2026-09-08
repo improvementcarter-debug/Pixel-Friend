@@ -450,8 +450,6 @@ main{padding:18px 22px 28px!important}
       <div class="card composer-card">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span id="postImagePill" class="file-pill hidden"></span><span id="postVideoPill" class="file-pill hidden"></span><span id="postAudioPill" class="file-pill hidden"></span></div>
       </div>
-      <div class="rail-card"><div class="rail-title">👥 WHO TO FOLLOW</div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
-    </div>
     <div class="home-center">
        <div class="composer-title"><h2 style="margin:0">✍️ CREATE POST</h2><span class="tiny">+10 XP</span></div>
         <textarea id="postText" maxlength="1000" placeholder="WHAT'S ON YOUR PIXEL MIND? (Ctrl+V to paste text or screenshot)"></textarea><div class="tiny paste-hint">📋 Paste text, 🖼️ screenshots, or copied pictures directly here (Ctrl+V)</div>
@@ -461,6 +459,8 @@ main{padding:18px 22px 28px!important}
       <div class="card feed-shell"><div class="feed-tabs"><button class="active">ALL POSTS</button><button>FOLLOWING</button><button>FRIENDS</button><span class="filter">⚱</span></div><div id="feed"></div></div>
     </div>
     <aside class="home-right">
+        <div class="rail-card"><div class="rail-title">👥 WHO TO FOLLOW</div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
+    </div>
       <div class="rail-card"><div class="rail-title">🏅 LEVEL PROGRESS</div><div class="level-hero"><div class="level-orb">🏅</div><div style="flex:1"><strong>LEVEL <span id="railLevel">1</span></strong><div class="rail-xp"><span id="railXpBar"></span></div><div class="tiny"><span id="railXpText">0 / 100 XP</span></div></div></div></div>
       <div class="rail-card"><div class="rail-title">🔥 RANKING THIS WEEK</div><div id="homeRankList"><div class="tiny">Loading ranking...</div></div><button class="secondary" style="width:100%;margin-top:10px" onclick="page('leaderboard')">VIEW FULL RANKING</button></div>
       <div class="rail-card"><div class="rail-title">🔥 TRENDING HASHTAGS</div><div class="trend"><span>#PixelWorld</span><small>12.5K posts</small></div><div class="trend"><span>#Gaming</span><small>8.2K posts</small></div><div class="trend"><span>#Friends</span><small>6.7K posts</small></div><div class="trend"><span>#Adventure</span><small>5.1K posts</small></div></div>
