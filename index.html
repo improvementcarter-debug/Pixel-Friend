@@ -4083,7 +4083,67 @@ window.logout = logout;</script>
   function frame(t){ctx.clearRect(0,0,w,h);const g=ctx.createRadialGradient(w*.2,h*.2,0,w*.2,h*.2,Math.max(w,h)*.75);g.addColorStop(0,'rgba(25,53,103,.28)');g.addColorStop(.48,'rgba(8,16,36,.08)');g.addColorStop(1,'rgba(2,6,15,.04)');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);drawGrid();drawConstellations(t);for(const s of stars){s.y-=s.v*.25;if(s.y<-3){s.y=h+3;s.x=Math.random()*w;}const a=s.a*(.62+.38*Math.sin(t*.002+s.p));ctx.fillStyle='rgba(180,220,255,'+a+')';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();if(s.r>1.25){ctx.strokeStyle='rgba(100,200,255,'+(a*.35)+')';ctx.beginPath();ctx.moveTo(s.x-s.r*3,s.y);ctx.lineTo(s.x+s.r*3,s.y);ctx.moveTo(s.x,s.y-s.r*3);ctx.lineTo(s.x,s.y+s.r*3);ctx.stroke();}}raf=requestAnimationFrame(frame);}
   resize();window.addEventListener('resize',resize,{passive:true});raf=requestAnimationFrame(frame);
 })();
-</script>
+/* --- Improved Avatar Upload Fix --- */
+document.addEventListener('click', function(event) {
+  // Check if the user clicked the "upload new avatar" button or anything inside it
+  const target = event.target.closest('button, label, div');
+  if (target && target.innerText && target.innerText.toLowerCase().includes('upload new avatar')) {
+    event.preventDefault();
+    
+    // Create a hidden file input on the fly if it doesn't exist yet
+    let fileInput = document.getElementById('runtimeAvatarInput');
+    if (!fileInput) {
+      fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.id = 'runtimeAvatarInput';
+      fileInput.accept = 'image/*';
+      fileInput.style.display = 'none';
+      
+      fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+          const base64Img = uploadEvent.target.result;
+          
+          // Save to local storage
+          localStorage.setItem('user_avatar_photo', base64Img);
+
+          // Instantly update all avatar images on the page
+          const images = document.querySelectorAll('img');
+          images.forEach(img => {
+            // Find the main profile image (usually the top rounded one)
+            if (img.closest('.profile-card') || img.src.includes('pixel') || img.width > 40) {
+              img.src = base64Img;
+            }
+          });
+
+          alert('Avatar updated successfully!');
+        };
+        reader.readAsDataURL(file);
+      });
+
+      document.body.appendChild(fileInput);
+    }
+
+    // Trigger the file picker window
+    fileInput.click();
+  }
+});
+
+// Automatically load the saved avatar when the page opens
+window.addEventListener('DOMContentLoaded', () => {
+  const savedAvatar = localStorage.getItem('user_avatar_photo');
+  if (savedAvatar) {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+      if (img.closest('.profile-card') || img.src.includes('pixel') || img.width > 40) {
+        img.src = savedAvatar;
+      }
+    });
+  }
+});</script>
 <style>
 .clickable-media{cursor:zoom-in}.pf-file-download{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px 12px;border:1px solid #4ea1ff;background:#0a1628;color:#dcecff;text-decoration:none;border-radius:8px}.pf-file-download span{margin-left:auto;font-size:11px;color:#65caff}.pf-media-modal{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);display:grid;place-items:center;padding:20px}.pf-media-modal .pf-media-box{width:min(1200px,96vw);height:min(92vh,900px);position:relative;display:grid;place-items:center}.pf-media-modal img,.pf-media-modal video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}.pf-media-close{position:absolute;top:-4px;right:-4px;z-index:2;width:46px;height:46px;font-size:20px}.pf-media-hint{position:absolute;bottom:-28px;color:#9fb6d3;font-size:14px}
 </style>
