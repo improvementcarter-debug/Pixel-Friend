@@ -1671,33 +1671,120 @@ input,textarea,select,button{max-width:100%}
 <input accept="image/*" class="hidden" id="chatImageInput" onchange="selectChatMedia('image')" type="file"/> <input accept="video/*" class="hidden" id="chatVideoInput" onchange="selectChatMedia('video')" type="file"/> <input accept="*/*" class="hidden" id="chatFileInput" onchange="selectChatMedia('file')" type="file"/>
 <input disabled="" id="messageInput" onkeydown="if(event.key==='Enter')sendMessage()" placeholder="Type a message... (paste text or screenshot)" style="flex:1"/> <button class="primary" disabled="" id="sendButton" onclick="sendMessage()">Send</button> </div> </div> </div> </div> </div></section>
 <section class="page" id="adminPanel"> <div class="card" style="padding:20px"> <h1>🛡️ Admin control panel</h1> <p class="tiny">Manage user administrator and account verification statuses. 👤 Guest and 👤 Real account types are visible to everyone.</p> <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div> </div></section>
-<section class="page" id="profile">
-  <div class="card pf-own-profile-card">
-    <div class="pf-own-cover" id="ownCoverPreview">
-      <div class="pf-own-cover-actions">
-        <label class="pf-profile-btn" for="coverInput">📷 Edit cover</label>
-        <input id="coverInput" type="file" accept="image/*" onchange="previewCoverImage(event)" hidden>
-      </div>
+<section class="page" id="profile"> <div class="card" style="padding:24px;max-width:540px;margin:0 auto"> <div style="text-align:center;margin-bottom:20px"> <div class="avatar profile-large-avatar" id="profileAvatar">👤<span class="online"></span></div><div class="profile-card">
+
+    <!-- ✅ PASTE THE COVER CODE RIGHT HERE -->
+    <div id="coverPreview" style="width: 100%; height: 200px; background-color: #2c3e50; background-size: cover; background-position: center; position: relative; border-radius: 8px; margin-bottom: 20px;">
+        <div style="position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 10;">
+            <label for="coverInput" style="cursor: pointer; background: #007bff; color: #fff; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: bold;">Upload Cover</label>
+            <button type="button" onclick="removeCoverImage()" style="background: #dc3545; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Remove</button>
+        </div>
+        <input type="file" id="coverInput" accept="image/*" style="display: none;" onchange="previewCoverImage(event)">
+      </body>
     </div>
-    <div class="pf-own-profile-main">
-      <div class="avatar profile-large-avatar" id="profileAvatar">👤</div>
-      <div>
-        <h1 id="profileNameDisplay">Player</h1>
-        <p id="profileBioDisplay">Pixel explorer</p>
-      </div>
-      <button class="pf-profile-btn primary" onclick="if(currentUser&&currentUser.id)openPublicProfile(currentUser.id)">View profile</button>
+<!-- Facebook-Style Profile Wrapper -->
+<div style="width: 100%; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+
+    <!-- Cover Photo Section -->
+    <div id="coverPreview" style="width: 100%; height: 220px; background-color: #e4e6eb; background-size: cover; background-position: center; position: relative;">
+        <!-- Upload / Remove Buttons on Bottom Right of Cover -->
+        <div style="position: absolute; bottom: 12px; right: 12px; display: flex; gap: 8px; background: rgba(0,0,0,0.6); padding: 6px; border-radius: 6px;">
+            <label for="coverInput" style="cursor: pointer; color: #fff; font-size: 13px; font-weight: bold; padding: 2px 6px;">Edit Cover Photo</label>
+            <button type="button" onclick="removeCoverImage()" style="background: none; border: none; color: #ff4d4d; font-size: 13px; font-weight: bold; cursor: pointer;">Remove</button>
+        </div>
+        <input type="file" id="coverInput" accept="image/*" style="display: none;" onchange="previewCoverImage(event)">
+</body>
+</div>
+    <!-- Your existing Avatar / Profile Management Section -->
+    <div class="avatar-management">
+       <!-- ... your avatar upload buttons ... -->
     </div>
-    <div class="pf-own-profile-form">
-      <label>Username<input id="profileNameInput" type="text"></label>
-      <label>Bio<textarea id="profileBioInput"></textarea></label>
-      <label>Gender<select id="profileGenderInput"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Other</option></select></label>
-      <label>Status<input id="profileStatusInput" type="text"></label>
-      <label>Location<input id="profileLocationInput" type="text"></label>
-      <label>Work<input id="profileWorkInput" type="text"></label>
-      <label>School<input id="profileSchoolInput" type="text"></label>
-      <label>Relationship Status<input id="profileRelationshipInput" type="text"></label>
-    </div>
-  </div>
+
+</div> <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">Player</h1><div id="profileAccountType"></div> <p class="tiny" id="profileBioDisplay">Pixel explorer</p> </div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px"> <div class="card" style="padding:14px;text-align:center"> <div class="tiny" style="margin-bottom:4px">Current level</div> <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong> </div> <div class="card" style="padding:14px;text-align:center"> <div class="tiny" style="margin-bottom:4px">Total xp</div> <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong> </div> </div>
+<div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px"> <h2 style="margin-top:0;margin-bottom:12px">⚙️ edit profile</h2> <label class="tiny" style="display:block;margin-bottom:4px">Username</label> <input id="editUsernameInput" placeholder="Enter new username..."/> <label class="tiny" style="display:block;margin-bottom:4px">Bio description</label> <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea> <button class="primary" onclick="saveProfileInfo()" style="width:100%">💾 save profile details</button> </div>
+<div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center"> <h2 style="margin-top:0;margin-bottom:12px">🖼️ avatar management</h2> <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"> <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 upload new avatar</button> <button class="danger" onclick="removeAvatar()">❌ remove avatar</button> <input accept="image/*" class="hidden" id="avatarUploadInput" onchange="uploadAvatar()" type="file"/> </div> </div> </div>
+<div class="card" id="pfProfileInfoCard">
+<div class="section-head">
+<h2>About</h2>
+<button class="secondary" id="pfEditProfileBtn" onclick="pfToggleProfileEdit()" type="button">✏️ Edit Profile</button>
+</div>
+<div id="pfProfileView">
+<div class="profile-info-grid">
+<div class="profile-info-item">
+<span class="profile-info-label">Gender</span>
+<span class="profile-info-value" id="pfProfileGender">Not set</span>
+</div>
+<div class="profile-info-item">
+<span class="profile-info-label">Status</span>
+<span class="profile-info-value" id="pfProfileStatus">Active</span>
+</div>
+  <script>
+    function previewCoverImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const coverElement = document.getElementById('coverPreview');
+                if (coverElement) {
+                    coverElement.style.backgroundImage = `url('${e.target.result}')`;
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeCoverImage() {
+        const coverElement = document.getElementById('coverPreview');
+        const inputElement = document.getElementById('coverInput');
+        if (coverElement) {
+            coverElement.style.backgroundImage = 'none';
+        }
+        if (inputElement) {
+            inputElement.value = '';
+        }
+    }
+    </body>
+</script>
+<div class="profile-info-item">
+<span class="profile-info-label">Join Date</span>
+<span class="profile-info-value" id="pfProfileJoinDate">—</span>
+</div>
+<div class="profile-info-item">
+<span class="profile-info-label">User ID</span>
+<span class="profile-info-value profile-id-code" id="pfProfileUserId">—</span>
+</div>
+</div>
+<div class="profile-joined-note">Your User ID and Join Date are account information and are shown automatically.</div>
+</div>
+<div id="pfProfileEdit" style="display:none">
+<div class="profile-edit-form">
+<label>
+          Gender
+          <select id="pfEditGender">
+<option value="">Prefer not to say</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+</label>
+<label>
+          Status
+          <select id="pfEditStatus">
+<option value="Active">Active</option>
+<option value="Single">Single</option>
+<option value="In a relationship">In a relationship</option>
+<option value="Married">Married</option>
+<option value="Busy">Busy</option>
+</select>
+</label>
+</div>
+<div class="profile-edit-actions">
+<button class="primary" onclick="pfSaveProfileInfo()" type="button">Save Changes</button>
+<button class="secondary" onclick="pfToggleProfileEdit(false)" type="button">Cancel</button>
+</div>
+</div>
+</div>
 </section>
 </main></div></div><div class="story-modal hidden" id="storyCreatorModal"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 create story</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 select photo or video<input accept="image/*,video/*" id="storyMediaInput" onchange="previewStoryMedia()" type="file"/></label><div class="tiny" id="storyMediaPreview"></div><button class="primary" onclick="publishStory()">🚀 publish story</button><div class="status" id="storyStatus"></div></div></div></div></div>
 <div class="story-modal hidden" id="storyViewerModal"><div class="story-viewer"><div class="story-progress" id="storyProgress"></div><div class="story-view-head"><div class="user-avatar" id="storyViewAvatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">Pixel user</strong><div class="story-meta" id="storyViewTime"></div></div><button class="danger hidden" id="storyDeleteBtn" onclick="deleteCurrentStory()" style="padding:5px 7px;font-size:12px">🗑</button><button class="secondary" onclick="closeStoryViewer()" style="padding:5px 8px">✕</button></div><div class="story-view-body" id="storyViewBody"></div><div class="story-caption" id="storyCaption"></div></div></div>
@@ -1715,8 +1802,6 @@ input,textarea,select,button{max-width:100%}
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
-window.sb = sb; // Make the shared Supabase client available to profile modules and inline handlers.
-
 
 let currentUser = null, currentProfile = null, selectedUser = null;
 let presenceChannel = null;
