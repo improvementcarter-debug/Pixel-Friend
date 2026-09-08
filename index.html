@@ -4008,7 +4008,7 @@ document.addEventListener('click', function(event) {
 });
 
 // Automatically load the saved avatar when the page opens
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', (postStatus) => {
   const savedAvatar = localStorage.getItem('user_avatar_photo');
   if (savedAvatar) {
     const images = document.querySelectorAll('img');
