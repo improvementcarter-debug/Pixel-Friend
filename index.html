@@ -932,6 +932,296 @@ main{
 .pf-profile-tabs{display:flex;gap:4px;padding:0 28px;background:#fff;border-top:1px solid #e4e6eb;border-bottom:1px solid #dddfe2}.pf-profile-tab{border:0;background:transparent;padding:16px 18px;font-weight:700;color:#65676b;cursor:pointer;border-bottom:3px solid transparent}.pf-profile-tab.active{color:#0866ff;border-bottom-color:#0866ff}.pf-profile-body{padding:18px 28px 30px}.pf-profile-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:18px}.pf-profile-about,.pf-profile-posts{min-width:0}.pf-profile-about{background:#fff;border-radius:10px;padding:18px;align-self:start}.pf-profile-section-title{font-size:18px;font-weight:800;margin-bottom:12px}.pf-profile-stat{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e4e6eb;font-size:14px}.pf-profile-stat:last-child{border-bottom:0}.pf-profile-stat span{color:#65676b}.pf-profile-posts{background:transparent}.pf-profile-post{background:#fff;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.08)}.pf-profile-post-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}.pf-profile-post-avatar{width:42px;height:42px;border-radius:50%;overflow:hidden;background:#e4e6eb;display:grid;place-items:center}.pf-profile-post-avatar img{width:100%;height:100%;object-fit:cover}.pf-profile-post-media{width:100%;max-height:560px;object-fit:contain;background:#f0f2f5;border-radius:8px;margin-top:12px}.pf-profile-empty{background:#fff;border-radius:10px;padding:40px;text-align:center;color:#65676b}
 @media(max-width:700px){.pf-profile-modal{padding:0}.pf-profile-cover{height:210px!important}.pf-profile-head{padding:0 16px 16px!important}.pf-profile-avatar{width:112px!important;height:112px!important;margin-top:-56px!important}.pf-profile-title{font-size:22px}.pf-profile-title-row{flex-direction:column}.pf-profile-actions{width:100%}.pf-profile-btn{flex:1}.pf-profile-tabs{padding:0 10px}.pf-profile-body{padding:12px}.pf-profile-grid{grid-template-columns:1fr}.chat-users{width:auto!important}.messages-list{height:calc(100vh - 250px)!important}.message-wrap{max-width:84%!important}}
 </style>
+  <style id="pf-facebook-profile">
+/* Facebook-style Pixel-Friend profile redesign */
+
+.pf-profile-modal .pf-profile-shell,
+#publicProfileModal .pf-profile-shell{
+  width:min(1120px,calc(100vw - 28px)) !important;
+  max-height:92vh !important;
+  overflow:auto !important;
+  border-radius:18px !important;
+}
+
+.pf-profile-cover{
+  height:300px !important;
+  position:relative !important;
+  overflow:hidden !important;
+  background:linear-gradient(135deg,#252a4a,#5b2d78 55%,#1f6f8b) !important;
+}
+
+.pf-profile-cover img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+}
+
+.pf-profile-cover:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    transparent 45%,
+    rgba(0,0,0,.48)
+  );
+  pointer-events:none;
+}
+
+.pf-profile-head{
+  position:relative !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  gap:22px !important;
+  padding:0 28px 22px !important;
+  margin-top:-78px !important;
+  z-index:3 !important;
+}
+
+.pf-profile-avatar{
+  width:148px !important;
+  height:148px !important;
+  min-width:148px !important;
+  border:5px solid var(--bg,#fff) !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+  box-shadow:0 3px 15px rgba(0,0,0,.25) !important;
+  background:#fff !important;
+}
+
+.pf-profile-title-row{
+  flex:1 !important;
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  min-width:0 !important;
+}
+
+.pf-profile-title{
+  font-size:30px !important;
+  font-weight:800 !important;
+  line-height:1.15 !important;
+}
+
+.pf-profile-bio{
+  margin-top:7px !important;
+  max-width:600px !important;
+  font-size:14px !important;
+  opacity:.78 !important;
+}
+
+.pf-profile-actions{
+  display:flex !important;
+  gap:8px !important;
+  align-items:center !important;
+  flex-wrap:wrap !important;
+  justify-content:flex-end !important;
+}
+
+.pf-profile-btn{
+  min-height:40px !important;
+  padding:9px 15px !important;
+  border-radius:10px !important;
+  font-weight:700 !important;
+}
+
+.pf-profile-tabs{
+  display:flex !important;
+  gap:4px !important;
+  padding:0 28px !important;
+  border-top:1px solid rgba(128,128,128,.18) !important;
+  border-bottom:1px solid rgba(128,128,128,.18) !important;
+}
+
+.pf-profile-tab{
+  border:0 !important;
+  background:transparent !important;
+  padding:15px 22px !important;
+  font-weight:700 !important;
+  border-bottom:3px solid transparent !important;
+}
+
+.pf-profile-tab.active{
+  border-bottom-color:currentColor !important;
+}
+
+.pf-profile-body{
+  padding:20px 28px 30px !important;
+}
+
+.pf-profile-grid{
+  display:grid !important;
+  grid-template-columns:
+    minmax(250px,340px)
+    minmax(0,1fr) !important;
+  gap:20px !important;
+  align-items:start !important;
+}
+
+.pf-profile-about,
+.pf-profile-posts{
+  border-radius:14px !important;
+}
+
+.pf-profile-about{
+  padding:18px !important;
+  background:rgba(128,128,128,.07) !important;
+  position:sticky !important;
+  top:0 !important;
+}
+
+.pf-profile-section-title{
+  font-size:19px !important;
+  font-weight:800 !important;
+  margin-bottom:14px !important;
+}
+
+.pf-profile-stat{
+  display:flex !important;
+  justify-content:space-between !important;
+  gap:12px !important;
+  padding:11px 0 !important;
+  border-bottom:1px solid rgba(128,128,128,.14) !important;
+}
+
+.pf-profile-stat:last-child{
+  border-bottom:0 !important;
+}
+
+.pf-profile-posts .post-card{
+  margin-bottom:14px !important;
+  border-radius:14px !important;
+}
+
+
+/* TABLET */
+@media(max-width:850px){
+
+  .pf-profile-modal .pf-profile-shell,
+  #publicProfileModal .pf-profile-shell{
+    width:calc(100vw - 16px) !important;
+    max-height:95vh !important;
+  }
+
+  .pf-profile-cover{
+    height:230px !important;
+  }
+
+  .pf-profile-head{
+    padding:0 18px 18px !important;
+    gap:14px !important;
+  }
+
+  .pf-profile-avatar{
+    width:112px !important;
+    height:112px !important;
+    min-width:112px !important;
+  }
+
+  .pf-profile-title{
+    font-size:24px !important;
+  }
+
+  .pf-profile-grid{
+    grid-template-columns:1fr !important;
+  }
+
+  .pf-profile-about{
+    position:static !important;
+  }
+
+  .pf-profile-body{
+    padding:16px 18px 24px !important;
+  }
+
+  .pf-profile-tabs{
+    padding:0 18px !important;
+    overflow-x:auto !important;
+  }
+}
+
+
+/* MOBILE */
+@media(max-width:600px){
+
+  .pf-profile-cover{
+    height:180px !important;
+  }
+
+  .pf-profile-head{
+    display:block !important;
+    margin-top:-58px !important;
+    padding:0 14px 14px !important;
+  }
+
+  .pf-profile-avatar{
+    width:104px !important;
+    height:104px !important;
+    min-width:104px !important;
+  }
+
+  .pf-profile-title-row{
+    display:block !important;
+    margin-top:10px !important;
+  }
+
+  .pf-profile-title{
+    font-size:22px !important;
+  }
+
+  .pf-profile-bio{
+    font-size:13px !important;
+  }
+
+  .pf-profile-actions{
+    margin-top:12px !important;
+    justify-content:flex-start !important;
+  }
+
+  .pf-profile-btn{
+    flex:1 1 auto !important;
+    min-width:100px !important;
+  }
+
+  .pf-profile-tabs{
+    padding:0 8px !important;
+  }
+
+  .pf-profile-tab{
+    padding:13px 15px !important;
+    white-space:nowrap !important;
+  }
+
+  .pf-profile-body{
+    padding:12px 10px 20px !important;
+  }
+}
+
+
+/* VERY SMALL PHONES */
+@media(max-width:380px){
+
+  .pf-profile-cover{
+    height:155px !important;
+  }
+
+  .pf-profile-avatar{
+    width:92px !important;
+    height:92px !important;
+    min-width:92px !important;
+  }
+
+  .pf-profile-title{
+    font-size:20px !important;
+  }
+
+  .pf-profile-btn{
+    min-width:85px !important;
+    padding:8px 10px !important;
+  }
+}
+</style>
 </head><body>
 <canvas aria-hidden="true" id="pfSpaceCanvas"></canvas>
 <div aria-hidden="true" id="pfSpaceGlow"></div>
