@@ -4111,7 +4111,59 @@ async function logout() {
   await stopPresence();
   await sb.auth.signOut();
 }
-window.logout = logout;</script>
+window.logout = logout;/* --- Direct Avatar Upload Fix --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const uploadBtn = document.getElementById('myUploadBtn');
+  if (!uploadBtn) return;
+
+  // Create a hidden file selector
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
+
+  // When user clicks your button, open file browser
+  uploadBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    fileInput.click();
+  });
+
+  // When a picture is chosen
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const base64Img = event.target.result;
+      
+      // Save it so it doesn't disappear on refresh
+      localStorage.setItem('user_avatar_photo', base64Img);
+
+      // Change the profile image on the screen
+      updateAllAvatars(base64Img);
+      alert('Avatar uploaded successfully!');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Load saved picture on page load
+  const savedAvatar = localStorage.getItem('user_avatar_photo');
+  if (savedAvatar) {
+    updateAllAvatars(savedAvatar);
+  }
+});
+
+function updateAllAvatars(imageSrc) {
+  const images = document.querySelectorAll('img');
+  images.forEach(img => {
+    // Targets the main avatar image at the top of your card
+    if (img.closest('div') && (img.width > 40 || img.src.includes('pixel') || img.alt.toLowerCase().includes('avatar'))) {
+      img.src = imageSrc;
+    }
+  });
+}</script>
 <div aria-modal="true" class="invite-modal hidden" id="inviteModal" role="dialog">
 <div class="invite-card">
 <h2>🔗 invite friends</h2>
