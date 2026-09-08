@@ -1609,7 +1609,23 @@ main{
 <input accept="image/*" class="hidden" id="chatImageInput" onchange="selectChatMedia('image')" type="file"/> <input accept="video/*" class="hidden" id="chatVideoInput" onchange="selectChatMedia('video')" type="file"/> <input accept="*/*" class="hidden" id="chatFileInput" onchange="selectChatMedia('file')" type="file"/>
 <input disabled="" id="messageInput" onkeydown="if(event.key==='Enter')sendMessage()" placeholder="Type a message... (paste text or screenshot)" style="flex:1"/> <button class="primary" disabled="" id="sendButton" onclick="sendMessage()">Send</button> </div> </div> </div> </div> </div></section>
 <section class="page" id="adminPanel"> <div class="card" style="padding:20px"> <h1>🛡️ Admin control panel</h1> <p class="tiny">Manage user administrator and account verification statuses. 👤 Guest and 👤 Real account types are visible to everyone.</p> <div id="adminUserList" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div> </div></section>
-<section class="page" id="profile"> <div class="card" style="padding:24px;max-width:540px;margin:0 auto"> <div style="text-align:center;margin-bottom:20px"> <div class="avatar profile-large-avatar" id="profileAvatar">👤<span class="online"></span></div> <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">Player</h1><div id="profileAccountType"></div> <p class="tiny" id="profileBioDisplay">Pixel explorer</p> </div>
+<section class="page" id="profile"> <div class="card" style="padding:24px;max-width:540px;margin:0 auto"> <div style="text-align:center;margin-bottom:20px"> <div class="avatar profile-large-avatar" id="profileAvatar">👤<span class="online"></span></div><div class="profile-card">
+
+    <!-- ✅ PASTE THE COVER CODE RIGHT HERE -->
+    <div id="coverPreview" style="width: 100%; height: 200px; background-color: #2c3e50; background-size: cover; background-position: center; position: relative; border-radius: 8px; margin-bottom: 20px;">
+        <div style="position: absolute; bottom: 10px; right: 10px; display: flex; gap: 8px; z-index: 10;">
+            <label for="coverInput" style="cursor: pointer; background: #007bff; color: #fff; padding: 6px 14px; border-radius: 4px; font-size: 13px; font-weight: bold;">Upload Cover</label>
+            <button type="button" onclick="removeCoverImage()" style="background: #dc3545; color: #fff; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold;">Remove</button>
+        </div>
+        <input type="file" id="coverInput" accept="image/*" style="display: none;" onchange="previewCoverImage(event)">
+    </div>
+
+    <!-- Your existing Avatar / Profile Management Section -->
+    <div class="avatar-management">
+       <!-- ... your avatar upload buttons ... -->
+    </div>
+
+</div> <h1 id="profileNameDisplay" style="margin:10px 0 5px 0">Player</h1><div id="profileAccountType"></div> <p class="tiny" id="profileBioDisplay">Pixel explorer</p> </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px"> <div class="card" style="padding:14px;text-align:center"> <div class="tiny" style="margin-bottom:4px">Current level</div> <strong id="statLevel" style="font-size:22px;color:var(--cyan)">1</strong> </div> <div class="card" style="padding:14px;text-align:center"> <div class="tiny" style="margin-bottom:4px">Total xp</div> <strong id="statXP" style="font-size:22px;color:var(--yellow)">0</strong> </div> </div>
 <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;margin-bottom:15px"> <h2 style="margin-top:0;margin-bottom:12px">⚙️ edit profile</h2> <label class="tiny" style="display:block;margin-bottom:4px">Username</label> <input id="editUsernameInput" placeholder="Enter new username..."/> <label class="tiny" style="display:block;margin-bottom:4px">Bio description</label> <textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:70px;margin-bottom:12px"></textarea> <button class="primary" onclick="saveProfileInfo()" style="width:100%">💾 save profile details</button> </div>
 <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center"> <h2 style="margin-top:0;margin-bottom:12px">🖼️ avatar management</h2> <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"> <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 upload new avatar</button> <button class="danger" onclick="removeAvatar()">❌ remove avatar</button> <input accept="image/*" class="hidden" id="avatarUploadInput" onchange="uploadAvatar()" type="file"/> </div> </div> </div>
