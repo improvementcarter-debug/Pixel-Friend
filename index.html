@@ -150,6 +150,7 @@
   display: none;
 }</style>
 <script>
+  
 
 /* ===== Telegram-style Copy/Paste for Posts and Messages ===== */
 function pfClipboardImageFile(items){
@@ -235,7 +236,86 @@ document.addEventListener('DOMContentLoaded', ()=>{
     <input type="file" class="hidden-file-input" accept="image/*" onchange="previewAvatarPhoto(event)">
   </label>
 </div>
-</script>
+/* --- Fix for Avatar & Cover Uploads in Your App --- */
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Load saved photos on startup
+  const savedAvatar = localStorage.getItem('user_avatar_photo');
+  if (savedAvatar) {
+    updateAvatarUI(savedAvatar);
+  }
+
+  // 2. Setup the "upload new avatar" button dynamically
+  setupAvatarUploadListeners();
+});
+
+function setupAvatarUploadListeners() {
+  // Find buttons or create a hidden file input if it doesn't exist
+  let fileInput = document.getElementById('dynamicAvatarInput');
+  if (!fileInput) {
+    fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.id = 'dynamicAvatarInput';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    fileInput.addEventListener('change', handleFileSelected);
+    document.body.appendChild(fileInput);
+  }
+
+  // Find your existing "upload new avatar" button from the screenshot
+  const uploadButtons = document.querySelectorAll('button, label');
+  uploadButtons.forEach(btn => {
+    if (btn.innerText && btn.innerText.toLowerCase().includes('upload new avatar')) {
+      // Prevent duplicate listeners
+      btn.onclick = (e) => {
+        e.preventDefault();
+        fileInput.click();
+      };
+    }
+    
+    // Also handle "remove avatar" if clicked
+    if (btn.innerText && btn.innerText.toLowerCase().includes('remove avatar')) {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        localStorage.removeItem('user_avatar_photo');
+        resetAvatarUI();
+      };
+    }
+  });
+}
+
+function handleFileSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Image = e.target.result;
+    localStorage.setItem('user_avatar_photo', base64Image);
+    updateAvatarUI(base64Image);
+    
+    // If your app has an active user state object, update it here too
+    if (typeof currentUser !== 'undefined') {
+      currentUser.avatar = base64Image;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateAvatarUI(imageSrc) {
+  // Target the pixel avatar image shown at the top of your screenshot
+  const avatarImgs = document.querySelectorAll('.profile-card img, img[alt*="avatar"], img[src*="pixel"]');
+  avatarImgs.forEach(img => {
+    // Check if it's the main profile image container
+    if (img.closest('.profile-card') || img.width > 50) {
+      img.src = imageSrc;
+    }
+  });
+}
+
+function resetAvatarUI() {
+  location.reload(); // Simple reload to revert to default pixel icon
+}</script>
 <style id="telegram-style-notifications">
 /* Telegram-style live notification popup */
 .pf-live-notification-stack{
