@@ -3136,7 +3136,7 @@ restoreSession();
 function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(!m||!c)return;c.innerHTML=type==='video'?`<video src="${url}" controls autoplay></video>`:`<img src="${url}">`;m.classList.remove('hidden');document.body.style.overflow='hidden';}
 function closeMediaFullscreen(){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(m)m.classList.add('hidden');if(c)c.innerHTML='';document.body.style.overflow='';}
 window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=closeMediaFullscreen;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMediaFullscreen();});
-</script>
+
    <footer style="text-align: center; padding: 4rem;">
   <div class="live-footer-badge">
     <div class="ticker-track">
@@ -3148,4 +3148,5 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
     </div>
   </div>
 </footer>
+     </script>
 </body></html>
