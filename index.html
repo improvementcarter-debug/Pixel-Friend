@@ -91,15 +91,6 @@
 /* Telegram-style paste media */
 .paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
-/* ===== PIXEL-FRIEND ARCADE ===== */
-/* ===== PIXEL-FRIEND ARCADE: BUNNY HOP ===== */
-.bunny-card{margin-top:18px}.bunny-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.bunny-layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:start;margin-top:16px}.bunny-canvas-wrap{position:relative;border:1px solid #2d466a;border-radius:16px;padding:12px;background:radial-gradient(circle at 50% 0%,rgba(75,50,180,.18),transparent 42%),linear-gradient(180deg,#081426,#050b15);box-shadow:inset 0 0 30px rgba(67,231,255,.05)}#bunnyCanvas{display:block;width:100%;max-width:620px;height:auto;margin:0 auto;border:1px solid #3a5f92;border-radius:12px;background:#071322;touch-action:manipulation;cursor:pointer;image-rendering:pixelated}.bunny-side{display:grid;gap:10px}.bunny-tip{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.bunny-tip h3{margin:0 0 7px;font-size:15px}.bunny-tip p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.bunny-status{min-height:24px;text-align:center;margin-top:12px}.bunny-live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#48e0a4;box-shadow:0 0 12px rgba(72,224,164,.8);margin-right:7px}.bunny-controls{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}.bunny-controls b{color:var(--cyan)}@media(max-width:800px){.bunny-layout{grid-template-columns:1fr}.bunny-side{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.bunny-side{grid-template-columns:1fr}.bunny-canvas-wrap{padding:7px}}
-.arcade-page{padding:20px;max-width:1100px;margin:0 auto}.arcade-hero{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px;padding:22px;border:1px solid #34547e;border-radius:16px;background:linear-gradient(135deg,#111c31,#0a1220);box-shadow:0 0 30px rgba(67,231,255,.08)}
-.arcade-title{margin:0;font-size:28px}.arcade-sub{color:var(--muted);margin-top:8px}.game-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.game-card{border:1px solid #2d466a;border-radius:16px;background:linear-gradient(180deg,#101a2d,#09111e);padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
-.game-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}.game-stat{background:#0a1423;border:1px solid #263f61;border-radius:10px;padding:10px;text-align:center}.game-stat b{display:block;font-size:22px;color:var(--cyan)}
-.pet-stage{min-height:180px;display:grid;place-items:center;border:1px solid #2d466a;border-radius:16px;background:radial-gradient(circle at 50% 30%,#182b48,#08111d 70%);margin:12px 0}.pixel-pet{font-size:100px;filter:drop-shadow(0 0 18px rgba(67,231,255,.3));animation:pfPetBounce .7s infinite alternate}@keyframes pfPetBounce{to{transform:translateY(-8px) scale(1.03)}}
-.target-food{text-align:center;font-size:18px;margin:12px 0}.target-food span{font-size:36px}.food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.food-btn{min-height:76px;font-size:40px;border:1px solid #3a587f;border-radius:12px;background:#101d31;cursor:pointer}.food-btn:hover{transform:translateY(-2px);border-color:var(--cyan);box-shadow:0 0 18px rgba(67,231,255,.18)}.food-btn:disabled{opacity:.45;cursor:not-allowed}
-.game-status{min-height:26px;text-align:center;margin-top:12px}.memory-card{margin-top:18px}.memory-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.memory-board{display:grid;grid-template-columns:repeat(4,minmax(52px,1fr));gap:10px;margin:18px 0}.memory-tile{min-height:72px;border:1px solid #34547e;background:#0a1423;border-radius:12px;color:#9eb2ce;font-size:28px;cursor:pointer;transition:transform .15s,background .15s,border-color .15s}.memory-tile:hover{transform:translateY(-2px);border-color:var(--cyan)}.memory-tile.revealed,.memory-tile.matched{background:linear-gradient(135deg,#12344b,#11243a);color:#fff}.memory-tile.matched{border-color:#48e0a4;box-shadow:0 0 14px rgba(72,224,164,.18)}.memory-status{min-height:24px;text-align:center;margin-top:10px}.game-switches{display:flex;gap:8px;flex-wrap:wrap}.game-switches button{padding:9px 12px}@media(max-width:520px){.memory-board{grid-template-columns:repeat(3,1fr)}.memory-tile{min-height:62px}}.arcade-list{display:grid;gap:10px}.arcade-mini{padding:14px;border:1px solid #294463;border-radius:12px;background:#0b1524}.arcade-mini h3{margin:0 0 6px}.arcade-mini p{margin:0;color:var(--muted);font-size:14px}.game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.combo{color:#ffcf5b;font-weight:700}@media(max-width:800px){.game-grid{grid-template-columns:1fr}.game-stats{grid-template-columns:repeat(2,1fr)}.arcade-hero{align-items:flex-start;flex-direction:column}}
 </style>
 <script>
 
@@ -432,7 +423,7 @@ main{padding:18px 22px 28px!important}
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
-    <div><h1>Join a passionate community of builders and creators.💝</h1><p>CONNECT Connect in real-time, exchange tips and make new friends.🤼P</p></div>
+    <div><h1>Join a passionate community of builders and creators.</h1><p>onnect in real-time, exchange tips and make new friends.P</p></div>
     <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸New Story</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ New post</button><button class="quick-btn" onclick="page('friends')">👥 Explore</button></div>
   </div>
 
@@ -455,7 +446,7 @@ main{padding:18px 22px 28px!important}
         <div class="media-actions"><button class="secondary" onclick="document.getElementById('postImageInput').click()">🖼️ Photo</button><button class="secondary" onclick="document.getElementById('postVideoInput').click()">📹 Video</button><button class="secondary" onclick="document.getElementById('postAudioInput').click()">🎵 Audio</button></div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px"><span id="postImagePill" class="file-pill hidden"></span><span id="postVideoPill" class="file-pill hidden"></span><span id="postAudioPill" class="file-pill hidden"></span></div>
         <input id="postImageInput" type="file" accept="image/*" class="hidden" onchange="previewPostFile('image')"><input id="postVideoInput" type="file" accept="video/*" class="hidden" onchange="previewPostFile('video')"><input id="postAudioInput" type="file" accept="audio/*" class="hidden" onchange="previewPostFile('audio')">
-        <button class="primary publish-wide" onclick="createPost()">Post (+10 XP)</button><div id="postStatus" class="status"></div>
+        <button class="primary publish-wide" onclick="createPost()">Post</button><div id="postStatus" class="status"></div>
       </div>
       <div class="rail-card"><div class="rail-title">👥 Recommend to follow </div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
     </div>
@@ -804,7 +795,7 @@ async function loadProfile(){
     const fallback = {
       id: currentUser.id,
       username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
-      avatar: currentUser.user_metadata?.avatar || (authGuest ? "🎮" : "👾"),
+      avatar: currentUser.user_metadata?.avatar || (authGuest ? "👤" : "👤"),
       xp: 0,
       is_verified: false,
       is_guest: authGuest
@@ -1331,7 +1322,7 @@ async function viewPost(postId){
       ${post.video_url ? `<video src="${esc(post.video_url)}" controls autoplay preload="metadata" class="post-view-media"></video>` : ''}
       ${post.audio_url ? `<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>` : ''}
       <div class="post-view-footer">
-        <button class="post-action-btn share" onclick="sharePost('${post.id}')">↗️ SHARE POST</button>
+        <button class="post-action-btn share" onclick="sharePost('${post.id}')">↗️ Share post</button>
         <button class="post-action-btn view" onclick="closePostView()">← BACK TO FEED</button>
       </div>
     `;
@@ -1590,6 +1581,10 @@ async function loadFeed(forceRender = false) {
             <button class="post-action-btn view" onclick="viewPost('${p.id}')">👁️ VIEW</button>
             <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
             <span id="postViews_${p.id}" class="post-view-count">👁️ ${getPostViewCount('${p.id}')} VIEWS</span>
+            <button class="post-action-btn Like" onclick="like('${p.id}')">👍Like</button>
+            <button class="post-action-btn Comment" onclick="Comment('${p.id}')">💬Comment</button>
+            <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
+            <button class="post-action-btn Save" onclick="Save('${p.id}')">Save</button>
           </div>
 
           <div class="comment-section">
