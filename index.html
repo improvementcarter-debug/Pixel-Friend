@@ -3295,12 +3295,69 @@ restoreSession();
 })();
 </script>
 
+
+<style id="pf-image-display-fix">
+/* Robust image display: works with public OR private Supabase Storage buckets. */
+.post-media-img,.msg-media-img,.clickable-media,.profile-cover img,.public-profile-cover img,.public-profile-post img{
+  display:block!important;opacity:1!important;visibility:visible!important;
+}
+.pf-image-loading{opacity:.45!important;filter:blur(2px)}
+.pf-image-broken{min-height:120px;display:grid!important;place-items:center;background:#0a1424!important;color:#8fa4c2!important;border:1px dashed #365174!important;font-size:13px!important;text-align:center;padding:18px}
+.pf-media-modal #pfMediaContent{width:100%;height:100%;display:grid;place-items:center}
+.pf-media-modal #pfMediaContent img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:block}
+</style>
+<script>
+/* Resolve Supabase Storage URLs for display, including private buckets. */
+async function pfResolveStorageImage(img){
+  if(!img || img.dataset.pfResolved==='1' || img.dataset.pfTrying==='1') return;
+  const src=img.currentSrc || img.src || '';
+  if(!src || !src.includes('/storage/v1/object/')) return;
+  const marker='/storage/v1/object/';
+  const idx=src.indexOf(marker);
+  if(idx<0)return;
+  let rest=src.slice(idx+marker.length);
+  rest=rest.replace(/^sign\//,'').replace(/^public\//,'');
+  const parts=rest.split('/');
+  if(parts.length<2)return;
+  const kind=parts.shift();
+  const bucket=decodeURIComponent(parts.shift());
+  const path=parts.map(x=>decodeURIComponent(x)).join('/');
+  if(!bucket || !path)return;
+  img.dataset.pfTrying='1';
+  try{
+    const {data,error}=await sb.storage.from(bucket).createSignedUrl(path,3600);
+    if(!error && data?.signedUrl && data.signedUrl!==src){
+      img.src=data.signedUrl;
+      img.dataset.pfResolved='1';
+      img.classList.remove('pf-image-loading');
+      return;
+    }
+  }catch(e){}
+  img.dataset.pfTrying='0';
+  img.classList.add('pf-image-broken');
+  img.alt='Image could not be displayed. Check Supabase Storage access.';
+  img.title='Image could not be displayed. Check Supabase Storage access.';
+}
+function pfPrepareImage(img){
+  if(!img || img.dataset.pfBound==='1')return;
+  img.dataset.pfBound='1';
+  img.classList.add('pf-image-loading');
+  img.addEventListener('load',()=>{img.classList.remove('pf-image-loading','pf-image-broken');img.dataset.pfLoaded='1';},{once:false});
+  img.addEventListener('error',()=>pfResolveStorageImage(img),{once:false});
+}
+function pfBindAllImages(root=document){
+  root.querySelectorAll('img[src]').forEach(pfPrepareImage);
+}
+document.addEventListener('DOMContentLoaded',()=>{pfBindAllImages();});
+new MutationObserver(muts=>{for(const m of muts){for(const n of m.addedNodes){if(n.nodeType===1){if(n.matches?.('img[src]'))pfPrepareImage(n);pfBindAllImages(n);}}}}).observe(document.documentElement,{childList:true,subtree:true});
+</script>
+
 <style>
 .clickable-media{cursor:zoom-in}.pf-file-download{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px 12px;border:1px solid #4ea1ff;background:#0a1628;color:#dcecff;text-decoration:none;border-radius:8px}.pf-file-download span{margin-left:auto;font-size:11px;color:#65caff}.pf-media-modal{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);display:grid;place-items:center;padding:20px}.pf-media-modal .pf-media-box{width:min(1200px,96vw);height:min(92vh,900px);position:relative;display:grid;place-items:center}.pf-media-modal img,.pf-media-modal video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}.pf-media-close{position:absolute;top:-4px;right:-4px;z-index:2;width:46px;height:46px;font-size:20px}.pf-media-hint{position:absolute;bottom:-28px;color:#9fb6d3;font-size:14px}
 </style>
 <div id="pfMediaModal" class="pf-media-modal hidden" onclick="if(event.target===this)closeMediaFullscreen()"><div class="pf-media-box"><button class="secondary pf-media-close" onclick="closeMediaFullscreen()">✕</button><div id="pfMediaContent"></div><div class="pf-media-hint">IMAGE: click to view full • VIDEO: double-click to view full</div></div></div>
 <script>
-function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(!m||!c)return;c.innerHTML=type==='video'?`<video src="${url}" controls autoplay></video>`:`<img src="${url}">`;m.classList.remove('hidden');document.body.style.overflow='hidden';}
+function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(!m||!c||!url)return;c.innerHTML=type==='video'?`<video src="${url}" controls autoplay></video>`:`<img src="${url}" alt="Full size image">`;m.classList.remove('hidden');document.body.style.overflow='hidden';const media=c.querySelector('img');if(media)pfPrepareImage(media);}
 function closeMediaFullscreen(){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(m)m.classList.add('hidden');if(c)c.innerHTML='';document.body.style.overflow='';}
 window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=closeMediaFullscreen;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMediaFullscreen();});
 
