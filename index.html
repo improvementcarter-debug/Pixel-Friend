@@ -1538,8 +1538,9 @@ async function loadFeed(forceRender = false) {
       const postReactions = (reactions || []).filter(r => r.post_id === p.id);
       const postComments = (comments || []).filter(c => c.post_id === p.id);
 
-      const counts = { '👍': 0, '❤️': 0, '🔥': 0, '👾': 0 };
-      const userReacted = { '👍': false, '❤️': false, '🔥': false, '👾': false };
+      const counts = { '👍': 0 };
+      const userReacted = { '👍': false };
+      
 
       postReactions.forEach(r => {
         if(counts[r.emoji] !== undefined) counts[r.emoji]++;
