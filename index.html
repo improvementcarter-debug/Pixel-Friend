@@ -1570,10 +1570,7 @@ async function loadFeed(forceRender = false) {
 
           <div class="post-actions">
             <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
-            <button class="react-btn ${userReacted['❤️'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '❤️')">❤️ ${counts['❤️']}</button>
-            <button class="react-btn ${userReacted['🔥'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '🔥')">🔥 ${counts['🔥']}</button>
-            <button class="react-btn ${userReacted['👾'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👾')">👾 ${counts['👾']}</button>
-            ${p.user_id === currentUser.id ? `
+                      ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
           </div>
