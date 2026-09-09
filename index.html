@@ -435,10 +435,11 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">CONNECT • SHARE • CHAT • LEVEL UP</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">LOGIN</button>      <button id="regTab" onclick="authTab('register')">REGISTER</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="EMAIL">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">ENTER PIXEL WORLD</button><button class="secondary auth-guest" onclick="guestLogin()">👤 CONTINUE AS GUEST</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
-<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <input id="globalSearch" placeholder="Search friends..." oninput="searchUsers(true)">        <div class="notification-wrap">
+<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <div id="pfLiveDateTime" class="pf-live-datetime" aria-live="polite">--</div>        <input id="globalSearch" placeholder="Search friends..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">📢<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
       <div id="notificationPanel" class="notification-panel hidden">
         <div class="notification-panel-head"><strong>📢 NOTIFICATIONS</strong><button class="notification-clear" onclick="markAllNotificationsRead(event)">MARK READ</button></div>
+        <div id="notificationFilters" class="pf-notification-filters"><button class="active" onclick="setNotificationFilter('all',this)">All</button><button onclick="setNotificationFilter('message',this)">💬 Messages</button><button onclick="setNotificationFilter('image',this)">🖼️ Images</button><button onclick="setNotificationFilter('video',this)">📹 Videos</button><button onclick="setNotificationFilter('audio',this)">🎤 Voice</button><button onclick="setNotificationFilter('sticker',this)">🎟️ Stickers</button></div>
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👤</button>    </div></header>
@@ -474,7 +475,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
       <div class="rail-card"><div class="rail-title">👥 Recommend to follow </div><div id="followMiniList" class="follow-list"><div class="tiny">Loading community...</div></div></div>
     </div>
     <div class="home-center">
-      <div class="card feed-shell"><div class="feed-tabs"><button class="active">All post</button><button>Following</button><button>Friends</button><span class="filter">⚱</span></div><div id="feed"></div></div>
+      <div class="card feed-shell"><div class="feed-tabs"><button id="feedTabAll" class="active" onclick="setFeedFilter('all',this)">All post</button><button id="feedTabFollowing" onclick="setFeedFilter('following',this)">Following</button><button id="feedTabFriends" onclick="setFeedFilter('friends',this)">Friends</button><span class="filter">⚱</span></div><div id="feedFilterHint" class="tiny pf-feed-filter-hint">Showing all community posts</div><div id="feed"></div></div>
     </div>
     <aside class="home-right">
       <div class="rail-card"><div class="rail-title">🏅 Level progress</div><div class="level-hero"><div class="level-orb">🏅</div><div style="flex:1"><strong>LEVEL <span id="railLevel">1</span></strong><div class="rail-xp"><span id="railXpBar"></span></div><div class="tiny"><span id="railXpText">0 / 100 XP</span></div></div></div></div>
@@ -658,6 +659,18 @@ function playRetroSound(type = 'click') {
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
       osc.start(now);
       osc.stop(now + 0.38);
+    } else if (type === 'image') {
+      osc.type='sine'; osc.frequency.setValueAtTime(660,now); osc.frequency.setValueAtTime(990,now+0.08); osc.frequency.setValueAtTime(1320,now+0.16);
+      gain.gain.setValueAtTime(0.13,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.34); osc.start(now); osc.stop(now+0.34);
+    } else if (type === 'video') {
+      osc.type='square'; osc.frequency.setValueAtTime(520,now); osc.frequency.setValueAtTime(780,now+0.10); osc.frequency.setValueAtTime(1040,now+0.20);
+      gain.gain.setValueAtTime(0.10,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.38); osc.start(now); osc.stop(now+0.38);
+    } else if (type === 'voice') {
+      osc.type='triangle'; osc.frequency.setValueAtTime(440,now); osc.frequency.setValueAtTime(660,now+0.12); osc.frequency.setValueAtTime(440,now+0.24);
+      gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.42); osc.start(now); osc.stop(now+0.42);
+    } else if (type === 'sticker') {
+      osc.type='sine'; osc.frequency.setValueAtTime(740,now); osc.frequency.setValueAtTime(1110,now+0.07); osc.frequency.setValueAtTime(1480,now+0.14);
+      gain.gain.setValueAtTime(0.11,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.30); osc.start(now); osc.stop(now+0.30);
     } else if (type === 'success') {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(440, now);
@@ -1053,6 +1066,27 @@ function renderNotificationBadge(count){
   badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
 }
 
+let activeNotificationFilter = 'all';
+function notificationType(message){
+  if(message?.video_url) return 'video';
+  if(message?.image_url) return 'image';
+  if(message?.audio_url) return 'audio';
+  if(message?.sticker) return 'sticker';
+  return 'message';
+}
+function notificationTypeLabel(type){ return ({message:'MESSAGE',image:'IMAGE',video:'VIDEO',audio:'VOICE',sticker:'STICKER'})[type] || 'NOTICE'; }
+function notificationSoundType(message){
+  const type=notificationType(message);
+  return ({message:'message',image:'image',video:'video',audio:'voice',sticker:'sticker'})[type] || 'notification';
+}
+function setNotificationFilter(filter, btn){
+  activeNotificationFilter=['all','message','image','video','audio','sticker'].includes(filter)?filter:'all';
+  document.querySelectorAll('#notificationFilters button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderNotificationList();
+}
+window.setNotificationFilter=setNotificationFilter;
+
 function notificationDetail(message){
   const text = (message?.content || '').trim();
   if(text) return text;
@@ -1075,14 +1109,14 @@ function notificationIcon(message){
 function renderNotificationList(){
   const list = $("notificationList");
   if(!list) return;
-  const rows = Array.from(notificationItems.values()).sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)).slice(0,50);
+  const rows = Array.from(notificationItems.values()).filter(n => activeNotificationFilter === 'all' || notificationType(n) === activeNotificationFilter).sort((a,b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)).slice(0,50);
   if(!rows.length){ list.innerHTML = '<div class="notification-empty">NO NEW NOTIFICATIONS</div>'; return; }
   list.innerHTML = rows.map(n => `
     <div class="notification-item ${n.unread ? 'unread' : ''}" onclick="openNotification('${esc(String(n.id))}','${esc(String(n.sender_id))}','${esc(n.senderName || 'PIXEL USER')}')">
       <div class="notification-item-icon">${notificationIcon(n)}</div>
       <div class="notification-item-body">
         <div class="notification-item-title">${esc(n.senderName || 'PIXEL USER')}</div>
-        <div class="notification-item-text">${esc(notificationDetail(n))}</div>
+        <div class="notification-item-text">${esc(notificationDetail(n))}<span class="notification-item-type">${notificationTypeLabel(notificationType(n))}</span></div>
         <div class="notification-item-time">${n.created_at ? new Date(n.created_at).toLocaleString() : 'Just now'}</div>
       </div>
     </div>`).join('');
@@ -1153,7 +1187,7 @@ function notifyIncomingMessage(message){
   renderNotificationBadge(localUnreadCount + 1);
   addNotificationItem(message, senderName, true);
   showTelegramNotification(message, senderName, senderAvatar);
-  playRetroSound('notification');
+  playRetroSound(notificationSoundType(message));
 
   if('Notification' in window && Notification.permission === 'granted'){
     try{
@@ -1403,7 +1437,7 @@ async function viewPost(postId){
         </div>
       </div>
       ${post.content ? `<div class="post-view-text">${esc(post.content)}</div>` : ''}
-      ${post.image_url ? `<img src="${esc(post.image_url)}" class="post-view-media" loading="lazy" decoding="async">` : ''}
+      ${post.image_url ? `<img src="${esc(post.image_url)}" class="post-view-media clickable-media" loading="lazy" decoding="async" onclick="openMediaFullscreen('${esc(post.image_url)}','image')">` : ''}
       ${post.video_url ? `<video src="${esc(post.video_url)}" controls autoplay preload="metadata" class="post-view-media"></video>` : ''}
       ${post.audio_url ? `<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>` : ''}
       <div class="post-view-footer">
@@ -1566,6 +1600,19 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){closePostView();closePublicProfile();}
 });
 
+let activeFeedFilter = 'all';
+
+function setFeedFilter(filter, btn){
+  activeFeedFilter = ['all','following','friends'].includes(filter) ? filter : 'all';
+  document.querySelectorAll('.feed-tabs button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const hint = $('feedFilterHint');
+  if(hint) hint.textContent = activeFeedFilter === 'following' ? 'Showing posts from people you follow' : activeFeedFilter === 'friends' ? 'Showing posts from mutual friends' : 'Showing all community posts';
+  feedRenderSignature = '';
+  loadFeed(true);
+}
+window.setFeedFilter = setFeedFilter;
+
 async function loadFeed(forceRender = false) {
   if (feedLoadInFlight) return;
   feedLoadInFlight = true;
@@ -1597,10 +1644,20 @@ async function loadFeed(forceRender = false) {
     if(reactionsError) console.warn("Feed reactions error:", reactionsError.message);
     if(commentsError) console.warn("Feed comments error:", commentsError.message);
 
+    const followingSet = new Set(Array.from(followingIds || []).map(String));
+    const friendsSet = new Set();
+    if(typeof followBackIds !== 'undefined') (followBackIds || new Set()).forEach(id => { if(followingSet.has(String(id))) friendsSet.add(String(id)); });
+    const visiblePosts = (posts || []).filter(p => {
+      const uid = String(p.user_id || '');
+      if(activeFeedFilter === 'following') return followingSet.has(uid) || uid === String(currentUser?.id || '');
+      if(activeFeedFilter === 'friends') return friendsSet.has(uid) || uid === String(currentUser?.id || '');
+      return true;
+    });
+
     // Build a stable signature. The page is only re-rendered when something
     // actually changes, so users can type comments without the input being reset.
     const signature = JSON.stringify({
-      posts: posts.map(p => ({
+      posts: visiblePosts.map(p => ({
         id:p.id, content:p.content, created_at:p.created_at,
         user_id:p.user_id, image_url:p.image_url, video_url:p.video_url, audio_url:p.audio_url
       })),
@@ -1614,7 +1671,12 @@ async function loadFeed(forceRender = false) {
     if(!forceRender && signature === feedRenderSignature) return;
     feedRenderSignature = signature;
 
-    $("feed").innerHTML = posts.map(p => {
+    if(!visiblePosts.length){
+      const label = activeFeedFilter === 'following' ? 'FOLLOW SOMEONE TO SEE THEIR POSTS HERE' : activeFeedFilter === 'friends' ? 'NO MUTUAL-FRIEND POSTS YET' : 'NO POSTS YET';
+      $("feed").innerHTML = `<div class="empty" style="padding:35px 15px;text-align:center">${label}</div>`;
+      return;
+    }
+    $("feed").innerHTML = visiblePosts.map(p => {
       const u = p.profiles || {};
       const verified = u.is_verified ? ' ✅' : '';
       const userTypeBadge = accountBadge(u, true);
@@ -2269,7 +2331,7 @@ async function openPublicProfile(userId){
       <div class="public-profile-posts"><div class="public-profile-posts-title">Post history (${posts.length})</div>
       ${posts.length?posts.map(post=>`<article class="public-profile-post"><div class="public-profile-post-time">${new Date(post.created_at).toLocaleString()}</div>
         ${post.content?`<div style="white-space:pre-wrap;word-break:break-word">${linkify(post.content)}</div>`:''}
-        ${post.image_url?`<img src="${esc(post.image_url)}" loading="lazy" alt="Post image">`:''}
+        ${post.image_url?`<img src="${esc(post.image_url)}" class="clickable-media" loading="lazy" alt="Post image" onclick="openMediaFullscreen('${esc(post.image_url)}','image')">`:''}
         ${post.video_url?`<video src="${esc(post.video_url)}" controls preload="metadata"></video>`:''}
         ${post.audio_url?`<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>`:''}</article>`).join(''):'<div class="public-profile-empty">This user has no posts yet.</div>'}
       </div>`;
@@ -3254,4 +3316,26 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
   </div>
 </footer>
      </script>
-</body></html>
+<style id="pf-v3-upgrades">
+.pf-live-datetime{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;color:#dcecff;background:#0c1728;border:1px solid #2d4669;padding:7px 9px;border-radius:3px;white-space:nowrap;min-width:190px;text-align:center}
+.pf-feed-filter-hint{padding:8px 12px 0;text-align:center}
+.pf-notification-filters{display:flex;gap:5px;flex-wrap:wrap;padding:8px;border-bottom:1px solid #1c2c47;background:#0a1322}
+.pf-notification-filters button{border:1px solid #2b3d5d;background:#101d31;color:#cfe1fa;padding:5px 7px;font-size:11px;border-radius:3px;cursor:pointer}
+.pf-notification-filters button.active{background:#24548a;border-color:#4ea1ff;color:#fff}
+.notification-item-type{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid #35517a;border-radius:3px;font-size:10px;color:#9fc8ff;text-transform:uppercase}
+@media(max-width:850px){.pf-live-datetime{min-width:auto;font-size:10px;padding:6px}.actions input{width:150px!important}}
+@media(max-width:600px){.pf-live-datetime{display:none}.pf-notification-filters{overflow-x:auto;flex-wrap:nowrap}.pf-notification-filters button{white-space:nowrap}}
+</style><script id="pf-live-datetime">
+(function(){
+  const el=document.getElementById('pfLiveDateTime');
+  const yearEl=document.getElementById('current-year');
+  function update(){
+    const now=new Date();
+    if(el){
+      el.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Phnom_Penh',weekday:'short',year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now)+' GMT+7';
+    }
+    if(yearEl) yearEl.textContent=String(now.getFullYear());
+  }
+  update(); setInterval(update,1000);
+})();
+</script></body></html>
