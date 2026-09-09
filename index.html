@@ -431,6 +431,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 .summary-value{font-family:var(--pf-font-ui)!important;letter-spacing:0!important}.invite-link{font-family:var(--pf-font-mono)!important}
 .tiny{font-size:13px!important;line-height:1.45!important}.post-view-text{font-size:17px!important;line-height:1.55!important}.message{font-size:15px!important}.story-text{font-size:24px!important}
 </style><style id="pf-profile-message-separation">
+.profile-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.profile-edit-grid select{margin-bottom:0}.clickable-media{cursor:zoom-in}.profile-avatar-wrap .profile-large-avatar,.profile-cover img,.public-profile-avatar img,.public-profile-cover img{cursor:zoom-in}@media(max-width:600px){.profile-edit-grid{grid-template-columns:1fr}}
 .profile-details-card{margin-top:16px;padding:18px;border:1px solid #2b4266;border-radius:14px;background:linear-gradient(145deg,rgba(12,24,44,.94),rgba(6,13,27,.92))}
 .profile-details-title{font-family:"Press Start 2P",monospace;font-size:12px;color:#dce8ff;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid #263d5f}
 .profile-details-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.profile-detail{padding:12px;border:1px solid #213957;border-radius:10px;background:rgba(5,13,27,.68);min-width:0}.profile-detail span{display:block;color:#8292b3;font-size:13px;margin-bottom:5px}.profile-detail strong{display:block;color:#f0f7ff;overflow-wrap:anywhere}.profile-verified{color:var(--cyan)!important}.profile-online{color:var(--green)!important}.profile-offline{color:#9aa8bd!important}
@@ -545,6 +546,10 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
       <h2 style="margin-top:0">Edit profile</h2>
       <label class="tiny" style="display:block;margin-bottom:4px">USERNAME</label><input id="editUsernameInput" placeholder="Enter username...">
       <label class="tiny" style="display:block;margin-bottom:4px">BIO DESCRIPTION</label><textarea id="editBioInput" placeholder="Tell people about yourself..." style="min-height:90px;margin-bottom:12px"></textarea>
+      <div class="profile-edit-grid">
+        <div><label class="tiny" style="display:block;margin-bottom:4px">GENDER</label><select id="editGenderInput"><option value="">Not set</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option><option value="Prefer not to say">Prefer not to say</option></select></div>
+        <div><label class="tiny" style="display:block;margin-bottom:4px">STATUS</label><select id="editStatusInput"><option value="Active">Active</option><option value="Away">Away</option><option value="Busy">Busy</option><option value="Offline">Offline</option></select></div>
+      </div>
       <button class="primary" style="width:100%" onclick="saveProfileInfo()">💾 Save profile details</button>
     </div>
     <div class="profile-media-manager">
@@ -888,8 +893,8 @@ async function claimDailyBonus(){
 window.claimDailyBonus=claimDailyBonus;
 
 function formatPfDate(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}
-function renderProfileDetails(profile){if(!profile)return;const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};const verified=profile.is_verified===true,online=onlineUserIds.has(String(profile.id));set('profileIdentity',isGuestProfile(profile)?'Guest':'Member');set('profileVerification',verified?'✓ Verified':'Not Verified');set('profileGender',profile.gender||'Not set');set('profileUserId',profile.id||'—');set('profileStatus',online?'Online':'Offline');set('profileJoinDate',formatPfDate(profile.join_date||profile.created_at));const ve=$('profileVerification'),st=$('profileStatus');if(ve)ve.className=verified?'profile-verified':'';if(st)st.className=online?'profile-online':'profile-offline';}
-function renderPublicProfileDetails(u){const verified=u.is_verified===true,online=onlineUserIds.has(String(u.id));return `<div class="public-profile-details"><div class="public-profile-detail"><span>Identity</span><strong>${esc(isGuestProfile(u)?'Guest':'Member')}</strong></div><div class="public-profile-detail"><span>Verification</span><strong class="${verified?'profile-verified':''}">${verified?'✓ Verified':'Not Verified'}</strong></div><div class="public-profile-detail"><span>Gender</span><strong>${esc(u.gender||'Not set')}</strong></div><div class="public-profile-detail"><span>ID</span><strong>${esc(u.id||'—')}</strong></div><div class="public-profile-detail"><span>Status</span><strong class="${online?'profile-online':'profile-offline'}">${online?'Online':'Offline'}</strong></div><div class="public-profile-detail"><span>Join Date</span><strong>${esc(formatPfDate(u.join_date||u.created_at))}</strong></div></div>`;}
+function renderProfileDetails(profile){if(!profile)return;const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};const verified=profile.is_verified===true,online=onlineUserIds.has(String(profile.id));set('profileIdentity',isGuestProfile(profile)?'Guest':'Member');set('profileVerification',verified?'✓ Verified':'Not Verified');set('profileGender',profile.gender||'Not set');set('profileUserId',profile.id||'—');set('profileStatus',profile.status || (online?'Online':'Offline'));set('profileJoinDate',formatPfDate(profile.join_date||profile.created_at));const ve=$('profileVerification'),st=$('profileStatus');if(ve)ve.className=verified?'profile-verified':'';if(st)st.className=online?'profile-online':'profile-offline';}
+function renderPublicProfileDetails(u){const verified=u.is_verified===true,online=onlineUserIds.has(String(u.id));return `<div class="public-profile-details"><div class="public-profile-detail"><span>Identity</span><strong>${esc(isGuestProfile(u)?'Guest':'Member')}</strong></div><div class="public-profile-detail"><span>Verification</span><strong class="${verified?'profile-verified':''}">${verified?'✓ Verified':'Not Verified'}</strong></div><div class="public-profile-detail"><span>Gender</span><strong>${esc(u.gender||'Not set')}</strong></div><div class="public-profile-detail"><span>ID</span><strong>${esc(u.id||'—')}</strong></div><div class="public-profile-detail"><span>Status</span><strong class="${online?'profile-online':'profile-offline'}">${esc(u.status || (online?'Online':'Offline'))}</strong></div><div class="public-profile-detail"><span>Join Date</span><strong>${esc(formatPfDate(u.join_date||u.created_at))}</strong></div></div>`;}
 function pfPinnedKey(){return 'pf_pinned_chats_'+String(currentUser?.id||'guest');}
 function getPinnedChats(){try{return new Set(JSON.parse(localStorage.getItem(pfPinnedKey())||'[]').map(String));}catch(e){return new Set();}}
 function togglePinnedChat(id){const set=getPinnedChats(),k=String(id);if(set.has(k))set.delete(k);else set.add(k);localStorage.setItem(pfPinnedKey(),JSON.stringify([...set]));loadMessageUsers();}
@@ -932,6 +937,8 @@ async function loadProfile(){
   document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
+  if($("editGenderInput")) $("editGenderInput").value = currentProfile.gender || "";
+  if($("editStatusInput")) $("editStatusInput").value = currentProfile.status || "Active";
   $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
   $("statXP").textContent = currentProfile.xp || 0;
   renderAvatarDisplay();
@@ -942,7 +949,7 @@ async function loadProfile(){
 
 function renderAvatarDisplay(){
   const html = currentProfile.avatar_url
-    ? `<img src="${esc(currentProfile.avatar_url)}"><span class="online"></span>`
+    ? `<img src="${esc(currentProfile.avatar_url)}" class="clickable-media" onclick="openMediaFullscreen('${esc(currentProfile.avatar_url)}','image')"><span class="online"></span>`
     : `${esc(currentProfile.avatar||"👾")}<span class="online"></span>`;
   $("sideAvatar").innerHTML = html;
   $("profileAvatar").innerHTML = html;
@@ -954,11 +961,15 @@ function renderAvatarDisplay(){
 async function saveProfileInfo(){
   const username = $("editUsernameInput").value.trim();
   const bio = $("editBioInput").value.trim();
+  const gender = $("editGenderInput")?.value || "";
+  const status = $("editStatusInput")?.value || "Active";
   if(!username) return toast("Username cannot be empty");
-  const r = await sb.from("profiles").update({ username, bio }).eq("id", currentUser.id);
+  const r = await sb.from("profiles").update({ username, bio, gender: gender || null, status }).eq("id", currentUser.id);
   if(r.error) return toast("❌ Error updating profile: " + r.error.message);
   currentProfile.username = username;
   currentProfile.bio = bio;
+  currentProfile.gender = gender || null;
+  currentProfile.status = status;
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = username + verifiedBadge;
   $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
@@ -1011,7 +1022,7 @@ window.uploadCover=uploadCover;
 function renderProfileCover(){
   const img=$("profileCoverImage"),ph=$("profileCoverPlaceholder"); if(!img||!ph)return;
   const url=currentProfile?.cover_url;
-  if(url){img.src=url;img.classList.remove("hidden");ph.classList.add("hidden")}
+  if(url){img.src=url;img.classList.remove("hidden");img.onclick=()=>openMediaFullscreen(url,'image');ph.classList.add("hidden")}
   else{img.removeAttribute("src");img.classList.add("hidden");ph.classList.remove("hidden")}
 }
 window.renderProfileCover=renderProfileCover;
@@ -1744,7 +1755,7 @@ async function loadFeed(forceRender = false) {
           </div>
           <div style="word-break:break-word">${linkify(p.content)}</div>
           ${p.image_url ? `<img src="${esc(p.image_url)}" class="post-media-img clickable-media" loading="lazy" decoding="async" onclick="openMediaFullscreen('${esc(p.image_url)}','image')">` : ''}
-          ${p.video_url ? `<video src="${esc(p.video_url)}" controls preload="metadata" class="post-media-img clickable-media" ondblclick="openMediaFullscreen('${esc(p.video_url)}','video')"></video>` : ''}
+          ${p.video_url ? `<video src="${esc(p.video_url)}" controls preload="metadata" class="post-media-img clickable-media" onclick="openMediaFullscreen('${esc(p.video_url)}','video')"></video>` : ''}
           ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
 
           <div class="post-actions">
@@ -2348,8 +2359,8 @@ async function openPublicProfile(userId){
     ]);
     if(pr.error)throw pr.error;if(ps.error)throw ps.error;if(!pr.data)throw new Error("User profile not found.");
     const u=pr.data,posts=ps.data||[],isMe=String(userId)===String(currentUser?.id);
-    const avatar=u.avatar_url?`<img src="${esc(u.avatar_url)}" alt="${esc(u.username||'User')}">`:esc(u.avatar||"👤");
-    const cover=u.cover_url?`<img src="${esc(u.cover_url)}" alt="Cover photo">`:`<div class="no-cover">NO COVER PHOTO</div>`;
+    const avatar=u.avatar_url?`<img src="${esc(u.avatar_url)}" class="clickable-media" alt="${esc(u.username||'User')}" onclick="openMediaFullscreen('${esc(u.avatar_url)}','image')">`:esc(u.avatar||"👤");
+    const cover=u.cover_url?`<img src="${esc(u.cover_url)}" class="clickable-media" alt="Cover photo" onclick="openMediaFullscreen('${esc(u.cover_url)}','image')">`:`<div class="no-cover">NO COVER PHOTO</div>`;
     box.innerHTML=`
       <div class="public-profile-cover">${cover}</div>
       <div class="public-profile-summary"><div class="public-profile-avatar">${avatar}</div>
@@ -2365,7 +2376,7 @@ async function openPublicProfile(userId){
       ${posts.length?posts.map(post=>`<article class="public-profile-post"><div class="public-profile-post-time">${new Date(post.created_at).toLocaleString()}</div>
         ${post.content?`<div style="white-space:pre-wrap;word-break:break-word">${linkify(post.content)}</div>`:''}
         ${post.image_url?`<img src="${esc(post.image_url)}" class="clickable-media" loading="lazy" alt="Post image" onclick="openMediaFullscreen('${esc(post.image_url)}','image')">`:''}
-        ${post.video_url?`<video src="${esc(post.video_url)}" controls preload="metadata"></video>`:''}
+        ${post.video_url?`<video src="${esc(post.video_url)}" controls preload="metadata" class="clickable-media" onclick="openMediaFullscreen('${esc(post.video_url)}','video')"></video>`:''}
         ${post.audio_url?`<audio src="${esc(post.audio_url)}" controls class="post-audio"></audio>`:''}</article>`).join(''):'<div class="public-profile-empty">This user has no posts yet.</div>'}
       </div>`;
     renderFollowButtons();
@@ -2579,7 +2590,7 @@ async function loadMessages() {
           ${replyPreview}
           ${body}
           ${m.image_url ? `<img src="${esc(m.image_url)}" class="msg-media-img clickable-media" onclick="openMediaFullscreen('${esc(m.image_url)}','image')">` : ''}
-          ${m.video_url ? `<video src="${esc(m.video_url)}" controls class="msg-media-video clickable-media" ondblclick="openMediaFullscreen('${esc(m.video_url)}','video')"></video>` : ''}
+          ${m.video_url ? `<video src="${esc(m.video_url)}" controls class="msg-media-video clickable-media" onclick="openMediaFullscreen('${esc(m.video_url)}','video')"></video>` : ''}
           ${m.audio_url ? `<audio src="${esc(m.audio_url)}" controls preload="metadata" class="msg-audio"></audio>` : ''}
           ${reactionHtml ? `<div class="message-reactions">${reactionHtml}</div>` : ''}
           <div class="message-tools">
@@ -3393,11 +3404,11 @@ new MutationObserver(muts=>{for(const m of muts){for(const n of m.addedNodes){if
 </script>
 
 <style>
-.clickable-media{cursor:zoom-in}.pf-file-download{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px 12px;border:1px solid #4ea1ff;background:#0a1628;color:#dcecff;text-decoration:none;border-radius:8px}.pf-file-download span{margin-left:auto;font-size:11px;color:#65caff}.pf-media-modal{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);display:grid;place-items:center;padding:20px}.pf-media-modal .pf-media-box{width:min(1200px,96vw);height:min(92vh,900px);position:relative;display:grid;place-items:center}.pf-media-modal img,.pf-media-modal video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}.pf-media-close{position:absolute;top:-4px;right:-4px;z-index:2;width:46px;height:46px;font-size:20px}.pf-media-hint{position:absolute;bottom:-28px;color:#9fb6d3;font-size:14px}
+.clickable-media{cursor:zoom-in}.pf-file-download{display:flex;align-items:center;gap:9px;margin-top:9px;padding:10px 12px;border:1px solid #4ea1ff;background:#0a1628;color:#dcecff;text-decoration:none;border-radius:8px}.pf-file-download span{margin-left:auto;font-size:11px;color:#65caff}.pf-media-modal{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.94);display:grid;place-items:center;padding:20px}.pf-media-modal .pf-media-box{width:min(1200px,96vw);height:min(92vh,900px);position:relative;display:grid;place-items:center}.pf-media-modal img,.pf-media-modal video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:8px}.pf-media-modal video{width:min(94vw,1200px);height:min(88vh,850px)}.pf-media-close{position:absolute;top:-4px;right:-4px;z-index:2;width:46px;height:46px;font-size:20px}.pf-media-hint{position:absolute;bottom:-28px;color:#9fb6d3;font-size:14px}
 </style>
 <div id="pfMediaModal" class="pf-media-modal hidden" onclick="if(event.target===this)closeMediaFullscreen()"><div class="pf-media-box"><button class="secondary pf-media-close" onclick="closeMediaFullscreen()">✕</button><div id="pfMediaContent"></div><div class="pf-media-hint">IMAGE: click to view full • VIDEO: double-click to view full</div></div></div>
 <script>
-function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(!m||!c||!url)return;c.innerHTML=type==='video'?`<video src="${url}" controls autoplay></video>`:`<img src="${url}" alt="Full size image">`;m.classList.remove('hidden');document.body.style.overflow='hidden';const media=c.querySelector('img');if(media)pfPrepareImage(media);}
+function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(!m||!c||!url)return;c.innerHTML=type==='video'?`<video src="${url}" controls autoplay playsinline></video>`:`<img src="${url}" alt="Full size image" draggable="false">`;m.classList.remove('hidden');document.body.style.overflow='hidden';const media=c.querySelector('img');if(media)pfPrepareImage(media);const vid=c.querySelector('video');if(vid){vid.focus();vid.play().catch(()=>{});}}
 function closeMediaFullscreen(){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(m)m.classList.add('hidden');if(c)c.innerHTML='';document.body.style.overflow='';}
 window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=closeMediaFullscreen;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMediaFullscreen();});
 
