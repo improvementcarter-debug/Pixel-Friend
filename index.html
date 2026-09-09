@@ -471,7 +471,7 @@ main{padding:18px 22px 28px!important}
   </div>
 </div>
 </section>
-<section id="friends" class="page">    <div class="card" style="padding:20px">        <h1>👥 PIXEL COMMUNITY</h1>        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">    </div>    <div id="searchResults" class="grid" style="margin-top:15px"></div>    <div class="card" style="padding:20px;margin-top:20px">        <h2>🤝 RECOMMENDED FRIENDS</h2>        <div id="friendsList" class="grid" style="margin-top:15px"></div>    </div></section>
+<section id="friends" class="page">    <div class="card" style="padding:20px">        <h1>👥 Community </h1>        <input id="friendSearch" placeholder="TYPE A USERNAME TO SEARCH FRIENDS..." oninput="searchUsers(false)">    </div>    <div id="searchResults" class="grid" style="margin-top:15px"></div>    <div class="card" style="padding:20px;margin-top:20px">        <h2>🤝 RECOMMENDED FRIENDS</h2>        <div id="friendsList" class="grid" style="margin-top:15px"></div>    </div></section>
 <section id="messages" class="page">    <div class="card" style="padding:20px">        <div class="messages-layout">            <div class="chat-users"><h2>💬 CHATS</h2><p class="tiny">SELECT A FRIEND TO CHAT</p><div id="messageUsers"></div></div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
         <div class="chat-input-bar">                    <div id="replyBar" class="reply-bar hidden"><span id="replyBarText"></span><button class="danger" style="padding:3px 7px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button></div>                    <div id="stickerPicker" class="sticker-picker hidden"></div>                    <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">                        <span id="chatAttachmentPill" class="file-pill"></span>                        <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>                    </div>          <div class="chat-controls" style="flex-wrap:wrap">                        <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>                        <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>                        <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>                        <button class="secondary" onclick="document.getElementById('chatFileInput').click()" title="Send File" disabled id="btnFile">📎 FILE</button>                        <button class="secondary" onclick="toggleStickerPicker()" title="Send Sticker" disabled id="btnSticker">😀</button>
@@ -489,58 +489,6 @@ main{padding:18px 22px 28px!important}
 
     <div style="background:#09101d;border:1px solid var(--border);padding:18px;border-radius:3px;text-align:center">      <h2 style="margin-top:0;margin-bottom:12px">🖼️ AVATAR MANAGEMENT</h2>      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">              <button class="secondary" onclick="document.getElementById('avatarUploadInput').click()">📷 UPLOAD NEW AVATAR</button>              <button class="danger" onclick="removeAvatar()">❌ REMOVE AVATAR</button>              <input id="avatarUploadInput" type="file" accept="image/*" class="hidden" onchange="uploadAvatar()">          </div>    </div>    </div></section>
 
-<section id="games" class="page">
-  <div class="arcade-page">
-    <div class="arcade-hero"><div><h1 class="arcade-title">👤 PIXEL-FRIEND ARCADE</h1><div class="arcade-sub">Play, beat your best score, and challenge your friends.</div></div><div class="game-switches"><button class="primary" onclick="startPetGame()">🐾 PLAY PET</button><button class="secondary" onclick="startMemoryGame()">🧠 PLAY MEMORY</button><button class="secondary" onclick="startBunnyHop()">🐰 BUNNY HOP</button></div></div>
-    <div class="game-grid">
-      <div class="game-card">
-        <h2 style="margin-top:0">🐾 FEED THE PIXEL PET</h2>
-        <div class="game-stats"><div class="game-stat">SCORE<b id="petScore">0</b></div><div class="game-stat">TIME<b id="petTimer">20</b></div><div class="game-stat">COMBO<b id="petCombo">0</b></div><div class="game-stat">BEST<b id="petBest">0</b></div></div>
-        <div class="pet-stage"><div id="petAvatar" class="pixel-pet">👤</div></div>
-        <div class="target-food">PET WANTS: <span id="desiredFood">🍪</span></div>
-        <div id="foodGrid" class="food-grid"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:20px">Press PLAY NOW to start!</div></div>
-        <div class="game-actions"><button id="petStartBtn" class="primary" onclick="startPetGame()">▶ START GAME</button><button class="secondary" onclick="sharePetScore()">↗️ SHARE SCORE</button></div>
-        <div id="petGameStatus" class="game-status tiny"></div>
-      </div>
-      <aside class="arcade-list">
-        <div class="arcade-mini"><h3>🏆 YOUR BEST</h3><p id="petBestText">Play your first game and set a high score!</p></div>
-        <div class="arcade-mini"><h3>🧠 MEMORY MATCH</h3><p>Find all 6 matching pairs before the 30-second timer reaches zero.</p></div>
-        <div class="arcade-mini"><h3>🎁 ARCADE REWARDS</h3><p>Complete a round to earn bragging rights, share your score, and challenge friends.</p></div>
-        <div class="arcade-mini"><h3>🐰 NEW: BUNNY HOP</h3><p>Jump over obstacles, survive longer, and beat your personal high score!</p></div>
-      </aside>
-    </div>
-    <div class="game-card memory-card">
-      <div class="memory-header"><div><h2 style="margin:0">🧠 PIXEL MEMORY MATCH</h2><p class="tiny" style="margin:7px 0 0">Match all the cute pairs before time runs out!</p></div><button id="memoryStartBtn" class="primary" onclick="startMemoryGame()">▶ START MEMORY GAME</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">PAIRS<b id="memoryMatches">0/6</b></div><div class="game-stat">TIME<b id="memoryTimer">30</b></div><div class="game-stat">MOVES<b id="memoryMoves">0</b></div><div class="game-stat">BEST<b id="memoryBest">—</b></div></div>
-      <div id="memoryBoard" class="memory-board"><div class="tiny" style="grid-column:1/-1;text-align:center;padding:25px">Press START MEMORY GAME to play.</div></div>
-      <div class="game-actions"><button class="secondary" onclick="shareMemoryScore()">↗️ SHARE RESULT</button></div>
-      <div id="memoryStatus" class="memory-status tiny"></div>
-    </div>
-    <div class="game-card bunny-card" id="bunnyHopGame">
-      <div class="bunny-header"><div><h2 style="margin:0">🐰 BUNNY HOP!</h2><p class="tiny" style="margin:7px 0 0">Help Pixel Friend's bunny dodge cactus obstacles and survive as the speed increases.</p></div><button id="bunnyStartBtn" class="primary" onclick="startBunnyHop()">▶ START BUNNY HOP</button></div>
-      <div class="game-stats" style="margin-top:16px"><div class="game-stat">SCORE<b id="bunnyScore">0</b></div><div class="game-stat">BEST<b id="bunnyBest">0</b></div><div class="game-stat">SPEED<b id="bunnySpeed">1.0x</b></div><div class="game-stat">STATUS<b id="bunnyLive">READY</b></div></div>
-      <div class="bunny-layout">
-        <div>
-          <div class="bunny-canvas-wrap"><canvas id="bunnyCanvas" width="640" height="300" aria-label="Bunny Hop game"></canvas></div>
-          <div class="bunny-controls">Press <b>SPACE</b>, <b>↑</b>, or tap the game arena to jump.</div>
-          <div class="game-actions"><button class="primary" onclick="startBunnyHop()">🐰 PLAY / RESTART</button><button class="secondary" onclick="shareBunnyScore()">↗️ SHARE SCORE</button></div>
-          <div id="bunnyStatus" class="bunny-status tiny">🐾 Ready to hop! Press START to play.</div>
-        </div>
-        <aside class="bunny-side">
-          <div class="bunny-tip"><h3>⚡ HOW TO PLAY</h3><p>Jump over every cactus. The game becomes faster the longer you survive.</p></div>
-          <div class="bunny-tip"><h3>🏆 HIGH SCORE</h3><p>Your best score is saved locally for your Pixel-Friend account.</p></div>
-          <div class="bunny-tip"><h3><span class="bunny-live-dot"></span>LIVE RUN</h3><p>Each obstacle passed gives points. Keep hopping and beat your best!</p></div>
-        </aside>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="worldClock" class="page">
-  <div class="world-clock-page">
-    <div class="wc-hero"><h1>🌍 GLOBAL WORLD CLOCK</h1><div class="wc-sub">Live synchronized time for Pixel-Friend community regions.</div></div>
-    <div id="pfWorldClockGrid" class="wc-grid"></div>
-  </div>
 </section>
 </main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
 <div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
