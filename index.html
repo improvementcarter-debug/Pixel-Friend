@@ -1569,7 +1569,7 @@ async function loadFeed(forceRender = false) {
           ${p.audio_url ? `<audio src="${esc(p.audio_url)}" controls class="post-audio"></audio>` : ''}
 
           <div class="post-actions">
-            <button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍')">👍 ${counts['👍']}</button>
+            <button class="react-btn ${userReacted['👍 Like'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍 Like')">👍 Like ${counts['👍 Like']}</button>
                       ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
