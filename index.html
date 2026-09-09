@@ -447,7 +447,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
-    <div><h1>Join a passionate community of builders and creators.</h1><p>onnect in real-time, exchange tips and make new friends.P</p></div>
+    <div><h1>Join a passionate community of builders and creators.</h1><p>Connect in real-time, exchange tips and make new friends.P</p></div>
     <div class="welcome-actions"><button class="quick-btn" onclick="openStoryCreator()">📸New Story</button><button class="quick-btn" onclick="document.getElementById('postText').focus()">✍️ New post</button><button class="quick-btn" onclick="page('friends')">👥 Explore</button></div>
   </div>
 
@@ -825,7 +825,7 @@ async function loadUserSummaryDashboard(){
     setSummaryValue('summaryNewRegister', newRes.error ? 0 : Number(newRes.count || 0));
     setSummaryValue('summaryOnlineUsers', onlineUserIds.size);
     setSummaryValue('summaryOfflineUsers', Math.max(0,total-onlineUserIds.size));
-    const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='UPDATED • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='Update • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
   }catch(e){
     console.warn('User summary dashboard:',e);
     refreshPresenceSummary();
