@@ -282,7 +282,7 @@ input,textarea,select{background:rgba(5,12,26,.80)!important;border-color:rgba(6
 /* ===== LIVE USER SUMMARY DASHBOARD ===== */
 .user-summary-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 18px}.summary-card{position:relative;overflow:hidden;min-height:122px;padding:16px;border:1px solid rgba(102,166,235,.34);border-radius:14px;background:linear-gradient(145deg,rgba(16,29,51,.92),rgba(8,16,31,.82));box-shadow:0 10px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(10px)}.summary-card:before{content:"";position:absolute;inset:auto -28px -40px auto;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(67,231,255,.18),transparent 68%);pointer-events:none}.summary-card.register:before{background:radial-gradient(circle,rgba(85,243,154,.18),transparent 68%)}.summary-card.login:before{background:radial-gradient(circle,rgba(155,108,255,.22),transparent 68%)}.summary-card.online:before{background:radial-gradient(circle,rgba(67,231,255,.24),transparent 68%)}.summary-card.offline:before{background:radial-gradient(circle,rgba(130,146,179,.18),transparent 68%)}.summary-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.summary-label{font-family:"Press Start 2P",monospace;font-size:10px;line-height:1.55;color:#b9c8df}.summary-icon{width:36px;height:36px;display:grid;place-items:center;border:1px solid #36547d;border-radius:10px;background:rgba(7,17,32,.78);font-size:19px}.summary-value{margin-top:12px;font-size:38px;line-height:1;font-weight:700;color:#f4f8ff;text-shadow:0 0 18px rgba(150,210,255,.20)}.summary-sub{margin-top:7px;font-size:14px;color:#8fa4c2}.summary-live{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:#75f6bb}.summary-live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pfSummaryPulse 1.4s infinite}.summary-live .offline-dot{background:#75839a;box-shadow:none}.user-summary-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-5px 0 12px;color:#7f94b3;font-size:13px}.user-summary-foot strong{color:#bcdfff;font-weight:600}@keyframes pfSummaryPulse{0%,100%{transform:scale(1);opacity:.65}50%{transform:scale(1.45);opacity:1}}@media(max-width:1050px){.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.user-summary-dashboard{grid-template-columns:1fr;gap:10px}.summary-card{min-height:106px}.summary-value{font-size:34px}}
 /* ===== COMMUNITY DASHBOARD VISUAL UPGRADE ===== */
-/* Standard card sizing prevents the ONLINE USERS card from shrinking. */
+/* Standard card sizing prevents the Online USERS card from shrinking. */
 .user-summary-dashboard{
   grid-template-columns:repeat(4,minmax(230px,1fr))!important;
   align-items:stretch!important;
@@ -466,7 +466,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👤</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 Home</button>        <button id="navFriends" onclick="page('friends',this)"> 👥 Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">Pixel explorer</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 Home</button>        <button id="navFriends" onclick="page('friends',this)"> 👥 Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -1946,7 +1946,7 @@ function isUserOnline(userId){
 
 function presenceMarkup(userId){
   const online = isUserOnline(userId);
-  return `<span class="presence-label ${online ? 'online-label' : 'offline-label'}"><span class="presence-dot ${online ? 'presence-online' : ''}"></span>${online ? 'ONLINE' : 'OFFLINE'}</span>`;
+  return `<span class="presence-label ${online ? 'online-label' : 'offline-label'}"><span class="presence-dot ${online ? 'presence-online' : ''}"></span>${online ? 'ONLINE' : 'Offline'}</span>`;
 }
 
 function refreshPresenceUI(){
@@ -2412,7 +2412,7 @@ function renderUserCard(u, options = {}){
   const following = followingIds.has(String(u.id));
   const mutual = followsDbAvailable && following && followBackIds.has(String(u.id));
   const relation = mutual ? '<div class="tiny" style="margin-top:4px">🤝 MUTUAL FRIEND</div>' :
-                   following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
+                   following ? '<div class="tiny" style="margin-top:4px">⭐ You follow this user</div>' : '';
   return `
     <div class="user-card">
       <div class="user-avatar profile-clickable" style="margin-bottom:8px" onclick="openPublicProfile('${esc(u.id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
