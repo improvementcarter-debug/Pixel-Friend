@@ -928,7 +928,19 @@ async function loadProfile(){
   if(!r.data){
     const fallback = {
       id: currentUser.id,
-      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
+      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).t
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+                                                        
+  
+                                                        
+  oUpperCase() : "PLAYER"),
       avatar: currentUser.user_metadata?.avatar || (authGuest ? "👤" : "👤"),
       xp: 0,
       is_verified: false,
@@ -952,10 +964,10 @@ async function loadProfile(){
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = currentProfile.username + verifiedBadge;
   $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("sideBio").textContent = currentProfile.bio || "Pixel explorer";
   $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
   $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("profileBioDisplay").textContent = currentProfile.bio || "Pixel explorer";
   document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
@@ -995,10 +1007,10 @@ async function saveProfileInfo(){
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = username + verifiedBadge;
   $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = bio || "PIXEL EXPLORER";
+  $("sideBio").textContent = bio || "Pixel explorer";
   $("profileNameDisplay").textContent = username + verifiedBadge;
   $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
+  $("profileBioDisplay").textContent = bio || "Pixel explorer";
   playRetroSound('success');
   toast("✅ Profile details updated!");
 }
@@ -2387,7 +2399,7 @@ async function openPublicProfile(userId){
       <div class="public-profile-cover">${cover}</div>
       <div class="public-profile-summary"><div class="public-profile-avatar">${avatar}</div>
         <div class="public-profile-info"><h1>${esc(u.username||'PIXEL USER')}${u.is_verified?' ✅':''}</h1>${accountBadge(u,true)}
-        <div class="public-profile-bio">${esc(u.bio||'Pixel Explorer')}</div></div></div>
+        <div class="public-profile-bio">${esc(u.bio||'Pixel explorer')}</div></div></div>
       ${renderPublicProfileDetails(u)}
       <div class="public-profile-actions">
         ${!isMe?`<button class="${followButtonClass(userId)} follow-action-btn" data-follow-user-id="${esc(userId)}" onclick="toggleFollow('${esc(userId)}')">${followButtonLabel(userId)}</button>
@@ -2419,7 +2431,7 @@ function renderUserCard(u, options = {}){
       <strong class="profile-clickable" onclick="openPublicProfile('${esc(u.id)}')">${esc(u.username || 'PIXEL USER')}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
       ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
       ${relation}
-      <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel Explorer")}</p>
+      <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel explorer")}</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
         <button class="${followButtonClass(u.id)} follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button>
         <button class="secondary" onclick="openChat('${esc(u.id)}', '${esc(u.username || 'PIXEL USER')}')">💬 MESSAGE</button>
