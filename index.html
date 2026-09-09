@@ -539,7 +539,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
         <div id="profileAvatar" class="avatar profile-large-avatar">👤<span class="online"></span></div>
         <button class="profile-avatar-edit" type="button" title="Change profile picture" onclick="document.getElementById('avatarUploadInput').click()">📷</button>
       </div>
-      <div class="profile-identity-text"><h1 id="profileNameDisplay">PLAYER</h1><div id="profileAccountType"></div><p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p></div>
+      <div class="profile-identity-text"><h1 id="profileNameDisplay">PLAYER</h1><div id="profileAccountType"></div><p id="profileBioDisplay" class="tiny">Pixel explorer</p></div>
     </div>
     <div class="profile-stats-grid">
       <div class="profile-stat"><span>CURRENT LEVEL</span><strong id="statLevel">1</strong></div>
@@ -899,7 +899,7 @@ async function refreshHomeDashboard(){
   try{
     const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
     const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.avatar||'👾')}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
-    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
+    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">Pixel explorer</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
   }catch(e){ console.warn('Dashboard widgets:',e); }
   const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
 }
