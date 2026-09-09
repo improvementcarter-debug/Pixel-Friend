@@ -1573,10 +1573,6 @@ async function loadFeed(forceRender = false) {
                       ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
-            <button class="💬Comment-btn ${usercomment['💬Comment'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '💬Commetn')">💬Comment ${counts['💬Comment']}</button>
-                      ${p.user_id === currentUser.id ? `
-              <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
-            ` : ''}
              <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button> </div>
              <button class="post-action-btn Save" onclick="Save('${p.id}')">Save</button> </div>
           </div>
