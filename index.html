@@ -282,7 +282,7 @@ input,textarea,select{background:rgba(5,12,26,.80)!important;border-color:rgba(6
 /* ===== LIVE USER SUMMARY DASHBOARD ===== */
 .user-summary-dashboard{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 18px}.summary-card{position:relative;overflow:hidden;min-height:122px;padding:16px;border:1px solid rgba(102,166,235,.34);border-radius:14px;background:linear-gradient(145deg,rgba(16,29,51,.92),rgba(8,16,31,.82));box-shadow:0 10px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(10px)}.summary-card:before{content:"";position:absolute;inset:auto -28px -40px auto;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(67,231,255,.18),transparent 68%);pointer-events:none}.summary-card.register:before{background:radial-gradient(circle,rgba(85,243,154,.18),transparent 68%)}.summary-card.login:before{background:radial-gradient(circle,rgba(155,108,255,.22),transparent 68%)}.summary-card.online:before{background:radial-gradient(circle,rgba(67,231,255,.24),transparent 68%)}.summary-card.offline:before{background:radial-gradient(circle,rgba(130,146,179,.18),transparent 68%)}.summary-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.summary-label{font-family:"Press Start 2P",monospace;font-size:10px;line-height:1.55;color:#b9c8df}.summary-icon{width:36px;height:36px;display:grid;place-items:center;border:1px solid #36547d;border-radius:10px;background:rgba(7,17,32,.78);font-size:19px}.summary-value{margin-top:12px;font-size:38px;line-height:1;font-weight:700;color:#f4f8ff;text-shadow:0 0 18px rgba(150,210,255,.20)}.summary-sub{margin-top:7px;font-size:14px;color:#8fa4c2}.summary-live{display:inline-flex;align-items:center;gap:6px;margin-top:7px;font-size:12px;color:#75f6bb}.summary-live i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pfSummaryPulse 1.4s infinite}.summary-live .offline-dot{background:#75839a;box-shadow:none}.user-summary-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-5px 0 12px;color:#7f94b3;font-size:13px}.user-summary-foot strong{color:#bcdfff;font-weight:600}@keyframes pfSummaryPulse{0%,100%{transform:scale(1);opacity:.65}50%{transform:scale(1.45);opacity:1}}@media(max-width:1050px){.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.user-summary-dashboard{grid-template-columns:1fr;gap:10px}.summary-card{min-height:106px}.summary-value{font-size:34px}}
 /* ===== COMMUNITY DASHBOARD VISUAL UPGRADE ===== */
-/* Standard card sizing prevents the Online USERS card from shrinking. */
+/* Standard card sizing prevents the ONLINE USERS card from shrinking. */
 .user-summary-dashboard{
   grid-template-columns:repeat(4,minmax(230px,1fr))!important;
   align-items:stretch!important;
@@ -466,7 +466,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👤</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">Pixel explorer</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 Home</button>        <button id="navFriends" onclick="page('friends',this)"> 👥 Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
+<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏢 Home</button>        <button id="navFriends" onclick="page('friends',this)">👥Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -515,7 +515,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
   <div class="message-user-section"><div class="message-section-title">📌 Pinned Chats <span id="pinnedChatCount">0</span></div><div id="pinnedMessageUsers" class="message-user-list"><div class="tiny">No pinned chats</div></div></div>
   <div class="message-user-section"><div class="message-section-title">🕘 Recent Users</div><div id="recentMessageUsers" class="message-user-list"><div class="tiny">Loading recent users...</div></div></div>
   <div class="message-user-section"><div class="message-section-title">👥 All Users</div><div id="messageUsers" class="message-user-list"></div></div>
-</div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">Online</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
+</div>            <div class="chat-main">                <div class="chat-header">                    <div><h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2></div>                    <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">ONLINE</strong></div>                </div>                        <div id="messagesList" class="messages-list"><div class="empty">👈 SELECT A FRIEND TO CHAT</div></div>                        <div id="typingIndicator" class="typing-indicator hidden">💬 Friend is typing...</div>
 
         <div class="chat-input-bar">                    <div id="replyBar" class="reply-bar hidden"><span id="replyBarText"></span><button class="danger" style="padding:3px 7px;font-size:12px" onclick="cancelReply()">✕ CANCEL</button></div>                    <div id="stickerPicker" class="sticker-picker hidden"></div>                    <div id="chatAttachmentBar" class="hidden" style="display:flex;gap:6px;align-items:center;margin-bottom:6px">                        <span id="chatAttachmentPill" class="file-pill"></span>                        <button class="danger" style="padding:2px 6px;font-size:12px" onclick="clearChatAttachment()">✕ REMOVE</button>                    </div>          <div class="chat-controls" style="flex-wrap:wrap">                        <button id="voiceRecordBtn" class="secondary" style="padding:10px 14px" onclick="toggleVoiceRecord()" disabled>🎤 VOICE</button>                        <button class="secondary" onclick="document.getElementById('chatImageInput').click()" title="Send Image" disabled id="btnImg">🖼️</button>                        <button class="secondary" onclick="document.getElementById('chatVideoInput').click()" title="Send Video" disabled id="btnVid">📹</button>                        <button class="secondary" onclick="document.getElementById('chatFileInput').click()" title="Send File" disabled id="btnFile">📎 FILE</button>                        <button class="secondary" onclick="toggleStickerPicker()" title="Send Sticker" disabled id="btnSticker">😀</button>
 
@@ -539,7 +539,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
         <div id="profileAvatar" class="avatar profile-large-avatar">👤<span class="online"></span></div>
         <button class="profile-avatar-edit" type="button" title="Change profile picture" onclick="document.getElementById('avatarUploadInput').click()">📷</button>
       </div>
-      <div class="profile-identity-text"><h1 id="profileNameDisplay">PLAYER</h1><div id="profileAccountType"></div><p id="profileBioDisplay" class="tiny">Pixel explorer</p></div>
+      <div class="profile-identity-text"><h1 id="profileNameDisplay">PLAYER</h1><div id="profileAccountType"></div><p id="profileBioDisplay" class="tiny">PIXEL EXPLORER</p></div>
     </div>
     <div class="profile-stats-grid">
       <div class="profile-stat"><span>CURRENT LEVEL</span><strong id="statLevel">1</strong></div>
@@ -899,7 +899,7 @@ async function refreshHomeDashboard(){
   try{
     const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
     const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(u.avatar||'👾')}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
-    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">Pixel explorer</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
+    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(u.avatar||'👾')}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
   }catch(e){ console.warn('Dashboard widgets:',e); }
   const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
 }
@@ -928,19 +928,7 @@ async function loadProfile(){
   if(!r.data){
     const fallback = {
       id: currentUser.id,
-      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).t
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
-                                                        
-  
-                                                        
-  oUpperCase() : "PLAYER"),
+      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
       avatar: currentUser.user_metadata?.avatar || (authGuest ? "👤" : "👤"),
       xp: 0,
       is_verified: false,
@@ -964,10 +952,10 @@ async function loadProfile(){
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = currentProfile.username + verifiedBadge;
   $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = currentProfile.bio || "Pixel explorer";
+  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
   $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
   $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = currentProfile.bio || "Pixel explorer";
+  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
   document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
   $("editUsernameInput").value = currentProfile.username || "";
   $("editBioInput").value = currentProfile.bio || "";
@@ -1007,10 +995,10 @@ async function saveProfileInfo(){
   const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
   $("sideName").textContent = username + verifiedBadge;
   $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
-  $("sideBio").textContent = bio || "Pixel explorer";
+  $("sideBio").textContent = bio || "PIXEL EXPLORER";
   $("profileNameDisplay").textContent = username + verifiedBadge;
   $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
-  $("profileBioDisplay").textContent = bio || "Pixel explorer";
+  $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
   playRetroSound('success');
   toast("✅ Profile details updated!");
 }
@@ -1958,7 +1946,7 @@ function isUserOnline(userId){
 
 function presenceMarkup(userId){
   const online = isUserOnline(userId);
-  return `<span class="presence-label ${online ? 'online-label' : 'offline-label'}"><span class="presence-dot ${online ? 'presence-online' : ''}"></span>${online ? 'ONLINE' : 'Offline'}</span>`;
+  return `<span class="presence-label ${online ? 'online-label' : 'offline-label'}"><span class="presence-dot ${online ? 'presence-online' : ''}"></span>${online ? 'ONLINE' : 'OFFLINE'}</span>`;
 }
 
 function refreshPresenceUI(){
@@ -2399,7 +2387,7 @@ async function openPublicProfile(userId){
       <div class="public-profile-cover">${cover}</div>
       <div class="public-profile-summary"><div class="public-profile-avatar">${avatar}</div>
         <div class="public-profile-info"><h1>${esc(u.username||'PIXEL USER')}${u.is_verified?' ✅':''}</h1>${accountBadge(u,true)}
-        <div class="public-profile-bio">${esc(u.bio||'Pixel explorer')}</div></div></div>
+        <div class="public-profile-bio">${esc(u.bio||'Pixel Explorer')}</div></div></div>
       ${renderPublicProfileDetails(u)}
       <div class="public-profile-actions">
         ${!isMe?`<button class="${followButtonClass(userId)} follow-action-btn" data-follow-user-id="${esc(userId)}" onclick="toggleFollow('${esc(userId)}')">${followButtonLabel(userId)}</button>
@@ -2424,14 +2412,14 @@ function renderUserCard(u, options = {}){
   const following = followingIds.has(String(u.id));
   const mutual = followsDbAvailable && following && followBackIds.has(String(u.id));
   const relation = mutual ? '<div class="tiny" style="margin-top:4px">🤝 MUTUAL FRIEND</div>' :
-                   following ? '<div class="tiny" style="margin-top:4px">⭐ You follow this user</div>' : '';
+                   following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
   return `
     <div class="user-card">
       <div class="user-avatar profile-clickable" style="margin-bottom:8px" onclick="openPublicProfile('${esc(u.id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(u.avatar||"👾")}</div>
       <strong class="profile-clickable" onclick="openPublicProfile('${esc(u.id)}')">${esc(u.username || 'PIXEL USER')}${u.is_verified?' ✅':''}${accountBadge(u, true)}</strong>
       ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
       ${relation}
-      <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel explorer")}</p>
+      <p class="tiny" style="margin:4px 0">${esc(u.bio || "Pixel Explorer")}</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
         <button class="${followButtonClass(u.id)} follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button>
         <button class="secondary" onclick="openChat('${esc(u.id)}', '${esc(u.username || 'PIXEL USER')}')">💬 MESSAGE</button>
