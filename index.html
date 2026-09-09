@@ -1538,8 +1538,8 @@ async function loadFeed(forceRender = false) {
       const postReactions = (reactions || []).filter(r => r.post_id === p.id);
       const postComments = (comments || []).filter(c => c.post_id === p.id);
 
-      const counts = { '👍': 0 };
-      const userReacted = { '👍': false };
+      const counts = { '👍 Like': 0 };
+      const userReacted = { '👍 Like': false };
       
 
       postReactions.forEach(r => {
