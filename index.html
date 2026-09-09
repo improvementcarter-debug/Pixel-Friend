@@ -1573,10 +1573,10 @@ async function loadFeed(forceRender = false) {
                       ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
+             <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button> </div>
           </div>
 
           <div class="post-engagement">
-            <button class="post-action-btn Like" onclick="like('${p.id}')">👍Like</button>
             <button class="post-action-btn Comment" onclick="Comment('${p.id}')">💬Comment</button>
             <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
             <button class="post-action-btn Save" onclick="Save('${p.id}')">Save</button>
