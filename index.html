@@ -1578,9 +1578,6 @@ async function loadFeed(forceRender = false) {
           </div>
 
           <div class="post-engagement">
-            <button class="post-action-btn view" onclick="viewPost('${p.id}')">👁️ VIEW</button>
-            <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
-            <span id="postViews_${p.id}" class="post-view-count">👁️ ${getPostViewCount('${p.id}')} VIEWS</span>
             <button class="post-action-btn Like" onclick="like('${p.id}')">👍Like</button>
             <button class="post-action-btn Comment" onclick="Comment('${p.id}')">💬Comment</button>
             <button class="post-action-btn share" onclick="sharePost('${p.id}')">↗️ SHARE</button>
@@ -1588,7 +1585,7 @@ async function loadFeed(forceRender = false) {
           </div>
 
           <div class="comment-section">
-            <h3>💬 COMMENTS (${postComments.length})</h3>
+            <h3>💬 Comments (${postComments.length})</h3>
 
             ${replyContext ? `
               <div class="comment-reply-preview">
