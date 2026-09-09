@@ -93,6 +93,20 @@
 /* Telegram-style paste media */
 .paste-hint{margin-top:6px;color:#9db3c9;font-size:12px}.paste-ready{outline:2px dashed var(--cyan)!important;outline-offset:3px}.paste-flash{animation:pfPasteFlash .7s ease}@keyframes pfPasteFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
+
+/* Fullscreen media viewer */
+#mediaFullscreenModal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.96);padding:10px;box-sizing:border-box}
+#mediaFullscreenModal.hidden{display:none}
+.media-fullscreen-backdrop{position:absolute;inset:0;cursor:pointer}
+.media-fullscreen-content{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:1}
+.media-fullscreen-content img,.media-fullscreen-content video{max-width:96vw;max-height:94vh;width:auto;height:auto;object-fit:contain;border-radius:4px;box-shadow:0 0 35px rgba(0,0,0,.7)}
+.media-fullscreen-content video{background:#000}
+.media-fullscreen-close{position:fixed;right:18px;top:18px;width:46px;height:46px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:rgba(20,20,20,.8);color:#fff;font-size:24px;cursor:pointer;z-index:3}
+.media-fullscreen-close:hover{background:rgba(255,255,255,.18)}
+.media-fullscreen-hint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);color:rgba(255,255,255,.72);font-size:13px;z-index:3;pointer-events:none}
+.clickable-media,.public-profile-post img,.public-profile-post video{cursor:zoom-in}
+@media(max-width:650px){#mediaFullscreenModal{padding:5px}.media-fullscreen-close{right:10px;top:10px}.media-fullscreen-content img,.media-fullscreen-content video{max-width:100vw;max-height:92vh}}
+
 </style><style id="pf-profile-upgrade">
 .profile-page-shell{width:min(920px,100%);margin:0 auto}.profile-cover{height:270px;border:1px solid #365174;border-radius:16px 16px 0 0;overflow:hidden;position:relative;background:radial-gradient(circle at 25% 30%,rgba(78,161,255,.22),transparent 30%),linear-gradient(135deg,#14294a,#0b1325 58%,#26183f)}
 .profile-cover img{width:100%;height:100%;display:block;object-fit:cover}.profile-cover-placeholder{position:absolute;inset:0;display:grid;place-items:center;color:#8195b4;font-size:13px;font-weight:600;letter-spacing:.08em}.profile-cover-overlay{position:absolute;right:16px;bottom:16px}
@@ -585,6 +599,14 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
     <div id="postViewContent" class="post-view-body"></div>
   </div>
 </div>
+
+<div id="mediaFullscreenModal" class="hidden" aria-hidden="true">
+  <div class="media-fullscreen-backdrop" onclick="closeMediaFullscreen()"></div>
+  <div class="media-fullscreen-content" id="mediaFullscreenContent"></div>
+  <button class="media-fullscreen-close" type="button" aria-label="Close" onclick="closeMediaFullscreen()">✕</button>
+  <div class="media-fullscreen-hint">Click outside or press ESC to close</div>
+</div>
+
 <div id="toast" class="toast hidden"></div>
 <script>
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
