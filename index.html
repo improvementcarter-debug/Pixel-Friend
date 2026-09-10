@@ -1832,6 +1832,20 @@ function setFeedFilter(filter, btn){
 }
 window.setFeedFilter = setFeedFilter;
 
+/* ===== Universal reaction menu, long-press and viewer ===== */
+const PF_REACTIONS = ['👍','❤️','😂','😮','😢','😡','🔥','🎉'];
+let pfReactionMenu=null,pfReactionHoldTimer=null;
+function pfCloseReactionMenu(){if(pfReactionMenu){pfReactionMenu.remove();pfReactionMenu=null}}
+function pfShowReactionMenu(target,kind,id){if(!currentUser||!target||!id)return;pfCloseReactionMenu();const menu=document.createElement('div');menu.className='pf-reaction-menu';PF_REACTIONS.forEach(e=>{const b=document.createElement('button');b.type='button';b.textContent=e;b.onclick=ev=>{ev.stopPropagation();pfReact(kind,id,e);pfCloseReactionMenu()};menu.appendChild(b)});document.body.appendChild(menu);pfReactionMenu=menu;const r=target.getBoundingClientRect();const mw=menu.offsetWidth;menu.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.left+r.width/2-mw/2))+'px';menu.style.top=Math.max(8,r.top-menu.offsetHeight-8)+'px'}
+function pfBindLongPress(el,kind,id){if(!el||el.dataset.pfHold==='1')return;el.dataset.pfHold='1';el.classList.add('pf-hold-target');el.addEventListener('contextmenu',e=>{e.preventDefault();pfShowReactionMenu(el,kind,id)});el.addEventListener('pointerdown',()=>{clearTimeout(pfReactionHoldTimer);pfReactionHoldTimer=setTimeout(()=>pfShowReactionMenu(el,kind,id),550)});['pointerup','pointercancel','pointerleave'].forEach(x=>el.addEventListener(x,()=>clearTimeout(pfReactionHoldTimer)))}
+async function pfReact(kind,id,emoji){if(kind==='post')return toggleReaction(id,emoji);if(kind==='message')return toggleMessageReaction(id,emoji);if(kind==='comment')return toggleCommentReaction(id,emoji)}
+window.pfShowReactionMenu=pfShowReactionMenu;
+async function pfOpenReactionView(kind,id){pfCloseReactionMenu();const modal=document.createElement('div');modal.className='pf-reaction-viewer';modal.innerHTML='<div class="pf-reaction-dialog"><div style="display:flex;justify-content:space-between;align-items:center"><h3>👥 Reaction viewers</h3><button class="danger" type="button">✕</button></div><div class="tiny">Loading reactions...</div></div>';document.body.appendChild(modal);modal.querySelector('button').onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove()};const body=modal.querySelector('.tiny');let rows=[];try{let r=kind==='post'?await sb.from('reactions').select('user_id,emoji').eq('post_id',id):kind==='message'?await sb.from('message_reactions').select('user_id,reaction').eq('message_id',id):await sb.from('comment_reactions').select('user_id,reaction').eq('comment_id',id);if(r.error)throw r.error;rows=(r.data||[]).map(x=>({user_id:x.user_id,emoji:x.emoji||x.reaction}))}catch(e){if(kind==='comment'){try{rows=JSON.parse(localStorage.getItem('pf_comment_reactions_'+id)||'[]')}catch(_){}}else{body.textContent='❌ Unable to load reaction viewers: '+e.message;return}}if(!rows.length){body.textContent='No reactions yet.';return}const ids=[...new Set(rows.map(x=>String(x.user_id)))];const pr=await sb.from('profiles').select('id,username,avatar,avatar_url,is_verified').in('id',ids);const users=new Map((pr.data||[]).map(u=>[String(u.id),u]));body.outerHTML=rows.map(x=>{const u=users.get(String(x.user_id))||{};const av=u.avatar_url?'<img src="'+esc(u.avatar_url)+'">':esc(u.avatar||'👤');return '<div class="pf-reaction-user"><div class="pf-reaction-user-avatar">'+av+'</div><div><strong>'+esc(u.username||'PIXEL USER')+'</strong><div class="tiny">'+esc(x.emoji||'👍')+'</div></div></div>'}).join('')}
+window.pfOpenReactionView=pfOpenReactionView;
+async function toggleCommentReaction(commentId,reaction){if(!currentUser||!commentId)return;try{const q=await sb.from('comment_reactions').select('id').eq('comment_id',commentId).eq('user_id',currentUser.id).eq('reaction',reaction).maybeSingle();if(q.error)throw q.error;if(q.data){const d=await sb.from('comment_reactions').delete().eq('id',q.data.id);if(d.error)throw d.error}else{const i=await sb.from('comment_reactions').insert({comment_id:commentId,user_id:currentUser.id,reaction});if(i.error)throw i.error}await loadFeed(true)}catch(e){let rows=[];try{rows=JSON.parse(localStorage.getItem('pf_comment_reactions_'+commentId)||'[]')}catch(_){}const i=rows.findIndex(x=>String(x.user_id)===String(currentUser.id)&&x.emoji===reaction);if(i>=0)rows.splice(i,1);else rows.push({user_id:currentUser.id,emoji:reaction});localStorage.setItem('pf_comment_reactions_'+commentId,JSON.stringify(rows));await loadFeed(true)}}
+window.toggleCommentReaction=toggleCommentReaction;
+function pfCommentReactionData(id){try{return JSON.parse(localStorage.getItem('pf_comment_reactions_'+id)||'[]')}catch(_){return[]}}
+
 async function loadFeed(forceRender = false) {
   if (feedLoadInFlight) return;
   feedLoadInFlight = true;
@@ -1904,8 +1918,9 @@ async function loadFeed(forceRender = false) {
       const postReactions = (reactions || []).filter(r => r.post_id === p.id);
       const postComments = (comments || []).filter(c => c.post_id === p.id);
 
-      const counts = { '👍 Like': 0 };
-      const userReacted = { '👍 Like': false };
+      const counts = {};
+      const userReacted = {};
+      PF_REACTIONS.forEach(e=>{counts[e]=0;userReacted[e]=false});
       
 
       postReactions.forEach(r => {
@@ -1935,7 +1950,7 @@ async function loadFeed(forceRender = false) {
           ${p.audio_url ? `<div class="post-audio-wrap"><audio src="${esc(p.audio_url)}" controls class="post-audio"></audio><button class="post-action-btn" style="margin-top:7px" onclick="playlistAddRemote('${esc(p.audio_url)}','${esc((p.content||'Audio Post').slice(0,70))}','${esc(u.username||'Pixel-Friend')}')">🎵 ADD TO PLAYLIST</button></div>` : ''}
 
           <div class="post-actions">
-            <button class="react-btn ${userReacted['👍 Like'] ? 'active' : ''}" onclick="toggleReaction('${p.id}', '👍 Like')">👍 Like ${counts['👍 Like']}</button>
+            <div class="pf-reaction-anchor"><button class="react-btn ${userReacted['👍'] ? 'active' : ''}" onclick="toggleReaction('${esc(p.id)}','👍')">👍 Like ${counts['👍']}</button><button class="react-btn" type="button" onclick="pfShowReactionMenu(this,'post','${esc(p.id)}')">➕ React</button><button class="react-btn" type="button" onclick="pfOpenReactionView('post','${esc(p.id)}')">👥 View</button><div class="pf-reaction-summary">${Object.entries(counts).filter(([,n])=>n>0).map(([e,n])=>`<button type="button" onclick="pfOpenReactionView('post','${esc(p.id)}')">${e} ${n}</button>`).join('')}</div></div>
                       ${p.user_id === currentUser.id ? `
               <button class="react-btn danger" onclick="deletePost('${p.id}')">🗑 DELETE POST</button>
             ` : ''}
@@ -1967,7 +1982,7 @@ async function loadFeed(forceRender = false) {
                         <div><strong>${esc(cu.username || "PLAYER")}${accountBadge(cu, true)}</strong><span class="tiny" style="margin-left:8px">${new Date(c.created_at).toLocaleTimeString()}</span></div>
                         <button class="secondary" style="padding:2px 6px;font-size:12px;" onclick="setReplyTarget('${p.id}', '${c.id}', '${esc(cu.username || "PLAYER")}')">💬 Reply</button>
                       </div>
-                      <div>${linkify(c.content)}</div>
+                      <div>${linkify(c.content)}</div><div class="pf-reaction-summary" id="commentReactions_${esc(c.id)}"></div><div style="display:flex;gap:5px;margin-top:5px"><button class="message-tool" type="button" onclick="pfShowReactionMenu(this,'comment','${esc(c.id)}')">😀 REACT</button><button class="message-tool" type="button" onclick="pfOpenReactionView('comment','${esc(c.id)}')">👥 VIEW REACTORS</button></div>
                     </div>
                   </div>
                 `;
@@ -1977,6 +1992,8 @@ async function loadFeed(forceRender = false) {
         </div>
       `;
     }).join('');
+    document.querySelectorAll('.post-card').forEach(card=>{const a=card.querySelector('.pf-reaction-anchor');const id=a?.closest('.post-card')?.querySelector('[data-pf-post-reaction]')?.getAttribute('data-pf-post-reaction');if(a){const postId=card.querySelector('[onclick*="toggleReaction"]')?.getAttribute('onclick')?.match(/toggleReaction\('([^']+)'/)?.[1];if(postId)pfBindLongPress(a,'post',postId)}});
+    document.querySelectorAll('[id^="commentReactions_"]').forEach(box=>{const id=box.id.replace('commentReactions_','');const rows=pfCommentReactionData(id);const cc={};rows.forEach(r=>cc[r.emoji]=(cc[r.emoji]||0)+1);box.innerHTML=Object.entries(cc).map(([e,n])=>`<button type="button" onclick="pfOpenReactionView('comment','${esc(id)}')">${e} ${n}</button>`).join('');const item=box.closest('.comment-item');if(item)pfBindLongPress(item,'comment',id)});
   } finally {
     feedLoadInFlight = false;
   }
@@ -2565,7 +2582,7 @@ window.closePublicProfile=closePublicProfile;
 function renderUserCard(u, options = {}){
   const following = followingIds.has(String(u.id));
   const mutual = followsDbAvailable && following && followBackIds.has(String(u.id));
-  const relation = mutual ? '<div class="tiny" style="margin-top:4px">🤝 MUTUAL FRIEND</div>' :
+  const relation = mutual ? '<div class="tiny" style="margin-top:4px;color:var(--green)">🤝 FRIEND • MUTUAL FOLLOW</div>' :
                    following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
   return `
     <div class="user-card">
@@ -2778,13 +2795,14 @@ async function loadMessages() {
             <button class="message-tool" onclick="replyToMessage('${esc(m.id)}')">↩ REPLY</button>
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','❤️')">❤️</button>
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','👍')">👍</button>
-            <button class="message-tool" onclick="toggleReactionPicker('${esc(m.id)}')">➕ REACT</button>
+            <button class="message-tool" onclick="toggleReactionPicker('${esc(m.id)}')">➕ REACT</button><button class="message-tool" onclick="pfShowReactionMenu(this,'message','${esc(m.id)}')">😀</button><button class="message-tool" onclick="pfOpenReactionView('message','${esc(m.id)}')">👥</button>
             ${mine ? `<button class="message-tool message-delete-tool" onclick="deleteMessage('${esc(m.id)}')">🗑 DELETE</button>` : ''}
           </div>
           ${status}
         </div>
       </div>`;
   }).join('');
+  document.querySelectorAll('#messagesList .message-wrap').forEach(w=>{const id=w.getAttribute('data-message-id');if(id)pfBindLongPress(w,'message',id)});
 
   $("messagesList").scrollTop = $("messagesList").scrollHeight;
   await markChatMessagesSeen();
@@ -3883,6 +3901,12 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
 .pf-profile-menu-card{width:min(360px,calc(100vw - 30px));background:linear-gradient(180deg,#111d31,#08111f);border:2px solid #3b5d88;border-radius:16px;padding:18px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
 .pf-profile-menu-title{font-family:"Press Start 2P",monospace;font-size:12px;color:#dcecff;margin-bottom:14px}
 .pf-profile-menu-card button{width:100%;margin-top:8px;padding:13px 14px;border-radius:10px;text-align:left}
+
+/* UNIVERSAL REACTIONS */
+.pf-reaction-menu{position:fixed;z-index:12000;display:flex;gap:3px;padding:7px;background:#091322;border:1px solid #3c5b86;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.pf-reaction-menu button{border:0;background:transparent;font-size:22px;padding:4px 6px;cursor:pointer;border-radius:8px}.pf-reaction-menu button:hover{background:#1a2c49;transform:scale(1.12)}
+.pf-reaction-summary{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.pf-reaction-summary button{border:1px solid #2b4266;background:#0b1423;color:#d9e5f7;border-radius:12px;padding:3px 7px;font-size:12px;cursor:pointer}
+.pf-reaction-viewer{position:fixed;inset:0;z-index:13000;background:rgba(1,5,14,.82);display:grid;place-items:center;padding:18px}.pf-reaction-dialog{width:min(460px,100%);max-height:calc(100vh - 36px);overflow:auto;background:#0b1423;border:1px solid #3c5b86;border-radius:16px;padding:18px}.pf-reaction-user{display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #1c2e49}.pf-reaction-user-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#17263f}.pf-reaction-user-avatar img{width:100%;height:100%;object-fit:cover}.pf-hold-target{-webkit-user-select:none;user-select:none}
 </style><div id="pfProfilePictureMenu" class="pf-profile-menu-modal hidden" onclick="if(event.target===this)closeProfilePictureMenu()"><div class="pf-profile-menu-card"><div class="pf-profile-menu-title">👤 PROFILE PICTURE</div><button class="primary" type="button" onclick="profilePictureViewProfile()">👤 View Profile</button><button class="secondary" type="button" onclick="profilePictureViewPosts()">📝 View Posts</button><button class="secondary" type="button" onclick="closeProfilePictureMenu()">✕ Cancel</button></div></div><script id="pf-profile-picture-actions">
 function openProfilePictureMenu(){const m=document.getElementById('pfProfilePictureMenu');if(m){m.classList.remove('hidden');document.body.style.overflow='hidden';}}
 function closeProfilePictureMenu(){const m=document.getElementById('pfProfilePictureMenu');if(m){m.classList.add('hidden');document.body.style.overflow='';}}
