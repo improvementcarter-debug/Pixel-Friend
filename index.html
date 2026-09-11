@@ -4,6 +4,7 @@
 
 
 
+
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pixel-Friend</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 
 </script><style>@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');*{box-sizing:border-box}:root{  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;}html,body{margin:0;min-height:100%;background:var(--bg)}body{  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;  letter-spacing:.25px;  background:    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);  background-size:8px 8px,8px 8px,100% 100%;}body:before{  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);}button,input,textarea,select{font:inherit}button{cursor:pointer}h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{  font-family:"Press Start 2P",Consolas,monospace;}h1{font-size:20px;line-height:1.55}h2{font-size:15px;line-height:1.6}h3{font-size:13px}.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.auth-screen{  min-height:100vh;display:grid;place-items:center;padding:20px;  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;}.card,.auth-card{  background:linear-gradient(180deg,#111b2d,#0b1220);  border:2px solid var(--border);border-radius:4px;  box-shadow:6px 6px 0 var(--shadow);}.auth-card{width:min(460px,100%);padding:28px;}.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px}.tagline{text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}.tabs button,.menu button,.icon,.notification-button,.secondary{  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;  padding:11px 12px;box-shadow:3px 3px 0 #050912;}.tabs .active,.primary{  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;}.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}button:active{transform:translate(2px,2px)}input,textarea,select{  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;  padding:12px;margin-bottom:12px;outline:none;}input:focus,textarea:focus,select:focus{border-color:var(--cyan)}textarea{min-height:100px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}.app{display:none}.topbar{  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;}.brand{font-size:14px;cursor:pointer}.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:200px;margin:0}.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}.mini{text-align:center}.avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}.presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#667085;vertical-align:middle}.presence-dot.presence-online{position:static;width:8px;height:8px;border:0;background:var(--green);display:inline-block}.presence-label{font-size:11px;letter-spacing:.4px}.presence-label.online-label{color:var(--green)}.presence-label.offline-label{color:#8892a8}.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;  border:2px solid #36547d;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}.user-avatar{width:46px;height:46px;font-size:24px}.post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}.post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.post-author{display:flex;align-items:center;gap:12px}.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}.post-audio,.msg-audio{width:100%;margin-top:8px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}.react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}.react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}.comment-section{margin-top:14px;background:#09101d;padding:12px;border:1px solid #1c2c47;border-radius:2px}.comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}.comment-reply-preview{background:#060c16;border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.messages-layout{display:grid;grid-template-columns:280px 1fr;min-height:640px}.chat-users{border-right:2px solid var(--border);padding-right:15px}.chat-user{padding:12px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;position:relative}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}.message-wrap.mine{align-self:flex-end;align-items:flex-end}.message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}.message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}.message:not(.mine){border-bottom-left-radius:2px}.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}.typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}.chat-controls{display:flex;gap:8px;align-items:center}.chat-controls input{margin:0}.file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}.notification-wrap{position:relative}.notification-panel{position:absolute;right:0;top:50px;width:min(390px,calc(100vw - 30px));background:#0b1423;border:2px solid var(--border);box-shadow:5px 5px 0 #02050b;z-index:1000}.notification-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:2px solid var(--border);font-size:12px}.notification-clear{background:#15233a;border:1px solid #2b3d5d;color:#dce8ff;padding:5px 7px;font-size:10px}.notification-list{max-height:430px;overflow-y:auto}.notification-item{display:flex;gap:10px;padding:11px;border-bottom:1px solid #1c2c47;cursor:pointer;background:#0d1829}.notification-item:hover{background:#162945}.notification-item.unread{border-left:4px solid var(--cyan)}.notification-item-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;background:#16263e;border:1px solid #35517a}.notification-item-body{min-width:0}.notification-item-title{font-size:16px;font-weight:bold}.notification-item-text{font-size:16px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;margin-top:3px;color:#eaf2ff}.notification-item-time{font-size:12px;color:var(--muted);margin-top:4px}.notification-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:14px}@media(max-width:600px){.notification-panel{right:-48px}}.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}.recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}@keyframes pulse{from{opacity:1}to{opacity:0.5}}@media(max-width:850px){  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}}.message-status{display:block;margin-top:4px;text-align:right;font-size:11px;color:var(--muted);letter-spacing:.5px}.message-status.seen{color:var(--cyan);font-weight:bold}.message-wrap:not(.mine) .message-status{text-align:left}
@@ -483,6 +484,25 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 .audio-track-list{display:grid;gap:8px}.audio-track{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:11px;padding:10px 12px;border:1px solid #263f60;border-radius:10px;background:rgba(8,17,31,.82);cursor:pointer}.audio-track:hover{border-color:#4d76a6;background:#101f35}.audio-track.active{border-color:var(--cyan);background:linear-gradient(90deg,rgba(35,79,112,.45),rgba(17,29,51,.9));box-shadow:inset 3px 0 var(--cyan)}
 .audio-track-num{width:32px;height:32px;display:grid;place-items:center;border-radius:8px;background:#142640;color:#9fc8ec;font-weight:bold}.audio-track.active .audio-track-num{color:#55f39a}.audio-track-main{min-width:0}.audio-track-title{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audio-track-sub{font-size:13px;color:#7187a5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audio-track-actions{display:flex;gap:5px}.audio-track-actions button{padding:6px 8px;background:#0e1a2d;border:1px solid #304a6d;color:#cfe5ff;border-radius:7px}.audio-track-actions button:hover{border-color:var(--cyan)}.audio-empty{text-align:center;padding:28px;color:#7187a5;border:1px dashed #2a4566;border-radius:10px}
 @media(max-width:700px){.audio-playlist-hero{align-items:flex-start;flex-direction:column}.audio-playlist-actions{width:100%}.audio-playlist-actions button{flex:1}.audio-list-head{align-items:stretch;flex-direction:column}.playlist-search{width:100%!important}.audio-track{grid-template-columns:36px minmax(0,1fr)}.audio-track-actions{grid-column:2}.audio-volume-wrap{margin-left:0}.audio-progress-row{grid-template-columns:38px 1fr 38px}}
+</style>
+<style id="pf-copy-link-breaking-fix">
+.message-content-text{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.message-link{color:#66c7ff;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;cursor:pointer}
+.message-link:hover{filter:brightness(1.2)}
+.pf-breaking-footer{margin-top:28px;padding:18px 14px 22px;background:#060b13;border-top:1px solid #24364f;overflow:hidden}
+.pf-breaking-bar{display:flex;align-items:center;gap:10px;max-width:1200px;margin:0 auto;border:1px solid #3a4b64;background:#0a111c;min-height:42px;overflow:hidden}
+.pf-breaking-label,.pf-breaking-live{height:42px;display:flex;align-items:center;justify-content:center;padding:0 12px;font:700 12px/1 Arial,sans-serif;letter-spacing:.8px;white-space:nowrap}
+.pf-breaking-label{background:#c40000;color:#fff}.pf-breaking-live{background:#8b0000;color:#fff}
+.pf-breaking-dot{width:8px;height:8px;border-radius:50%;background:#fff;margin-right:7px;animation:pfBreakingBlink 1s infinite}
+.pf-breaking-window{flex:1;min-width:0;overflow:hidden;position:relative}
+.pf-breaking-track{display:flex;width:max-content;animation:pfBreakingScroll 22s linear infinite;white-space:nowrap;font:700 12px/42px Arial,sans-serif;color:#f2f5f8}
+.pf-breaking-track span{padding-right:60px}
+.pf-breaking-bar:hover .pf-breaking-track{animation-play-state:paused}
+.pf-breaking-copy{text-align:center;margin-top:10px;color:#7488a3;font:11px/1.4 Arial,sans-serif}
+@keyframes pfBreakingScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes pfBreakingBlink{50%{opacity:.25}}
+@media(max-width:600px){.pf-breaking-label,.pf-breaking-live{padding:0 8px;font-size:10px}.pf-breaking-track{font-size:10px;line-height:42px}.pf-breaking-copy{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.pf-breaking-track,.pf-breaking-dot{animation:none}}
 </style>
 </head><body>
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
@@ -2713,6 +2733,43 @@ async function markChatMessagesSeen() {
 }
 window.markChatMessagesSeen = markChatMessagesSeen;
 
+function pfMessageLinkify(escapedText){
+  if(!escapedText) return '';
+  return escapedText.replace(/https?:\/\/[^\s<]+/gi, function(raw){
+    const trailing = raw.match(/[.,!?;:)]*$/)?.[0] || '';
+    const url = trailing ? raw.slice(0,-trailing.length) : raw;
+    if(!url) return raw;
+    return `<a class="message-link" href="${url}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${url}</a>${trailing}`;
+  });
+}
+function pfGetMessageText(id){
+  const wrap=document.querySelector(`[data-message-id="${CSS.escape(String(id))}"]`);
+  if(!wrap) return '';
+  const clone=wrap.cloneNode(true);
+  clone.querySelectorAll('.message-tools,.message-status,.message-reactions,.message-reply-preview,.pf-file-download').forEach(el=>el.remove());
+  return (clone.querySelector('.message')?.innerText || clone.innerText || '').trim();
+}
+async function copyMessageText(id){
+  const text=pfGetMessageText(id);
+  if(!text) return toast('⚠️ Nothing to copy.');
+  try{
+    const ok=await copyShareText(text);
+    if(ok){ toast('📋 Message copied!'); return; }
+  }catch(e){ console.warn('Message copy failed:',e); }
+  window.prompt('Copy message:',text);
+}
+function openMessageLink(id){
+  const wrap=document.querySelector(`[data-message-id="${CSS.escape(String(id))}"]`);
+  const link=wrap?.querySelector('.message-link');
+  if(link?.href){ window.open(link.href,'_blank','noopener,noreferrer'); return; }
+  const text=pfGetMessageText(id);
+  const match=text.match(/https?:\/\/[^\s]+/i);
+  if(match) window.open(match[0].replace(/[.,!?;:)]+$/,''),'_blank','noopener,noreferrer');
+  else toast('🔗 No link found in this message.');
+}
+window.copyMessageText=copyMessageText;
+window.openMessageLink=openMessageLink;
+
 async function loadMessages() {
   if(!selectedUser || messageLoadInFlight) return;
   messageLoadInFlight = true;
@@ -2782,7 +2839,9 @@ async function loadMessages() {
     let giftData = null;
     const giftMatch = messageText.match(/^\[PF_GIFT\](\{.*\})$/s);
     if(giftMatch){ try { giftData = JSON.parse(giftMatch[1]); messageText = ''; } catch(e){} }
-    const body = m.sticker ? `<div class="message-sticker">${esc(m.sticker)}</div>` : giftData ? `<div class="message-gift" title="Gift">${esc(giftData.emoji || '🎁')}</div><div class="message-gift-label">${esc(giftData.name || 'Gift')}</div>` : `<div>${esc(messageText)}</div>${fileHtml}`;
+    const linkedText = pfMessageLinkify(esc(messageText));
+    const hasLink = /https?:\/\//i.test(messageText);
+    const body = m.sticker ? `<div class="message-sticker">${esc(m.sticker)}</div>` : giftData ? `<div class="message-gift" title="Gift">${esc(giftData.emoji || '🎁')}</div><div class="message-gift-label">${esc(giftData.name || 'Gift')}</div>` : `<div class="message-content-text">${linkedText}</div>${fileHtml}`;
     return `
       <div class="message-wrap ${mine ? 'mine' : ''}" data-message-id="${esc(m.id || '')}">
         <div class="message ${mine ? 'mine' : ''}">
@@ -2797,6 +2856,8 @@ async function loadMessages() {
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','❤️')">❤️</button>
             <button class="message-tool" onclick="quickReact('${esc(m.id)}','👍')">👍</button>
             <button class="message-tool" onclick="toggleReactionPicker('${esc(m.id)}')">➕ REACT</button><button class="message-tool" onclick="pfShowReactionMenu(this,'message','${esc(m.id)}')">😀</button><button class="message-tool" onclick="pfOpenReactionView('message','${esc(m.id)}')">👥</button>
+            <button class="message-tool" onclick="copyMessageText('${esc(m.id)}')">📋 COPY</button>
+            ${hasLink ? `<button class="message-tool" onclick="openMessageLink('${esc(m.id)}')">🔗 OPEN LINK</button>` : ''}
             ${mine ? `<button class="message-tool message-delete-tool" onclick="deleteMessage('${esc(m.id)}')">🗑 DELETE</button>` : ''}
           </div>
           ${status}
@@ -3646,18 +3707,7 @@ function openMediaFullscreen(url,type){const m=document.getElementById('pfMediaM
 function closeMediaFullscreen(){const m=document.getElementById('pfMediaModal'),c=document.getElementById('pfMediaContent');if(m)m.classList.add('hidden');if(c)c.innerHTML='';document.body.style.overflow='';}
 window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=closeMediaFullscreen;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMediaFullscreen();});
 
-   <footer style="text-align: center; padding: 4rem;">
-  <div class="live-footer-badge">
-    <div class="ticker-track">
-      <span class="live-sparkle">✨</span> 
-      <span>LIVE UPDATE • © <span id="current-year">2026</span> • Built for built to help friends and communities connect, chat, and share experiences in a collaborative digital space </span> 
-      <a href="https://improvementcarter-debug.github.io/Pixel-Friend" target="_blank" rel="noopener noreferrer">
-        <span class="active-letter">P</span><span class="active-letter">i</span><span class="active-letter">x</span><span class="active-letter">e</span><span class="active-letter">l</span><span class="active-letter">&nbsp;</span><span class="active-letter">F</span><span class="active-letter">r</span><span class="active-letter">i</span><span class="active-letter">e</span><span class="active-letter">n</span><span class="active-letter">d</span>
-      </a> 🚀
-    </div>
-  </div>
-</footer>
-     </script>
+</script>
 <style id="pf-v3-upgrades">
 .pf-live-datetime{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;color:#dcecff;background:#0c1728;border:1px solid #2d4669;padding:7px 9px;border-radius:3px;white-space:nowrap;min-width:190px;text-align:center}
 .pf-feed-filter-hint{padding:8px 12px 0;text-align:center}
@@ -3939,7 +3989,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
 
   function getPostId(card){
     const b=card?.querySelector('[onclick*="toggleReaction"]');
-    const m=b?.getAttribute('onclick')?.match(/toggleReaction\\('([^']+)'/);
+    const m=b?.getAttribute('onclick')?.match(/toggleReaction\('([^']+)'/);
     return m?m[1]:null;
   }
   function reactionTotal(card){
@@ -4179,4 +4229,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
   setTimeout(()=>{ensurePostMetrics();updateNotificationCounts()},800);
 })();
 </script>
+<footer class="pf-breaking-footer" aria-label="Live updates">
+  <div class="pf-breaking-bar">
+    <div class="pf-breaking-label"><span class="pf-breaking-dot"></span> BREAKING</div>
+    <div class="pf-breaking-window">
+      <div class="pf-breaking-track">
+        <span>🔴 LIVE • PIXEL-FRIEND • CONNECT • CHAT • SHARE • COMMUNITY UPDATES • </span>
+        <span>🔴 LIVE • PIXEL-FRIEND • CONNECT • CHAT • SHARE • COMMUNITY UPDATES • </span>
+      </div>
+    </div>
+    <div class="pf-breaking-live">LIVE</div>
+  </div>
+  <div class="pf-breaking-copy">© <span id="current-year">2026</span> Pixel-Friend • Live community updates</div>
+</footer>
 </body></html>
