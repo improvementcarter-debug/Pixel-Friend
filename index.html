@@ -1634,6 +1634,7 @@ async function markAllNotificationsRead(e){
 window.markAllNotificationsRead=markAllNotificationsRead;
 
 function notifyIncomingMessage(message){
+  if(window.pfIsCallSignal && window.pfIsCallSignal(message)) return;
   if(!currentUser || !message?.id || String(message.receiver_id) !== String(currentUser.id)) return;
 
   const id = String(message.id);
@@ -1770,8 +1771,12 @@ async function updateNotificationBadge(options = {}){
     loadPersistentPostNotifications();
     const {data,error} = await sb.from('messages').select('id,sender_id,receiver_id,content,sticker,image_url,video_url,audio_url,created_at,is_read').eq('receiver_id', currentUser.id).eq('is_read', false).order('created_at', {ascending:false});
     if(error) throw error;
-    const unreadRows = data || [];
+    const unreadRows = (data || []).filter(m => !(window.pfIsCallSignal && window.pfIsCallSignal(m)));
     const unreadIds = new Set(unreadRows.map(m => String(m.id)));
+    // Remove any older call-signaling packets that may have been displayed by a previous version.
+    for(const old of Array.from(notificationItems.values())){
+      if(window.pfIsCallSignal && window.pfIsCallSignal(old)){ notificationItems.delete(String(old.id)); knownUnreadMessageIds.delete(String(old.id)); }
+    }
     for(const m of unreadRows){
       const name = notificationProfileCache.get(String(m.sender_id)) || 'PIXEL USER';
       addNotificationItem(m, name, true);
@@ -4975,6 +4980,71 @@ try{
     if(q('pfSpeakerBtn')) q('pfSpeakerBtn').textContent=pfSpeakerOff?'🔇 SPEAKER':'🔊 SPEAKER';
   }
   window.pfToggleSpeaker=pfToggleSpeaker;
+
+  /*
+   * RELIABLE SIGNALING FALLBACK
+   * ---------------------------
+   * The normal app message channel can temporarily report CLOSED/TIMED_OUT.
+   * In that situation a call offer may still be inserted into `messages` but
+   * the Realtime callback is not delivered. Poll the same table once per
+   * second for recent [PF_CALL] packets so calls can still ring/connect.
+   */
+  let pfSignalPollTimer = null;
+  let pfSignalPollUser = '';
+  const pfSeenSignalIds = new Set();
+  let pfSignalPollBusy = false;
+
+  async function pfPollSignals(){
+    if(pfSignalPollBusy || !currentUser || !sb) return;
+    pfSignalPollBusy=true;
+    try{
+      const uid=String(currentUser.id);
+      if(pfSignalPollUser!==uid){
+        pfSignalPollUser=uid;
+        pfSeenSignalIds.clear();
+      }
+      const {data,error}=await sb.from('messages')
+        .select('id,sender_id,receiver_id,content,created_at')
+        .or(`sender_id.eq.${uid},receiver_id.eq.${uid}`)
+        .order('created_at',{ascending:false})
+        .limit(60);
+      if(error) throw error;
+
+      const rows=(data||[]).filter(m=>pfIsCallSignal(m));
+      const now=Date.now();
+      for(const msg of rows){
+        const id=String(msg.id||'');
+        if(!id || pfSeenSignalIds.has(id)) continue;
+        pfSeenSignalIds.add(id);
+        // Only new/recent call packets are actionable. This prevents an old
+        // offer from ringing again after a refresh.
+        const sig=pfDecodeCall(msg);
+        const packetTime=Number(sig?.at || (msg.created_at ? new Date(msg.created_at).getTime() : 0));
+        const recent=packetTime && (now-packetTime < 30000);
+        if(!recent) continue;
+        if(String(msg.receiver_id)!==uid) continue;
+        await pfHandleCallSignal(msg);
+      }
+      // Keep memory bounded.
+      if(pfSeenSignalIds.size>500){
+        const keep=new Set(rows.map(m=>String(m.id||'')));
+        for(const id of Array.from(pfSeenSignalIds)) if(!keep.has(id)) pfSeenSignalIds.delete(id);
+      }
+    }catch(e){
+      // Realtime may be reconnecting; polling is only a fallback and should
+      // never break the rest of Pixel-Friend.
+      console.warn('Pixel-Friend call signaling fallback:',e?.message||e);
+    }finally{
+      pfSignalPollBusy=false;
+    }
+  }
+
+  function pfStartSignalPolling(){
+    if(pfSignalPollTimer) clearInterval(pfSignalPollTimer);
+    pfSignalPollTimer=setInterval(pfPollSignals,1000);
+    setTimeout(pfPollSignals,250);
+  }
+  pfStartSignalPolling();
 
   // Close a call cleanly when the user logs out or closes the page.
   window.addEventListener('beforeunload',()=>{
