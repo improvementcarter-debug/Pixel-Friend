@@ -3488,14 +3488,8 @@ async function setupRealtime(force=false){
   // LIVE FEED CHANNEL
   realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
     .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => { loadFeed(true); notifyIncomingPost(payload.new); })
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'reactions'}, payload => {
-      loadFeed(true);
-      pfNotifyIncomingInteraction(payload.new, 'reaction');
-    })
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'comments'}, payload => {
-      loadFeed(true);
-      pfNotifyIncomingInteraction(payload.new, 'comment');
-    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
+    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
     .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
     .on('postgres_changes', {event:'*', schema:'public', table:'message_reactions'}, payload => {
       const r=payload.new || payload.old;
@@ -4288,16 +4282,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
   function loadInteractionNotifications(){
     if(!currentUser) return;
     const arr=readInteractions(currentUser.id);
-    arr.forEach(n=>{if(n?.id) notificationItems.set(String(n.id),{
-      ...n,
-      kind:'interaction',
-      notification_kind:n.kind,
-      unread:n.unread!==false,
-      newfeed:false,
-      senderName:n.senderName||'PIXEL USER',
-      senderAvatar:n.senderAvatar||'👾',
-      content:n.text||''
-    })});
+    arr.forEach(n=>{if(n?.id) notificationItems.set(String(n.id),{...n,kind:'interaction',notification_kind:n.kind,unread:n.unread!==false,newfeed:false,senderName:'PIXEL USER',content:n.text||''})});
   }
 
   function updateNotificationCounts(){
@@ -4341,11 +4326,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
     list.innerHTML=rows.map(n=>{
       const isInteraction=n.kind==='interaction';
       const detail=isInteraction?(n.text||n.content||'Interaction'):notificationDetail(n);
-      const icon=n.notification_kind==='reaction'?(n.reaction_emoji==='👍'?'👍':'❤️'):n.notification_kind==='like'?'👍':n.notification_kind==='comment'?'💬':n.notification_kind==='share'?'↗️':n.notification_kind==='profile_view'?'👤':notificationIcon(n);
-      const type=n.notification_kind==='reaction'?'REACT':n.notification_kind==='like'?'LIKE':n.notification_kind==='comment'?'COMMENT':n.notification_kind==='share'?'SHARE':n.notification_kind==='profile_view'?'PROFILE VIEW':notificationTypeLabel(notificationType(n));
+      const icon=n.notification_kind==='reaction'?'❤️':n.notification_kind==='share'?'↗️':n.notification_kind==='profile_view'?'👤':notificationIcon(n);
+      const type=n.notification_kind==='reaction'?'REACTION':n.notification_kind==='share'?'SHARE':n.notification_kind==='profile_view'?'PROFILE VIEW':notificationTypeLabel(notificationType(n));
       return '<div class="notification-item '+(n.unread?'unread':'')+'" onclick="openNotificationV2(\\''+esc(String(n.id))+'\\')">'+
         '<div class="notification-item-icon">'+icon+'</div><div class="notification-item-body">'+
-        '<div class="notification-item-title">'+(isInteraction?esc(n.senderName||'PIXEL USER'):esc(n.senderName||'PIXEL USER'))+'</div>'+
+        '<div class="notification-item-title">'+(isInteraction?'ACTIVITY':esc(n.senderName||'PIXEL USER'))+'</div>'+
         '<div class="notification-item-text">'+esc(detail)+' <span class="notification-item-type">'+type+'</span></div>'+
         '<div class="notification-item-time">'+(n.created_at?new Date(n.created_at).toLocaleString():'Just now')+'</div></div></div>';
     }).join('');
@@ -4412,151 +4397,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
   document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensurePostMetrics();updateNotificationCounts()},300));
   setTimeout(()=>{ensurePostMetrics();updateNotificationCounts()},800);
 })();
-
-<script id="pf-notification-interactions-live">
-/* ===== LIVE POST NOTIFICATIONS: LIKE / REACT / COMMENT =====
-   These alerts are delivered by the existing Supabase Realtime feed channel.
-   Clicking an interaction always opens the exact post that received it.
-*/
-window.pfNotifyIncomingInteraction = async function(row, kind){
-  try{
-    if(!currentUser || !row || !row.id) return;
-
-    const actorId = String(row.user_id || '');
-    const myId = String(currentUser.id || '');
-    if(!actorId || actorId === myId) return; // never notify yourself
-
-    const postId = String(row.post_id || '');
-    if(!postId) return;
-
-    /* Find the owner of the post. Only the owner receives the alert. */
-    const {data: post, error: postError} = await sb
-      .from('posts')
-      .select('id,user_id')
-      .eq('id', postId)
-      .maybeSingle();
-    if(postError || !post) return;
-
-    const ownerId = String(post.user_id || '');
-    if(ownerId !== myId) return;
-
-    const interactionId = 'interaction:' + String(kind) + ':' + String(row.id);
-    if(notificationItems.has(interactionId)) return;
-
-    let actorName = notificationProfileCache.get(actorId) || 'PIXEL USER';
-    let actorAvatar = '👾';
-    const cached = notificationProfileDataCache.get(actorId);
-    if(cached){
-      actorName = cached.username || actorName;
-      actorAvatar = cached.avatar_url
-        ? `<img src="${esc(cached.avatar_url)}" alt="">`
-        : esc(cached.avatar || '👾');
-    }else{
-      try{
-        const {data: profile} = await sb
-          .from('profiles')
-          .select('username,avatar,avatar_url')
-          .eq('id', actorId)
-          .maybeSingle();
-        if(profile){
-          actorName = profile.username || actorName;
-          actorAvatar = profile.avatar_url
-            ? `<img src="${esc(profile.avatar_url)}" alt="">`
-            : esc(profile.avatar || '👾');
-          notificationProfileCache.set(actorId, actorName);
-          notificationProfileDataCache.set(actorId, profile);
-        }
-      }catch(e){}
-    }
-
-    const emoji = String(row.emoji || '👍');
-    const isLike = kind === 'reaction' && emoji === '👍';
-    const notificationKind = isLike ? 'like' : kind;
-
-    let detail = '';
-    if(kind === 'comment'){
-      const commentText = String(row.content || '').trim();
-      detail = '💬 ' + actorName + ' commented on your post' +
-        (commentText ? ': ' + commentText : '');
-    }else if(isLike){
-      detail = '👍 ' + actorName + ' liked your post';
-    }else{
-      detail = '❤️ ' + actorName + ' reacted ' + emoji + ' to your post';
-    }
-
-    const item = {
-      id: interactionId,
-      kind: 'interaction',
-      notification_kind: notificationKind,
-      post_id: postId,
-      sender_id: actorId,
-      senderName: actorName,
-      senderAvatar: actorAvatar,
-      reaction_emoji: emoji,
-      text: detail,
-      content: detail,
-      created_at: row.created_at || new Date().toISOString(),
-      unread: true,
-      newfeed: false
-    };
-
-    notificationItems.set(interactionId, item);
-
-    /* Persist locally for this receiving account so refresh keeps the alert. */
-    try{
-      const arr = readInteractions(myId).filter(n => String(n.id) !== interactionId);
-      arr.unshift({
-        id: interactionId,
-        kind: notificationKind,
-        post_id: postId,
-        sender_id: actorId,
-        senderName: actorName,
-        senderAvatar: actorAvatar,
-        reaction_emoji: emoji,
-        text: detail,
-        created_at: item.created_at,
-        unread: true,
-        newfeed: false
-      });
-      saveInteractions(myId, arr);
-    }catch(e){}
-
-    renderNotificationList();
-    updateNotificationCounts();
-    showTelegramNotification(item, actorName, actorAvatar);
-    playRetroSound(kind === 'comment' ? 'message' : (isLike ? 'notification' : 'notification'));
-
-    if('Notification' in window && Notification.permission === 'granted'){
-      try{
-        new Notification(
-          kind === 'comment' ? '💬 New comment' : (isLike ? '👍 New like' : '❤️ New reaction'),
-          {body: detail, tag:'pixel-friend-'+interactionId, renotify:true}
-        );
-      }catch(e){}
-    }
-  }catch(e){
-    console.warn('Pixel-Friend interaction notification failed:', e);
-  }
-};
-
-/* Make the interaction popup and list use the same exact-post navigation. */
-window.openNotificationV2 = window.openNotificationV2 || function(id){
-  const item = notificationItems.get(String(id));
-  if(!item) return;
-  item.unread = false;
-  if(item.post_id && typeof viewPost === 'function'){
-    viewPost(item.post_id);
-  }else if(item.sender_id && typeof openPublicProfile === 'function'){
-    openPublicProfile(item.sender_id);
-  }
-};
-
-/* Refresh notification counts when Realtime adds an interaction. */
-document.addEventListener('pf:notification-interaction', function(){
-  renderNotificationList();
-  updateNotificationCounts();
-});
-</script>
 </script>
 <footer class="pf-breaking-footer" aria-label="Live updates">
   <div class="pf-breaking-bar">
@@ -4570,4 +4410,59 @@ document.addEventListener('pf:notification-interaction', function(){
     <div class="pf-breaking-live"><span class="pf-breaking-dot"></span>LIVE</div>
   </div>
 </footer>
+<script>
+// Pixel-Friend Android V2 native push bridge.
+// The Android wrapper injects the FCM token here. This token is stored in Supabase
+// so the backend can send notifications even when the WebView/app is closed.
+window.PFNativePushToken = async function(token){
+  if(!token || typeof sb==='undefined') return;
+  try{
+    let session=null;
+    for(let i=0;i<12;i++){
+      const r=await sb.auth.getSession();
+      session=r?.data?.session||null;
+      if(session?.user?.id) break;
+      await new Promise(res=>setTimeout(res,500));
+    }
+    if(!session?.user?.id) return;
+    await sb.from('device_tokens').upsert({
+      user_id:session.user.id,
+      token:String(token),
+      platform:'android',
+      app_version:'2.0.0',
+      updated_at:new Date().toISOString()
+    },{onConflict:'token'});
+  }catch(e){ console.warn('Android push token registration failed',e); }
+};
+
+window.PFHandleNativeIntent = function(target, notificationId, callAction, callId){
+  try{
+    if(callAction){
+      window.__pfNativeCallIntent={action:callAction,callId:callId||''};
+      if(typeof toast==='function') toast(callAction==='answer'?'📞 ANSWERING CALL…':'📵 CALL DECLINED');
+      // Existing Pixel-Friend WebRTC/call logic can consume this state when present.
+      window.dispatchEvent(new CustomEvent('pixelfriend:native-call',{detail:window.__pfNativeCallIntent}));
+      return;
+    }
+    if(notificationId && typeof openNotificationV2==='function'){
+      openNotificationV2(notificationId);
+      return;
+    }
+    if(target){
+      const [kind,id]=String(target).split(':');
+      if(kind==='post' && id && typeof viewPost==='function') viewPost(id);
+      else if(kind==='profile' && id && typeof openPublicProfile==='function') openPublicProfile(id);
+    }
+  }catch(e){ console.warn('Native notification navigation failed',e); }
+};
+
+// Re-register after login/account changes because the same Android device may be
+// used by more than one Pixel-Friend account.
+try{
+  if(typeof sb!=='undefined') sb.auth.onAuthStateChange(()=>{
+    const token=window.PixelFriendNative?.getFcmToken?.();
+    if(token) setTimeout(()=>window.PFNativePushToken(token),250);
+  });
+}catch(e){}
+</script>
 </body></html>
