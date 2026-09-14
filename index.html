@@ -164,8 +164,10 @@
 .pf-call-type{font-family:"Press Start 2P",monospace;font-size:10px;color:var(--cyan);margin-bottom:6px}
 .pf-call-timer{font-family:"Press Start 2P",monospace;font-size:11px;color:#a9c7e9}
 .pf-call-stage{position:relative;flex:1;min-height:320px;background:#02070f;display:grid;place-items:center;overflow:hidden}
-#pfRemoteVideo{width:100%;height:100%;object-fit:contain;background:#02070f}
+#pfRemoteVideo{width:100%;height:100%;object-fit:contain;background:#02070f;display:block}
 #pfRemoteVideo.hidden,#pfLocalVideo.hidden{display:none}
+#pfRemoteVideo:not(.hidden){min-height:100%;min-width:100%}
+#pfCallModal .pf-call-stage video{background:#02070f}
 #pfLocalVideo{position:absolute;right:14px;bottom:14px;width:min(190px,32%);aspect-ratio:4/3;object-fit:cover;background:#101927;border:2px solid #67bfff;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,.55);z-index:3}
 #pfRemoteAudio{position:absolute;opacity:0;pointer-events:none}
 .pf-call-avatar{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#1d3558,#0b1423);border:2px solid #4e7bad;font-size:70px;box-shadow:0 0 40px rgba(78,161,255,.25)}
@@ -941,7 +943,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
       <button id="pfSpeakerBtn" type="button" onclick="pfToggleSpeaker()" disabled>🔊 SPEAKER</button>
       <button id="pfEndBtn" type="button" class="pf-end-call" onclick="pfEndCall('hangup')" disabled>📵 END CALL</button>
     </div>
-    <div class="pf-call-note">🔒 Direct browser-to-browser WebRTC • Camera/microphone permission required</div>
+    <div class="pf-call-note">🔒 Direct browser-to-browser WebRTC • Camera + microphone permission required for video calls</div>
   </div>
 </div>
 
@@ -4725,15 +4727,38 @@ try{
         },pfCallPeerId);
       }catch(err){console.warn('Pixel-Friend ICE send failed:',err);}
     };
+    pfPc._remoteStream = new MediaStream();
     pfPc.ontrack=e=>{
-      const stream=e.streams?.[0];
+      // Some browsers/WebViews provide an empty e.streams array. Build the
+      // remote stream from tracks so video still renders in that case.
+      const track=e.track;
+      if(track){
+        const already=pfPc._remoteStream.getTracks().some(t=>t.id===track.id);
+        if(!already) pfPc._remoteStream.addTrack(track);
+      }
+      const stream=e.streams?.[0] || pfPc._remoteStream;
       if(!stream) return;
+
       if(pfCallMode==='video'){
         const el=q('pfRemoteVideo');
-        if(el){el.srcObject=stream;el.classList.remove('hidden');el.play?.().catch(()=>{});}
+        if(el){
+          el.srcObject=stream;
+          el.classList.remove('hidden');
+          const playVideo=()=>{
+            const p=el.play?.();
+            if(p?.catch) p.catch(err=>console.warn('Remote video autoplay:',err));
+          };
+          if(el.readyState>=2) playVideo();
+          else el.onloadedmetadata=playVideo;
+        }
+        q('pfCallAvatar')?.classList.add('hidden');
       }else{
         const el=q('pfRemoteAudio');
-        if(el){el.srcObject=stream;el.play?.().catch(()=>{});}
+        if(el){
+          el.srcObject=stream;
+          const p=el.play?.();
+          if(p?.catch) p.catch(err=>console.warn('Remote audio autoplay:',err));
+        }
       }
     };
     pfPc.onconnectionstatechange=()=>{
@@ -4754,17 +4779,45 @@ try{
   async function pfGetMedia(mode){
     if(!navigator.mediaDevices?.getUserMedia)
       throw new Error('Camera/microphone API is unavailable. Use HTTPS or localhost.');
-    const constraints=mode==='video'
-      ? {audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'}}
-      : {audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}};
+
+    const audio={echoCancellation:true,noiseSuppression:true,autoGainControl:true};
+
+    // Video calls use a deliberately simple first request. Some cameras reject
+    // ideal/facingMode constraints even though they work perfectly with
+    // video:true. We retry with progressively simpler constraints.
+    const videoAttempts = [
+      {audio, video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'}},
+      {audio, video:{width:{ideal:640},height:{ideal:480}}},
+      {audio, video:true}
+    ];
+
     try{
-      return await navigator.mediaDevices.getUserMedia(constraints);
-    }catch(e){
-      if(mode==='video' && (e.name==='NotFoundError'||e.name==='OverconstrainedError')){
-        throw new Error('Camera not found or unavailable. For a voice call, use the 📞 button.');
+      if(mode!=='video'){
+        return await navigator.mediaDevices.getUserMedia({audio});
       }
+
+      let lastError=null;
+      for(const constraints of videoAttempts){
+        try{
+          const stream=await navigator.mediaDevices.getUserMedia(constraints);
+          const cam=stream.getVideoTracks()[0];
+          if(!cam) throw new Error('The browser returned no camera track.');
+          console.log('Pixel-Friend video camera:', cam.label || 'camera', cam.getSettings?.() || {});
+          return stream;
+        }catch(e){
+          lastError=e;
+          console.warn('Pixel-Friend video camera attempt failed:', e?.name, e?.message);
+          if(e?.name==='NotAllowedError'||e?.name==='PermissionDeniedError') break;
+        }
+      }
+      throw lastError || new Error('Unable to access the camera.');
+    }catch(e){
       if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError')
-        throw new Error('Camera/microphone permission was blocked. Allow access for Pixel-Friend and try again.');
+        throw new Error('Camera/microphone permission was blocked. Click the 🔒 icon in Chrome, allow Camera + Microphone for Pixel-Friend, then refresh.');
+      if(mode==='video' && (e.name==='NotFoundError'||e.name==='OverconstrainedError'))
+        throw new Error('No usable camera was found. Check that your webcam/camera is connected and not being used by another app.');
+      if(mode==='video' && e.name==='NotReadableError')
+        throw new Error('The camera is busy or cannot be read. Close Zoom, Meet, Teams, Camera, or another app using the camera, then try again.');
       throw e;
     }
   }
@@ -4793,7 +4846,16 @@ try{
       pfLocalStream=await pfGetMedia(mode);
       if(mode==='video'){
         const lv=q('pfLocalVideo');
-        if(lv){lv.srcObject=pfLocalStream;lv.classList.remove('hidden');lv.play?.().catch(()=>{});}
+        if(lv){
+          lv.srcObject=pfLocalStream;
+          lv.muted=true;
+          lv.autoplay=true;
+          lv.playsInline=true;
+          lv.classList.remove('hidden');
+          const p=lv.play?.();
+          if(p?.catch) p.catch(err=>console.warn('Local video playback:',err));
+        }
+        pfSetStatus('Camera ready • Ringing '+pfCallPeerName+'…');
       }
       pfConfigurePeer();
       pfLocalStream.getTracks().forEach(t=>pfPc.addTrack(t,pfLocalStream));
@@ -4812,6 +4874,23 @@ try{
     }
   }
   window.pfStartCall=pfStartCall;
+
+  // Useful for troubleshooting video calls without changing the UI.
+  window.pfVideoDiagnostics=async function(){
+    try{
+      const devices=await navigator.mediaDevices.enumerateDevices();
+      const cameras=devices.filter(d=>d.kind==='videoinput');
+      console.log('Pixel-Friend video diagnostics:', {
+        secureContext: location.protocol==='https:' || location.hostname==='localhost',
+        cameraCount:cameras.length,
+        cameras:cameras.map(c=>({label:c.label||'(permission not granted)',id:c.deviceId}))
+      });
+      return cameras.length;
+    }catch(e){
+      console.error('Pixel-Friend video diagnostics failed:',e);
+      return 0;
+    }
+  };
 
   async function pfHandleOffer(sig,message){
     if(!sig?.offer || !sig.callId) return;
@@ -4848,7 +4927,15 @@ try{
       pfLocalStream=await pfGetMedia(pfCallMode);
       if(pfCallMode==='video'){
         const lv=q('pfLocalVideo');
-        if(lv){lv.srcObject=pfLocalStream;lv.classList.remove('hidden');lv.play?.().catch(()=>{});}
+        if(lv){
+          lv.srcObject=pfLocalStream;
+          lv.muted=true;
+          lv.autoplay=true;
+          lv.playsInline=true;
+          lv.classList.remove('hidden');
+          const p=lv.play?.();
+          if(p?.catch) p.catch(err=>console.warn('Local video playback:',err));
+        }
       }
       pfConfigurePeer();
       pfLocalStream.getTracks().forEach(t=>pfPc.addTrack(t,pfLocalStream));
