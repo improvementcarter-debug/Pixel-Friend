@@ -972,13 +972,253 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 }
 </style>
 
+
+<style id="pf-header-live-standard">
+/* ===== HEADER LIVE UPDATE + STANDARD TYPOGRAPHY ===== */
+
+/* Standard, clean system font throughout the app */
+html,body,
+button,input,textarea,select,
+body *{
+  font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;
+}
+body{font-size:16px;letter-spacing:0}
+h1{font-size:24px;line-height:1.35}
+h2{font-size:20px;line-height:1.4}
+h3{font-size:17px;line-height:1.4}
+.brand{font-size:16px;font-weight:700}
+.menu button{font-size:16px}
+.logo{font-size:22px}
+.account-badge,.account-type-banner{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif!important}
+.account-badge{font-weight:700}
+.tiny{font-size:13px}
+
+/* Header live update */
+.pf-live-update{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  max-width:min(650px,48vw);
+  height:40px;
+  padding:0 10px;
+  border:1px solid #304a6d;
+  border-radius:6px;
+  background:linear-gradient(90deg,#0b1627,#0d1b2e);
+  box-shadow:0 3px 10px rgba(0,0,0,.22);
+  overflow:hidden;
+  white-space:nowrap;
+}
+.pf-live-badge{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 8px;
+  border-radius:4px;
+  background:#a90000;
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+.pf-live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#fff;display:inline-block;
+  animation:pfHeaderLiveBlink .9s infinite;
+}
+.pf-live-message{
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:#dcecff;
+  font-size:13px;
+  font-weight:500;
+}
+.pf-live-time{
+  flex:0 0 auto;
+  color:#8fe8ff;
+  font-size:12px;
+  font-weight:700;
+  padding-left:8px;
+  border-left:1px solid #30415f;
+}
+@keyframes pfHeaderLiveBlink{
+  0%,100%{opacity:1}
+  50%{opacity:.3}
+}
+
+/* Remove any legacy breaking-footer display if old CSS remains elsewhere */
+.pf-breaking-footer{display:none!important}
+
+@media(max-width:1000px){
+  .pf-live-update{max-width:42vw}
+  .pf-live-message{font-size:12px}
+}
+@media(max-width:850px){
+  .pf-live-update{
+    max-width:calc(100vw - 150px);
+    height:36px;
+    padding:0 7px;
+    gap:6px;
+  }
+  .pf-live-message{display:none}
+  .pf-live-time{
+    border-left:0;
+    padding-left:0;
+    font-size:11px;
+  }
+  .pf-live-badge{font-size:9px;padding:4px 6px}
+}
+@media(max-width:520px){
+  .pf-live-update{max-width:calc(100vw - 120px)}
+  .pf-live-time{font-size:10px}
+  .pf-live-badge{font-size:8px}
+}
+</style>
+
+
+<style id="pf-topbar-live-layout">
+.topbar{gap:10px}
+.topbar .brand{flex:0 0 auto}
+.topbar .actions{min-width:0;flex:1;justify-content:flex-end}
+@media(max-width:850px){
+  .topbar{padding:7px 10px}
+  .topbar .actions{gap:5px}
+  .topbar .brand{max-width:105px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+</style>
+
+
+<style id="pf-professional-live-ticker">
+/* Professional TV-style LIVE UPDATE ticker */
+.pf-live-update{
+  display:flex!important;
+  align-items:center!important;
+  gap:0!important;
+  min-width:0!important;
+  max-width:min(720px,52vw)!important;
+  height:40px!important;
+  padding:0!important;
+  border:1px solid #314968!important;
+  border-radius:6px!important;
+  background:#0a1422!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.22)!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+.pf-live-badge{
+  position:relative!important;
+  z-index:3!important;
+  flex:0 0 auto!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  height:100%!important;
+  padding:0 11px!important;
+  border-radius:0!important;
+  background:#b00000!important;
+  color:#fff!important;
+  font-size:11px!important;
+  font-weight:800!important;
+  letter-spacing:.5px!important;
+}
+.pf-live-dot{
+  width:7px!important;
+  height:7px!important;
+  border-radius:50%!important;
+  background:#fff!important;
+  display:inline-block!important;
+  animation:pfHeaderLiveBlink .9s infinite!important;
+}
+.pf-live-message{
+  display:block!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+  color:#e8f3ff!important;
+  font-size:13px!important;
+  font-weight:500!important;
+  letter-spacing:.15px!important;
+  height:100%!important;
+  line-height:40px!important;
+  position:relative!important;
+  white-space:nowrap!important;
+}
+.pf-live-message::after{
+  content:""!important;
+  display:none!important;
+}
+.pf-live-ticker-track{
+  display:inline-block!important;
+  white-space:nowrap!important;
+  padding-left:100%!important;
+  animation:pfLiveTickerRTL 18s linear infinite!important;
+  will-change:transform!important;
+}
+.pf-live-time{
+  position:relative!important;
+  z-index:3!important;
+  flex:0 0 auto!important;
+  color:#8fe8ff!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  padding:0 9px!important;
+  height:100%!important;
+  line-height:40px!important;
+  border-left:1px solid #314968!important;
+  background:#0a1422!important;
+}
+@keyframes pfLiveTickerRTL{
+  from{transform:translateX(0)}
+  to{transform:translateX(-100%)}
+}
+@keyframes pfHeaderLiveBlink{
+  0%,100%{opacity:1}
+  50%{opacity:.3}
+}
+@media(max-width:1000px){
+  .pf-live-update{max-width:46vw!important}
+}
+@media(max-width:850px){
+  .pf-live-update{
+    max-width:calc(100vw - 150px)!important;
+    height:36px!important;
+  }
+  .pf-live-message{
+    font-size:11px!important;
+    line-height:36px!important;
+  }
+  .pf-live-time{
+    display:none!important;
+  }
+  .pf-live-badge{
+    font-size:9px!important;
+    padding:0 7px!important;
+  }
+}
+@media(max-width:520px){
+  .pf-live-update{max-width:calc(100vw - 120px)!important}
+  .pf-live-message{font-size:10px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .pf-live-ticker-track{animation-duration:35s!important}
+}
+</style>
+
 </head><body>
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
 <div id="pfSpaceGlow" aria-hidden="true"></div>
 
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">Connect in real-time, exchange tips and make new friends.</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">Login</button>      <button id="regTab" onclick="authTab('register')">Register</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="Email">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">🛡️ Login as Members</button><button class="secondary auth-guest" onclick="guestLogin()">👤 Continue as Guest</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.📌</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
-<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <div id="pfLiveDateTime" class="pf-live-datetime" aria-live="polite">--</div>        <input id="globalSearch" placeholder="Search friends..." oninput="searchUsers(true)">        <div class="notification-wrap">
+<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <div id="pfLiveUpdate" class="pf-live-update" aria-live="polite">
+  <span class="pf-live-badge"><span class="pf-live-dot"></span> LIVE UPDATE</span>
+  <span class="pf-live-message">Welcome to Pixel-Friend • New activity • Messages • Stories • Posts • Reactions</span>
+  <span id="pfLiveDateTime" class="pf-live-time">--</span>
+</div>        <input id="globalSearch" placeholder="Search friends..." oninput="searchUsers(true)">        <div class="notification-wrap">
       <button class="notification-button" onclick="toggleNotifications(event)" title="Notifications">📢<span id="notifBadge" class="badge" style="position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:10px;padding:1px 4px;border-radius:2px;display:none;">0</span></button>
       <div id="notificationPanel" class="notification-panel hidden">
         <div class="notification-panel-head"><strong>📢 NOTIFICATIONS <span id="notificationHeaderCount" class="pf-notification-header-count">0</span></strong><button class="notification-clear" onclick="markAllNotificationsRead(event)">MARK READ</button></div>
@@ -4265,20 +4505,56 @@ window.openMediaFullscreen=openMediaFullscreen;window.closeMediaFullscreen=close
 .notification-item-type{display:inline-block;margin-left:6px;padding:2px 5px;border:1px solid #35517a;border-radius:3px;font-size:10px;color:#9fc8ff;text-transform:uppercase}
 @media(max-width:850px){.pf-live-datetime{min-width:auto;font-size:10px;padding:6px}.actions input{width:150px!important}}
 @media(max-width:600px){.pf-live-datetime{display:none}.pf-notification-filters{overflow-x:auto;flex-wrap:nowrap}.pf-notification-filters button{white-space:nowrap}}
-</style><script id="pf-live-datetime">
+</style>
+<script id="pf-professional-live-ticker-script">
 (function(){
-  const el=document.getElementById('pfLiveDateTime');
-  const yearEl=document.getElementById('current-year');
-  function update(){
-    const now=new Date();
-    if(el){
-      el.textContent=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Phnom_Penh',weekday:'short',year:'numeric',month:'short',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).format(now)+' GMT+7';
+  const box=document.getElementById('pfLiveUpdate');
+  const message=document.querySelector('#pfLiveUpdate .pf-live-message');
+  if(!box || !message) return;
+
+  const items=[
+    'WELCOME TO PIXEL-FRIEND',
+    'LIVE COMMUNITY UPDATE',
+    'NEW MESSAGES • NEW STORIES • NEW POSTS',
+    'REACTIONS • COMMENTS • FRIENDS • FOLLOWING',
+    'STAY CONNECTED WITH PIXEL-FRIEND'
+  ];
+
+  message.innerHTML='';
+  const track=document.createElement('span');
+  track.className='pf-live-ticker-track';
+  track.textContent='  •  '+items.join('     •     ')+'     •  ';
+  message.appendChild(track);
+
+  // Restart the ticker cleanly whenever the browser returns to the tab.
+  document.addEventListener('visibilitychange',function(){
+    if(!document.hidden){
+      track.style.animation='none';
+      void track.offsetWidth;
+      track.style.animation='';
     }
-    if(yearEl) yearEl.textContent=String(now.getFullYear());
+  });
+
+  const clock=document.getElementById('pfLiveDateTime');
+  function updateClock(){
+    if(!clock) return;
+    clock.textContent=new Intl.DateTimeFormat('en-US',{
+      timeZone:'Asia/Phnom_Penh',
+      weekday:'short',
+      year:'numeric',
+      month:'short',
+      day:'2-digit',
+      hour:'2-digit',
+      minute:'2-digit',
+      second:'2-digit',
+      hour12:false
+    }).format(new Date())+' GMT+7';
   }
-  update(); setInterval(update,1000);
+  updateClock();
+  setInterval(updateClock,1000);
 })();
 </script>
+
 <script id="pf-audio-playlist-js">
 /* ===== PIXEL-FRIEND AUDIO PLAYLIST =====
    Local tracks are stored in IndexedDB so they survive refreshes.
@@ -4777,18 +5053,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
   setTimeout(()=>{ensurePostMetrics();updateNotificationCounts()},800);
 })();
 </script>
-<footer class="pf-breaking-footer" aria-label="Live updates">
-  <div class="pf-breaking-bar">
-    <div class="pf-breaking-label"><span class="pf-breaking-dot"></span> BREAKING</div>
-    <div class="pf-breaking-window" aria-label="Live community updates">
-      <div class="pf-breaking-track">
-        <span><strong>🔴 LIVE UPDATE</strong> • Welcome to Pixel-Friend • Connect • Chat • Share • React • Comment • Follow • New community activity is happening now • </span>
-        <span><strong>🔴 LIVE UPDATE</strong> • Welcome to Pixel-Friend • Connect • Chat • Share • React • Comment • Follow • New community activity is happening now • </span>
-      </div>
-    </div>
-    <div class="pf-breaking-live"><span class="pf-breaking-dot"></span>LIVE</div>
-  </div>
-</footer>
 <script>
 // Pixel-Friend Android V2 native push bridge.
 // The Android wrapper injects the FCM token here. This token is stored in Supabase
