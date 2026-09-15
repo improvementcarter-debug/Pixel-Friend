@@ -9,7 +9,6 @@
 
 
 
-
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Pixel-Friend</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 
 </script><style>@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');*{box-sizing:border-box}:root{  --bg:#070b14;--panel:#0d1422;--panel2:#111b2d;--panel3:#16233a;  --border:#30415f;--blue:#4ea1ff;--cyan:#43e7ff;--green:#55f39a;  --yellow:#ffd34e;--pink:#ff4f91;--purple:#9b6cff;--orange:#ff9b54;  --text:#f3f7ff;--muted:#8292b3;--shadow:#02050b;}html,body{margin:0;min-height:100%;background:var(--bg)}body{  color:var(--text);font-family:"VT323",Consolas,monospace;font-size:19px;  letter-spacing:.25px;  background:    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),    radial-gradient(circle at 50% -10%,#17294a 0,#070b14 48%);  background-size:8px 8px,8px 8px,100% 100%;}body:before{  content:"";position:fixed;inset:0;pointer-events:none;z-index:999;  background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(255,255,255,.018) 4px);}button,input,textarea,select{font:inherit}button{cursor:pointer}h1,h2,h3,.logo,.brand,.menu button,.badge,.notification-header strong{  font-family:"Press Start 2P",Consolas,monospace;}h1{font-size:20px;line-height:1.55}h2{font-size:15px;line-height:1.6}h3{font-size:13px}.hidden{display:none!important}.tiny{color:var(--muted);font-size:15px}.auth-screen{  min-height:100vh;display:grid;place-items:center;padding:20px;  background:radial-gradient(circle,#1a2b49 1px,transparent 1px);background-size:12px 12px;}.card,.auth-card{  background:linear-gradient(180deg,#111b2d,#0b1220);  border:2px solid var(--border);border-radius:4px;  box-shadow:6px 6px 0 var(--shadow);}.auth-card{width:min(460px,100%);padding:28px;}.logo{text-align:center;font-size:21px;text-shadow:3px 3px 0 #000}.logo-icon{font-size:58px}.tagline{text-align:center;color:var(--muted)}.tabs{display:flex;gap:8px;margin:22px 0}.tabs>*{flex:1}.tabs button,.menu button,.icon,.notification-button,.secondary{  background:#15233a;border:2px solid #2b3d5d;border-radius:2px;color:#dce8ff;  padding:11px 12px;box-shadow:3px 3px 0 #050912;}.tabs .active,.primary{  background:var(--blue)!important;border:2px solid #8ac5ff!important;color:#06101f!important;  border-radius:2px!important;box-shadow:3px 3px 0 #06101f!important;font-weight:900;}.primary,.secondary{padding:11px 15px}.secondary{color:#fff}.danger{background:#301629!important;color:#ff86ac!important;border-color:#71304f!important}button:active{transform:translate(2px,2px)}input,textarea,select{  width:100%;background:#070e1b;color:#fff;border:2px solid #2b3d5d;border-radius:2px;  padding:12px;margin-bottom:12px;outline:none;}input:focus,textarea:focus,select:focus{border-color:var(--cyan)}textarea{min-height:100px;resize:vertical}.status{min-height:22px;margin-top:8px;color:var(--green)}.app{display:none}.topbar{  height:62px;padding:8px 20px;background:#080f1d;border-bottom:2px solid var(--border);  display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:30;}.brand{font-size:14px;cursor:pointer}.actions{display:flex;gap:8px;align-items:center;position:relative}.actions input{width:200px;margin:0}.icon,.notification-button{width:44px;height:44px;padding:0;display:grid;place-items:center;position:relative}.layout{display:grid;grid-template-columns:225px 1fr;min-height:calc(100vh - 62px)}.side{background:#09111f;border-right:2px solid var(--border);padding:18px 16px}.mini{text-align:center}.avatar,.user-avatar{background:#17263f;border:2px solid #314667;display:grid;place-items:center;overflow:hidden;border-radius:2px;position:relative}.avatar{width:82px;height:82px;margin:0 auto 10px auto;font-size:40px}.avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-large-avatar{width:110px;height:110px;font-size:55px;margin:0 auto 15px auto}.presence-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:#667085;vertical-align:middle}.presence-dot.presence-online{position:static;width:8px;height:8px;border:0;background:var(--green);display:inline-block}.presence-label{font-size:11px;letter-spacing:.4px}.presence-label.online-label{color:var(--green)}.presence-label.offline-label{color:#8892a8}.online{position:absolute;right:2px;bottom:2px;width:12px;height:12px;background:var(--green);border:2px solid #07101b;border-radius:50%;z-index:2}.menu{display:flex;flex-direction:column;gap:6px;margin-top:22px}.menu button{text-align:left;width:100%;font-size:20px;border-radius:2px;padding:11px 9px;background:transparent;box-shadow:none}.menu button.active{background:#172c4d;color:#fff;border-left:4px solid var(--cyan)}main{padding:24px;max-width:1240px;width:100%;margin:auto}.page{display:none}.page.active{display:block}.hero{  background:linear-gradient(135deg,rgba(78,161,255,.16),transparent),#101d32;  border:2px solid #36547d;padding:24px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}.row{display:flex;gap:9px;align-items:center}.row>*{flex:1}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}.user-card{background:#0e1829;border:2px solid #2b3d5d;padding:15px}.user-avatar{width:46px;height:46px;font-size:24px}.post-card{background:#0d1626;border:2px solid var(--border);padding:18px;margin-top:16px;border-radius:3px}.post-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.post-author{display:flex;align-items:center;gap:12px}.post-media-img,.msg-media-img{max-width:100%;max-height:360px;border-radius:3px;border:1px solid #35537d;margin-top:8px;object-fit:contain}.msg-media-video{max-width:100%;max-height:300px;border-radius:3px;border:1px solid #35537d;margin-top:8px}.post-audio,.msg-audio{width:100%;margin-top:8px}.post-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px dashed #21334f}.react-btn{padding:5px 10px;background:#14233c;border:1px solid #2d456b;border-radius:2px;color:#d0e2ff;font-size:16px}.react-btn.active{background:#2a4f80;border-color:var(--cyan);color:#fff}.comment-section{margin-top:14px;background:#09101d;padding:12px;border:1px solid #1c2c47;border-radius:2px}.comment-item{padding:8px 0;border-bottom:1px solid #18273f;display:flex;gap:8px;align-items:flex-start}.comment-reply-preview{background:#060c16;border-left:3px solid var(--cyan);padding:4px 8px;margin-bottom:6px;font-size:15px;display:flex;justify-content:space-between;align-items:center}.messages-layout{display:grid;grid-template-columns:280px 1fr;min-height:640px}.chat-users{border-right:2px solid var(--border);padding-right:15px}.chat-user{padding:12px;border:1px solid transparent;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:12px;border-radius:2px;position:relative}.chat-user:hover,.chat-user.active{background:#162945;border-color:#35557d}.chat-main{padding-left:20px;display:flex;flex-direction:column;min-width:0}.chat-header{border-bottom:2px solid var(--border);padding-bottom:12px;display:flex;justify-content:space-between;align-items:center}.messages-list{flex:1;min-height:380px;max-height:480px;overflow-y:auto;padding:15px 6px;scrollbar-color:#36557c #08101d;display:flex;flex-direction:column;gap:12px}.message-wrap{display:flex;flex-direction:column;align-items:flex-start;position:relative;max-width:82%}.message-wrap.mine{align-self:flex-end;align-items:flex-end}.message{position:relative;border:2px solid #304362;background:#14233b;padding:10px 14px;border-radius:12px;word-break:break-word;box-shadow:2px 2px 0 var(--shadow)}.message.mine{background:#1f518d;border-color:#4ea1ff;color:#fff;border-bottom-right-radius:2px}.message:not(.mine){border-bottom-left-radius:2px}.message-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:10px;font-size:13px;opacity:0.8}.typing-indicator{font-size:15px;color:var(--cyan);margin-bottom:6px;font-style:italic}.chat-input-bar{display:flex;flex-direction:column;gap:6px;margin-top:10px}.chat-controls{display:flex;gap:8px;align-items:center}.chat-controls input{margin:0}.file-pill{padding:6px 10px;background:#0a1526;border:1px dashed #416284;color:#9fc8ff;font-size:14px;margin-right:6px}.notification-wrap{position:relative}.notification-panel{position:absolute;right:0;top:50px;width:min(390px,calc(100vw - 30px));background:#0b1423;border:2px solid var(--border);box-shadow:5px 5px 0 #02050b;z-index:1000}.notification-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:2px solid var(--border);font-size:12px}.notification-clear{background:#15233a;border:1px solid #2b3d5d;color:#dce8ff;padding:5px 7px;font-size:10px}.notification-list{max-height:430px;overflow-y:auto}.notification-item{display:flex;gap:10px;padding:11px;border-bottom:1px solid #1c2c47;cursor:pointer;background:#0d1829}.notification-item:hover{background:#162945}.notification-item.unread{border-left:4px solid var(--cyan)}.notification-item-icon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;background:#16263e;border:1px solid #35517a}.notification-item-body{min-width:0}.notification-item-title{font-size:16px;font-weight:bold}.notification-item-text{font-size:16px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;margin-top:3px;color:#eaf2ff}.notification-item-time{font-size:12px;color:var(--muted);margin-top:4px}.notification-empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:14px}@media(max-width:600px){.notification-panel{right:-48px}}.toast{position:fixed;right:20px;bottom:20px;background:#0c1728;border:2px solid var(--cyan);padding:14px 18px;z-index:200;max-width:min(460px,calc(100vw - 40px))}.recording-active{animation:pulse 1s infinite alternate;background:#711c38!important;border-color:#ff4f91!important}@keyframes pulse{from{opacity:1}to{opacity:0.5}}@media(max-width:850px){  .layout{grid-template-columns:1fr}.side{display:none}.actions input{display:none}.messages-layout{grid-template-columns:1fr}  .chat-users{border-right:0;border-bottom:2px solid var(--border);padding:0 0 15px;margin-bottom:15px}}.message-status{display:block;margin-top:4px;text-align:right;font-size:11px;color:var(--muted);letter-spacing:.5px}.message-status.seen{color:var(--cyan);font-weight:bold}.message-wrap:not(.mine) .message-status{text-align:left}
@@ -890,7 +889,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 </section>
 
 </section>
-</main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><button class="secondary" type="button" onclick="testStoryConnection()">🔧 TEST STORY CONNECTION</button><div id="storyStatus" class="status"></div></div></div></div></div>
+</main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
 <div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
 
 <div id="publicProfileModal" class="public-profile-modal hidden" onclick="if(event.target===this)closePublicProfile()">
@@ -2524,347 +2523,134 @@ let storyReactionsDbAvailable = null;
 const STORY_EMOJIS = ['❤️','🔥','😂','😮','😢','👾'];
 
 function storySeenKey(id){ return `pixel_story_seen_${id}`; }
-function isStorySeen(id){ try{return localStorage.getItem(storySeenKey(id)) === '1';}catch(e){return false;} }
-function markStorySeen(id){ try{localStorage.setItem(storySeenKey(id),'1');}catch(e){} }
-
-function storyAvatarHtml(u){
-  return u?.avatar_url
-    ? `<img src="${esc(u.avatar_url)}" loading="lazy" decoding="async">`
-    : esc(profileAvatarValue(u));
-}
-function storyTimeLabel(date){
-  const ms=Date.now()-new Date(date).getTime();
-  const h=Math.max(0,Math.floor(ms/3600000));
-  const m=Math.max(0,Math.floor(ms/60000));
-  return h<1?(m<1?'JUST NOW':`${m}M AGO`):`${h}H AGO`;
-}
+function isStorySeen(id){ return localStorage.getItem(storySeenKey(id)) === '1'; }
+function markStorySeen(id){ try{ localStorage.setItem(storySeenKey(id),'1'); }catch(e){} }
+function storyAvatarHtml(u){ return u?.avatar_url ? `<img src="${esc(u.avatar_url)}" loading="lazy" decoding="async">` : esc(profileAvatarValue(u)); }
+function storyTimeLabel(date){ const ms=Date.now()-new Date(date).getTime(); const h=Math.max(0,Math.floor(ms/3600000)); const m=Math.max(0,Math.floor(ms/60000)); return h<1?(m<1?'JUST NOW':`${m}M AGO`):`${h}H AGO`; }
 function storyLocalReactionKey(id){ return `pixel_story_reactions_${id}`; }
-function getLocalStoryReactions(id){
-  try{return JSON.parse(localStorage.getItem(storyLocalReactionKey(id))||'[]');}catch(e){return [];}
-}
-function setLocalStoryReactions(id,rows){
-  try{localStorage.setItem(storyLocalReactionKey(id),JSON.stringify(rows));}catch(e){}
-}
-
+function getLocalStoryReactions(id){ try{return JSON.parse(localStorage.getItem(storyLocalReactionKey(id))||'[]');}catch(e){return [];} }
+function setLocalStoryReactions(id,rows){ try{localStorage.setItem(storyLocalReactionKey(id),JSON.stringify(rows));}catch(e){} }
 function buildStoryReactionSummary(rows){
   const counts=Object.fromEntries(STORY_EMOJIS.map(x=>[x,0]));
   const mine=new Set();
-  (rows||[]).forEach(r=>{
-    if(counts[r.emoji]!==undefined) counts[r.emoji]++;
-    if(String(r.user_id)===String(currentUser?.id)) mine.add(r.emoji);
-  });
+  (rows||[]).forEach(r=>{ if(counts[r.emoji]!==undefined) counts[r.emoji]++; if(r.user_id===currentUser?.id) mine.add(r.emoji); });
   return {counts,mine,total:(rows||[]).length};
 }
-
 async function loadStoryReactions(storyIds){
   storyReactionsCache=new Map();
   if(!storyIds.length) return;
   try{
-    const {data,error}=await sb.from('story_reactions')
-      .select('story_id,user_id,emoji').in('story_id',storyIds);
+    const {data,error}=await sb.from('story_reactions').select('story_id,user_id,emoji').in('story_id',storyIds);
     if(error) throw error;
     storyReactionsDbAvailable=true;
-    (data||[]).forEach(r=>{
-      const a=storyReactionsCache.get(r.story_id)||[];
-      a.push(r); storyReactionsCache.set(r.story_id,a);
-    });
+    (data||[]).forEach(r=>{const a=storyReactionsCache.get(r.story_id)||[];a.push(r);storyReactionsCache.set(r.story_id,a);});
   }catch(err){
     storyReactionsDbAvailable=false;
     storyIds.forEach(id=>storyReactionsCache.set(id,getLocalStoryReactions(id)));
   }
 }
-
-function storyStorageInfo(url){
-  try{
-    const u=new URL(url);
-    const marker='/storage/v1/object/';
-    const i=u.pathname.indexOf(marker);
-    if(i<0) return null;
-    let rest=u.pathname.slice(i+marker.length);
-    rest=rest.replace(/^sign\//,'').replace(/^public\//,'').replace(/^authenticated\//,'');
-    const parts=rest.split('/').filter(Boolean);
-    if(parts.length<2) return null;
-    return {bucket:decodeURIComponent(parts[0]),path:parts.slice(1).map(decodeURIComponent).join('/')};
-  }catch(e){ return null; }
-}
-
-async function resolveStoryMediaUrl(url){
-  if(!url) return url;
-  const info=storyStorageInfo(url);
-  if(!info) return url;
-  try{
-    const signed=await sb.storage.from(info.bucket).createSignedUrl(info.path,60*60*24);
-    if(!signed.error && signed.data?.signedUrl) return signed.data.signedUrl;
-  }catch(e){}
-  return url;
-}
-
 async function loadStories(){
-  if(!currentUser){
-    const row=$('storiesRow');
-    if(row) row.innerHTML='<div class="story-empty">Please log in to use Stories.</div>';
-    return;
-  }
+  if(!currentUser) return;
   try{
-    const now=new Date().toISOString();
+    const now = new Date().toISOString();
     const {data,error}=await sb.from('stories')
       .select('id,user_id,content,media_url,media_type,created_at,expires_at')
-      .gt('expires_at',now)
-      .order('created_at',{ascending:false})
-      .limit(100);
+      .gt('expires_at',now).order('created_at',{ascending:false}).limit(100);
     if(error) throw error;
-
-    const rows=(data||[]).filter(st=>!st.expires_at || new Date(st.expires_at)>new Date());
+    const rows=data||[];
     const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
     let profileMap=new Map();
-
     if(ids.length){
-      const pr=await sb.from('profiles')
-        .select('id,username,avatar,avatar_url,is_verified,is_guest')
-        .in('id',ids);
+      const pr=await sb.from('profiles').select('id,username,avatar,avatar_url,is_verified,is_guest').in('id',ids);
       if(pr.error) throw pr.error;
       profileMap=new Map((pr.data||[]).map(u=>[String(u.id),u]));
     }
-
-    // Resolve media URLs safely. Public buckets keep working; private buckets
-    // receive a fresh signed URL when the storage API allows it.
-    storiesCache=await Promise.all(rows.map(async st=>({
-      ...st,
-      media_url:await resolveStoryMediaUrl(st.media_url),
-      profiles:profileMap.get(String(st.user_id))||{
-        username:'PIXEL USER',avatar:'👤',is_guest:false,is_verified:false
-      }
-    })));
-
+    storiesCache=rows.map(st=>({...st,profiles:profileMap.get(String(st.user_id))||{username:'PIXEL USER',avatar:'👤',is_guest:false,is_verified:false}}));
+    // Load reactions separately so a missing optional table never blocks stories.
+    loadStoryReactions(rows.map(x=>x.id)).then(()=>{renderStories(); if(!$('storyViewerModal').classList.contains('hidden')) renderActiveStoryReactions();});
     renderStories();
-    await loadStoryReactions(rows.map(x=>x.id));
-    renderStories();
-    if(!$('storyViewerModal')?.classList.contains('hidden')) renderActiveStoryReactions();
   }catch(err){
     const message=err?.message||String(err);
     const row=$('storiesRow');
-    if(row) row.innerHTML=
-      `<div class="story-empty">❌ STORIES ERROR: ${esc(message)}<br><br>`+
-      `Check the "stories" table, RLS policies, and the "stories" storage bucket.</div>`;
+    if(row) row.innerHTML=`<div class="story-empty">❌ STORIES ERROR: ${esc(message)}<br><br>Check the stories table, RLS policies, and storage bucket.</div>`;
     console.warn('Stories:',err);
   }
 }
-
 function renderStories(){
   const row=$('storiesRow'); if(!row) return;
-  const cards=[
-    `<div class="story-card" onclick="openStoryCreator()">
-      <div class="story-ring story-add">＋</div>
-      <div class="story-name">YOUR STORY</div>
-    </div>`
-  ];
-
+  const cards=[`<div class="story-card" onclick="openStoryCreator()"><div class="story-ring story-add">＋</div><div class="story-name">YOUR STORY</div></div>`];
   storiesCache.forEach((st,i)=>{
     const u=st.profiles||{};
-    const preview=st.media_url
-      ? (st.media_type==='video'
-        ? `<video src="${esc(st.media_url)}" muted preload="metadata" playsinline></video>`
-        : `<img src="${esc(st.media_url)}" loading="lazy" decoding="async">`)
-      : `<div class="story-avatar-fallback">${storyAvatarHtml(u)}</div>`;
+    const preview=st.media_url ? (st.media_type==='video'?`<video src="${esc(st.media_url)}" muted preload="metadata"></video>`:`<img src="${esc(st.media_url)}" loading="lazy" decoding="async">`) : `<div class="story-avatar-fallback">${storyAvatarHtml(u)}</div>`;
     const reactionTotal=(storyReactionsCache.get(st.id)||[]).length;
-    cards.push(
-      `<div class="story-card" onclick="openStoryViewer(${i})">
-        <div class="story-ring ${isStorySeen(st.id)?'seen':''}">${preview}</div>
-        <div class="story-name">${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}</div>
-        ${reactionTotal?`<div class="tiny" style="font-size:12px">❤️ ${reactionTotal}</div>`:''}
-      </div>`
-    );
+    cards.push(`<div class="story-card" onclick="openStoryViewer(${i})"><div class="story-ring ${isStorySeen(st.id)?'seen':''}">${preview}</div><div class="story-name">${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}</div>${reactionTotal?`<div class="tiny" style="font-size:12px">❤️ ${reactionTotal}</div>`:''}</div>`);
   });
   row.innerHTML=cards.join('');
 }
-
-function openStoryCreator(){
-  if(!currentUser){ toast('Please log in first.'); return; }
-  const modal=$('storyCreatorModal');
-  if(!modal) return;
-  modal.classList.remove('hidden');
-  $('storyStatus').textContent='';
-}
-function closeStoryCreator(){
-  $('storyCreatorModal')?.classList.add('hidden');
-}
-function previewStoryMedia(){
-  const input=$('storyMediaInput');
-  const f=input?.files?.[0]||null;
-  storyMediaFile=f;
-  if($('storyMediaPreview')) $('storyMediaPreview').textContent=f?`Selected: ${f.name}`:'';
-}
-
-async function testStoryConnection(){
-  const out=$('storyStatus');
-  if(out) out.textContent='Testing Supabase Story connection...';
-  try{
-    const s=await sb.auth.getSession();
-    if(s.error) throw s.error;
-    if(!s.data?.session?.user) throw new Error('No active Supabase session.');
-
-    const u=s.data.session.user;
-    const p=await sb.from('profiles').select('id').eq('id',u.id).maybeSingle();
-    if(p.error) throw new Error('profiles SELECT failed: '+p.error.message);
-    if(!p.data) throw new Error('No matching profiles row for Auth user '+u.id);
-
-    const t=await sb.from('stories').select('id').limit(1);
-    if(t.error) throw new Error('stories SELECT failed: '+t.error.message);
-
-    const b=await sb.storage.from('stories').list(u.id,{limit:1});
-    if(b.error) throw new Error('Storage access failed: '+b.error.message);
-
-    if(out) out.innerHTML='✅ Supabase Story connection is working.<br>Auth ✓ &nbsp; Profile ✓ &nbsp; Stories table ✓ &nbsp; Storage ✓';
-  }catch(e){
-    console.error('Story connection test failed:',e);
-    if(out) out.innerHTML='❌ '+esc(e?.message||String(e));
-  }
-}
-window.testStoryConnection=testStoryConnection;
-
+function openStoryCreator(){ $('storyCreatorModal').classList.remove('hidden'); $('storyStatus').textContent=''; }
+function closeStoryCreator(){ $('storyCreatorModal').classList.add('hidden'); }
+function previewStoryMedia(){ const f=$('storyMediaInput').files[0]; storyMediaFile=f||null; $('storyMediaPreview').textContent=f?`Selected: ${f.name}`:''; }
 async function publishStory(){
-  if(!currentUser) return status('storyStatus','Please log in first.',true);
-
-  const text=$('storyText')?.value.trim()||'';
-  const file=storyMediaFile;
-  if(!text && !file) return status('storyStatus','Add text, a photo, or a video.',true);
-
-  if(file && !/^image\/|^video\//i.test(file.type)){
-    return status('storyStatus','Only image and video files can be added to a story.',true);
-  }
-
+  const text=$('storyText').value.trim();
+  if(!text && !storyMediaFile) return status('storyStatus','Add text, a photo, or a video.',true);
   status('storyStatus','Publishing story...');
   try{
     let media_url=null,media_type=null;
-
-    if(file){
-      media_type=file.type.startsWith('video/')?'video':'image';
-      const safeExt=(file.name.split('.').pop()||'bin')
-        .replace(/[^a-zA-Z0-9]/g,'').slice(0,10)||'bin';
-      const path=`${currentUser.id}/story_${Date.now()}_${Math.random().toString(36).slice(2,8)}.${safeExt}`;
-
-      const up=await sb.storage.from('stories').upload(path,file,{
-        upsert:false,
-        contentType:file.type,
-        cacheControl:'3600'
-      });
-      if(up.error){
-        throw new Error(
-          'Story media upload failed: '+up.error.message+
-          ' | Check Storage bucket "stories" and its INSERT policy.'
-        );
-      }
-
-      // Public URL is stored for compatibility with the existing stories schema.
-      // The loader can also convert it to a signed URL for private buckets.
-      const pub=sb.storage.from('stories').getPublicUrl(path);
-      media_url=pub?.data?.publicUrl||null;
-      if(!media_url) throw new Error('Could not create the story media URL.');
+    if(storyMediaFile){
+      media_type=storyMediaFile.type.startsWith('video/')?'video':'image';
+      const ext=(storyMediaFile.name.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'');
+      const path=`${currentUser.id}/story_${Date.now()}.${ext}`;
+      const up=await sb.storage.from('stories').upload(path,storyMediaFile,{upsert:false,contentType:storyMediaFile.type});
+      if(up.error) throw up.error;
+      media_url=sb.storage.from('stories').getPublicUrl(path).data.publicUrl;
     }
-
-    const created_at=new Date();
-    const expires_at=new Date(created_at.getTime()+24*60*60*1000);
-
-    const {error}=await sb.from('stories').insert({
-      user_id:currentUser.id,
-      content:text,
-      media_url,
-      media_type,
-      created_at:created_at.toISOString(),
-      expires_at:expires_at.toISOString()
-    });
-    if(error){
-      throw new Error(
-        'Story database insert failed: '+error.message+
-        (error.code ? ' [code '+error.code+']' : '')+
-        ' | Check public.stories RLS INSERT policy.'
-      );
-    }
-
-    $('storyText').value='';
-    $('storyMediaInput').value='';
-    storyMediaFile=null;
-    $('storyMediaPreview').textContent='';
-    closeStoryCreator();
-    playRetroSound('success');
-    toast('📸 Story published for 24 hours!');
-    await loadStories();
+    const created_at=new Date(); const expires_at=new Date(created_at.getTime()+24*60*60*1000);
+    const {error}=await sb.from('stories').insert({user_id:currentUser.id,content:text,media_url,media_type,expires_at:expires_at.toISOString()});
+    if(error) throw error;
+    $('storyText').value=''; $('storyMediaInput').value=''; storyMediaFile=null; $('storyMediaPreview').textContent='';
+    closeStoryCreator(); playRetroSound('success'); toast('📸 Story published for 24 hours!'); await loadStories();
   }catch(err){
     console.error('Publish story failed:',err);
     status('storyStatus','❌ Story publish failed: '+(err?.message||String(err)),true);
   }
 }
-
-async function openStoryViewer(index){
+function openStoryViewer(index){
   if(!storiesCache[index]) return;
   activeStoryIndex=index;
   const st=storiesCache[index],u=st.profiles||{};
   markStorySeen(st.id);
-
   $('storyViewAvatar').innerHTML=storyAvatarHtml(u);
   $('storyViewName').innerHTML=`${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}`;
-  $('storyViewTime').textContent=
-    storyTimeLabel(st.created_at)+' • EXPIRES '+new Date(st.expires_at).toLocaleTimeString();
+  $('storyViewTime').textContent=storyTimeLabel(st.created_at)+' • EXPIRES '+new Date(st.expires_at).toLocaleTimeString();
   $('storyCaption').innerHTML=linkify(st.content||'');
-
-  const body=$('storyViewBody');
-  body.innerHTML=st.media_url
-    ? (st.media_type==='video'
-      ? `<video src="${esc(st.media_url)}" controls autoplay playsinline preload="metadata"></video>`
-      : `<img src="${esc(st.media_url)}" loading="eager" decoding="async">`)
-    : `<div class="story-text">${linkify(st.content||'PIXEL STORY')}</div>`;
-
-  body.insertAdjacentHTML('beforeend',
-    `<div class="story-nav">
-      <button aria-label="Previous story" onclick="storyPrev()"></button>
-      <button aria-label="Next story" onclick="storyNext()"></button>
-    </div>`
-  );
-
-  $('storyProgress').innerHTML=storiesCache.map((_,i)=>
-    `<span class="${i===index?'active':''}"></span>`).join('');
-  $('storyDeleteBtn').classList.toggle('hidden',
-    String(st.user_id)!==String(currentUser?.id));
+  $('storyViewBody').innerHTML=st.media_url ? (st.media_type==='video'?`<video src="${esc(st.media_url)}" controls autoplay playsinline preload="metadata"></video>`:`<img src="${esc(st.media_url)}" loading="eager" decoding="async">`) : `<div class="story-text">${linkify(st.content||'PIXEL STORY')}</div>`;
+  $('storyViewBody').insertAdjacentHTML('beforeend',`<div class="story-nav"><button aria-label="Previous story" onclick="storyPrev()"></button><button aria-label="Next story" onclick="storyNext()"></button></div>`);
+  $('storyProgress').innerHTML=storiesCache.map((_,i)=>`<span class="${i===index?'active':''}"></span>`).join('');
+  $('storyDeleteBtn').classList.toggle('hidden',st.user_id!==currentUser.id);
   $('storyViewerModal').classList.remove('hidden');
   renderActiveStoryReactions();
   renderStories();
 }
-
 function renderActiveStoryReactions(){
   const st=storiesCache[activeStoryIndex]; if(!st) return;
   const viewer=$('storyViewerModal'); if(!viewer) return;
   viewer.querySelector('.story-reactions')?.remove();
-
   const summary=buildStoryReactionSummary(storyReactionsCache.get(st.id)||[]);
-  const html=`<div class="story-reactions">${
-    STORY_EMOJIS.map(e=>
-      `<button class="story-react-btn ${summary.mine.has(e)?'active':''}"
-        onclick="toggleStoryReaction('${esc(st.id)}','${e}')">
-        ${e}<span class="story-react-count">${summary.counts[e]||0}</span>
-      </button>`
-    ).join('')
-  }<span class="story-reaction-summary">${
-    summary.total?`${summary.total} reaction${summary.total===1?'':'s'}`:'Be the first to react'
-  }</span></div>`;
+  const html=`<div class="story-reactions">${STORY_EMOJIS.map(e=>`<button class="story-react-btn ${summary.mine.has(e)?'active':''}" onclick="toggleStoryReaction('${st.id}','${e}')">${e}<span class="story-react-count">${summary.counts[e]||0}</span></button>`).join('')}<span class="story-reaction-summary">${summary.total?`${summary.total} reaction${summary.total===1?'':'s'}`:'Be the first to react'}</span></div>`;
   $('storyViewBody').insertAdjacentHTML('afterend',html);
 }
-
 async function toggleStoryReaction(storyId,emoji){
   if(!currentUser) return toast('Please log in first.');
   let rows=storyReactionsCache.get(storyId)||[];
-  const mine=rows.find(r=>String(r.user_id)===String(currentUser.id)&&r.emoji===emoji);
-
+  const mine=rows.find(r=>r.user_id===currentUser.id && r.emoji===emoji);
   if(storyReactionsDbAvailable){
     try{
       if(mine){
-        const {error}=await sb.from('story_reactions').delete()
-          .eq('story_id',storyId).eq('user_id',currentUser.id).eq('emoji',emoji);
+        const {error}=await sb.from('story_reactions').delete().eq('story_id',storyId).eq('user_id',currentUser.id).eq('emoji',emoji);
         if(error) throw error;
-        rows=rows.filter(r=>!(String(r.user_id)===String(currentUser.id)&&r.emoji===emoji));
+        rows=rows.filter(r=>!(r.user_id===currentUser.id&&r.emoji===emoji));
       }else{
-        const {data,error}=await sb.from('story_reactions').insert({
-          story_id:storyId,user_id:currentUser.id,emoji
-        }).select('story_id,user_id,emoji').single();
+        const {data,error}=await sb.from('story_reactions').insert({story_id:storyId,user_id:currentUser.id,emoji}).select('story_id,user_id,emoji').single();
         if(error) throw error;
         rows=[...rows,data];
       }
@@ -2874,53 +2660,25 @@ async function toggleStoryReaction(storyId,emoji){
       rows=getLocalStoryReactions(storyId);
     }
   }
-
   if(!storyReactionsDbAvailable){
-    if(mine) rows=rows.filter(r=>!(String(r.user_id)===String(currentUser.id)&&r.emoji===emoji));
+    if(mine) rows=rows.filter(r=>!(r.user_id===currentUser.id&&r.emoji===emoji));
     else rows=[...rows,{story_id:storyId,user_id:currentUser.id,emoji}];
     setLocalStoryReactions(storyId,rows);
     storyReactionsCache.set(storyId,rows);
   }
-
-  renderActiveStoryReactions();
-  renderStories();
-  playRetroSound('success');
+  renderActiveStoryReactions(); renderStories(); playRetroSound('success');
 }
-
-function closeStoryViewer(){ $('storyViewerModal')?.classList.add('hidden'); }
-function storyPrev(){
-  if(!storiesCache.length) return;
-  openStoryViewer((activeStoryIndex-1+storiesCache.length)%storiesCache.length);
-}
-function storyNext(){
-  if(!storiesCache.length) return;
-  openStoryViewer((activeStoryIndex+1)%storiesCache.length);
-}
-
+function closeStoryViewer(){ $('storyViewerModal').classList.add('hidden'); }
+function storyPrev(){ openStoryViewer((activeStoryIndex-1+storiesCache.length)%storiesCache.length); }
+function storyNext(){ openStoryViewer((activeStoryIndex+1)%storiesCache.length); }
 async function deleteCurrentStory(){
-  const st=storiesCache[activeStoryIndex];
-  if(!st || String(st.user_id)!==String(currentUser?.id)) return;
+  const st=storiesCache[activeStoryIndex]; if(!st||st.user_id!==currentUser.id) return;
   if(!confirm('Delete this story?')) return;
-
-  const {error}=await sb.from('stories').delete()
-    .eq('id',st.id).eq('user_id',currentUser.id);
+  const {error}=await sb.from('stories').delete().eq('id',st.id).eq('user_id',currentUser.id);
   if(error) return toast('❌ '+error.message);
-
-  closeStoryViewer();
-  toast('🗑️ Story deleted');
-  await loadStories();
+  closeStoryViewer(); toast('🗑️ Story deleted'); await loadStories();
 }
-
-window.openStoryCreator=openStoryCreator;
-window.closeStoryCreator=closeStoryCreator;
-window.previewStoryMedia=previewStoryMedia;
-window.publishStory=publishStory;
-window.openStoryViewer=openStoryViewer;
-window.closeStoryViewer=closeStoryViewer;
-window.storyPrev=storyPrev;
-window.storyNext=storyNext;
-window.deleteCurrentStory=deleteCurrentStory;
-window.toggleStoryReaction=toggleStoryReaction;
+window.openStoryCreator=openStoryCreator; window.closeStoryCreator=closeStoryCreator; window.previewStoryMedia=previewStoryMedia; window.publishStory=publishStory; window.openStoryViewer=openStoryViewer; window.closeStoryViewer=closeStoryViewer; window.storyPrev=storyPrev; window.storyNext=storyNext; window.deleteCurrentStory=deleteCurrentStory; window.toggleStoryReaction=toggleStoryReaction;
 
 // ============================================================
 // FOLLOWING + FRIEND SYSTEM
@@ -4522,15 +4280,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
       const shares=num('shares',id);
       box.innerHTML=
         '<span class="pf-post-metric">❤️ <b>'+reactions+'</b> REACTIONS</span>'+
-        '<span class="pf-post-metric" data-post-action="view" data-post-id="'+esc(id)+'">👁️ <b>'+views+'</b> VIEWS</span>'+
-        '<span class="pf-post-metric" data-post-action="share" data-post-id="'+esc(id)+'">↗️ <b>'+shares+'</b> SHARES</span>';
-      box.querySelectorAll('[data-post-action]').forEach(el=>{
-        el.addEventListener('click',()=>{
-          const postId=el.getAttribute('data-post-id');
-          if(el.getAttribute('data-post-action')==='view' && typeof viewPost==='function') viewPost(postId);
-          if(el.getAttribute('data-post-action')==='share' && typeof sharePost==='function') sharePost(postId);
-        });
-      });
+        '<span class="pf-post-metric" onclick="viewPost(\\''+esc(id)+'\\')">👁️ <b>'+views+'</b> VIEWS</span>'+
+        '<span class="pf-post-metric" onclick="sharePost(\\''+esc(id)+'\\')">↗️ <b>'+shares+'</b> SHARES</span>';
     });
   }
 
@@ -4670,7 +4421,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
       const detail=isInteraction?(n.text||n.content||'Interaction'):notificationDetail(n);
       const icon=n.notification_kind==='reaction'?'❤️':n.notification_kind==='share'?'↗️':n.notification_kind==='profile_view'?'👤':notificationIcon(n);
       const type=n.notification_kind==='reaction'?'REACTION':n.notification_kind==='share'?'SHARE':n.notification_kind==='profile_view'?'PROFILE VIEW':notificationTypeLabel(notificationType(n));
-      return '<div class="notification-item '+(n.unread?'unread':'')+'" data-notification-id="'+esc(String(n.id))+'">'+
+      return '<div class="notification-item '+(n.unread?'unread':'')+'" onclick="openNotificationV2(\\''+esc(String(n.id))+'\\')">'+
         '<div class="notification-item-icon">'+icon+'</div><div class="notification-item-body">'+
         '<div class="notification-item-title">'+(isInteraction?'ACTIVITY':esc(n.senderName||'PIXEL USER'))+'</div>'+
         '<div class="notification-item-text">'+esc(detail)+' <span class="notification-item-type">'+type+'</span></div>'+
@@ -4678,17 +4429,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
     }).join('');
     updateNotificationCounts();
   };
-
-  // Safer notification click handling (avoids inline escaped-quote syntax issues).
-  if(!window.__pfNotificationClickBound){
-    window.__pfNotificationClickBound=true;
-    document.addEventListener('click', function(ev){
-      const item=ev.target.closest?.('.notification-item[data-notification-id]');
-      if(!item) return;
-      const id=item.getAttribute('data-notification-id');
-      if(id && typeof window.openNotificationV2==='function') window.openNotificationV2(id);
-    });
-  }
 
   window.openNotificationV2=function(id){
     const item=notificationItems.get(String(id)); if(!item)return;
