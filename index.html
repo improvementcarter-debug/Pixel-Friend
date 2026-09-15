@@ -890,7 +890,7 @@ h1{font-size:22px!important;line-height:1.35!important;font-weight:700!important
 </section>
 
 </section>
-</main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 New STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><div id="storyStatus" class="status"></div></div></div></div></div>
+</main></div></div><div id="storyCreatorModal" class="story-modal hidden"><div class="story-viewer" style="height:auto;max-height:calc(100vh - 32px);overflow:auto"><div class="story-view-head"><h2 style="margin:0;flex:1">📸 CREATE STORY</h2><button class="danger" onclick="closeStoryCreator()">✕</button></div><div style="padding:14px"><div class="story-form"><textarea id="storyText" maxlength="500" placeholder="Share a short story... (optional if you upload media)"></textarea><label class="story-upload-label">🖼️ / 📹 SELECT PHOTO OR VIDEO<input id="storyMediaInput" type="file" accept="image/*,video/*" onchange="previewStoryMedia()"></label><div id="storyMediaPreview" class="tiny"></div><button class="primary" onclick="publishStory()">🚀 PUBLISH STORY</button><button class="secondary" type="button" onclick="testStoryConnection()">🔧 TEST STORY CONNECTION</button><div id="storyStatus" class="status"></div></div></div></div></div>
 <div id="storyViewerModal" class="story-modal hidden"><div class="story-viewer"><div id="storyProgress" class="story-progress"></div><div class="story-view-head"><div id="storyViewAvatar" class="user-avatar" style="width:38px;height:38px"></div><div class="story-view-user"><strong id="storyViewName">PIXEL USER</strong><div id="storyViewTime" class="story-meta"></div></div><button id="storyDeleteBtn" class="danger hidden" style="padding:5px 7px;font-size:12px" onclick="deleteCurrentStory()">🗑</button><button class="secondary" style="padding:5px 8px" onclick="closeStoryViewer()">✕</button></div><div id="storyViewBody" class="story-view-body"></div><div id="storyCaption" class="story-caption"></div></div></div>
 
 <div id="publicProfileModal" class="public-profile-modal hidden" onclick="if(event.target===this)closePublicProfile()">
@@ -2695,6 +2695,33 @@ function previewStoryMedia(){
   if($('storyMediaPreview')) $('storyMediaPreview').textContent=f?`Selected: ${f.name}`:'';
 }
 
+async function testStoryConnection(){
+  const out=$('storyStatus');
+  if(out) out.textContent='Testing Supabase Story connection...';
+  try{
+    const s=await sb.auth.getSession();
+    if(s.error) throw s.error;
+    if(!s.data?.session?.user) throw new Error('No active Supabase session.');
+
+    const u=s.data.session.user;
+    const p=await sb.from('profiles').select('id').eq('id',u.id).maybeSingle();
+    if(p.error) throw new Error('profiles SELECT failed: '+p.error.message);
+    if(!p.data) throw new Error('No matching profiles row for Auth user '+u.id);
+
+    const t=await sb.from('stories').select('id').limit(1);
+    if(t.error) throw new Error('stories SELECT failed: '+t.error.message);
+
+    const b=await sb.storage.from('stories').list(u.id,{limit:1});
+    if(b.error) throw new Error('Storage access failed: '+b.error.message);
+
+    if(out) out.innerHTML='✅ Supabase Story connection is working.<br>Auth ✓ &nbsp; Profile ✓ &nbsp; Stories table ✓ &nbsp; Storage ✓';
+  }catch(e){
+    console.error('Story connection test failed:',e);
+    if(out) out.innerHTML='❌ '+esc(e?.message||String(e));
+  }
+}
+window.testStoryConnection=testStoryConnection;
+
 async function publishStory(){
   if(!currentUser) return status('storyStatus','Please log in first.',true);
 
@@ -2721,7 +2748,12 @@ async function publishStory(){
         contentType:file.type,
         cacheControl:'3600'
       });
-      if(up.error) throw up.error;
+      if(up.error){
+        throw new Error(
+          'Story media upload failed: '+up.error.message+
+          ' | Check Storage bucket "stories" and its INSERT policy.'
+        );
+      }
 
       // Public URL is stored for compatibility with the existing stories schema.
       // The loader can also convert it to a signed URL for private buckets.
@@ -2741,7 +2773,13 @@ async function publishStory(){
       created_at:created_at.toISOString(),
       expires_at:expires_at.toISOString()
     });
-    if(error) throw error;
+    if(error){
+      throw new Error(
+        'Story database insert failed: '+error.message+
+        (error.code ? ' [code '+error.code+']' : '')+
+        ' | Check public.stories RLS INSERT policy.'
+      );
+    }
 
     $('storyText').value='';
     $('storyMediaInput').value='';
@@ -4632,7 +4670,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
       const detail=isInteraction?(n.text||n.content||'Interaction'):notificationDetail(n);
       const icon=n.notification_kind==='reaction'?'❤️':n.notification_kind==='share'?'↗️':n.notification_kind==='profile_view'?'👤':notificationIcon(n);
       const type=n.notification_kind==='reaction'?'REACTION':n.notification_kind==='share'?'SHARE':n.notification_kind==='profile_view'?'PROFILE VIEW':notificationTypeLabel(notificationType(n));
-      return '<div class="notification-item '+(n.unread?'unread':'')+'" onclick="openNotificationV2(\\''+esc(String(n.id))+'\\')">'+
+      return '<div class="notification-item '+(n.unread?'unread':'')+'" data-notification-id="'+esc(String(n.id))+'">'+
         '<div class="notification-item-icon">'+icon+'</div><div class="notification-item-body">'+
         '<div class="notification-item-title">'+(isInteraction?'ACTIVITY':esc(n.senderName||'PIXEL USER'))+'</div>'+
         '<div class="notification-item-text">'+esc(detail)+' <span class="notification-item-type">'+type+'</span></div>'+
@@ -4640,6 +4678,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
     }).join('');
     updateNotificationCounts();
   };
+
+  // Safer notification click handling (avoids inline escaped-quote syntax issues).
+  if(!window.__pfNotificationClickBound){
+    window.__pfNotificationClickBound=true;
+    document.addEventListener('click', function(ev){
+      const item=ev.target.closest?.('.notification-item[data-notification-id]');
+      if(!item) return;
+      const id=item.getAttribute('data-notification-id');
+      if(id && typeof window.openNotificationV2==='function') window.openNotificationV2(id);
+    });
+  }
 
   window.openNotificationV2=function(id){
     const item=notificationItems.get(String(id)); if(!item)return;
