@@ -321,9 +321,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
 .pf-live-notification-time{margin-left:auto;font-size:11px;opacity:.55;white-space:nowrap}
 .pf-live-notification-text{font-size:13px;line-height:1.35;opacity:.88;margin-top:3px;word-break:break-word}
 .pf-live-notification-close{
-  border:0;background:transparent;color:inherit;opacity:.55;
-  cursor:pointer;font-size:16px;padding:0 2px;line-height:1
+  border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);color:inherit;
+  opacity:.85;cursor:pointer;font-size:11px;padding:5px 8px;line-height:1;
+  border-radius:7px;white-space:nowrap;font-family:"Press Start 2P",Consolas,monospace;
 }
+.pf-live-notification-close:hover{opacity:1;border-color:var(--cyan);background:rgba(67,231,255,.12)}
+.pf-live-notification.is-ringing{box-shadow:0 0 0 1px rgba(67,231,255,.22),0 12px 35px rgba(0,0,0,.45),0 0 22px rgba(67,231,255,.10)}
+
 .pf-live-notification-close:hover{opacity:1}
 .pf-live-notification-progress{height:2px;margin-top:9px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
 .pf-live-notification-progress span{display:block;height:100%;width:100%;background:currentColor;transform-origin:left;animation:pfNotifProgress 7s linear forwards}
@@ -1602,24 +1606,22 @@ function playRetroSound(type = 'click') {
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     const now = audioCtx.currentTime;
+
     if (type === 'click') {
       osc.type = 'square';
       osc.frequency.setValueAtTime(440, now);
       osc.frequency.exponentialRampToValueAtTime(220, now + 0.05);
       gain.gain.setValueAtTime(0.08, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
+      osc.start(now); osc.stop(now + 0.05);
     } else if (type === 'message') {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(587.33, now);
       osc.frequency.setValueAtTime(880, now + 0.08);
-      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.setValueAtTime(0.10, now);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-      osc.start(now);
-      osc.stop(now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
     } else if (type === 'notification') {
-      // Clear, short two-tone pop alert for incoming notifications.
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, now);
       osc.frequency.setValueAtTime(1174.66, now + 0.11);
@@ -1627,43 +1629,78 @@ function playRetroSound(type = 'click') {
       gain.gain.setValueAtTime(0.0001, now + 0.02);
       gain.gain.linearRampToValueAtTime(0.20, now + 0.035);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
-      osc.start(now);
-      osc.stop(now + 0.62);
+      osc.start(now); osc.stop(now + 0.62);
     } else if (type === 'image') {
-      osc.type='sine'; osc.frequency.setValueAtTime(660,now); osc.frequency.setValueAtTime(990,now+0.08); osc.frequency.setValueAtTime(1320,now+0.16);
-      gain.gain.setValueAtTime(0.13,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.34); osc.start(now); osc.stop(now+0.34);
-    } else if (type === 'video') {
-      osc.type='square'; osc.frequency.setValueAtTime(520,now); osc.frequency.setValueAtTime(780,now+0.10); osc.frequency.setValueAtTime(1040,now+0.20);
-      gain.gain.setValueAtTime(0.10,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.38); osc.start(now); osc.stop(now+0.38);
-    } else if (type === 'voice') {
-      osc.type='triangle'; osc.frequency.setValueAtTime(440,now); osc.frequency.setValueAtTime(660,now+0.12); osc.frequency.setValueAtTime(440,now+0.24);
-      gain.gain.setValueAtTime(0.12,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.42); osc.start(now); osc.stop(now+0.42);
-    } else if (type === 'sticker') {
-      osc.type='sine'; osc.frequency.setValueAtTime(740,now); osc.frequency.setValueAtTime(1110,now+0.07); osc.frequency.setValueAtTime(1480,now+0.14);
-      gain.gain.setValueAtTime(0.11,now); gain.gain.exponentialRampToValueAtTime(0.0001,now+0.30); osc.start(now); osc.stop(now+0.30);
-    } else if (type === 'post') {
-      osc.type='sawtooth';
-      osc.frequency.setValueAtTime(392,now);
-      osc.frequency.setValueAtTime(523.25,now+0.12);
-      osc.frequency.setValueAtTime(783.99,now+0.24);
+      osc.type='sine'; osc.frequency.setValueAtTime(660,now);
+      osc.frequency.setValueAtTime(990,now+0.08); osc.frequency.setValueAtTime(1320,now+0.16);
       gain.gain.setValueAtTime(0.13,now);
-      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.52);
-      osc.start(now); osc.stop(now+0.52);
-    } else if (type === 'success') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.setValueAtTime(554.37, now + 0.08);
-      osc.frequency.setValueAtTime(659.25, now + 0.16);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-      osc.start(now);
-      osc.stop(now + 0.3);
-    }  } catch (e) {
-    console.warn("Web Audio API not supported or blocked", e);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.34);
+      osc.start(now); osc.stop(now+0.34);
+    } else if (type === 'video') {
+      osc.type='square'; osc.frequency.setValueAtTime(520,now);
+      osc.frequency.setValueAtTime(780,now+0.10); osc.frequency.setValueAtTime(1040,now+0.20);
+      gain.gain.setValueAtTime(0.10,now);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.38);
+      osc.start(now); osc.stop(now+0.38);
+    } else if (type === 'voice') {
+      osc.type='triangle'; osc.frequency.setValueAtTime(440,now);
+      osc.frequency.setValueAtTime(660,now+0.12); osc.frequency.setValueAtTime(440,now+0.24);
+      gain.gain.setValueAtTime(0.12,now);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.42);
+      osc.start(now); osc.stop(now+0.42);
+    } else if (type === 'sticker' || type === 'post') {
+      osc.type='sine'; osc.frequency.setValueAtTime(740,now);
+      osc.frequency.setValueAtTime(988,now+0.10);
+      gain.gain.setValueAtTime(0.13,now);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.30);
+      osc.start(now); osc.stop(now+0.30);
+    } else {
+      osc.type='sine'; osc.frequency.setValueAtTime(660,now);
+      gain.gain.setValueAtTime(0.10,now);
+      gain.gain.exponentialRampToValueAtTime(0.0001,now+0.20);
+      osc.start(now); osc.stop(now+0.20);
+    }
+  } catch(e) {
+    console.warn('Pixel-Friend sound error:', e);
   }
 }
 
-// Click sounds intentionally disabled. Only notification/message alerts use audio.
+/* ===== PERSISTENT NOTIFICATION ALERT SOUND =====
+   Each incoming realtime notification gets its own loop.
+   The loop is stopped only when that notification is dismissed/opened.
+*/
+const pfNotificationRingers = new Map();
+
+function pfStartNotificationSound(notificationId, soundType='notification'){
+  const id = String(notificationId || '');
+  if(!id) return;
+  pfStopNotificationSound(id);
+
+  const play = () => {
+    try { playRetroSound(soundType); } catch(e) {}
+  };
+  play();
+  const timer = setInterval(play, 1200);
+  pfNotificationRingers.set(id, timer);
+}
+
+function pfStopNotificationSound(notificationId){
+  const id = String(notificationId || '');
+  const timer = pfNotificationRingers.get(id);
+  if(timer){
+    clearInterval(timer);
+    pfNotificationRingers.delete(id);
+  }
+}
+
+function pfStopAllNotificationSounds(){
+  pfNotificationRingers.forEach(timer => clearInterval(timer));
+  pfNotificationRingers.clear();
+}
+
+window.pfStartNotificationSound = pfStartNotificationSound;
+window.pfStopNotificationSound = pfStopNotificationSound;
+window.pfStopAllNotificationSounds = pfStopAllNotificationSounds;
 
 function isAdmin(){
   return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
@@ -2201,6 +2238,11 @@ async function markAllNotificationsRead(e){
   toast('✅ Notifications marked as read');
 }
 window.markAllNotificationsRead=markAllNotificationsRead;
+const __pfOriginalMarkAllNotificationsRead = window.markAllNotificationsRead;
+window.markAllNotificationsRead = function(e){
+  pfStopAllNotificationSounds();
+  return __pfOriginalMarkAllNotificationsRead.apply(this, arguments);
+};
 
 function notifyIncomingMessage(message){
   if(window.pfIsCallSignal && window.pfIsCallSignal(message)) return;
@@ -2223,7 +2265,6 @@ function notifyIncomingMessage(message){
   renderNotificationBadge(localUnreadCount + 1);
   addNotificationItem(message, senderName, true);
   showTelegramNotification(message, senderName, senderAvatar);
-  playRetroSound(notificationSoundType(message));
 
   if('Notification' in window && Notification.permission === 'granted'){
     try{
@@ -2266,7 +2307,7 @@ async function notifyIncomingPost(post){
   const item={id:key,kind:'post',notification_kind:'post',post_id:String(post.id),sender_id:senderId,senderName,senderAvatar,content:post.content||'',image_url:post.image_url||null,video_url:post.video_url||null,created_at:post.created_at||new Date().toISOString(),unread:true};
   notificationItems.set(key,item); savePersistentPostNotifications();
   renderNotificationBadge(Array.from(notificationItems.values()).filter(n=>n.unread).length);
-  renderNotificationList(); showTelegramNotification(item,senderName,senderAvatar); playRetroSound('post');
+  renderNotificationList(); showTelegramNotification(item,senderName,senderAvatar);
   if(!notificationProfileCache.has(senderId)&&senderId){
     sb.from('profiles').select('username,avatar,avatar_url').eq('id',senderId).maybeSingle().then(({data})=>{
       const resolved=data?.username||'PIXEL USER'; notificationProfileCache.set(senderId,resolved); notificationProfileDataCache.set(senderId,data||{});
@@ -2281,30 +2322,36 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
   if(!stack || !message?.id) return;
 
   const id = String(message.id);
-  // Prevent duplicate popups for the same message.
   if(stack.querySelector(`[data-pf-notification-id="${CSS.escape(id)}"]`)) return;
 
+  const soundType = notificationSoundType(message);
   const item = document.createElement('div');
-  item.className = 'pf-live-notification';
+  item.className = 'pf-live-notification is-ringing';
   item.dataset.pfNotificationId = id;
   item.dataset.notificationKind = notificationType(message);
-  item.setAttribute('role','button');
+  item.setAttribute('role','alert');
   item.innerHTML = `
     <div class="pf-live-notification-avatar">${senderAvatar || '👾'}</div>
     <div class="pf-live-notification-main">
       <div class="pf-live-notification-head">
         <div class="pf-live-notification-name">${esc(senderName || 'PIXEL USER')}</div>
-        <div class="pf-live-notification-time">now</div>
+        <div class="pf-live-notification-time">LIVE</div>
       </div>
       <div class="pf-live-notification-text">${esc(notificationDetail(message))}</div>
       <div class="pf-live-notification-progress"><span></span></div>
     </div>
-    <button class="pf-live-notification-close" type="button" aria-label="Mark as read">✓</button>
+    <button class="pf-live-notification-close" type="button" aria-label="Dismiss notification">DISMISS</button>
   `;
 
-  const open = () => {
+  const removePopup = () => {
+    pfStopNotificationSound(id);
+    item.classList.remove('is-ringing');
     item.classList.add('removing');
     setTimeout(() => item.remove(), 200);
+  };
+
+  const open = () => {
+    removePopup();
     openNotification(id, message.sender_id, senderName);
   };
 
@@ -2313,19 +2360,41 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
     open();
   });
 
-  item.querySelector('.pf-live-notification-close')?.addEventListener('click', e => {
+  item.querySelector('.pf-live-notification-close')?.addEventListener('click', async e => {
     e.stopPropagation();
-    open();
+    pfStopNotificationSound(id);
+    removePopup();
+
+    // Dismiss = mark this alert read without navigating away.
+    try{
+      if(message.receiver_id && currentUser?.id){
+        await sb.from('messages')
+          .update({is_read:true, read_at:new Date().toISOString()})
+          .eq('id', id)
+          .eq('receiver_id', currentUser.id);
+      }
+    }catch(err){
+      console.warn('Dismiss notification read update failed:', err);
+    }
+
+    knownUnreadMessageIds.delete(id);
+    notificationItems.delete(id);
+    renderNotificationList();
+    renderNotificationBadge(Math.max(0, localUnreadCount - 1));
   });
 
   stack.prepend(item);
 
-  // Keep the stack compact.
-  while(stack.children.length > 4) stack.lastElementChild.remove();
+  while(stack.children.length > 4){
+    const old = stack.lastElementChild;
+    pfStopNotificationSound(old?.dataset?.pfNotificationId);
+    old?.remove();
+  }
 
-  // Persistent: unread notification remains visible until the user marks it as read.
-
+  // Start AFTER the popup exists so the alert is visibly and audibly live.
+  pfStartNotificationSound(id, soundType);
 }
+
 
 function requestNotificationPermission(){
   if('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(()=>{});
@@ -4343,6 +4412,7 @@ sb.auth.onAuthStateChange((event, session) => {
 });
 
 async function logout() {
+  pfStopAllNotificationSounds();
   notificationInitialized = false;
   knownUnreadMessageIds.clear();
   notificationProfileCache.clear();
@@ -5801,6 +5871,7 @@ try{
 
   // Close a call cleanly when the user logs out or closes the page.
   window.addEventListener('beforeunload',()=>{
+    try{ pfStopAllNotificationSounds(); }catch(e){}
     try{
       if(pfCallPeerId && pfCallId && sb && currentUser){
         // sendBeacon cannot authenticate Supabase, so best-effort only.
@@ -6051,6 +6122,18 @@ try{
   window.pfAlertNotification=(title,text)=>start(title,text);
 })();
 </script>
+
+/* ===== REALTIME NOTIFICATION DIAGNOSTICS ===== */
+window.pfNotificationDiagnostics = function(){
+  return {
+    realtimeStarted: !!window.realtimeStarted,
+    feedStatus: window.feedRealtimeStatus || 'unknown',
+    activeNotificationSounds: pfNotificationRingers.size,
+    visibleLivePopups: document.querySelectorAll('.pf-live-notification').length,
+    currentUser: !!window.currentUser
+  };
+};
+
 </body></html>
 
 <script>
