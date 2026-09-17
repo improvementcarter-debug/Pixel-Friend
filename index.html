@@ -1245,20 +1245,19 @@ h3{font-size:17px;line-height:1.4}
 #pfNotificationSoundLoop .pf-dismiss{width:100%;padding:12px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:800;background:#36e0ff;color:#071018}
 </style>
 
-<style id="pf-alert-enable-style">
-#pf-alert-enable-banner{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483647;background:#111827;color:#fff;border:2px solid #36e0ff;border-radius:14px;padding:14px 16px;box-shadow:0 8px 35px #0008;display:flex;gap:12px;align-items:center;max-width:calc(100vw - 28px);font:600 14px Arial,sans-serif}
+<style id="pf-persistent-alert-style">
+.notification-button.pf-notification-alarming{animation:pfBellAlarmFlash .65s steps(2,end) infinite!important;background:#8b163f!important;border-color:#ff6ba6!important;box-shadow:0 0 0 3px rgba(255,79,145,.25),0 0 24px rgba(255,79,145,.65)!important}
+@keyframes pfBellAlarmFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.14);filter:brightness(1.8)}}
+#pf-alert-enable-banner{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:2147483647;background:#111827;color:#fff;border:2px solid #36e0ff;border-radius:14px;padding:13px 16px;box-shadow:0 8px 35px #0008;display:flex;gap:12px;align-items:center;max-width:calc(100vw - 28px);font:600 14px Arial,sans-serif}
 #pf-alert-enable-banner button{border:0;border-radius:9px;background:#36e0ff;color:#071018;font-weight:800;padding:10px 14px;cursor:pointer}
-#pf-alert-enable-banner small{display:block;font-weight:400;opacity:.8;margin-top:3px}
-.notification-button.pf-notification-alarming{animation:pfBellAlarmFlash .65s steps(2,end) infinite;background:#8b163f!important;border-color:#ff6ba6!important;box-shadow:0 0 0 3px rgba(255,79,145,.25),0 0 24px rgba(255,79,145,.65)!important}
-@keyframes pfBellAlarmFlash{0%,100%{transform:scale(1);filter:none}50%{transform:scale(1.14);filter:brightness(1.8)}}
-#pf-alert-enable-banner .pf-alert-state{font-size:11px;opacity:.85;margin-top:4px}
+#pf-alert-enable-banner small{display:block;font-weight:400;opacity:.85;margin-top:3px}
 </style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
 <div id="pfNotifLoopTitle" class="pf-notif-title">🔔 NEW NOTIFICATION</div>
 <div id="pfNotifLoopText" class="pf-notif-text">You have a new notification.</div>
-<button type="button" class="pf-dismiss" id="pfNotifDismiss">DISMISS / STOP ALARM</button>
+<button type="button" class="pf-dismiss" id="pfNotifDismiss">DISMISS</button>
 </div></div>
 
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
@@ -1674,9 +1673,9 @@ function playRetroSound(type = 'click') {
   }
 }
 
-/* ===== PERSISTENT LIVE NOTIFICATION ALARM =====
-   One shared alarm continues until every live alert is closed/opened.
-   Browsers require one user gesture before sound can play.
+/* ===== PERSISTENT NOTIFICATION ALARM =====
+   The alarm is connected to the notification panel and keeps ringing
+   until the user opens/dismisses the notification or marks notifications read.
 */
 const pfNotificationRingers = new Set();
 let pfAlertAudioCtx = null;
@@ -1690,11 +1689,9 @@ function pfGetAlertAudioContext(){
     if(!AC) return null;
     if(!pfAlertAudioCtx) pfAlertAudioCtx = new AC();
     return pfAlertAudioCtx;
-  }catch(e){
-    console.warn('[PF Audio] Cannot create AudioContext:', e);
-    return null;
-  }
+  }catch(e){ console.warn('[PF Audio] Context error:', e); return null; }
 }
+
 async function pfUnlockAlertAudio(){
   try{
     const ctx = pfGetAlertAudioContext();
@@ -1709,48 +1706,44 @@ async function pfUnlockAlertAudio(){
     return false;
   }
 }
+
 function pfPlaySystemAlertTone(){
   try{
     const ctx = pfGetAlertAudioContext();
-    if(!ctx || ctx.state !== 'running'){
-      pfAlarmPending = true;
-      return false;
-    }
+    if(!ctx || ctx.state !== 'running'){ pfAlarmPending = true; return false; }
     const now = ctx.currentTime;
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.48, now + 0.025);
-    master.gain.setValueAtTime(0.48, now + 0.18);
-    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
-    master.connect(ctx.destination);
-
-    const o1 = ctx.createOscillator();
-    const o2 = ctx.createOscillator();
-    o1.type = 'square'; o2.type = 'sine';
-    o1.frequency.setValueAtTime(880, now);
-    o1.frequency.setValueAtTime(1174.66, now + 0.20);
-    o1.frequency.setValueAtTime(880, now + 0.40);
-    o2.frequency.setValueAtTime(440, now);
-    o2.frequency.setValueAtTime(587.33, now + 0.20);
-    o2.frequency.setValueAtTime(440, now + 0.40);
-    o1.connect(master); o2.connect(master);
-    o1.start(now); o2.start(now);
-    o1.stop(now + 0.65); o2.stop(now + 0.65);
-    setTimeout(() => { try{ master.disconnect(); }catch(e){} }, 900);
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.42, now + 0.025);
+    gain.gain.setValueAtTime(0.42, now + 0.16);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
+    gain.connect(ctx.destination);
+    const a = ctx.createOscillator(), b = ctx.createOscillator();
+    a.type = 'square'; b.type = 'sine';
+    a.frequency.setValueAtTime(880, now);
+    a.frequency.setValueAtTime(1174.66, now + 0.20);
+    a.frequency.setValueAtTime(880, now + 0.40);
+    b.frequency.setValueAtTime(440, now);
+    b.frequency.setValueAtTime(587.33, now + 0.20);
+    b.frequency.setValueAtTime(440, now + 0.40);
+    a.connect(gain); b.connect(gain);
+    a.start(now); b.start(now);
+    a.stop(now + 0.65); b.stop(now + 0.65);
+    setTimeout(()=>{ try{gain.disconnect();}catch(e){} }, 900);
     pfAlarmPending = false;
     return true;
-  }catch(e){
-    console.warn('[PF Audio] Alarm tone error:', e);
-    return false;
-  }
+  }catch(e){ console.warn('[PF Audio] Tone error:', e); return false; }
 }
+
 function pfSetBellAlarmState(active){
   document.querySelectorAll('.notification-button').forEach(btn=>{
     btn.classList.toggle('pf-notification-alarming', !!active);
-    btn.setAttribute('aria-label', active ? 'New notification — alarm active' : 'Notifications');
+    btn.setAttribute('aria-label', active ? 'New notification - alarm active' : 'Notifications');
   });
-  document.title = active ? '🔔 NEW ALERT — Pixel-Friend' : 'Pixel-Friend';
+  if(active) document.title = '🔔 NEW ALERT - Pixel-Friend';
+  else if(document.title.indexOf('NEW ALERT') >= 0) document.title = 'Pixel-Friend';
 }
+
 function pfStartGlobalNotificationAlarm(){
   pfAlarmPending = true;
   pfSetBellAlarmState(true);
@@ -1763,10 +1756,7 @@ function pfStartGlobalNotificationAlarm(){
   }
 }
 function pfStopGlobalNotificationAlarm(){
-  if(pfGlobalAlarmTimer){
-    clearInterval(pfGlobalAlarmTimer);
-    pfGlobalAlarmTimer = null;
-  }
+  if(pfGlobalAlarmTimer){ clearInterval(pfGlobalAlarmTimer); pfGlobalAlarmTimer = null; }
   pfAlarmPending = false;
   pfSetBellAlarmState(false);
 }
@@ -1785,39 +1775,421 @@ function pfStopAllNotificationSounds(){
   pfNotificationRingers.clear();
   pfStopGlobalNotificationAlarm();
 }
-async function pfUnlockAlertAudioFromGesture(){
-  const unlocked = await pfUnlockAlertAudio();
-  let notificationOK = true;
-  if('Notification' in window){
-    try{
-      if(Notification.permission === 'default') await Notification.requestPermission();
-      notificationOK = Notification.permission === 'granted';
-    }catch(e){ notificationOK = false; }
-  }else notificationOK = false;
-  if(unlocked && pfNotificationRingers.size) pfPlaySystemAlertTone();
-  console.info('[PF Audio] Activation result:', {
-    audioUnlocked: unlocked,
-    notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
-    desktopNotifications: notificationOK
-  });
-  return unlocked;
-}
-['pointerdown','touchstart','keydown'].forEach(evt=>{
+async function pfUnlockAlertAudioFromGesture(){ return await pfUnlockAlertAudio(); }
+
+['pointerdown','touchstart','keydown','click'].forEach(evt=>{
   document.addEventListener(evt, ()=>{ pfUnlockAlertAudio().catch(()=>{}); }, {passive:true,capture:true});
 });
 window.addEventListener('visibilitychange',()=>{
   if(document.visibilityState === 'visible') pfUnlockAlertAudio().catch(()=>{});
 });
+window.addEventListener('online',()=>{ if(typeof scheduleRealtimeReconnect==='function') scheduleRealtimeReconnect('browser online'); });
+
 window.pfStartNotificationSound = pfStartNotificationSound;
 window.pfStopNotificationSound = pfStopNotificationSound;
 window.pfStopAllNotificationSounds = pfStopAllNotificationSounds;
 window.pfUnlockAlertAudio = pfUnlockAlertAudio;
 window.pfTestSystemAlertSound = async function(){
   const ok = await pfUnlockAlertAudio();
-  if(!ok) return {ok:false, reason:'Browser audio is blocked. Click ENABLE ALERTS and allow sound.'};
+  if(!ok) return {ok:false, reason:'Click ENABLE ALERTS first and allow browser sound.'};
   return {ok:pfPlaySystemAlertTone(), message:'System alert sound played'};
 };
 
+
+function isAdmin(){
+  return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
+}
+
+function toast(m){
+  const e = $("toast");
+  e.textContent = m;
+  e.classList.remove("hidden");
+  clearTimeout(window.__toast);
+  window.__toast = setTimeout(()=>e.classList.add("hidden"), 4000);
+}
+
+function status(id, m, err=false){
+  if($(id)){
+    $(id).textContent = m;
+    $(id).style.color = err ? "#ff7795" : "var(--green)";
+  }
+}
+
+function page(name, btn){
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const target = $(name);
+  if(target) target.classList.add("active");
+  if(btn){
+    document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+  if(name === 'messages') updateNotificationBadge();
+  if(name === 'profile') renderProfileCover();
+  if(name === 'adminPanel' && isAdmin()) loadAdminUsers();
+}
+window.page = page;
+
+function authTab(t){
+  const l = t === "login";
+  $("loginPane").classList.toggle("hidden", !l);
+  $("registerPane").classList.toggle("hidden", l);
+  $("loginTab").classList.toggle("active", l);
+  $("regTab").classList.toggle("active", !l);
+}
+window.authTab = authTab;
+
+async function register(){
+  const username = $("regName").value.trim();
+  const email = $("regEmail").value.trim().toLowerCase();
+  const password = $("regPass").value;
+  const avatar = $("regAvatar").value;
+  if(username.length < 2 || !email.includes("@") || password.length < 6) return status("authStatus","Check input fields.",true);
+  status("authStatus","Creating account...");
+  const r = await sb.auth.signUp({email, password, options:{data:{username, avatar}}});
+  if(r.error) return status("authStatus", r.error.message, true);
+  const loginRes = await sb.auth.signInWithPassword({email, password});
+  if(loginRes.error){
+    status("authStatus", "Account created! Please log in.");
+    authTab('login');
+  } else {
+    await startApp(loginRes.data.user);
+  }
+}
+window.register = register;
+
+async function guestLogin(){
+  status("authStatus","Creating guest account...");
+  const r = await sb.auth.signInAnonymously({
+    options:{data:{username:"GUEST-" + Math.random().toString(36).slice(2,7).toUpperCase(), avatar:"👤", is_guest:true}}
+  });
+  if(r.error) return status("authStatus", "Guest login failed: " + r.error.message, true);
+  await startApp(r.data.user);
+}
+window.guestLogin = guestLogin;
+
+async function login(){
+  const email = $("loginEmail").value.trim().toLowerCase();
+  const password = $("loginPass").value;
+  if(!email || !password) return status("authStatus","Enter email & password.",true);
+  status("authStatus","Logging in...");
+  const r = await sb.auth.signInWithPassword({email, password});
+  if(r.error) return status("authStatus", r.error.message, true);
+  await startApp(r.data.user);
+}
+window.login = login;
+
+async function startApp(user){
+  currentUser = user;
+  $("authScreen").style.display = "none";
+  $("app").style.display = "block";
+  playRetroSound('success');
+  await loadProfile();
+  await applyPendingInvite();
+
+  if(currentUser.email === ADMIN_EMAIL && !currentProfile.is_admin) {
+    await sb.from("profiles").update({ is_admin: true }).eq("id", currentUser.id);
+    currentProfile.is_admin = true;
+  }
+
+  if(isAdmin()){
+    $("navAdmin").classList.remove("hidden");
+  }
+
+  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
+  setupRealtime();
+  await setupPresence();
+  startUserSummaryDashboard();
+  page("home");
+}
+
+
+let userSummaryRefreshTimer = null;
+let userSummaryRefreshInFlight = false;
+let userSummaryTotalUsers = 0;
+
+function setSummaryValue(id, value){ const el=$(id); if(el) el.textContent = Number.isFinite(Number(value)) ? Number(value).toLocaleString() : value; }
+
+function refreshPresenceSummary(){
+  setSummaryValue('summaryOnlineUsers', onlineUserIds.size);
+  if(userSummaryTotalUsers >= 0) setSummaryValue('summaryOfflineUsers', Math.max(0, userSummaryTotalUsers - onlineUserIds.size));
+  const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='LIVE • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+async function loadUserSummaryDashboard(){
+  if(!currentUser || userSummaryRefreshInFlight) return;
+  userSummaryRefreshInFlight = true;
+  try{
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayISO = today.toISOString();
+    const [totalRes, guestRes, newRes] = await Promise.all([
+      sb.from('profiles').select('*',{count:'exact',head:true}),
+      sb.from('profiles').select('*',{count:'exact',head:true}).eq('is_guest',true),
+      sb.from('profiles').select('*',{count:'exact',head:true}).gte('created_at',todayISO)
+    ]);
+    const total = Number(totalRes.count || 0);
+    userSummaryTotalUsers = total;
+    const guests = guestRes.error ? 0 : Number(guestRes.count || 0);
+    const realUsers = Math.max(0,total-guests);
+    setSummaryValue('summaryLoginUsers', realUsers);
+    setSummaryValue('summaryNewRegister', newRes.error ? 0 : Number(newRes.count || 0));
+    setSummaryValue('summaryOnlineUsers', onlineUserIds.size);
+    setSummaryValue('summaryOfflineUsers', Math.max(0,total-onlineUserIds.size));
+    const stamp=$('summaryUpdatedAt'); if(stamp) stamp.textContent='Update • '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }catch(e){
+    console.warn('User summary dashboard:',e);
+    refreshPresenceSummary();
+  }finally{ userSummaryRefreshInFlight=false; }
+}
+
+function startUserSummaryDashboard(){
+  if(userSummaryRefreshTimer) clearInterval(userSummaryRefreshTimer);
+  loadUserSummaryDashboard();
+  userSummaryRefreshTimer=setInterval(loadUserSummaryDashboard,30000);
+}
+
+async function refreshHomeDashboard(){
+  if(!currentProfile) return;
+  if(currentUser) await loadFollowingState();
+  const xp = Number(currentProfile.xp || 0), level = Math.floor(xp / 100) + 1, progress = xp % 100;
+  const setText=(id,v)=>{const e=$(id); if(e)e.textContent=v};
+  setText('railLevel', level); setText('railXpText', `${progress} / 100 XP`);
+  const bar=$('railXpBar'); if(bar) bar.style.width = progress + '%';
+  try{
+    const {data: rankUsers} = await sb.from('profiles').select('id,username,avatar,avatar_url,xp,is_guest').order('xp',{ascending:false}).limit(5);
+    const rankEl=$('homeRankList'); if(rankEl && rankUsers){ rankEl.innerHTML=rankUsers.map((u,i)=>`<div class="rank-row"><div class="rank-num">${i+1}</div><div class="rank-avatar">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`:esc(profileAvatarValue(u))}</div><div class="rank-name">${esc(u.username||'PLAYER')}${u.id===currentUser.id?' <span class="tiny">(YOU)</span>':''}</div><small>${u.xp||0} XP</small></div>`).join(''); }
+    const followEl=$('followMiniList'); if(followEl && rankUsers){ const picks=rankUsers.filter(u=>u.id!==currentUser.id).slice(0,3); followEl.innerHTML=picks.length?picks.map(u=>`<div class="follow-mini"><div class="mini-av">${u.avatar_url?`<img src="${esc(u.avatar_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:7px">`:esc(profileAvatarValue(u))}</div><div class="follow-name"><strong>${esc(u.username||'PLAYER')}</strong><div class="tiny">PIXEL EXPLORER</div></div><button class="follow-action-btn" data-follow-user-id="${esc(u.id)}" onclick="toggleFollow('${esc(u.id)}')">${followButtonLabel(u.id)}</button></div>`).join(''):'<div class="tiny">More friends will appear here.</div>'; }
+  }catch(e){ console.warn('Dashboard widgets:',e); }
+  const btn=$('dailyBonusBtn'); if(btn && localStorage.getItem('pixelFriendDailyBonus')===new Date().toDateString()){btn.textContent='CLAIMED ✓';btn.classList.add('claimed');}
+}
+async function claimDailyBonus(){
+  if(!currentUser || !currentProfile) return;
+  const key='pixelFriendDailyBonus', today=new Date().toDateString();
+  if(localStorage.getItem(key)===today) return toast('🎁 Daily bonus already claimed! Come back tomorrow.');
+  const newXP=Number(currentProfile.xp||0)+50;
+  const {error}=await sb.from('profiles').update({xp:newXP}).eq('id',currentUser.id);
+  if(error) return toast('❌ Unable to claim bonus: '+error.message);
+  currentProfile.xp=newXP; localStorage.setItem(key,today); toast('🎉 +50 XP claimed!'); await loadProfile(); await refreshHomeDashboard();
+}
+window.claimDailyBonus=claimDailyBonus;
+
+function formatPfDate(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}
+function renderProfileDetails(profile){if(!profile)return;const set=(id,v)=>{const e=$(id);if(e)e.textContent=v};const verified=profile.is_verified===true,online=onlineUserIds.has(String(profile.id));set('profileIdentity',isGuestProfile(profile)?'Guest':'Member');set('profileVerification',verified?'✓ Verified':'Not Verified');set('profileGender',profile.gender||'Not set');set('profileUserId',profile.id||'—');set('profileStatus',profile.status || (online?'Online':'Offline'));set('profileJoinDate',formatPfDate(profile.join_date||profile.created_at));const ve=$('profileVerification'),st=$('profileStatus');if(ve)ve.className=verified?'profile-verified':'';if(st)st.className=online?'profile-online':'profile-offline';}
+function renderPublicProfileDetails(u){const verified=u.is_verified===true,online=onlineUserIds.has(String(u.id));return `<div class="public-profile-details"><div class="public-profile-detail"><span>Identity</span><strong>${esc(isGuestProfile(u)?'Guest':'Member')}</strong></div><div class="public-profile-detail"><span>Verification</span><strong class="${verified?'profile-verified':''}">${verified?'✓ Verified':'Not Verified'}</strong></div><div class="public-profile-detail"><span>Gender</span><strong>${esc(u.gender||'Not set')}</strong></div><div class="public-profile-detail"><span>ID</span><strong>${esc(u.id||'—')}</strong></div><div class="public-profile-detail"><span>Status</span><strong class="${online?'profile-online':'profile-offline'}">${esc(u.status || (online?'Online':'Offline'))}</strong></div><div class="public-profile-detail"><span>Join Date</span><strong>${esc(formatPfDate(u.join_date||u.created_at))}</strong></div></div>`;}
+function pfPinnedKey(){return 'pf_pinned_chats_'+String(currentUser?.id||'guest');}
+function getPinnedChats(){try{return new Set(JSON.parse(localStorage.getItem(pfPinnedKey())||'[]').map(String));}catch(e){return new Set();}}
+function togglePinnedChat(id){const set=getPinnedChats(),k=String(id);if(set.has(k))set.delete(k);else set.add(k);localStorage.setItem(pfPinnedKey(),JSON.stringify([...set]));loadMessageUsers();}
+window.togglePinnedChat=togglePinnedChat;
+async function loadProfile(){
+  const authGuest = currentUser?.is_anonymous === true || currentUser?.user_metadata?.is_guest === true;
+  let r = await sb.from("profiles").select("*").eq("id", currentUser.id).maybeSingle();
+
+  if(!r.data){
+    const fallback = {
+      id: currentUser.id,
+      username: currentUser.user_metadata?.username || (authGuest ? "GUEST-" + String(currentUser.id).slice(0,5).toUpperCase() : "PLAYER"),
+      avatar: currentUser.user_metadata?.avatar || (authGuest ? "👤" : "👤"),
+      xp: 0,
+      is_verified: false,
+      is_guest: authGuest
+    };
+    r = await sb.from("profiles").upsert(fallback).select("*").maybeSingle();
+  } else if(authGuest && r.data.is_guest !== true){
+    // A database trigger may already have created this profile with the default
+    // is_guest=false. Correct it immediately for every anonymous login.
+    const {data: fixedProfile, error: fixError} = await sb
+      .from("profiles")
+      .update({is_guest:true})
+      .eq("id", currentUser.id)
+      .select("*")
+      .maybeSingle();
+    if(!fixError && fixedProfile) r.data = fixedProfile;
+    else r.data = {...r.data, is_guest:true}; // still identify correctly in this session
+  }
+
+  currentProfile = r.data;
+  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
+  $("sideName").textContent = currentProfile.username + verifiedBadge;
+  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
+  $("sideBio").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  $("profileNameDisplay").textContent = currentProfile.username + verifiedBadge;
+  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
+  $("profileBioDisplay").textContent = currentProfile.bio || "PIXEL EXPLORER";
+  document.body.classList.toggle('guest-user', isGuestProfile(currentProfile));
+  $("editUsernameInput").value = currentProfile.username || "";
+  $("editBioInput").value = currentProfile.bio || "";
+  if($("editGenderInput")) $("editGenderInput").value = currentProfile.gender || "";
+  if($("editStatusInput")) $("editStatusInput").value = currentProfile.status || "Active";
+  $("statLevel").textContent = Math.floor((currentProfile.xp || 0) / 100) + 1;
+  $("statXP").textContent = currentProfile.xp || 0;
+  renderAvatarDisplay();
+  renderProfileDetails(currentProfile);
+  renderProfileCover();
+  refreshHomeDashboard();
+}
+
+function profileAvatarValue(profile){
+  if(!profile) return '👤';
+  // Guest accounts always use the neutral Guest avatar instead of a game avatar
+  // when they do not have a real uploaded picture.
+  if(isGuestProfile(profile) && !profile.avatar_url) return '👤';
+  return profile.avatar || '👤';
+}
+function profileIdentityAvatarBadge(profile){
+  const guest = isGuestProfile(profile);
+  const verified = profile?.is_verified === true;
+  const label = verified ? '✓' : (guest ? 'G' : 'R');
+  const cls = verified ? 'verified' : (guest ? 'guest' : 'real');
+  return `<span class="profile-avatar-identity ${cls}" title="${verified ? 'Verified account' : (guest ? 'Guest account' : 'Real account')}">${label}</span>`;
+}
+function renderAvatarDisplay(){
+  const picture = currentProfile.avatar_url
+    ? `<img src="${esc(currentProfile.avatar_url)}" class="clickable-media" onclick="openMediaFullscreen('${esc(currentProfile.avatar_url)}','image')">`
+    : esc(profileAvatarValue(currentProfile));
+  const html = `${picture}<span class="online"></span>${profileIdentityAvatarBadge(currentProfile)}`;
+  $("sideAvatar").innerHTML = html;
+  $("profileAvatar").innerHTML = html;
+  $("headAvatar").innerHTML = currentProfile.avatar_url
+    ? `<img src="${esc(currentProfile.avatar_url)}" style="width:100%;height:100%;object-fit:cover">`
+    : esc(profileAvatarValue(currentProfile));
+}
+
+async function saveProfileInfo(){
+  const username = $("editUsernameInput").value.trim();
+  const bio = $("editBioInput").value.trim();
+  const gender = $("editGenderInput")?.value || "";
+  const status = $("editStatusInput")?.value || "Active";
+  if(!username) return toast("Username cannot be empty");
+  const r = await sb.from("profiles").update({ username, bio, gender: gender || null, status }).eq("id", currentUser.id);
+  if(r.error) return toast("❌ Error updating profile: " + r.error.message);
+  currentProfile.username = username;
+  currentProfile.bio = bio;
+  currentProfile.gender = gender || null;
+  currentProfile.status = status;
+  const verifiedBadge = currentProfile.is_verified ? ' ✅' : '';
+  $("sideName").textContent = username + verifiedBadge;
+  $("sideAccountType").innerHTML = accountBadge(currentProfile, true);
+  $("sideBio").textContent = bio || "PIXEL EXPLORER";
+  $("profileNameDisplay").textContent = username + verifiedBadge;
+  $("profileAccountType").innerHTML = accountTypeBanner(currentProfile);
+  $("profileBioDisplay").textContent = bio || "PIXEL EXPLORER";
+  playRetroSound('success');
+  toast("✅ Profile details updated!");
+}
+window.saveProfileInfo = saveProfileInfo;
+
+async function uploadImageToBucket(bucket,file,prefix){
+  if(!currentUser) throw new Error('Please log in first.');
+  if(!file) throw new Error('No image selected.');
+  if(!file.type || !file.type.startsWith('image/')) throw new Error('Please select an image file.');
+  if(file.size>8*1024*1024) throw new Error('Image is too large. Maximum size is 8 MB.');
+  const ext=(file.name.split('.').pop()||'jpg').replace(/[^a-zA-Z0-9]/g,'').toLowerCase()||'jpg';
+  const path=`${currentUser.id}/${prefix}_${Date.now()}.${ext}`;
+  const u=await sb.storage.from(bucket).upload(path,file,{upsert:true,contentType:file.type,cacheControl:'31536000'});
+  if(u.error) throw u.error;
+  return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+async function uploadAvatar(){
+  const input=$("avatarUploadInput"),file=input?.files?.[0]; if(!file)return;
+  toast("Uploading profile picture...");
+  try{
+    const avatar_url=await uploadImageToBucket("avatars",file,"avatar");
+    const {error}=await sb.from("profiles").update({avatar_url}).eq("id",currentUser.id); if(error)throw error;
+    currentProfile.avatar_url=avatar_url; renderAvatarDisplay(); playRetroSound('success'); toast("✅ Profile picture uploaded successfully!");
+  }catch(err){toast("❌ Profile picture upload failed: "+(err?.message||err));}finally{if(input)input.value=""}
+}
+window.uploadAvatar=uploadAvatar;
+async function uploadCover(){
+  const input=$("coverUploadInput"),file=input?.files?.[0]; if(!file)return;
+  const statusEl=$("coverUploadStatus"); if(statusEl)statusEl.textContent="Uploading cover photo...";
+  toast("Uploading cover photo...");
+  try{
+    const cover_url=await uploadImageToBucket("avatars",file,"cover");
+    const {error}=await sb.from("profiles").update({cover_url}).eq("id",currentUser.id); if(error)throw error;
+    currentProfile.cover_url=cover_url; renderProfileCover(); playRetroSound('success');
+    if(statusEl)statusEl.textContent="✅ Cover photo uploaded successfully!";
+    toast("✅ Cover photo uploaded successfully!");
+  }catch(err){
+    if(statusEl)statusEl.textContent="❌ Cover upload failed: "+(err?.message||err);
+    toast("❌ Cover photo upload failed: "+(err?.message||err)+" — make sure profiles.cover_url exists.");
+  }finally{if(input)input.value=""}
+}
+window.uploadCover=uploadCover;
+function renderProfileCover(){
+  const img=$("profileCoverImage"),ph=$("profileCoverPlaceholder"); if(!img||!ph)return;
+  const url=currentProfile?.cover_url;
+  if(url){img.src=url;img.classList.remove("hidden");img.onclick=()=>openMediaFullscreen(url,'image');ph.classList.add("hidden")}
+  else{img.removeAttribute("src");img.classList.add("hidden");ph.classList.remove("hidden")}
+}
+window.renderProfileCover=renderProfileCover;
+async function removeAvatar(){
+  try{const {error}=await sb.from("profiles").update({avatar_url:null}).eq("id",currentUser.id);if(error)throw error;
+    currentProfile.avatar_url=null;renderAvatarDisplay();toast("🗑️ Profile picture removed!");
+  }catch(err){toast("❌ Error removing profile picture: "+(err?.message||err))}
+}
+window.removeAvatar=removeAvatar;
+
+async function loadAdminUsers(){
+  if(!isAdmin()) return toast("❌ Unauthorized access");
+  const r = await sb.from("profiles").select("*").order("username", {ascending: true});
+  if(!r.data) return;
+
+  $("adminUserList").innerHTML = r.data.map(u => {
+    const isUserAdmin = u.is_admin === true;
+    const isVerified = u.is_verified === true;
+    return `
+      <div class="card" style="padding:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div class="row" style="gap:12px; align-items:center;">
+          <div class="user-avatar" style="width:36px;height:36px">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(profileAvatarValue(u))}</div>
+          <div>
+            <strong>${esc(u.username)}</strong>
+            ${isUserAdmin ? '<span style="color:var(--yellow);font-size:14px;">🛡️ [ADMIN]</span>' : ''}
+            ${accountBadge(u, true)}
+            <div class="tiny">ID: ${u.id}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="${isVerified ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserVerify('${u.id}', ${isVerified})">
+            ${isVerified ? '❌ Unverify' : '✅ Verify Account'}
+          </button>
+          <button class="${isUserAdmin ? 'secondary' : 'primary'}" style="padding:6px 12px; font-size:14px;" onclick="toggleUserAdmin('${u.id}', ${isUserAdmin})">
+            ${isUserAdmin ? '❌ Revoke Admin' : '🛡️ Make Admin'}
+          </button>
+        </div>
+      </div>    `;
+  }).join('');
+}
+window.loadAdminUsers = loadAdminUsers;
+
+async function toggleUserAdmin(targetUserId, currentStatus){
+  if(!isAdmin()) return toast("❌ Admin privileges required.");
+  const newStatus = !currentStatus;
+  const r = await sb.from("profiles").update({ is_admin: newStatus }).eq("id", targetUserId);
+  if(r.error){
+    toast("❌ Error: " + r.error.message);
+  } else {
+    toast(newStatus ? "✅ User promoted to Admin!" : "ℹ️ Admin role revoked.");
+    playRetroSound('success');
+    loadAdminUsers();
+  }
+}
+window.toggleUserAdmin = toggleUserAdmin;
+
+async function toggleUserVerify(targetUserId, currentStatus){
+  if(!isAdmin()) return toast("❌ Admin privileges required.");
+  const newStatus = !currentStatus;
+  const r = await sb.from("profiles").update({ is_verified: newStatus }).eq("id", targetUserId);
+  if(r.error){
+    toast("❌ Error: " + r.error.message);
+  } else {
+    toast(newStatus ? "✅ Account verified successfully!" : "ℹ️ Account verification removed.");
+    playRetroSound('success');
+    loadAdminUsers();
+  }
+}
+window.toggleUserVerify = toggleUserVerify;
+
+let notificationInitialized = false;
+let knownUnreadMessageIds = new Set();
 let notificationCheckInFlight = false;
 let localUnreadCount = 0;
 let notificationProfileCache = new Map();
@@ -1966,37 +2338,6 @@ window.markAllNotificationsRead = function(e){
   return __pfOriginalMarkAllNotificationsRead.apply(this, arguments);
 };
 
-function pfShowDesktopNotification(message, senderName){
-  if(!('Notification' in window)){
-    console.warn('[PF Desktop Alert] This browser does not support desktop notifications.');
-    return false;
-  }
-  if(Notification.permission !== 'granted'){
-    console.warn('[PF Desktop Alert] Permission is not granted:', Notification.permission);
-    return false;
-  }
-  try{
-    const n = new Notification('💬 ' + (senderName || 'PIXEL USER'), {
-      body: notificationDetail(message),
-      tag: 'pixel-friend-message-' + String(message.id),
-      renotify: true,
-      requireInteraction: true,
-      silent: false,
-      icon: './favicon.ico'
-    });
-    n.onclick = () => {
-      try{ window.focus(); }catch(e){}
-      try{ n.close(); }catch(e){}
-      if(message?.id) openNotification(String(message.id), message.sender_id, senderName || 'PIXEL USER');
-    };
-    return true;
-  }catch(err){
-    console.error('[PF Desktop Alert] Could not create desktop notification:', err);
-    return false;
-  }
-}
-window.pfShowDesktopNotification = pfShowDesktopNotification;
-
 function notifyIncomingMessage(message){
   if(window.pfIsCallSignal && window.pfIsCallSignal(message)) return;
   if(!currentUser || !message?.id || String(message.receiver_id) !== String(currentUser.id)) return;
@@ -2019,7 +2360,15 @@ function notifyIncomingMessage(message){
   addNotificationItem(message, senderName, true);
   showTelegramNotification(message, senderName, senderAvatar);
 
-  pfShowDesktopNotification(message, senderName);
+  if('Notification' in window && Notification.permission === 'granted'){
+    try{
+      new Notification(`💬 ${senderName}`, {
+        body: notificationDetail(message),
+        tag:'pixel-friend-'+id,
+        renotify:true
+      });
+    }catch(e){}
+  }
 
   // Profile lookup happens AFTER the alert is already visible/audible.
   if(!notificationProfileCache.has(senderId) && message.sender_id){
@@ -2130,9 +2479,12 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
 
   stack.prepend(item);
 
-  // Keep every active alert visible and ringing until the user explicitly
-  // dismisses it or opens it. Do not silently remove older alerts because
-  // that would also stop their system alert sound.
+  while(stack.children.length > 4){
+    const old = stack.lastElementChild;
+    pfStopNotificationSound(old?.dataset?.pfNotificationId);
+    old?.remove();
+  }
+
   // Start AFTER the popup exists so the alert is visibly and audibly live.
   pfStartNotificationSound(id, soundType);
 }
@@ -4017,13 +4369,8 @@ async function setupRealtime(force=false){
   const uid = String(currentUser.id);
 
   // LIVE FEED CHANNEL
-  const channelSuffix = '-' + uid + '-' + Date.now();
-  console.info('[PF Realtime] Creating feed channel', {uid, channel: 'pixel-friend-live-feed' + channelSuffix});
-  realtimeFeedChannel = sb.channel('pixel-friend-live-feed' + channelSuffix)
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => {
-      console.info('[PF Realtime EVENT] posts INSERT', payload);
-      loadFeed(true); notifyIncomingPost(payload.new);
-    })
+  realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => { loadFeed(true); notifyIncomingPost(payload.new); })
     .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
     .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
     .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
@@ -4033,33 +4380,21 @@ async function setupRealtime(force=false){
     })
     .subscribe(status => {
       feedRealtimeStatus = status;
-      console.log('[PF Realtime] FEED channel status:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ [PF Realtime] feed is LIVE');
-      if(status === 'CHANNEL_ERROR') console.error('❌ [PF Realtime] feed channel error');
+      console.log('Pixel-Friend FEED Realtime:', status);
+      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend feed is LIVE');
       if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
         scheduleRealtimeReconnect('feed ' + status);
       }
     });
 
   // DEDICATED LIVE MESSAGE/NOTIFICATION CHANNEL
-  console.info('[PF Realtime] Creating message channel', {uid, receiverFilter: 'receiver_id=eq.' + uid});
-  realtimeMessageChannel = sb.channel('pixel-friend-messages' + channelSuffix)
+  realtimeMessageChannel = sb.channel('pixel-friend-messages-' + uid + '-' + Date.now())
     .on('postgres_changes', {
       event:'INSERT', schema:'public', table:'messages',
       filter:'receiver_id=eq.' + uid
     }, async payload => {
       const msg=payload.new;
-      console.info('[PF Realtime EVENT] messages INSERT received', {
-        payload,
-        messageId: msg?.id,
-        senderId: msg?.sender_id,
-        receiverId: msg?.receiver_id,
-        currentUserId: uid
-      });
-      if(!msg || String(msg.sender_id) === uid) {
-        console.debug('[PF Realtime] Ignored own/empty message', msg);
-        return;
-      }
+      if(!msg || String(msg.sender_id) === uid) return;
 
       // This is the real-time notification path. No polling/query is needed.
       // NEVER wait for UI/database refresh before firing the alert.
@@ -4093,12 +4428,9 @@ async function setupRealtime(force=false){
         renderNotificationBadge(Math.max(0, localUnreadCount-1));
       }
     })
-    .subscribe((status, err) => {
-      console.log('[PF Realtime] MESSAGE channel status:', status, err || '');
-      if(status === 'SUBSCRIBED') console.log('✅ [PF Realtime] notifications are LIVE');
-      if(status === 'CHANNEL_ERROR') console.error('❌ [PF Realtime] message channel error:', err || 'No error payload');
-      if(status === 'TIMED_OUT') console.error('❌ [PF Realtime] message channel timed out');
-      if(status === 'CLOSED') console.warn('⚠️ [PF Realtime] message channel closed');
+    .subscribe(status => {
+      console.log('Pixel-Friend MESSAGE Realtime:', status);
+      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are LIVE');
       if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
         scheduleRealtimeReconnect('messages ' + status);
       }
@@ -4134,84 +4466,34 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// ===== REQUIRED BROWSER ALERT ACTIVATION =====
-(function installAlertActivationPrompt(){
+// One-click browser activation for sound and desktop notifications.
+(function installAlertActivation(){
   function mount(){
     if(document.getElementById('pf-alert-enable-banner')) return;
-    const box=document.createElement('div');
-    box.id='pf-alert-enable-banner';
-    box.innerHTML='<div>🔔 <b>Enable live system alerts</b><small>Click once to allow sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
+    const box=document.createElement('div'); box.id='pf-alert-enable-banner';
+    box.innerHTML='<div>🔔 <b>Enable notification alarm</b><small>Click once to allow repeating sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
     document.body.appendChild(box);
     box.querySelector('button').addEventListener('click', async ()=>{
-      const button = box.querySelector('button');
-      const small = box.querySelector('small');
-      button.disabled = true;
-      button.textContent = 'ENABLING…';
-      let audioOK = false;
-      try { audioOK = await pfUnlockAlertAudioFromGesture(); } catch(e) {}
-      let notificationOK = true;
+      const btn=box.querySelector('button'), small=box.querySelector('small');
+      btn.disabled=true; btn.textContent='ENABLING...';
+      const audioOK=await pfUnlockAlertAudioFromGesture();
+      let notifOK=true;
       if('Notification' in window){
-        try{
-          if(Notification.permission === 'default') await Notification.requestPermission();
-          notificationOK = Notification.permission === 'granted';
-        }catch(e){ notificationOK = false; }
-      } else notificationOK = false;
-
-      if(audioOK){
-        pfPlaySystemAlertTone();
-      }
-      if(audioOK && notificationOK){
-        small.textContent = 'Sound and desktop notifications are enabled. Keep this tab open.';
-        button.textContent = 'ENABLED ✓';
-        setTimeout(()=>box.remove(), 1400);
+        try{ if(Notification.permission==='default') await Notification.requestPermission(); notifOK=Notification.permission==='granted'; }
+        catch(e){ notifOK=false; }
+      } else notifOK=false;
+      if(audioOK) pfPlaySystemAlertTone();
+      if(audioOK && notifOK){
+        small.textContent='Sound and desktop notifications enabled. Keep this tab open.';
+        btn.textContent='ENABLED ✓'; setTimeout(()=>box.remove(),1600);
       }else{
-        button.disabled = false;
-        button.textContent = 'TRY AGAIN';
-        small.textContent = (!audioOK && !notificationOK)
-          ? 'Sound and notifications are blocked. Allow Sound and Notifications in the browser site settings, then try again.'
-          : (!audioOK
-            ? 'Desktop notifications are allowed, but sound is blocked. Allow Sound in browser site settings, then try again.'
-            : 'Sound works, but desktop notifications are not allowed. Allow Notifications in browser site settings, then try again.');
+        btn.disabled=false; btn.textContent='TRY AGAIN';
+        small.textContent=!audioOK ? 'Sound is blocked. Allow browser sound and try again.' : 'Notifications are blocked. Allow notifications in browser settings.';
       }
     });
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true});
-  else mount();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
 })();
-
-// ===== PIXEL-FRIEND REALTIME DIAGNOSTICS =====
-window.pfRealtimeDiagnostics = function(){
-  const state = {
-    currentUserId: currentUser?.id || null,
-    feedChannelState: realtimeFeedChannel?.state || null,
-    messageChannelState: realtimeMessageChannel?.state || null,
-    feedRealtimeStatus,
-    realtimeStarted,
-    supabaseReady: !!sb,
-    audioContextState: pfAlertAudioCtx?.state || null,
-    audioUnlocked: pfAlertAudioUnlocked,
-    notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
-    secureContext: window.isSecureContext,
-    pageProtocol: location.protocol,
-    pageVisibility: document.visibilityState,
-    online: navigator.onLine
-  };
-  console.table(state);
-  return state;
-};
-window.pfTestRealtimeMessageEvent = function(){
-  console.warn('[PF Realtime TEST] This only checks the browser handler. Insert a real row into public.messages to test Supabase delivery.');
-  const test = {
-    id: 'browser-test-' + Date.now(),
-    sender_id: 'test-sender',
-    receiver_id: currentUser?.id,
-    content: 'Browser Realtime handler test'
-  };
-  console.info('[PF Realtime TEST] Dispatching synthetic message:', test);
-  notifyIncomingMessage(test);
-  return test;
-};
-console.info('🧪 [PF Diagnostics] Run pfRealtimeDiagnostics() and pfTestRealtimeMessageEvent() in the console.');
 
 async function restoreSession() {
   try {
@@ -4264,40 +4546,6 @@ async function logout() {
   await sb.auth.signOut();
 }
 window.logout = logout;
-
-// ===== PIXEL-FRIEND REALTIME DIAGNOSTICS =====
-window.pfRealtimeDiagnostics = function(){
-  const state = {
-    currentUserId: currentUser?.id || null,
-    feedChannelState: realtimeFeedChannel?.state || null,
-    messageChannelState: realtimeMessageChannel?.state || null,
-    feedRealtimeStatus,
-    realtimeStarted,
-    supabaseReady: !!sb,
-    audioContextState: pfAlertAudioCtx?.state || null,
-    audioUnlocked: pfAlertAudioUnlocked,
-    notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
-    secureContext: window.isSecureContext,
-    pageProtocol: location.protocol,
-    pageVisibility: document.visibilityState,
-    online: navigator.onLine
-  };
-  console.table(state);
-  return state;
-};
-window.pfTestRealtimeMessageEvent = function(){
-  console.warn('[PF Realtime TEST] This only checks the browser handler. Insert a real row into public.messages to test Supabase delivery.');
-  const test = {
-    id: 'browser-test-' + Date.now(),
-    sender_id: 'test-sender',
-    receiver_id: currentUser?.id,
-    content: 'Browser Realtime handler test'
-  };
-  console.info('[PF Realtime TEST] Dispatching synthetic message:', test);
-  notifyIncomingMessage(test);
-  return test;
-};
-console.info('🧪 [PF Diagnostics] Run pfRealtimeDiagnostics() and pfTestRealtimeMessageEvent() in the console.');
 
 async function restoreSession() {
   try {
