@@ -1244,14 +1244,6 @@ h3{font-size:17px;line-height:1.4}
 #pfNotificationSoundLoop .pf-notif-text{font-size:14px;line-height:1.5;opacity:.92;margin-bottom:16px;word-break:break-word}
 #pfNotificationSoundLoop .pf-dismiss{width:100%;padding:12px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:800;background:#36e0ff;color:#071018}
 </style>
-
-<style id="pf-persistent-alert-style">
-.notification-button.pf-notification-alarming{animation:pfBellAlarmFlash .65s steps(2,end) infinite!important;background:#8b163f!important;border-color:#ff6ba6!important;box-shadow:0 0 0 3px rgba(255,79,145,.25),0 0 24px rgba(255,79,145,.65)!important}
-@keyframes pfBellAlarmFlash{0%,100%{transform:scale(1)}50%{transform:scale(1.14);filter:brightness(1.8)}}
-#pf-alert-enable-banner{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:2147483647;background:#111827;color:#fff;border:2px solid #36e0ff;border-radius:14px;padding:13px 16px;box-shadow:0 8px 35px #0008;display:flex;gap:12px;align-items:center;max-width:calc(100vw - 28px);font:600 14px Arial,sans-serif}
-#pf-alert-enable-banner button{border:0;border-radius:9px;background:#36e0ff;color:#071018;font-weight:800;padding:10px 14px;cursor:pointer}
-#pf-alert-enable-banner small{display:block;font-weight:400;opacity:.85;margin-top:3px}
-</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -1673,15 +1665,15 @@ function playRetroSound(type = 'click') {
   }
 }
 
-/* ===== PERSISTENT NOTIFICATION ALARM =====
-   The alarm is connected to the notification panel and keeps ringing
-   until the user opens/dismisses the notification or marks notifications read.
+/* ===== RELIABLE SYSTEM NOTIFICATION ALERT SOUND =====
+   Uses one shared Web Audio context and a per-notification timer.
+   The sound continues until that notification is opened/dismissed.
+   Browser autoplay rules are handled by unlocking/resuming the context
+   whenever the user interacts with the page.
 */
-const pfNotificationRingers = new Set();
+const pfNotificationRingers = new Map();
 let pfAlertAudioCtx = null;
 let pfAlertAudioUnlocked = false;
-let pfGlobalAlarmTimer = null;
-let pfAlarmPending = false;
 
 function pfGetAlertAudioContext(){
   try{
@@ -1689,19 +1681,20 @@ function pfGetAlertAudioContext(){
     if(!AC) return null;
     if(!pfAlertAudioCtx) pfAlertAudioCtx = new AC();
     return pfAlertAudioCtx;
-  }catch(e){ console.warn('[PF Audio] Context error:', e); return null; }
+  }catch(e){
+    console.warn('Pixel-Friend alert audio context error:', e);
+    return null;
+  }
 }
 
 async function pfUnlockAlertAudio(){
   try{
     const ctx = pfGetAlertAudioContext();
     if(!ctx) return false;
-    if(ctx.state !== 'running') await ctx.resume();
-    pfAlertAudioUnlocked = ctx.state === 'running';
-    if(pfAlertAudioUnlocked && pfAlarmPending) pfPlaySystemAlertTone();
+    if(ctx.state === 'suspended') await ctx.resume();
+    pfAlertAudioUnlocked = (ctx.state === 'running');
     return pfAlertAudioUnlocked;
   }catch(e){
-    console.warn('[PF Audio] Unlock failed:', e);
     pfAlertAudioUnlocked = false;
     return false;
   }
@@ -1710,80 +1703,96 @@ async function pfUnlockAlertAudio(){
 function pfPlaySystemAlertTone(){
   try{
     const ctx = pfGetAlertAudioContext();
-    if(!ctx || ctx.state !== 'running'){ pfAlarmPending = true; return false; }
+    if(!ctx || ctx.state !== 'running') return false;
+
     const now = ctx.currentTime;
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.42, now + 0.025);
-    gain.gain.setValueAtTime(0.42, now + 0.16);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
-    gain.connect(ctx.destination);
-    const a = ctx.createOscillator(), b = ctx.createOscillator();
-    a.type = 'square'; b.type = 'sine';
-    a.frequency.setValueAtTime(880, now);
-    a.frequency.setValueAtTime(1174.66, now + 0.20);
-    a.frequency.setValueAtTime(880, now + 0.40);
-    b.frequency.setValueAtTime(440, now);
-    b.frequency.setValueAtTime(587.33, now + 0.20);
-    b.frequency.setValueAtTime(440, now + 0.40);
-    a.connect(gain); b.connect(gain);
-    a.start(now); b.start(now);
-    a.stop(now + 0.65); b.stop(now + 0.65);
-    setTimeout(()=>{ try{gain.disconnect();}catch(e){} }, 900);
-    pfAlarmPending = false;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.32, now + 0.025);
+    master.gain.setValueAtTime(0.32, now + 0.10);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+    master.connect(ctx.destination);
+
+    const o1 = ctx.createOscillator();
+    const o2 = ctx.createOscillator();
+    o1.type = 'sine';
+    o2.type = 'sine';
+    o1.frequency.setValueAtTime(880, now);
+    o1.frequency.setValueAtTime(1174.66, now + 0.13);
+    o2.frequency.setValueAtTime(440, now);
+    o2.frequency.setValueAtTime(587.33, now + 0.13);
+    o1.connect(master);
+    o2.connect(master);
+
+    o1.start(now);
+    o2.start(now);
+    o1.stop(now + 0.40);
+    o2.stop(now + 0.40);
+
+    setTimeout(() => {
+      try{ master.disconnect(); }catch(e){}
+    }, 500);
     return true;
-  }catch(e){ console.warn('[PF Audio] Tone error:', e); return false; }
-}
-
-function pfSetBellAlarmState(active){
-  document.querySelectorAll('.notification-button').forEach(btn=>{
-    btn.classList.toggle('pf-notification-alarming', !!active);
-    btn.setAttribute('aria-label', active ? 'New notification - alarm active' : 'Notifications');
-  });
-  if(active) document.title = '🔔 NEW ALERT - Pixel-Friend';
-  else if(document.title.indexOf('NEW ALERT') >= 0) document.title = 'Pixel-Friend';
-}
-
-function pfStartGlobalNotificationAlarm(){
-  pfAlarmPending = true;
-  pfSetBellAlarmState(true);
-  if(!pfGlobalAlarmTimer){
-    pfPlaySystemAlertTone();
-    pfGlobalAlarmTimer = setInterval(()=>{
-      if(pfNotificationRingers.size) pfPlaySystemAlertTone();
-      else pfStopGlobalNotificationAlarm();
-    }, 1200);
+  }catch(e){
+    console.warn('Pixel-Friend system alert tone error:', e);
+    return false;
   }
 }
-function pfStopGlobalNotificationAlarm(){
-  if(pfGlobalAlarmTimer){ clearInterval(pfGlobalAlarmTimer); pfGlobalAlarmTimer = null; }
-  pfAlarmPending = false;
-  pfSetBellAlarmState(false);
-}
+
 function pfStartNotificationSound(notificationId){
   const id = String(notificationId || '');
   if(!id) return;
-  pfNotificationRingers.add(id);
-  pfStartGlobalNotificationAlarm();
+  // Do not create multiple timers for the same notification.
+  if(pfNotificationRingers.has(id)) return;
+
+  const ring = async () => {
+    try {
+      // If the user already clicked ENABLE ALERTS, this will be running.
+      // If not, the browser may block audio; the next user gesture unlocks it.
+      const unlocked = await pfUnlockAlertAudio();
+      if(unlocked) pfPlaySystemAlertTone();
+    } catch(err) {
+      console.warn('[PF Alert] Sound attempt failed:', err);
+    }
+  };
+
+  ring();
+  const timer = setInterval(ring, 1200);
+  pfNotificationRingers.set(id, timer);
+  document.documentElement.classList.add('pf-alarm-active');
 }
+
 function pfStopNotificationSound(notificationId){
   const id = String(notificationId || '');
-  if(id) pfNotificationRingers.delete(id);
-  if(!pfNotificationRingers.size) pfStopGlobalNotificationAlarm();
+  const timer = pfNotificationRingers.get(id);
+  if(timer){
+    clearInterval(timer);
+    pfNotificationRingers.delete(id);
+  }
+  if(!pfNotificationRingers.size) document.documentElement.classList.remove('pf-alarm-active');
 }
-function pfStopAllNotificationSounds(){
-  pfNotificationRingers.clear();
-  pfStopGlobalNotificationAlarm();
-}
-async function pfUnlockAlertAudioFromGesture(){ return await pfUnlockAlertAudio(); }
 
+function pfStopAllNotificationSounds(){
+  pfNotificationRingers.forEach(timer => clearInterval(timer));
+  pfNotificationRingers.clear();
+  document.documentElement.classList.remove('pf-alarm-active');
+}
+
+function pfUnlockAlertAudioFromGesture(){
+  pfUnlockAlertAudio().catch(()=>{});
+}
+
+/* Any normal interaction unlocks the alert audio for later realtime events. */
 ['pointerdown','touchstart','keydown','click'].forEach(evt=>{
-  document.addEventListener(evt, ()=>{ pfUnlockAlertAudio().catch(()=>{}); }, {passive:true,capture:true});
+  document.addEventListener(evt, pfUnlockAlertAudioFromGesture, {
+    passive: true,
+    capture: true
+  });
 });
+
 window.addEventListener('visibilitychange',()=>{
   if(document.visibilityState === 'visible') pfUnlockAlertAudio().catch(()=>{});
 });
-window.addEventListener('online',()=>{ if(typeof scheduleRealtimeReconnect==='function') scheduleRealtimeReconnect('browser online'); });
 
 window.pfStartNotificationSound = pfStartNotificationSound;
 window.pfStopNotificationSound = pfStopNotificationSound;
@@ -1791,8 +1800,9 @@ window.pfStopAllNotificationSounds = pfStopAllNotificationSounds;
 window.pfUnlockAlertAudio = pfUnlockAlertAudio;
 window.pfTestSystemAlertSound = async function(){
   const ok = await pfUnlockAlertAudio();
-  if(!ok) return {ok:false, reason:'Click ENABLE ALERTS first and allow browser sound.'};
-  return {ok:pfPlaySystemAlertTone(), message:'System alert sound played'};
+  if(!ok) return {ok:false, reason:'Browser audio is still locked'};
+  pfPlaySystemAlertTone();
+  return {ok:true, message:'System alert sound played'};
 };
 
 
@@ -4466,35 +4476,6 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
-// One-click browser activation for sound and desktop notifications.
-(function installAlertActivation(){
-  function mount(){
-    if(document.getElementById('pf-alert-enable-banner')) return;
-    const box=document.createElement('div'); box.id='pf-alert-enable-banner';
-    box.innerHTML='<div>🔔 <b>Enable notification alarm</b><small>Click once to allow repeating sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
-    document.body.appendChild(box);
-    box.querySelector('button').addEventListener('click', async ()=>{
-      const btn=box.querySelector('button'), small=box.querySelector('small');
-      btn.disabled=true; btn.textContent='ENABLING...';
-      const audioOK=await pfUnlockAlertAudioFromGesture();
-      let notifOK=true;
-      if('Notification' in window){
-        try{ if(Notification.permission==='default') await Notification.requestPermission(); notifOK=Notification.permission==='granted'; }
-        catch(e){ notifOK=false; }
-      } else notifOK=false;
-      if(audioOK) pfPlaySystemAlertTone();
-      if(audioOK && notifOK){
-        small.textContent='Sound and desktop notifications enabled. Keep this tab open.';
-        btn.textContent='ENABLED ✓'; setTimeout(()=>box.remove(),1600);
-      }else{
-        btn.disabled=false; btn.textContent='TRY AGAIN';
-        small.textContent=!audioOK ? 'Sound is blocked. Allow browser sound and try again.' : 'Notifications are blocked. Allow notifications in browser settings.';
-      }
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true}); else mount();
-})();
-
 async function restoreSession() {
   try {
     const { data, error } = await sb.auth.getSession();
@@ -6124,6 +6105,63 @@ window.addEventListener('beforeunload', ()=>{
 });
 </script>
 
+
+<style id="pf-alert-activation-style">
+#pf-alert-activation{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147483000;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 28px);padding:12px 14px;border:1px solid #3d6fa8;border-radius:12px;background:#071426;color:#eaf4ff;box-shadow:0 8px 30px #0008;font:14px Arial,sans-serif}
+#pf-alert-activation small{display:block;color:#9eb6d5;margin-top:3px}
+#pf-alert-activation button{border:1px solid #5edcff;border-radius:8px;background:#123c62;color:#fff;padding:9px 12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#pf-alert-activation button:disabled{opacity:.65;cursor:wait}
+#pf-alert-activation .pf-alert-error{color:#ff9cac}
+#pf-alert-activation .pf-alert-ok{color:#79f2b0}
+</style>
+<script id="pf-alert-activation-script">
+(function(){
+  function isLoggedIn(){
+    return typeof currentUser !== 'undefined' && !!currentUser;
+  }
+  function mount(){
+    if(document.getElementById('pf-alert-activation')) return;
+    const el=document.createElement('div');
+    el.id='pf-alert-activation';
+    el.innerHTML='<div><b>🔔 Enable notification alarm</b><small>Click once to enable repeating sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
+    document.body.appendChild(el);
+    const btn=el.querySelector('button'), small=el.querySelector('small');
+    btn.addEventListener('click',async function(){
+      btn.disabled=true; btn.textContent='ENABLING...';
+      let audioOK=false, notificationOK=false;
+      try { audioOK=!!(await pfUnlockAlertAudio()); } catch(e) {}
+      if('Notification' in window){
+        try{
+          if(Notification.permission==='default') await Notification.requestPermission();
+          notificationOK=Notification.permission==='granted';
+        }catch(e){ notificationOK=false; }
+      }
+      if(audioOK){ try{ pfPlaySystemAlertTone(); }catch(e){} }
+      if(audioOK && notificationOK){
+        small.className='pf-alert-ok';
+        small.textContent='Sound and desktop notifications enabled.';
+        btn.textContent='ENABLED ✓';
+        setTimeout(()=>el.remove(),1800);
+      }else if(audioOK){
+        small.className='pf-alert-error';
+        small.textContent='Sound enabled, but desktop notifications are blocked or unavailable.';
+        btn.disabled=false; btn.textContent='TRY AGAIN';
+      }else{
+        small.className='pf-alert-error';
+        small.textContent='Browser blocked sound. Click again or allow sound for this site.';
+        btn.disabled=false; btn.textContent='TRY AGAIN';
+      }
+    });
+  }
+  function update(){
+    const el=document.getElementById('pf-alert-activation');
+    if(isLoggedIn()){ if(!el) mount(); }
+    else if(el) el.remove();
+  }
+  setInterval(update,1000);
+  document.addEventListener('DOMContentLoaded',update);
+})();
+</script>
 </body></html>
 
 <script>
