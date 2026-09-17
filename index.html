@@ -1232,7 +1232,22 @@ h3{font-size:17px;line-height:1.4}
 .message-editing{outline:2px solid var(--cyan)!important;outline-offset:2px}
 .pf-edit-actions{display:flex;gap:6px;flex-wrap:wrap}.pf-edit-actions button{padding:6px 10px;border-radius:7px;border:1px solid #36557d;background:#12233a;color:#fff}.pf-edit-actions .save{border-color:var(--green);background:#123b2a}
 </style>
+<style id="pf-notification-loop-style">
+#pfNotificationSoundLoop{position:fixed;inset:0;z-index:999999;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+#pfNotificationSoundLoop.show{display:flex}
+#pfNotificationSoundLoop .pf-notif-card{width:min(92vw,420px);background:#101827;color:#fff;border:2px solid #36e0ff;border-radius:14px;padding:20px;text-align:center;box-shadow:0 0 30px rgba(54,224,255,.25)}
+#pfNotificationSoundLoop .pf-notif-title{font-size:18px;font-weight:800;margin-bottom:10px}
+#pfNotificationSoundLoop .pf-notif-text{font-size:14px;line-height:1.5;opacity:.92;margin-bottom:16px;word-break:break-word}
+#pfNotificationSoundLoop .pf-dismiss{width:100%;padding:12px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:800;background:#36e0ff;color:#071018}
+</style>
 </head><body>
+<div id="pfNotificationSoundLoop" aria-hidden="true">
+<div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
+<div id="pfNotifLoopTitle" class="pf-notif-title">🔔 NEW NOTIFICATION</div>
+<div id="pfNotifLoopText" class="pf-notif-text">You have a new notification.</div>
+<button type="button" class="pf-dismiss" id="pfNotifDismiss">DISMISS</button>
+</div></div>
+
 <canvas id="pfSpaceCanvas" aria-hidden="true"></canvas>
 <div id="pfSpaceGlow" aria-hidden="true"></div>
 
@@ -5904,6 +5919,68 @@ try{
 })();
 </script>
 
+<script id="pf-notification-loop-engine">
+(() => {
+  let timer = null, active = false;
+
+  function stopLoop(){
+    active = false;
+    if(timer){ clearInterval(timer); timer=null; }
+    const modal=document.getElementById('pfNotificationSoundLoop');
+    if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
+  }
+
+  function beep(){
+    try{
+      if(window.notificationAudio instanceof HTMLAudioElement){
+        const a=window.notificationAudio;
+        a.pause(); a.currentTime=0; a.loop=false;
+        a.play().catch(()=>{});
+        return;
+      }
+    }catch(e){}
+    try{
+      const AC=window.AudioContext||window.webkitAudioContext;
+      if(!AC)return;
+      if(!window.__pfNotifAudioCtx)window.__pfNotifAudioCtx=new AC();
+      const c=window.__pfNotifAudioCtx;
+      if(c.state==='suspended')c.resume().catch(()=>{});
+      const n=c.currentTime,o=c.createOscillator(),g=c.createGain();
+      o.type='square';
+      o.frequency.setValueAtTime(880,n);
+      o.frequency.setValueAtTime(660,n+.12);
+      g.gain.setValueAtTime(.0001,n);
+      g.gain.exponentialRampToValueAtTime(.18,n+.015);
+      g.gain.exponentialRampToValueAtTime(.0001,n+.28);
+      o.connect(g);g.connect(c.destination);o.start(n);o.stop(n+.3);
+    }catch(e){}
+  }
+
+  function startLoop(title,text){
+    stopLoop(); active=true;
+    const m=document.getElementById('pfNotificationSoundLoop');
+    const t=document.getElementById('pfNotifLoopTitle');
+    const x=document.getElementById('pfNotifLoopText');
+    if(t)t.textContent=title||'🔔 NEW NOTIFICATION';
+    if(x)x.textContent=text||'You have a new notification.';
+    if(m){m.classList.add('show');m.setAttribute('aria-hidden','false');}
+    beep();
+    try{if(navigator.vibrate)navigator.vibrate([250,120,250]);}catch(e){}
+    timer=setInterval(()=>{if(active){beep();try{if(navigator.vibrate)navigator.vibrate([250,120,250]);}catch(e){}}},1500);
+  }
+
+  window.pfStartNotificationLoop=startLoop;
+  window.pfStopNotificationLoop=stopLoop;
+
+  document.addEventListener('click',e=>{
+    if(e.target && e.target.id==='pfNotifDismiss') stopLoop();
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape' && active) stopLoop();
+  });
+})();
+</script>
 </body></html>
 
 <script>
