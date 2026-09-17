@@ -1743,20 +1743,26 @@ function pfStartNotificationSound(notificationId){
   const id = String(notificationId || '');
   if(!id) return;
 
+  // Do not create duplicate ringers for the same alert.
   pfStopNotificationSound(id);
 
   const ring = async () => {
     const ok = await pfUnlockAlertAudio();
-    if(ok) pfPlaySystemAlertTone();
+    if(ok){
+      pfPlaySystemAlertTone();
+      pfAlertAudioUnlocked = true;
+    }else{
+      // Browsers require one user gesture before audio can play.
+      // Keep the alert pending; the gesture listeners below will unlock it.
+      console.warn('[PF Audio] Waiting for browser audio permission. Click/tap the page once.');
+    }
   };
 
-  // Attempt immediately. If autoplay was blocked, a later user gesture
-  // unlocks the context and the next interval will sound.
+  // Start immediately and continue until this exact notification is closed.
   ring();
   const timer = setInterval(ring, 1200);
   pfNotificationRingers.set(id, timer);
 }
-
 function pfStopNotificationSound(notificationId){
   const id = String(notificationId || '');
   const timer = pfNotificationRingers.get(id);
@@ -1771,8 +1777,16 @@ function pfStopAllNotificationSounds(){
   pfNotificationRingers.clear();
 }
 
-function pfUnlockAlertAudioFromGesture(){
-  pfUnlockAlertAudio().catch(()=>{});
+async function pfUnlockAlertAudioFromGesture(){
+  const unlocked = await pfUnlockAlertAudio();
+  if(!unlocked) return;
+
+  // A browser gesture may be required before Web Audio is allowed.
+  // Replay all currently active alerts immediately after unlocking.
+  for(const id of pfNotificationRingers.keys()){
+    pfPlaySystemAlertTone();
+  }
+  console.info('[PF Audio] Alert audio unlocked by user gesture.');
 }
 
 /* Any normal interaction unlocks the alert audio for later realtime events. */
@@ -2482,12 +2496,9 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
 
   stack.prepend(item);
 
-  while(stack.children.length > 4){
-    const old = stack.lastElementChild;
-    pfStopNotificationSound(old?.dataset?.pfNotificationId);
-    old?.remove();
-  }
-
+  // Keep every active alert visible and ringing until the user explicitly
+  // dismisses it or opens it. Do not silently remove older alerts because
+  // that would also stop their system alert sound.
   // Start AFTER the popup exists so the alert is visibly and audibly live.
   pfStartNotificationSound(id, soundType);
 }
