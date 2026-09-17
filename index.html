@@ -1244,6 +1244,12 @@ h3{font-size:17px;line-height:1.4}
 #pfNotificationSoundLoop .pf-notif-text{font-size:14px;line-height:1.5;opacity:.92;margin-bottom:16px;word-break:break-word}
 #pfNotificationSoundLoop .pf-dismiss{width:100%;padding:12px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:800;background:#36e0ff;color:#071018}
 </style>
+
+<style id="pf-alert-enable-style">
+#pf-alert-enable-banner{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:2147483647;background:#111827;color:#fff;border:2px solid #36e0ff;border-radius:14px;padding:14px 16px;box-shadow:0 8px 35px #0008;display:flex;gap:12px;align-items:center;max-width:calc(100vw - 28px);font:600 14px Arial,sans-serif}
+#pf-alert-enable-banner button{border:0;border-radius:9px;background:#36e0ff;color:#071018;font-weight:800;padding:10px 14px;cursor:pointer}
+#pf-alert-enable-banner small{display:block;font-weight:400;opacity:.8;margin-top:3px}
+</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -1742,23 +1748,17 @@ function pfPlaySystemAlertTone(){
 function pfStartNotificationSound(notificationId){
   const id = String(notificationId || '');
   if(!id) return;
-
-  // Do not create duplicate ringers for the same alert.
   pfStopNotificationSound(id);
 
-  const ring = async () => {
-    const ok = await pfUnlockAlertAudio();
-    if(ok){
+  // Play only when the AudioContext is actually running. The context is
+  // unlocked by the ENABLE ALERT SOUND button or any user gesture.
+  const ring = () => {
+    if(pfAlertAudioCtx && pfAlertAudioCtx.state === 'running'){
       pfPlaySystemAlertTone();
-      pfAlertAudioUnlocked = true;
-    }else{
-      // Browsers require one user gesture before audio can play.
-      // Keep the alert pending; the gesture listeners below will unlock it.
-      console.warn('[PF Audio] Waiting for browser audio permission. Click/tap the page once.');
+    } else {
+      console.warn('[PF Audio] Alert is waiting for user audio permission.');
     }
   };
-
-  // Start immediately and continue until this exact notification is closed.
   ring();
   const timer = setInterval(ring, 1200);
   pfNotificationRingers.set(id, timer);
@@ -1779,14 +1779,15 @@ function pfStopAllNotificationSounds(){
 
 async function pfUnlockAlertAudioFromGesture(){
   const unlocked = await pfUnlockAlertAudio();
-  if(!unlocked) return;
-
-  // A browser gesture may be required before Web Audio is allowed.
-  // Replay all currently active alerts immediately after unlocking.
-  for(const id of pfNotificationRingers.keys()){
-    pfPlaySystemAlertTone();
+  if('Notification' in window && Notification.permission === 'default'){
+    try{ await Notification.requestPermission(); }catch(e){}
   }
+  if(!unlocked) return false;
+
+  // Immediately sound once for every active alert after browser permission.
+  for(const id of pfNotificationRingers.keys()) pfPlaySystemAlertTone();
   console.info('[PF Audio] Alert audio unlocked by user gesture.');
+  return true;
 }
 
 /* Any normal interaction unlocks the alert audio for later realtime events. */
@@ -2382,7 +2383,9 @@ function notifyIncomingMessage(message){
       new Notification(`💬 ${senderName}`, {
         body: notificationDetail(message),
         tag:'pixel-friend-'+id,
-        renotify:true
+        renotify:true,
+        silent:false,
+        requireInteraction:true
       });
     }catch(e){}
   }
@@ -4499,6 +4502,28 @@ document.addEventListener('visibilitychange', () => {
     scheduleRealtimeReconnect('tab visible');
   }
 });
+
+// ===== REQUIRED BROWSER ALERT ACTIVATION =====
+(function installAlertActivationPrompt(){
+  function mount(){
+    if(document.getElementById('pf-alert-enable-banner')) return;
+    const box=document.createElement('div');
+    box.id='pf-alert-enable-banner';
+    box.innerHTML='<div>🔔 <b>Enable live system alerts</b><small>Click once to allow sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
+    document.body.appendChild(box);
+    box.querySelector('button').addEventListener('click', async ()=>{
+      const ok=await pfUnlockAlertAudioFromGesture();
+      if(ok){
+        pfPlaySystemAlertTone();
+        box.remove();
+      }else{
+        box.querySelector('small').textContent='Browser audio is blocked. Click the browser lock icon and allow sound, then try again.';
+      }
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',mount,{once:true});
+  else mount();
+})();
 
 // ===== PIXEL-FRIEND REALTIME DIAGNOSTICS =====
 window.pfRealtimeDiagnostics = function(){
