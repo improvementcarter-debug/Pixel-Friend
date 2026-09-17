@@ -2356,6 +2356,37 @@ window.markAllNotificationsRead = function(e){
   return __pfOriginalMarkAllNotificationsRead.apply(this, arguments);
 };
 
+function pfShowDesktopNotification(message, senderName){
+  if(!('Notification' in window)){
+    console.warn('[PF Desktop Alert] This browser does not support desktop notifications.');
+    return false;
+  }
+  if(Notification.permission !== 'granted'){
+    console.warn('[PF Desktop Alert] Permission is not granted:', Notification.permission);
+    return false;
+  }
+  try{
+    const n = new Notification('💬 ' + (senderName || 'PIXEL USER'), {
+      body: notificationDetail(message),
+      tag: 'pixel-friend-message-' + String(message.id),
+      renotify: true,
+      requireInteraction: true,
+      silent: false,
+      icon: './favicon.ico'
+    });
+    n.onclick = () => {
+      try{ window.focus(); }catch(e){}
+      try{ n.close(); }catch(e){}
+      if(message?.id) openNotification(String(message.id), message.sender_id, senderName || 'PIXEL USER');
+    };
+    return true;
+  }catch(err){
+    console.error('[PF Desktop Alert] Could not create desktop notification:', err);
+    return false;
+  }
+}
+window.pfShowDesktopNotification = pfShowDesktopNotification;
+
 function notifyIncomingMessage(message){
   if(window.pfIsCallSignal && window.pfIsCallSignal(message)) return;
   if(!currentUser || !message?.id || String(message.receiver_id) !== String(currentUser.id)) return;
@@ -2378,17 +2409,7 @@ function notifyIncomingMessage(message){
   addNotificationItem(message, senderName, true);
   showTelegramNotification(message, senderName, senderAvatar);
 
-  if('Notification' in window && Notification.permission === 'granted'){
-    try{
-      new Notification(`💬 ${senderName}`, {
-        body: notificationDetail(message),
-        tag:'pixel-friend-'+id,
-        renotify:true,
-        silent:false,
-        requireInteraction:true
-      });
-    }catch(e){}
-  }
+  pfShowDesktopNotification(message, senderName);
 
   // Profile lookup happens AFTER the alert is already visible/audible.
   if(!notificationProfileCache.has(senderId) && message.sender_id){
@@ -4512,12 +4533,35 @@ document.addEventListener('visibilitychange', () => {
     box.innerHTML='<div>🔔 <b>Enable live system alerts</b><small>Click once to allow sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
     document.body.appendChild(box);
     box.querySelector('button').addEventListener('click', async ()=>{
-      const ok=await pfUnlockAlertAudioFromGesture();
-      if(ok){
+      const button = box.querySelector('button');
+      const small = box.querySelector('small');
+      button.disabled = true;
+      button.textContent = 'ENABLING…';
+      let audioOK = false;
+      try { audioOK = await pfUnlockAlertAudio(); } catch(e) {}
+      let notificationOK = true;
+      if('Notification' in window){
+        try{
+          if(Notification.permission === 'default') await Notification.requestPermission();
+          notificationOK = Notification.permission === 'granted';
+        }catch(e){ notificationOK = false; }
+      } else notificationOK = false;
+
+      if(audioOK){
         pfPlaySystemAlertTone();
-        box.remove();
+      }
+      if(audioOK && notificationOK){
+        small.textContent = 'Sound and desktop notifications are enabled. Keep this tab open.';
+        button.textContent = 'ENABLED ✓';
+        setTimeout(()=>box.remove(), 1400);
       }else{
-        box.querySelector('small').textContent='Browser audio is blocked. Click the browser lock icon and allow sound, then try again.';
+        button.disabled = false;
+        button.textContent = 'TRY AGAIN';
+        small.textContent = (!audioOK && !notificationOK)
+          ? 'Sound and notifications are blocked. Allow Sound and Notifications in the browser site settings, then try again.'
+          : (!audioOK
+            ? 'Desktop notifications are allowed, but sound is blocked. Allow Sound in browser site settings, then try again.'
+            : 'Sound works, but desktop notifications are not allowed. Allow Notifications in browser site settings, then try again.');
       }
     });
   }
@@ -4537,6 +4581,8 @@ window.pfRealtimeDiagnostics = function(){
     audioContextState: pfAlertAudioCtx?.state || null,
     audioUnlocked: pfAlertAudioUnlocked,
     notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
+    secureContext: window.isSecureContext,
+    pageProtocol: location.protocol,
     pageVisibility: document.visibilityState,
     online: navigator.onLine
   };
@@ -4621,6 +4667,8 @@ window.pfRealtimeDiagnostics = function(){
     audioContextState: pfAlertAudioCtx?.state || null,
     audioUnlocked: pfAlertAudioUnlocked,
     notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
+    secureContext: window.isSecureContext,
+    pageProtocol: location.protocol,
     pageVisibility: document.visibilityState,
     online: navigator.onLine
   };
