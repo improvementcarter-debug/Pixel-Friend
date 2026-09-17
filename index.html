@@ -6123,7 +6123,7 @@ window.addEventListener('beforeunload', ()=>{
     if(document.getElementById('pf-alert-activation')) return;
     const el=document.createElement('div');
     el.id='pf-alert-activation';
-    el.innerHTML='<div><b>🔔 Enable notification alarm</b><small>Click once to enable repeating sound and desktop notifications.</small></div><button type="button">ENABLE ALERTS</button>';
+    el.innerHTML='<div><b>🔔 ENABLE NOTIFICATION ALARM</b><small>Click once to enable repeating sound and desktop notifications.</small></div><button type="button">ENABLE NOTIFICATION ALARM</button>';
     document.body.appendChild(el);
     const btn=el.querySelector('button'), small=el.querySelector('small');
     btn.addEventListener('click',async function(){
@@ -6154,11 +6154,13 @@ window.addEventListener('beforeunload', ()=>{
     });
   }
   function update(){
-    const el=document.getElementById('pf-alert-activation');
-    if(isLoggedIn()){ if(!el) mount(); }
-    else if(el) el.remove();
+    // Keep the activation control visible so the user can always find it.
+    // It is safe to click before or after login because it only unlocks browser permissions.
+    if(!document.getElementById('pf-alert-activation')) mount();
   }
-  setInterval(update,1000);
+  window.pfMountNotificationAlarmButton = mount;
+  window.pfUpdateNotificationAlarmButton = update;
+  setInterval(update,500);
   document.addEventListener('DOMContentLoaded',update);
 })();
 </script>
