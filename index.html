@@ -1665,22 +1665,95 @@ function playRetroSound(type = 'click') {
   }
 }
 
-/* ===== PERSISTENT NOTIFICATION ALERT SOUND =====
-   Each incoming realtime notification gets its own loop.
-   The loop is stopped only when that notification is dismissed/opened.
+/* ===== RELIABLE SYSTEM NOTIFICATION ALERT SOUND =====
+   Uses one shared Web Audio context and a per-notification timer.
+   The sound continues until that notification is opened/dismissed.
+   Browser autoplay rules are handled by unlocking/resuming the context
+   whenever the user interacts with the page.
 */
 const pfNotificationRingers = new Map();
+let pfAlertAudioCtx = null;
+let pfAlertAudioUnlocked = false;
 
-function pfStartNotificationSound(notificationId, soundType='notification'){
+function pfGetAlertAudioContext(){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return null;
+    if(!pfAlertAudioCtx) pfAlertAudioCtx = new AC();
+    return pfAlertAudioCtx;
+  }catch(e){
+    console.warn('Pixel-Friend alert audio context error:', e);
+    return null;
+  }
+}
+
+async function pfUnlockAlertAudio(){
+  try{
+    const ctx = pfGetAlertAudioContext();
+    if(!ctx) return false;
+    if(ctx.state === 'suspended') await ctx.resume();
+    pfAlertAudioUnlocked = (ctx.state === 'running');
+    return pfAlertAudioUnlocked;
+  }catch(e){
+    pfAlertAudioUnlocked = false;
+    return false;
+  }
+}
+
+function pfPlaySystemAlertTone(){
+  try{
+    const ctx = pfGetAlertAudioContext();
+    if(!ctx || ctx.state !== 'running') return false;
+
+    const now = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.32, now + 0.025);
+    master.gain.setValueAtTime(0.32, now + 0.10);
+    master.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+    master.connect(ctx.destination);
+
+    const o1 = ctx.createOscillator();
+    const o2 = ctx.createOscillator();
+    o1.type = 'sine';
+    o2.type = 'sine';
+    o1.frequency.setValueAtTime(880, now);
+    o1.frequency.setValueAtTime(1174.66, now + 0.13);
+    o2.frequency.setValueAtTime(440, now);
+    o2.frequency.setValueAtTime(587.33, now + 0.13);
+    o1.connect(master);
+    o2.connect(master);
+
+    o1.start(now);
+    o2.start(now);
+    o1.stop(now + 0.40);
+    o2.stop(now + 0.40);
+
+    setTimeout(() => {
+      try{ master.disconnect(); }catch(e){}
+    }, 500);
+    return true;
+  }catch(e){
+    console.warn('Pixel-Friend system alert tone error:', e);
+    return false;
+  }
+}
+
+function pfStartNotificationSound(notificationId){
   const id = String(notificationId || '');
   if(!id) return;
+
   pfStopNotificationSound(id);
 
-  const play = () => {
-    try { playRetroSound(soundType); } catch(e) {}
+  const ring = async () => {
+    const ok = await pfUnlockAlertAudio();
+    if(ok) pfPlaySystemAlertTone();
   };
-  play();
-  const timer = setInterval(play, 1200);
+
+  // Attempt immediately. If autoplay was blocked, a later user gesture
+  // unlocks the context and the next interval will sound.
+  ring();
+  const timer = setInterval(ring, 1200);
   pfNotificationRingers.set(id, timer);
 }
 
@@ -1698,9 +1771,33 @@ function pfStopAllNotificationSounds(){
   pfNotificationRingers.clear();
 }
 
+function pfUnlockAlertAudioFromGesture(){
+  pfUnlockAlertAudio().catch(()=>{});
+}
+
+/* Any normal interaction unlocks the alert audio for later realtime events. */
+['pointerdown','touchstart','keydown','click'].forEach(evt=>{
+  document.addEventListener(evt, pfUnlockAlertAudioFromGesture, {
+    passive: true,
+    capture: true
+  });
+});
+
+window.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState === 'visible') pfUnlockAlertAudio().catch(()=>{});
+});
+
 window.pfStartNotificationSound = pfStartNotificationSound;
 window.pfStopNotificationSound = pfStopNotificationSound;
 window.pfStopAllNotificationSounds = pfStopAllNotificationSounds;
+window.pfUnlockAlertAudio = pfUnlockAlertAudio;
+window.pfTestSystemAlertSound = async function(){
+  const ok = await pfUnlockAlertAudio();
+  if(!ok) return {ok:false, reason:'Browser audio is still locked'};
+  pfPlaySystemAlertTone();
+  return {ok:true, message:'System alert sound played'};
+};
+
 
 function isAdmin(){
   return currentProfile?.is_admin === true || currentUser?.email === ADMIN_EMAIL;
@@ -5991,148 +6088,15 @@ try{
 </script>
 
 
-<script id="pf-notification-loop-engine">
-(() => {
-  let timer = null, active = false;
-  let audioCtx = null;
 
-  function el(id){ return document.getElementById(id); }
 
-  function stop(){
-    active=false;
-    if(timer){clearInterval(timer);timer=null;}
-    const m=el('pfNotificationSoundLoop');
-    if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}
-    try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
-  }
 
-  async function unlockAudio(){
-    try{
-      const AC=window.AudioContext||window.webkitAudioContext;
-      if(!AC)return false;
-      if(!audioCtx) audioCtx=new AC();
-      if(audioCtx.state==='suspended') await audioCtx.resume();
-      return audioCtx.state==='running';
-    }catch(e){return false;}
-  }
-
-  function beep(){
-    // A generated tone avoids dependence on missing audio files.
-    try{
-      if(!audioCtx){
-        const AC=window.AudioContext||window.webkitAudioContext;
-        if(!AC)return;
-        audioCtx=new AC();
-      }
-      if(audioCtx.state==='suspended'){audioCtx.resume().catch(()=>{});return;}
-      const n=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='sine';
-      o.frequency.setValueAtTime(880,n);
-      o.frequency.setValueAtTime(660,n+0.14);
-      g.gain.setValueAtTime(0.0001,n);
-      g.gain.exponentialRampToValueAtTime(0.28,n+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001,n+0.34);
-      o.connect(g);g.connect(audioCtx.destination);
-      o.start(n);o.stop(n+0.36);
-    }catch(e){}
-  }
-
-  function start(title,text){
-    stop();
-    active=true;
-    const m=el('pfNotificationSoundLoop');
-    const t=el('pfNotifLoopTitle');
-    const x=el('pfNotifLoopText');
-    if(t)t.textContent=title||'🔔 NEW NOTIFICATION';
-    if(x)x.textContent=text||'You have a new notification.';
-    if(m){m.classList.add('show');m.setAttribute('aria-hidden','false');}
-
-    // Try to start immediately. If the browser blocks autoplay, the next
-    // user gesture will unlock the audio, while the alert remains visible.
-    unlockAudio().then(ok=>{ if(ok && active) beep(); });
-    try{if(navigator.vibrate)navigator.vibrate([300,120,300]);}catch(e){}
-
-    timer=setInterval(()=>{
-      if(!active)return;
-      unlockAudio().then(ok=>{if(ok&&active)beep();});
-      try{if(navigator.vibrate)navigator.vibrate([300,120,300]);}catch(e){}
-    },1500);
-  }
-
-  // Unlock audio on any user interaction with the app.
-  ['pointerdown','touchstart','keydown'].forEach(evt=>{
-    document.addEventListener(evt,()=>{
-      if(active) unlockAudio().then(ok=>{if(ok)beep();});
-    },{passive:true});
-  });
-
-  document.addEventListener('click',e=>{
-    if(e.target && e.target.id==='pfNotifDismiss') stop();
-  });
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape' && active) stop();
-  });
-
-  window.pfStartNotificationLoop=start;
-  window.pfStopNotificationLoop=stop;
-
-  // Hook the REAL incoming notification functions after the whole app has
-  // loaded, so later function declarations cannot overwrite the hook.
-  function hookIncoming(){
-    if(typeof window.notifyIncomingMessage==='function' && !window.notifyIncomingMessage.__pfLoopHook){
-      const original=window.notifyIncomingMessage;
-      const wrapped=function(message){
-        const result=original.apply(this,arguments);
-        try{
-          const text=(message?.content||'').trim() ||
-            (message?.image_url?'🖼️ New image':
-             message?.video_url?'📹 New video':
-             message?.audio_url?'🎤 New voice message':
-             message?.sticker?'🎟️ New sticker':'📩 New message');
-          const sender=window.notificationProfileCache?.get?.(String(message?.sender_id||'')) || 'PIXEL USER';
-          start('🔔 NEW MESSAGE — '+sender,text);
-        }catch(e){}
-        return result;
-      };
-      wrapped.__pfLoopHook=true;
-      window.notifyIncomingMessage=wrapped;
-    }
-
-    if(typeof window.notifyIncomingPost==='function' && !window.notifyIncomingPost.__pfLoopHook){
-      const original=window.notifyIncomingPost;
-      const wrapped=function(post){
-        const result=original.apply(this,arguments);
-        try{
-          start('🆕 NEW POST','A new public post is available.');
-        }catch(e){}
-        return result;
-      };
-      wrapped.__pfLoopHook=true;
-      window.notifyIncomingPost=wrapped;
-    }
-  }
-
-  // Re-hook repeatedly because the original app assigns globals at runtime.
-  hookIncoming();
-  setTimeout(hookIncoming,500);
-  setTimeout(hookIncoming,1500);
-  setInterval(hookIncoming,3000);
-
-  // Also expose a generic bridge for future notification events.
-  window.pfAlertNotification=(title,text)=>start(title,text);
-})();
+<script id="pf-notification-audio-cleanup">
+window.addEventListener('beforeunload', ()=>{
+  try{ pfStopAllNotificationSounds(); }catch(e){}
+  try{ pfAlertAudioCtx?.close(); }catch(e){}
+});
 </script>
-
-/* ===== REALTIME NOTIFICATION DIAGNOSTICS ===== */
-window.pfNotificationDiagnostics = function(){
-  return {
-    realtimeStarted: !!window.realtimeStarted,
-    feedStatus: window.feedRealtimeStatus || 'unknown',
-    activeNotificationSounds: pfNotificationRingers.size,
-    visibleLivePopups: document.querySelectorAll('.pf-live-notification').length,
-    currentUser: !!window.currentUser
-  };
-};
 
 </body></html>
 
