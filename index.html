@@ -4372,8 +4372,13 @@ async function setupRealtime(force=false){
   const uid = String(currentUser.id);
 
   // LIVE FEED CHANNEL
-  realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => { loadFeed(true); notifyIncomingPost(payload.new); })
+  const channelSuffix = '-' + uid + '-' + Date.now();
+  console.info('[PF Realtime] Creating feed channel', {uid, channel: 'pixel-friend-live-feed' + channelSuffix});
+  realtimeFeedChannel = sb.channel('pixel-friend-live-feed' + channelSuffix)
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => {
+      console.info('[PF Realtime EVENT] posts INSERT', payload);
+      loadFeed(true); notifyIncomingPost(payload.new);
+    })
     .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
     .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
     .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
@@ -4383,21 +4388,33 @@ async function setupRealtime(force=false){
     })
     .subscribe(status => {
       feedRealtimeStatus = status;
-      console.log('Pixel-Friend FEED Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend feed is LIVE');
+      console.log('[PF Realtime] FEED channel status:', status);
+      if(status === 'SUBSCRIBED') console.log('✅ [PF Realtime] feed is LIVE');
+      if(status === 'CHANNEL_ERROR') console.error('❌ [PF Realtime] feed channel error');
       if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
         scheduleRealtimeReconnect('feed ' + status);
       }
     });
 
   // DEDICATED LIVE MESSAGE/NOTIFICATION CHANNEL
-  realtimeMessageChannel = sb.channel('pixel-friend-messages-' + uid + '-' + Date.now())
+  console.info('[PF Realtime] Creating message channel', {uid, receiverFilter: 'receiver_id=eq.' + uid});
+  realtimeMessageChannel = sb.channel('pixel-friend-messages' + channelSuffix)
     .on('postgres_changes', {
       event:'INSERT', schema:'public', table:'messages',
       filter:'receiver_id=eq.' + uid
     }, async payload => {
       const msg=payload.new;
-      if(!msg || String(msg.sender_id) === uid) return;
+      console.info('[PF Realtime EVENT] messages INSERT received', {
+        payload,
+        messageId: msg?.id,
+        senderId: msg?.sender_id,
+        receiverId: msg?.receiver_id,
+        currentUserId: uid
+      });
+      if(!msg || String(msg.sender_id) === uid) {
+        console.debug('[PF Realtime] Ignored own/empty message', msg);
+        return;
+      }
 
       // This is the real-time notification path. No polling/query is needed.
       // NEVER wait for UI/database refresh before firing the alert.
@@ -4431,9 +4448,12 @@ async function setupRealtime(force=false){
         renderNotificationBadge(Math.max(0, localUnreadCount-1));
       }
     })
-    .subscribe(status => {
-      console.log('Pixel-Friend MESSAGE Realtime:', status);
-      if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are LIVE');
+    .subscribe((status, err) => {
+      console.log('[PF Realtime] MESSAGE channel status:', status, err || '');
+      if(status === 'SUBSCRIBED') console.log('✅ [PF Realtime] notifications are LIVE');
+      if(status === 'CHANNEL_ERROR') console.error('❌ [PF Realtime] message channel error:', err || 'No error payload');
+      if(status === 'TIMED_OUT') console.error('❌ [PF Realtime] message channel timed out');
+      if(status === 'CLOSED') console.warn('⚠️ [PF Realtime] message channel closed');
       if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
         scheduleRealtimeReconnect('messages ' + status);
       }
@@ -4468,6 +4488,38 @@ document.addEventListener('visibilitychange', () => {
     scheduleRealtimeReconnect('tab visible');
   }
 });
+
+// ===== PIXEL-FRIEND REALTIME DIAGNOSTICS =====
+window.pfRealtimeDiagnostics = function(){
+  const state = {
+    currentUserId: currentUser?.id || null,
+    feedChannelState: realtimeFeedChannel?.state || null,
+    messageChannelState: realtimeMessageChannel?.state || null,
+    feedRealtimeStatus,
+    realtimeStarted,
+    supabaseReady: !!sb,
+    audioContextState: pfAlertAudioCtx?.state || null,
+    audioUnlocked: pfAlertAudioUnlocked,
+    notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
+    pageVisibility: document.visibilityState,
+    online: navigator.onLine
+  };
+  console.table(state);
+  return state;
+};
+window.pfTestRealtimeMessageEvent = function(){
+  console.warn('[PF Realtime TEST] This only checks the browser handler. Insert a real row into public.messages to test Supabase delivery.');
+  const test = {
+    id: 'browser-test-' + Date.now(),
+    sender_id: 'test-sender',
+    receiver_id: currentUser?.id,
+    content: 'Browser Realtime handler test'
+  };
+  console.info('[PF Realtime TEST] Dispatching synthetic message:', test);
+  notifyIncomingMessage(test);
+  return test;
+};
+console.info('🧪 [PF Diagnostics] Run pfRealtimeDiagnostics() and pfTestRealtimeMessageEvent() in the console.');
 
 async function restoreSession() {
   try {
@@ -4520,6 +4572,38 @@ async function logout() {
   await sb.auth.signOut();
 }
 window.logout = logout;
+
+// ===== PIXEL-FRIEND REALTIME DIAGNOSTICS =====
+window.pfRealtimeDiagnostics = function(){
+  const state = {
+    currentUserId: currentUser?.id || null,
+    feedChannelState: realtimeFeedChannel?.state || null,
+    messageChannelState: realtimeMessageChannel?.state || null,
+    feedRealtimeStatus,
+    realtimeStarted,
+    supabaseReady: !!sb,
+    audioContextState: pfAlertAudioCtx?.state || null,
+    audioUnlocked: pfAlertAudioUnlocked,
+    notificationPermission: ('Notification' in window) ? Notification.permission : 'unsupported',
+    pageVisibility: document.visibilityState,
+    online: navigator.onLine
+  };
+  console.table(state);
+  return state;
+};
+window.pfTestRealtimeMessageEvent = function(){
+  console.warn('[PF Realtime TEST] This only checks the browser handler. Insert a real row into public.messages to test Supabase delivery.');
+  const test = {
+    id: 'browser-test-' + Date.now(),
+    sender_id: 'test-sender',
+    receiver_id: currentUser?.id,
+    content: 'Browser Realtime handler test'
+  };
+  console.info('[PF Realtime TEST] Dispatching synthetic message:', test);
+  notifyIncomingMessage(test);
+  return test;
+};
+console.info('🧪 [PF Diagnostics] Run pfRealtimeDiagnostics() and pfTestRealtimeMessageEvent() in the console.');
 
 async function restoreSession() {
   try {
