@@ -2452,9 +2452,10 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
   overlay.classList.add('show');
   document.body.classList.add('pf-message-alarm-active');
 
-  // Stop any previous ring and start one persistent ring for the current alert.
+  // Keep one persistent ring for the active message alarm.
   pfStopAllNotificationSounds();
   pfStartNotificationSound('message-alarm-' + id);
+  console.info('[PF ALARM] Message alarm displayed and sound loop started:', id);
 
   const stopAndClose = async () => {
     pfStopNotificationSound('message-alarm-' + id);
@@ -4319,9 +4320,11 @@ window.stopVoiceRecord = stopVoiceRecord;
 let realtimeFeedChannel = null;
 let realtimeMessageChannel = null;
 let realtimeReconnectTimer = null;
+let pfIncomingAlertPollTimer = null;
 let realtimeStarted = false;
 
 async function teardownRealtime(){
+  stopIncomingAlertFallback();
   if(realtimeReconnectTimer){
     clearTimeout(realtimeReconnectTimer);
     realtimeReconnectTimer = null;
@@ -4344,6 +4347,38 @@ function scheduleRealtimeReconnect(reason){
     await setupRealtime(true);
   }, 1000);
 }
+
+
+// Safety fallback: if Supabase Realtime is delayed or unavailable, check only
+// unread incoming messages frequently and trigger the same alarm handler.
+// Realtime remains primary; this prevents missed alerts during reconnects.
+async function pfPollIncomingAlerts(){
+  if(!currentUser || document.visibilityState !== 'visible') return;
+  try{
+    const {data,error} = await sb.from('messages')
+      .select('id,sender_id,receiver_id,content,sticker,image_url,video_url,audio_url,created_at,is_read')
+      .eq('receiver_id', currentUser.id)
+      .eq('is_read', false)
+      .order('created_at', {ascending:false})
+      .limit(30);
+    if(error || !Array.isArray(data)) return;
+    for(const msg of data.reverse()){
+      if(window.pfIsCallSignal && window.pfIsCallSignal(msg)) continue;
+      const id=String(msg.id);
+      if(!knownUnreadMessageIds.has(id)) notifyIncomingMessage(msg);
+    }
+  }catch(err){ console.warn('[PF Alert fallback] poll failed:', err); }
+}
+
+function startIncomingAlertFallback(){
+  if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
+  pfIncomingAlertPollTimer=setInterval(pfPollIncomingAlerts, 2500);
+  pfPollIncomingAlerts();
+}
+function stopIncomingAlertFallback(){
+  if(pfIncomingAlertPollTimer){ clearInterval(pfIncomingAlertPollTimer); pfIncomingAlertPollTimer=null; }
+}
+window.pfPollIncomingAlerts=pfPollIncomingAlerts;
 
 async function setupRealtime(force=false){
   if(!currentUser) return;
@@ -4385,6 +4420,7 @@ async function setupRealtime(force=false){
       filter:'receiver_id=eq.' + uid
     }, async payload => {
       const msg=payload.new;
+      console.info('[PF Realtime EVENT] messages INSERT received:', msg);
       if(!msg || String(msg.sender_id) === uid) return;
 
       // This is the real-time notification path. No polling/query is needed.
@@ -4428,6 +4464,7 @@ async function setupRealtime(force=false){
     });
 
   realtimeStarted=true;
+  startIncomingAlertFallback();
 
   // Fallback only. Realtime remains the primary path.
   feedRefreshTimer=setInterval(() => {
@@ -5099,8 +5136,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
       const shares=num('shares',id);
       box.innerHTML=
         '<span class="pf-post-metric">❤️ <b>'+reactions+'</b> REACTIONS</span>'+
-        '<span class="pf-post-metric" onclick="viewPost(\\''+esc(id)+'\\')">👁️ <b>'+views+'</b> VIEWS</span>'+
-        '<span class="pf-post-metric" onclick="sharePost(\\''+esc(id)+'\\')">↗️ <b>'+shares+'</b> SHARES</span>';
+        `<span class="pf-post-metric" onclick="viewPost('${esc(id)}')">👁️ <b>${views}</b> VIEWS</span>`+
+        `<span class="pf-post-metric" onclick="sharePost('${esc(id)}')">↗️ <b>${shares}</b> SHARES</span>`;
     });
   }
 
@@ -5240,7 +5277,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProfilePictureM
       const detail=isInteraction?(n.text||n.content||'Interaction'):notificationDetail(n);
       const icon=n.notification_kind==='reaction'?'❤️':n.notification_kind==='share'?'↗️':n.notification_kind==='profile_view'?'👤':notificationIcon(n);
       const type=n.notification_kind==='reaction'?'REACTION':n.notification_kind==='share'?'SHARE':n.notification_kind==='profile_view'?'PROFILE VIEW':notificationTypeLabel(notificationType(n));
-      return '<div class="notification-item '+(n.unread?'unread':'')+'" onclick="openNotificationV2(\\''+esc(String(n.id))+'\\')">'+
+      return '<div class="notification-item '+(n.unread?'unread':'')+'" onclick="openNotificationV2(\''+esc(String(n.id))+'\')">'+
         '<div class="notification-item-icon">'+icon+'</div><div class="notification-item-body">'+
         '<div class="notification-item-title">'+(isInteraction?'ACTIVITY':esc(n.senderName||'PIXEL USER'))+'</div>'+
         '<div class="notification-item-text">'+esc(detail)+' <span class="notification-item-type">'+type+'</span></div>'+
