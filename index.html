@@ -1244,6 +1244,19 @@ h3{font-size:17px;line-height:1.4}
 #pfNotificationSoundLoop .pf-notif-text{font-size:14px;line-height:1.5;opacity:.92;margin-bottom:16px;word-break:break-word}
 #pfNotificationSoundLoop .pf-dismiss{width:100%;padding:12px 16px;border:0;border-radius:9px;cursor:pointer;font-weight:800;background:#36e0ff;color:#071018}
 </style>
+
+<style id="pf-message-alarm-modal-style">
+#pfMessageAlarmOverlay{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.42);backdrop-filter:blur(3px)}
+#pfMessageAlarmOverlay.show{display:flex}
+#pfMessageAlarmBox{width:min(520px,calc(100vw - 28px));border:1px solid #ff424b;border-radius:14px;background:#10182b;box-shadow:0 0 0 1px rgba(255,66,75,.22),0 18px 60px rgba(0,0,0,.62),0 0 30px rgba(255,45,55,.18);padding:28px 26px 26px;text-align:center;color:#fff;animation:pfAlarmPop .22s ease-out}
+#pfMessageAlarmBox .pf-alarm-title{font-size:20px;font-weight:800;letter-spacing:1.5px;color:#ff424b;margin-bottom:10px}
+#pfMessageAlarmBox .pf-alarm-message{font-size:14px;line-height:1.5;color:#f3f5fb;margin-bottom:20px;word-break:break-word}
+#pfMessageAlarmBox .pf-alarm-sub{font-size:12px;color:#d4d9e5;margin-top:-10px;margin-bottom:22px}
+#pfMessageAlarmBox button{width:100%;border:0;border-radius:7px;background:#ff4148;color:#fff;min-height:34px;padding:10px 16px;font-weight:800;font-size:12px;letter-spacing:.4px;cursor:pointer}
+#pfMessageAlarmBox button:hover{background:#ff5960}
+@keyframes pfAlarmPop{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@media(max-width:520px){#pfMessageAlarmBox{padding:24px 18px}.pf-alarm-title{font-size:18px!important}}
+</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -1256,6 +1269,14 @@ h3{font-size:17px;line-height:1.4}
 <div id="pfSpaceGlow" aria-hidden="true"></div>
 
 <div id="pfLiveNotificationStack" class="pf-live-notification-stack" aria-live="polite" aria-atomic="false"></div>
+<div id="pfMessageAlarmOverlay" role="alertdialog" aria-modal="true" aria-live="assertive">
+  <div id="pfMessageAlarmBox">
+    <div class="pf-alarm-title">⏰ ALARM: New Message</div>
+    <div id="pfMessageAlarmText" class="pf-alarm-message">A new message has arrived.</div>
+    <div class="pf-alarm-sub">Sound will loop continuously until you click Dismiss.</div>
+    <button id="pfMessageAlarmDismiss" type="button">DISMISS &amp; STOP SOUND</button>
+  </div>
+</div>
 <div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">Connect in real-time, exchange tips and make new friends.</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">Login</button>      <button id="regTab" onclick="authTab('register')">Register</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="Email">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">🛡️ Login as Members</button><button class="secondary auth-guest" onclick="guestLogin()">👤 Continue as Guest</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.📌</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
 <div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <div id="pfLiveUpdate" class="pf-live-update" aria-live="polite">
   <span class="pf-live-badge"><span class="pf-live-dot"></span> LIVE UPDATE</span>
@@ -1742,24 +1763,19 @@ function pfPlaySystemAlertTone(){
 function pfStartNotificationSound(notificationId){
   const id = String(notificationId || '');
   if(!id) return;
-  // Do not create multiple timers for the same notification.
-  if(pfNotificationRingers.has(id)) return;
+
+  pfStopNotificationSound(id);
 
   const ring = async () => {
-    try {
-      // If the user already clicked ENABLE ALERTS, this will be running.
-      // If not, the browser may block audio; the next user gesture unlocks it.
-      const unlocked = await pfUnlockAlertAudio();
-      if(unlocked) pfPlaySystemAlertTone();
-    } catch(err) {
-      console.warn('[PF Alert] Sound attempt failed:', err);
-    }
+    const ok = await pfUnlockAlertAudio();
+    if(ok) pfPlaySystemAlertTone();
   };
 
+  // Attempt immediately. If autoplay was blocked, a later user gesture
+  // unlocks the context and the next interval will sound.
   ring();
   const timer = setInterval(ring, 1200);
   pfNotificationRingers.set(id, timer);
-  document.documentElement.classList.add('pf-alarm-active');
 }
 
 function pfStopNotificationSound(notificationId){
@@ -1769,13 +1785,11 @@ function pfStopNotificationSound(notificationId){
     clearInterval(timer);
     pfNotificationRingers.delete(id);
   }
-  if(!pfNotificationRingers.size) document.documentElement.classList.remove('pf-alarm-active');
 }
 
 function pfStopAllNotificationSounds(){
   pfNotificationRingers.forEach(timer => clearInterval(timer));
   pfNotificationRingers.clear();
-  document.documentElement.classList.remove('pf-alarm-active');
 }
 
 function pfUnlockAlertAudioFromGesture(){
@@ -2421,82 +2435,49 @@ async function notifyIncomingPost(post){
   }
 }
 
+let pfActiveMessageAlarm = null;
+
 function showTelegramNotification(message, senderName, senderAvatar='👾'){
-  const stack = $("pfLiveNotificationStack");
-  if(!stack || !message?.id) return;
-
+  if(!message?.id) return;
   const id = String(message.id);
-  if(stack.querySelector(`[data-pf-notification-id="${CSS.escape(id)}"]`)) return;
+  const overlay = document.getElementById('pfMessageAlarmOverlay');
+  const text = document.getElementById('pfMessageAlarmText');
+  const dismiss = document.getElementById('pfMessageAlarmDismiss');
+  if(!overlay || !text || !dismiss) return;
 
-  const soundType = notificationSoundType(message);
-  const item = document.createElement('div');
-  item.className = 'pf-live-notification is-ringing';
-  item.dataset.pfNotificationId = id;
-  item.dataset.notificationKind = notificationType(message);
-  item.setAttribute('role','alert');
-  item.innerHTML = `
-    <div class="pf-live-notification-avatar">${senderAvatar || '👾'}</div>
-    <div class="pf-live-notification-main">
-      <div class="pf-live-notification-head">
-        <div class="pf-live-notification-name">${esc(senderName || 'PIXEL USER')}</div>
-        <div class="pf-live-notification-time">LIVE</div>
-      </div>
-      <div class="pf-live-notification-text">${esc(notificationDetail(message))}</div>
-      <div class="pf-live-notification-progress"><span></span></div>
-    </div>
-    <button class="pf-live-notification-close" type="button" aria-label="Dismiss notification">DISMISS</button>
-  `;
+  // If another message arrives while the alarm is visible, update the same
+  // system-style dialog and keep the alarm ringing rather than creating many popups.
+  pfActiveMessageAlarm = {id, message, senderName: senderName || 'PIXEL USER'};
+  text.textContent = `${senderName || 'PIXEL USER'} sent you a new message.`;
+  overlay.classList.add('show');
+  document.body.classList.add('pf-message-alarm-active');
 
-  const removePopup = () => {
-    pfStopNotificationSound(id);
-    item.classList.remove('is-ringing');
-    item.classList.add('removing');
-    setTimeout(() => item.remove(), 200);
-  };
+  // Stop any previous ring and start one persistent ring for the current alert.
+  pfStopAllNotificationSounds();
+  pfStartNotificationSound('message-alarm-' + id);
 
-  const open = () => {
-    removePopup();
-    openNotification(id, message.sender_id, senderName);
-  };
+  const stopAndClose = async () => {
+    pfStopNotificationSound('message-alarm-' + id);
+    pfStopAllNotificationSounds();
+    overlay.classList.remove('show');
+    document.body.classList.remove('pf-message-alarm-active');
+    const current = pfActiveMessageAlarm;
+    pfActiveMessageAlarm = null;
 
-  item.addEventListener('click', e => {
-    if(e.target.closest('.pf-live-notification-close')) return;
-    open();
-  });
-
-  item.querySelector('.pf-live-notification-close')?.addEventListener('click', async e => {
-    e.stopPropagation();
-    pfStopNotificationSound(id);
-    removePopup();
-
-    // Dismiss = mark this alert read without navigating away.
-    try{
-      if(message.receiver_id && currentUser?.id){
-        await sb.from('messages')
-          .update({is_read:true, read_at:new Date().toISOString()})
-          .eq('id', id)
-          .eq('receiver_id', currentUser.id);
-      }
-    }catch(err){
-      console.warn('Dismiss notification read update failed:', err);
+    if(current?.message?.receiver_id && currentUser?.id){
+      try{
+        await sb.from('messages').update({is_read:true, read_at:new Date().toISOString()})
+          .eq('id', String(current.message.id)).eq('receiver_id', currentUser.id);
+      }catch(err){ console.warn('Alarm dismiss read update failed:', err); }
     }
-
-    knownUnreadMessageIds.delete(id);
-    notificationItems.delete(id);
+    knownUnreadMessageIds.delete(String(current?.message?.id || id));
+    notificationItems.delete(String(current?.message?.id || id));
     renderNotificationList();
-    renderNotificationBadge(Math.max(0, localUnreadCount - 1));
-  });
+    if(typeof updateNotificationBadge === 'function') updateNotificationBadge({details:true});
+  };
 
-  stack.prepend(item);
-
-  while(stack.children.length > 4){
-    const old = stack.lastElementChild;
-    pfStopNotificationSound(old?.dataset?.pfNotificationId);
-    old?.remove();
-  }
-
-  // Start AFTER the popup exists so the alert is visibly and audibly live.
-  pfStartNotificationSound(id, soundType);
+  dismiss.onclick = stopAndClose;
+  overlay.onclick = e => { if(e.target === overlay) stopAndClose(); };
 }
 
 
@@ -6105,65 +6086,6 @@ window.addEventListener('beforeunload', ()=>{
 });
 </script>
 
-
-<style id="pf-alert-activation-style">
-#pf-alert-activation{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2147483000;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 28px);padding:12px 14px;border:1px solid #3d6fa8;border-radius:12px;background:#071426;color:#eaf4ff;box-shadow:0 8px 30px #0008;font:14px Arial,sans-serif}
-#pf-alert-activation small{display:block;color:#9eb6d5;margin-top:3px}
-#pf-alert-activation button{border:1px solid #5edcff;border-radius:8px;background:#123c62;color:#fff;padding:9px 12px;font-weight:700;cursor:pointer;white-space:nowrap}
-#pf-alert-activation button:disabled{opacity:.65;cursor:wait}
-#pf-alert-activation .pf-alert-error{color:#ff9cac}
-#pf-alert-activation .pf-alert-ok{color:#79f2b0}
-</style>
-<script id="pf-alert-activation-script">
-(function(){
-  function isLoggedIn(){
-    return typeof currentUser !== 'undefined' && !!currentUser;
-  }
-  function mount(){
-    if(document.getElementById('pf-alert-activation')) return;
-    const el=document.createElement('div');
-    el.id='pf-alert-activation';
-    el.innerHTML='<div><b>🔔 ENABLE NOTIFICATION ALARM</b><small>Click once to enable repeating sound and desktop notifications.</small></div><button type="button">ENABLE NOTIFICATION ALARM</button>';
-    document.body.appendChild(el);
-    const btn=el.querySelector('button'), small=el.querySelector('small');
-    btn.addEventListener('click',async function(){
-      btn.disabled=true; btn.textContent='ENABLING...';
-      let audioOK=false, notificationOK=false;
-      try { audioOK=!!(await pfUnlockAlertAudio()); } catch(e) {}
-      if('Notification' in window){
-        try{
-          if(Notification.permission==='default') await Notification.requestPermission();
-          notificationOK=Notification.permission==='granted';
-        }catch(e){ notificationOK=false; }
-      }
-      if(audioOK){ try{ pfPlaySystemAlertTone(); }catch(e){} }
-      if(audioOK && notificationOK){
-        small.className='pf-alert-ok';
-        small.textContent='Sound and desktop notifications enabled.';
-        btn.textContent='ENABLED ✓';
-        setTimeout(()=>el.remove(),1800);
-      }else if(audioOK){
-        small.className='pf-alert-error';
-        small.textContent='Sound enabled, but desktop notifications are blocked or unavailable.';
-        btn.disabled=false; btn.textContent='TRY AGAIN';
-      }else{
-        small.className='pf-alert-error';
-        small.textContent='Browser blocked sound. Click again or allow sound for this site.';
-        btn.disabled=false; btn.textContent='TRY AGAIN';
-      }
-    });
-  }
-  function update(){
-    // Keep the activation control visible so the user can always find it.
-    // It is safe to click before or after login because it only unlocks browser permissions.
-    if(!document.getElementById('pf-alert-activation')) mount();
-  }
-  window.pfMountNotificationAlarmButton = mount;
-  window.pfUpdateNotificationAlarmButton = update;
-  setInterval(update,500);
-  document.addEventListener('DOMContentLoaded',update);
-})();
-</script>
 </body></html>
 
 <script>
