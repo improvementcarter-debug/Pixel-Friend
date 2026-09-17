@@ -5919,66 +5919,136 @@ try{
 })();
 </script>
 
+
 <script id="pf-notification-loop-engine">
 (() => {
   let timer = null, active = false;
+  let audioCtx = null;
 
-  function stopLoop(){
-    active = false;
-    if(timer){ clearInterval(timer); timer=null; }
-    const modal=document.getElementById('pfNotificationSoundLoop');
-    if(modal){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  function el(id){ return document.getElementById(id); }
+
+  function stop(){
+    active=false;
+    if(timer){clearInterval(timer);timer=null;}
+    const m=el('pfNotificationSoundLoop');
+    if(m){m.classList.remove('show');m.setAttribute('aria-hidden','true');}
     try{ if(navigator.vibrate) navigator.vibrate(0); }catch(e){}
   }
 
-  function beep(){
-    try{
-      if(window.notificationAudio instanceof HTMLAudioElement){
-        const a=window.notificationAudio;
-        a.pause(); a.currentTime=0; a.loop=false;
-        a.play().catch(()=>{});
-        return;
-      }
-    }catch(e){}
+  async function unlockAudio(){
     try{
       const AC=window.AudioContext||window.webkitAudioContext;
-      if(!AC)return;
-      if(!window.__pfNotifAudioCtx)window.__pfNotifAudioCtx=new AC();
-      const c=window.__pfNotifAudioCtx;
-      if(c.state==='suspended')c.resume().catch(()=>{});
-      const n=c.currentTime,o=c.createOscillator(),g=c.createGain();
-      o.type='square';
+      if(!AC)return false;
+      if(!audioCtx) audioCtx=new AC();
+      if(audioCtx.state==='suspended') await audioCtx.resume();
+      return audioCtx.state==='running';
+    }catch(e){return false;}
+  }
+
+  function beep(){
+    // A generated tone avoids dependence on missing audio files.
+    try{
+      if(!audioCtx){
+        const AC=window.AudioContext||window.webkitAudioContext;
+        if(!AC)return;
+        audioCtx=new AC();
+      }
+      if(audioCtx.state==='suspended'){audioCtx.resume().catch(()=>{});return;}
+      const n=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.type='sine';
       o.frequency.setValueAtTime(880,n);
-      o.frequency.setValueAtTime(660,n+.12);
-      g.gain.setValueAtTime(.0001,n);
-      g.gain.exponentialRampToValueAtTime(.18,n+.015);
-      g.gain.exponentialRampToValueAtTime(.0001,n+.28);
-      o.connect(g);g.connect(c.destination);o.start(n);o.stop(n+.3);
+      o.frequency.setValueAtTime(660,n+0.14);
+      g.gain.setValueAtTime(0.0001,n);
+      g.gain.exponentialRampToValueAtTime(0.28,n+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,n+0.34);
+      o.connect(g);g.connect(audioCtx.destination);
+      o.start(n);o.stop(n+0.36);
     }catch(e){}
   }
 
-  function startLoop(title,text){
-    stopLoop(); active=true;
-    const m=document.getElementById('pfNotificationSoundLoop');
-    const t=document.getElementById('pfNotifLoopTitle');
-    const x=document.getElementById('pfNotifLoopText');
+  function start(title,text){
+    stop();
+    active=true;
+    const m=el('pfNotificationSoundLoop');
+    const t=el('pfNotifLoopTitle');
+    const x=el('pfNotifLoopText');
     if(t)t.textContent=title||'🔔 NEW NOTIFICATION';
     if(x)x.textContent=text||'You have a new notification.';
     if(m){m.classList.add('show');m.setAttribute('aria-hidden','false');}
-    beep();
-    try{if(navigator.vibrate)navigator.vibrate([250,120,250]);}catch(e){}
-    timer=setInterval(()=>{if(active){beep();try{if(navigator.vibrate)navigator.vibrate([250,120,250]);}catch(e){}}},1500);
+
+    // Try to start immediately. If the browser blocks autoplay, the next
+    // user gesture will unlock the audio, while the alert remains visible.
+    unlockAudio().then(ok=>{ if(ok && active) beep(); });
+    try{if(navigator.vibrate)navigator.vibrate([300,120,300]);}catch(e){}
+
+    timer=setInterval(()=>{
+      if(!active)return;
+      unlockAudio().then(ok=>{if(ok&&active)beep();});
+      try{if(navigator.vibrate)navigator.vibrate([300,120,300]);}catch(e){}
+    },1500);
   }
 
-  window.pfStartNotificationLoop=startLoop;
-  window.pfStopNotificationLoop=stopLoop;
+  // Unlock audio on any user interaction with the app.
+  ['pointerdown','touchstart','keydown'].forEach(evt=>{
+    document.addEventListener(evt,()=>{
+      if(active) unlockAudio().then(ok=>{if(ok)beep();});
+    },{passive:true});
+  });
 
   document.addEventListener('click',e=>{
-    if(e.target && e.target.id==='pfNotifDismiss') stopLoop();
+    if(e.target && e.target.id==='pfNotifDismiss') stop();
   });
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape' && active) stopLoop();
+    if(e.key==='Escape' && active) stop();
   });
+
+  window.pfStartNotificationLoop=start;
+  window.pfStopNotificationLoop=stop;
+
+  // Hook the REAL incoming notification functions after the whole app has
+  // loaded, so later function declarations cannot overwrite the hook.
+  function hookIncoming(){
+    if(typeof window.notifyIncomingMessage==='function' && !window.notifyIncomingMessage.__pfLoopHook){
+      const original=window.notifyIncomingMessage;
+      const wrapped=function(message){
+        const result=original.apply(this,arguments);
+        try{
+          const text=(message?.content||'').trim() ||
+            (message?.image_url?'🖼️ New image':
+             message?.video_url?'📹 New video':
+             message?.audio_url?'🎤 New voice message':
+             message?.sticker?'🎟️ New sticker':'📩 New message');
+          const sender=window.notificationProfileCache?.get?.(String(message?.sender_id||'')) || 'PIXEL USER';
+          start('🔔 NEW MESSAGE — '+sender,text);
+        }catch(e){}
+        return result;
+      };
+      wrapped.__pfLoopHook=true;
+      window.notifyIncomingMessage=wrapped;
+    }
+
+    if(typeof window.notifyIncomingPost==='function' && !window.notifyIncomingPost.__pfLoopHook){
+      const original=window.notifyIncomingPost;
+      const wrapped=function(post){
+        const result=original.apply(this,arguments);
+        try{
+          start('🆕 NEW POST','A new public post is available.');
+        }catch(e){}
+        return result;
+      };
+      wrapped.__pfLoopHook=true;
+      window.notifyIncomingPost=wrapped;
+    }
+  }
+
+  // Re-hook repeatedly because the original app assigns globals at runtime.
+  hookIncoming();
+  setTimeout(hookIncoming,500);
+  setTimeout(hookIncoming,1500);
+  setInterval(hookIncoming,3000);
+
+  // Also expose a generic bridge for future notification events.
+  window.pfAlertNotification=(title,text)=>start(title,text);
 })();
 </script>
 </body></html>
