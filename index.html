@@ -1908,6 +1908,671 @@ body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="
   .pf-call-window,.pf-call-modal *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}
 }
 </style>
+
+<style id="rotating_summary_card_borders">
+/* Rotating neon borders for New Register, Login Users, Online Users and Offline Users */
+.summary-card {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background-clip: padding-box !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 12px 32px rgba(0,0,0,.28) !important;
+}
+.summary-card::before {
+  content: "";
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2 !important;
+  padding: 2px !important;
+  border-radius: inherit !important;
+  background: conic-gradient(from var(--summary-angle, 0deg), var(--summary-c1), var(--summary-c2), var(--summary-c3), var(--summary-c1)) !important;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask-composite: exclude !important;
+  animation: summaryBorderSpin 4.5s linear infinite !important;
+  pointer-events: none !important;
+}
+.summary-card::after {
+  content: "";
+  position: absolute !important;
+  inset: 2px !important;
+  z-index: -1 !important;
+  border-radius: 14px !important;
+  background: linear-gradient(145deg, rgba(11,20,38,.98), rgba(5,12,25,.98)) !important;
+  pointer-events: none !important;
+}
+.summary-card.register { --summary-c1:#36b8ff; --summary-c2:#8b5cf6; --summary-c3:#22d3ee; }
+.summary-card.login { --summary-c1:#a78bfa; --summary-c2:#ec4899; --summary-c3:#60a5fa; }
+.summary-card.online { --summary-c1:#22c55e; --summary-c2:#22d3ee; --summary-c3:#a3e635; }
+.summary-card.offline { --summary-c1:#64748b; --summary-c2:#38bdf8; --summary-c3:#a78bfa; }
+.summary-card:hover::before { animation-duration: 1.8s !important; }
+.summary-card:hover { transform: translateY(-3px); transition: transform .2s ease, box-shadow .2s ease; box-shadow: 0 0 22px color-mix(in srgb, var(--summary-c2) 35%, transparent), 0 14px 34px rgba(0,0,0,.32) !important; }
+.summary-card .summary-top,
+.summary-card .summary-value,
+.summary-card .summary-sub,
+.summary-card .summary-live { position: relative; z-index: 1; }
+.summary-card .summary-icon { position: relative; z-index: 2; }
+@keyframes summaryBorderSpin { to { --summary-angle: 360deg; } }
+@property --summary-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@media (prefers-reduced-motion: reduce) {
+  .summary-card::before { animation: none !important; }
+  .summary-card:hover { transform: none !important; }
+}
+</style>
+
+<style id="pf-circular-orbit-summary-cards">
+/* ===== CIRCULAR ORBIT ENERGY RINGS FOR HOME SUMMARY CARDS ===== */
+.user-summary-dashboard .summary-card {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  border-color: rgba(80, 180, 255, .42) !important;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(18, 86, 150, .16), transparent 47%),
+    linear-gradient(145deg, rgba(10, 25, 48, .97), rgba(5, 13, 28, .98)) !important;
+  box-shadow: 0 0 0 1px rgba(0, 220, 255, .06), 0 12px 30px rgba(0,0,0,.28), inset 0 0 28px rgba(0, 120, 255, .06) !important;
+}
+
+/* Main circular energy ring */
+.user-summary-dashboard .summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  width: 126% !important;
+  aspect-ratio: 1 / 1 !important;
+  left: -13% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  border-radius: 50% !important;
+  padding: 5px !important;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 28deg,
+    #00eaff 62deg,
+    #247bff 108deg,
+    #a855ff 155deg,
+    #ff28d7 205deg,
+    #ff9b32 238deg,
+    #00ffd0 286deg,
+    #00eaff 330deg,
+    transparent 358deg
+  ) !important;
+  transform: translateY(-50%) rotate(0deg) !important;
+  animation: pfSummaryOrbit 4.2s linear infinite !important;
+  filter: drop-shadow(0 0 5px rgba(0,234,255,.95)) drop-shadow(0 0 14px rgba(155,85,255,.7)) !important;
+  pointer-events: none !important;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+  mask-composite: exclude !important;
+}
+
+/* Thin secondary orbit ring */
+.user-summary-dashboard .summary-card::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 0 !important;
+  width: 104% !important;
+  aspect-ratio: 1 / 1 !important;
+  left: -2% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  border: 1px solid rgba(0, 225, 255, .42) !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  transform: translateY(-50%) rotate(0deg) !important;
+  animation: pfSummaryOrbitReverse 6.5s linear infinite, pfSummaryRingPulse 2.8s ease-in-out infinite !important;
+  box-shadow: 0 0 8px rgba(0, 225, 255, .45), inset 0 0 12px rgba(0, 225, 255, .12) !important;
+  pointer-events: none !important;
+}
+
+/* Small orbit highlights / energy sparks */
+.user-summary-dashboard .summary-card .summary-top,
+.user-summary-dashboard .summary-card .summary-value,
+.user-summary-dashboard .summary-card .summary-sub,
+.user-summary-dashboard .summary-card .summary-live {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+.user-summary-dashboard .summary-card .summary-icon {
+  position: relative !important;
+  z-index: 4 !important;
+  box-shadow: 0 0 14px rgba(0, 220, 255, .18), inset 0 0 12px rgba(0, 220, 255, .08) !important;
+}
+
+/* Unique card color accents */
+.user-summary-dashboard .summary-card.register::before {
+  filter: hue-rotate(0deg) drop-shadow(0 0 6px #00eaff) drop-shadow(0 0 15px #287bff) !important;
+}
+.user-summary-dashboard .summary-card.login::before {
+  filter: hue-rotate(58deg) drop-shadow(0 0 6px #ff35d0) drop-shadow(0 0 15px #a855ff) !important;
+}
+.user-summary-dashboard .summary-card.online::before {
+  filter: hue-rotate(112deg) drop-shadow(0 0 6px #00ff9d) drop-shadow(0 0 15px #00ffd5) !important;
+}
+.user-summary-dashboard .summary-card.offline::before {
+  filter: hue-rotate(188deg) drop-shadow(0 0 6px #438cff) drop-shadow(0 0 15px #00eaff) !important;
+}
+
+.user-summary-dashboard .summary-card:hover::before {
+  animation-duration: 1.8s !important;
+  filter: brightness(1.45) drop-shadow(0 0 8px #00eaff) drop-shadow(0 0 22px #a855ff) !important;
+}
+.user-summary-dashboard .summary-card:hover::after {
+  border-color: rgba(255,255,255,.75) !important;
+}
+
+@keyframes pfSummaryOrbit {
+  from { transform: translateY(-50%) rotate(0deg) !important; }
+  to { transform: translateY(-50%) rotate(360deg) !important; }
+}
+@keyframes pfSummaryOrbitReverse {
+  from { transform: translateY(-50%) rotate(360deg) !important; }
+  to { transform: translateY(-50%) rotate(0deg) !important; }
+}
+@keyframes pfSummaryRingPulse {
+  0%, 100% { opacity: .38; transform: translateY(-50%) scale(.96); }
+  50% { opacity: .95; transform: translateY(-50%) scale(1.02); }
+}
+
+@media (max-width: 700px) {
+  .user-summary-dashboard .summary-card::before { width: 112% !important; left: -6% !important; }
+  .user-summary-dashboard .summary-card::after { width: 94% !important; left: 3% !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .user-summary-dashboard .summary-card::before,
+  .user-summary-dashboard .summary-card::after { animation: none !important; }
+}
+</style>
+
+
+<style id="pf-circular-orbit-visible-fix">
+/* =========================================================
+   VISIBLE CIRCULAR ORBIT EFFECT
+   Applies to the real Home cards:
+   .summary-card.register
+   .summary-card.login
+   .summary-card.online
+   .summary-card.offline
+   This override is placed last so older styles cannot hide it.
+========================================================= */
+.user-summary-dashboard .summary-card {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(85, 190, 255, .42) !important;
+  background: radial-gradient(circle at 50% 50%, rgba(14, 54, 92, .28), rgba(6, 15, 31, .96) 70%) !important;
+  transition: transform .25s ease, box-shadow .25s ease !important;
+}
+
+/* Main rotating circular energy ring */
+.user-summary-dashboard .summary-card::before {
+  content: "" !important;
+  position: absolute !important;
+  width: 150px !important;
+  height: 150px !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin-left: -75px !important;
+  margin-top: -75px !important;
+  border-radius: 50% !important;
+  padding: 5px !important;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 28deg,
+    #00eaff 58deg,
+    #287bff 105deg,
+    #a855ff 155deg,
+    #ff35d0 205deg,
+    #ff9d35 245deg,
+    #00ffd5 295deg,
+    #00eaff 335deg,
+    transparent 360deg
+  ) !important;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite: xor !important;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+  mask-composite: exclude !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  animation: pfOrbitSpin 3.2s linear infinite !important;
+  filter: drop-shadow(0 0 5px #00eaff) drop-shadow(0 0 13px #a855ff) drop-shadow(0 0 22px rgba(0, 234, 255, .7)) !important;
+}
+
+/* Inner circular ring */
+.user-summary-dashboard .summary-card::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 124px !important;
+  height: 124px !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  margin-left: -62px !important;
+  margin-top: -62px !important;
+  border-radius: 50% !important;
+  border: 1px solid rgba(0, 234, 255, .42) !important;
+  background: radial-gradient(circle, transparent 58%, rgba(0, 234, 255, .035) 59%, transparent 70%) !important;
+  box-shadow: 0 0 10px rgba(0, 234, 255, .3), inset 0 0 16px rgba(0, 234, 255, .16) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+  animation: pfOrbitPulse 2.1s ease-in-out infinite !important;
+}
+
+/* Keep text and icons above the orbit */
+.user-summary-dashboard .summary-card > * {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Per-card color identity */
+.user-summary-dashboard .summary-card.register::before {
+  filter: hue-rotate(0deg) drop-shadow(0 0 6px #00eaff) drop-shadow(0 0 18px #287bff) !important;
+}
+.user-summary-dashboard .summary-card.login::before {
+  filter: hue-rotate(55deg) drop-shadow(0 0 6px #ff35d0) drop-shadow(0 0 18px #a855ff) !important;
+}
+.user-summary-dashboard .summary-card.online::before {
+  filter: hue-rotate(115deg) drop-shadow(0 0 6px #00ff88) drop-shadow(0 0 18px #00ffd5) !important;
+}
+.user-summary-dashboard .summary-card.offline::before {
+  filter: hue-rotate(190deg) drop-shadow(0 0 6px #287bff) drop-shadow(0 0 18px #00eaff) !important;
+}
+
+.user-summary-dashboard .summary-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 0 24px rgba(0, 220, 255, .24), 0 12px 32px rgba(0, 0, 0, .35) !important;
+}
+.user-summary-dashboard .summary-card:hover::before {
+  animation-duration: 1.55s !important;
+  filter: brightness(1.45) drop-shadow(0 0 10px #00eaff) drop-shadow(0 0 25px #a855ff) !important;
+}
+
+@keyframes pfOrbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pfOrbitPulse {
+  0%, 100% { transform: scale(.94); opacity: .45; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@media (max-width: 700px) {
+  .user-summary-dashboard .summary-card::before {
+    width: 132px !important;
+    height: 132px !important;
+    margin-left: -66px !important;
+    margin-top: -66px !important;
+  }
+  .user-summary-dashboard .summary-card::after {
+    width: 108px !important;
+    height: 108px !important;
+    margin-left: -54px !important;
+    margin-top: -54px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .user-summary-dashboard .summary-card::before,
+  .user-summary-dashboard .summary-card::after {
+    animation: none !important;
+  }
+}
+</style>
+
+
+<style id="pf-reference-circular-summary-cards">
+/* =========================================================
+   PIXEL-FRIEND — REFERENCE-STYLE CIRCULAR SUMMARY CARDS
+   Large luminous orbit rings inspired by the supplied image
+========================================================= */
+.user-summary-dashboard{
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:20px !important;
+  margin:18px 0 24px !important;
+}
+
+.user-summary-dashboard > .summary-card{
+  position:relative !important;
+  isolation:isolate !important;
+  overflow:hidden !important;
+  min-width:0 !important;
+  height:250px !important;
+  min-height:250px !important;
+  padding:22px 18px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  border:1px solid rgba(55,150,255,.42) !important;
+  border-radius:18px !important;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(18,76,145,.22),transparent 53%),
+    linear-gradient(145deg,rgba(7,24,54,.96),rgba(3,10,28,.98)) !important;
+  box-shadow:0 0 0 1px rgba(0,180,255,.06),0 16px 42px rgba(0,0,0,.32),inset 0 0 35px rgba(0,130,255,.06) !important;
+}
+
+/* Main rotating ring */
+.user-summary-dashboard > .summary-card::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:-2 !important;
+  width:214px !important;
+  height:214px !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) rotate(0deg) !important;
+  border-radius:50% !important;
+  padding:7px !important;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 24deg,
+    var(--orbit-a,#00eaff) 58deg,
+    var(--orbit-b,#467bff) 105deg,
+    var(--orbit-c,#c14cff) 156deg,
+    transparent 198deg,
+    transparent 236deg,
+    var(--orbit-a,#00eaff) 286deg,
+    var(--orbit-b,#467bff) 330deg,
+    transparent 360deg
+  ) !important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0) !important;
+  -webkit-mask-composite:xor !important;
+  mask-composite:exclude !important;
+  filter:drop-shadow(0 0 5px var(--orbit-a,#00eaff)) drop-shadow(0 0 15px var(--orbit-c,#8c5cff)) !important;
+  animation:pfReferenceOrbit 4.5s linear infinite !important;
+  pointer-events:none !important;
+}
+
+/* Inner ring / luminous halo */
+.user-summary-dashboard > .summary-card::after{
+  content:"" !important;
+  position:absolute !important;
+  z-index:-1 !important;
+  width:178px !important;
+  height:178px !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%,-50%) !important;
+  border-radius:50% !important;
+  border:2px solid color-mix(in srgb,var(--orbit-a,#00eaff) 55%,transparent) !important;
+  box-shadow:
+    0 0 8px var(--orbit-a,#00eaff),
+    0 0 22px color-mix(in srgb,var(--orbit-a,#00eaff) 55%,transparent),
+    inset 0 0 18px color-mix(in srgb,var(--orbit-b,#467bff) 28%,transparent) !important;
+  opacity:.78 !important;
+  animation:pfReferenceInner 2.8s ease-in-out infinite !important;
+  pointer-events:none !important;
+}
+
+/* Tiny orbit highlight to make the ring feel energized */
+.user-summary-dashboard > .summary-card .summary-icon{
+  position:relative !important;
+  z-index:3 !important;
+  width:52px !important;
+  height:52px !important;
+  flex:0 0 52px !important;
+  display:grid !important;
+  place-items:center !important;
+  border-radius:50% !important;
+  font-size:23px !important;
+  background:rgba(2,15,38,.88) !important;
+  border:2px solid var(--orbit-a,#00eaff) !important;
+  color:var(--orbit-a,#00eaff) !important;
+  box-shadow:0 0 12px var(--orbit-a,#00eaff),inset 0 0 14px rgba(0,180,255,.12) !important;
+}
+.user-summary-dashboard > .summary-card .summary-icon svg{width:25px !important;height:25px !important}
+.user-summary-dashboard > .summary-card .summary-top{
+  position:relative !important;
+  z-index:3 !important;
+  width:100% !important;
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column-reverse !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:9px !important;
+}
+.user-summary-dashboard > .summary-card .summary-label{
+  position:relative !important;
+  z-index:3 !important;
+  font-family:Inter,ui-sans-serif,sans-serif !important;
+  font-size:15px !important;
+  line-height:1.25 !important;
+  letter-spacing:.2px !important;
+  color:#cce8ff !important;
+  text-shadow:0 0 10px rgba(77,188,255,.28) !important;
+  white-space:nowrap !important;
+}
+.user-summary-dashboard > .summary-card .summary-value{
+  position:relative !important;
+  z-index:3 !important;
+  margin-top:12px !important;
+  font-size:48px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  letter-spacing:-1px !important;
+  color:#effaff !important;
+  text-shadow:0 0 12px var(--orbit-a,#00eaff),0 0 28px color-mix(in srgb,var(--orbit-a,#00eaff) 45%,transparent) !important;
+}
+.user-summary-dashboard > .summary-card .summary-sub,
+.user-summary-dashboard > .summary-card .summary-live{
+  position:relative !important;
+  z-index:3 !important;
+  margin-top:9px !important;
+  font-size:12px !important;
+  line-height:1.25 !important;
+  color:#93b8d9 !important;
+}
+.user-summary-dashboard > .summary-card .summary-live i{width:7px !important;height:7px !important}
+
+/* Per-card color identity */
+.user-summary-dashboard > .summary-card.register{
+  --orbit-a:#00eaff;--orbit-b:#397bff;--orbit-c:#b84cff;
+}
+.user-summary-dashboard > .summary-card.login{
+  --orbit-a:#ff39d4;--orbit-b:#9a4dff;--orbit-c:#ffad3d;
+}
+.user-summary-dashboard > .summary-card.online{
+  --orbit-a:#00ff9d;--orbit-b:#00eaff;--orbit-c:#b4ff3d;
+}
+.user-summary-dashboard > .summary-card.offline{
+  --orbit-a:#438dff;--orbit-b:#8b63ff;--orbit-c:#00d9ff;
+}
+.user-summary-dashboard > .summary-card.online .summary-value{color:#baffdc !important}
+.user-summary-dashboard > .summary-card.offline .summary-value{color:#dbe8ff !important}
+
+.user-summary-dashboard > .summary-card:hover{
+  transform:translateY(-5px) !important;
+  border-color:var(--orbit-a,#00eaff) !important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--orbit-a,#00eaff) 28%,transparent),0 18px 48px rgba(0,0,0,.38),inset 0 0 40px color-mix(in srgb,var(--orbit-a,#00eaff) 8%,transparent) !important;
+}
+.user-summary-dashboard > .summary-card:hover::before{animation-duration:2s !important;filter:brightness(1.35) drop-shadow(0 0 10px var(--orbit-a,#00eaff)) drop-shadow(0 0 24px var(--orbit-c,#8c5cff)) !important}
+
+@keyframes pfReferenceOrbit{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes pfReferenceInner{0%,100%{opacity:.48;transform:translate(-50%,-50%) scale(.96)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.035)}}
+
+@media(max-width:1180px){
+  .user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
+}
+@media(max-width:600px){
+  .user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px !important}
+  .user-summary-dashboard > .summary-card{height:205px !important;min-height:205px !important;padding:14px 8px !important}
+  .user-summary-dashboard > .summary-card::before{width:174px !important;height:174px !important}
+  .user-summary-dashboard > .summary-card::after{width:144px !important;height:144px !important}
+  .user-summary-dashboard > .summary-card .summary-icon{width:42px !important;height:42px !important;flex-basis:42px !important}
+  .user-summary-dashboard > .summary-card .summary-icon svg{width:21px !important;height:21px !important}
+  .user-summary-dashboard > .summary-card .summary-label{font-size:11px !important;white-space:normal !important}
+  .user-summary-dashboard > .summary-card .summary-value{font-size:35px !important}
+  .user-summary-dashboard > .summary-card .summary-sub,
+  .user-summary-dashboard > .summary-card .summary-live{font-size:10px !important}
+}
+@media(max-width:380px){
+  .user-summary-dashboard > .summary-card{height:190px !important;min-height:190px !important}
+  .user-summary-dashboard > .summary-card::before{width:158px !important;height:158px !important}
+  .user-summary-dashboard > .summary-card::after{width:130px !important;height:130px !important}
+  .user-summary-dashboard > .summary-card .summary-value{font-size:31px !important}
+}
+@media(prefers-reduced-motion:reduce){
+  .user-summary-dashboard > .summary-card::before,
+  .user-summary-dashboard > .summary-card::after{animation:none !important}
+}
+</style>
+
+
+<style id="reference-circular-card-final">
+/* REFERENCE-STYLE CIRCULAR SUMMARY CARDS */
+.user-summary-dashboard{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:20px!important;
+  align-items:stretch!important;
+}
+.summary-card{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  min-height:300px!important;
+  height:300px!important;
+  padding:26px 18px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  border:1px solid rgba(56,164,255,.42)!important;
+  border-radius:18px!important;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(12,46,88,.42) 0%,rgba(4,14,31,.92) 57%,rgba(2,8,20,.98) 100%)!important;
+  box-shadow:inset 0 0 28px rgba(0,140,255,.08),0 12px 32px rgba(0,0,0,.32)!important;
+  transition:transform .3s ease,box-shadow .3s ease!important;
+}
+/* Hide the old corner glow */
+.summary-card > .summary-top,
+.summary-card > .summary-value,
+.summary-card > .summary-sub,
+.summary-card > .summary-live{position:relative!important;z-index:5!important}
+.summary-card:before{
+  content:""!important;
+  position:absolute!important;
+  width:248px!important;
+  height:248px!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%) rotate(0deg)!important;
+  border-radius:50%!important;
+  padding:7px!important;
+  background:conic-gradient(from 0deg,
+    transparent 0deg,transparent 18deg,
+    var(--orbit-a,#00eaff) 42deg,
+    var(--orbit-b,#5b8cff) 78deg,
+    transparent 112deg,transparent 145deg,
+    var(--orbit-c,#c45cff) 178deg,
+    var(--orbit-d,#ff35d0) 224deg,
+    transparent 264deg,transparent 300deg,
+    var(--orbit-a,#00eaff) 330deg,
+    transparent 355deg)!important;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0)!important;
+  -webkit-mask-composite:xor!important;
+  mask-composite:exclude!important;
+  filter:drop-shadow(0 0 5px var(--orbit-a,#00eaff)) drop-shadow(0 0 15px var(--orbit-c,#c45cff))!important;
+  animation:referenceOrbit 4s linear infinite!important;
+  pointer-events:none!important;
+  z-index:1!important;
+}
+.summary-card:after{
+  content:""!important;
+  position:absolute!important;
+  width:214px!important;
+  height:214px!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  border-radius:50%!important;
+  border:2px solid color-mix(in srgb,var(--orbit-a,#00eaff) 55%,transparent)!important;
+  box-shadow:0 0 10px color-mix(in srgb,var(--orbit-a,#00eaff) 65%,transparent),inset 0 0 18px color-mix(in srgb,var(--orbit-b,#5b8cff) 30%,transparent)!important;
+  animation:referencePulse 2.8s ease-in-out infinite!important;
+  pointer-events:none!important;
+  z-index:2!important;
+}
+.summary-card .summary-top{
+  display:flex!important;
+  flex-direction:column-reverse!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:10px!important;
+  min-height:0!important;
+  margin:0!important;
+}
+.summary-card .summary-icon{
+  width:58px!important;
+  height:58px!important;
+  flex:0 0 58px!important;
+  display:grid!important;
+  place-items:center!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  color:var(--orbit-a,#00eaff)!important;
+  font-size:28px!important;
+  filter:drop-shadow(0 0 8px currentColor)!important;
+}
+.summary-card .summary-icon svg{width:44px!important;height:44px!important}
+.summary-card .summary-label{
+  font-family:inherit!important;
+  font-size:18px!important;
+  line-height:1.25!important;
+  letter-spacing:.2px!important;
+  color:#e4f5ff!important;
+  text-shadow:0 0 9px color-mix(in srgb,var(--orbit-a,#00eaff) 50%,transparent)!important;
+  white-space:nowrap!important;
+}
+.summary-card .summary-value{
+  margin-top:14px!important;
+  font-size:52px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  letter-spacing:0!important;
+  color:#f5fbff!important;
+  text-shadow:0 0 16px color-mix(in srgb,var(--orbit-a,#00eaff) 55%,transparent)!important;
+}
+.summary-card .summary-sub{
+  margin-top:10px!important;
+  font-size:13px!important;
+  color:#9bc8e8!important;
+}
+.summary-card .summary-live{
+  margin-top:12px!important;
+  font-size:13px!important;
+  color:var(--orbit-a,#00eaff)!important;
+  text-shadow:0 0 8px currentColor!important;
+}
+.summary-card .summary-live i{background:var(--orbit-a,#00eaff)!important;box-shadow:0 0 10px var(--orbit-a,#00eaff)!important}
+.summary-card .summary-live .offline-dot{background:#8494ad!important;box-shadow:none!important}
+.summary-card.register{--orbit-a:#00eaff;--orbit-b:#377dff;--orbit-c:#9b5cff;--orbit-d:#ff39d4}
+.summary-card.login{--orbit-a:#ff38d1;--orbit-b:#9b5cff;--orbit-c:#ff9a3c;--orbit-d:#ff38d1}
+.summary-card.online{--orbit-a:#00ff8a;--orbit-b:#00eaff;--orbit-c:#7dff4f;--orbit-d:#00ffd5}
+.summary-card.offline{--orbit-a:#398bff;--orbit-b:#6f5cff;--orbit-c:#b45cff;--orbit-d:#00d9ff}
+.summary-card:hover{transform:translateY(-6px)!important;box-shadow:0 0 28px color-mix(in srgb,var(--orbit-a,#00eaff) 25%,transparent),inset 0 0 30px color-mix(in srgb,var(--orbit-a,#00eaff) 10%,transparent),0 16px 38px rgba(0,0,0,.38)!important}
+.summary-card:hover:before{animation-duration:1.8s!important;filter:brightness(1.35) drop-shadow(0 0 8px var(--orbit-a,#00eaff)) drop-shadow(0 0 22px var(--orbit-c,#c45cff))!important}
+@keyframes referenceOrbit{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes referencePulse{0%,100%{opacity:.45;transform:translate(-50%,-50%) scale(.96)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.035)}}
+@media(max-width:1200px){.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}.summary-card{height:280px!important;min-height:280px!important}}
+@media(max-width:600px){.user-summary-dashboard{grid-template-columns:1fr!important;gap:14px!important}.summary-card{height:270px!important;min-height:270px!important}.summary-card:before{width:220px!important;height:220px!important}.summary-card:after{width:190px!important;height:190px!important}.summary-card .summary-label{font-size:17px!important}}
+@media(prefers-reduced-motion:reduce){.summary-card:before,.summary-card:after{animation:none!important}}
+</style>
+
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
