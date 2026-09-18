@@ -1257,6 +1257,608 @@ h3{font-size:17px;line-height:1.4}
 @keyframes pfAlarmPop{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @media(max-width:520px){#pfMessageAlarmBox{padding:24px 18px}.pf-alarm-title{font-size:18px!important}}
 </style>
+
+<style id="sci_fi_hud_login_interface">
+/* ===== SCI-FI HUD LOGIN INTERFACE — QUANTUM-OS STYLE ===== */
+#authScreen{
+  position:relative!important; min-height:100vh!important; width:100%;
+  display:grid; grid-template-rows:auto 1fr auto;
+  align-items:stretch; gap:0; padding:0!important; overflow:hidden; isolation:isolate;
+  color:#a9f7ff;
+  background:#02080d!important;
+  background-image:
+    linear-gradient(rgba(0,220,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,220,255,.055) 1px,transparent 1px),
+    radial-gradient(circle at 50% 45%,rgba(0,100,130,.16),transparent 55%),
+    linear-gradient(180deg,#02070c,#030b12 55%,#02070b)!important;
+  background-size:32px 32px,32px 32px,100% 100%,100% 100%!important;
+  font-family:"VT323",Consolas,monospace;
+}
+#authScreen::before{
+  content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(0,235,255,.025) 4px),radial-gradient(ellipse at center,transparent 42%,rgba(0,0,0,.68));
+}
+#authScreen::after{
+  content:"";position:absolute;left:0;right:0;top:89px;height:1px;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0 2%,rgba(0,226,255,.65) 12%,rgba(0,226,255,.2) 50%,rgba(0,226,255,.65) 88%,transparent 98%);
+  box-shadow:0 0 14px rgba(0,225,255,.3);
+}
+#authScreen .hud-header{
+  position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;
+  min-height:90px;padding:20px 3.2vw 17px;border-bottom:1px solid rgba(0,200,235,.22);
+  background:linear-gradient(180deg,rgba(2,11,17,.92),rgba(2,9,14,.58));
+}
+#authScreen .hud-brand{display:flex;align-items:center;gap:13px;min-width:0}
+#authScreen .hud-brand-mark{width:40px;height:40px;display:grid;place-items:center;border:1px solid #00dfff;color:#00eaff;font-size:21px;line-height:1;box-shadow:0 0 15px rgba(0,220,255,.18);position:relative}
+#authScreen .hud-brand-mark::after{content:"";position:absolute;inset:6px;border:1px solid rgba(0,220,255,.3)}
+#authScreen .hud-brand-title{font-family:"Press Start 2P",monospace;font-size:clamp(10px,1.35vw,17px);letter-spacing:1px;color:#00e5ff;text-shadow:0 0 9px rgba(0,220,255,.4);white-space:nowrap}
+#authScreen .hud-brand-sub{margin-top:7px;font-size:12px;letter-spacing:1.7px;color:#147f9b}
+#authScreen .hud-header-meta{display:flex;gap:16px;align-items:center;font-size:12px;letter-spacing:1px;color:#00d9ee;white-space:nowrap}
+#authScreen .hud-status,#authScreen .hud-clock{border:1px solid rgba(0,215,240,.45);padding:6px 13px;background:rgba(0,80,105,.09)}
+#authScreen .hud-status::before{content:"● ";color:#42f4a5;text-shadow:0 0 8px #42f4a5}
+#authScreen .hud-main{position:relative;z-index:1;width:min(1060px,calc(100% - 7vw));margin:auto;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(290px,.82fr);gap:24px;align-items:stretch;padding:34px 0 28px}
+#authScreen .auth-card,#authScreen .hud-side{position:relative;min-width:0;border:1px solid rgba(0,217,240,.58);border-radius:0 0 24px 24px;background:linear-gradient(145deg,rgba(3,22,31,.86),rgba(2,10,17,.94));box-shadow:0 0 0 1px rgba(0,150,190,.08),0 0 30px rgba(0,150,190,.08),inset 0 0 35px rgba(0,150,190,.035);backdrop-filter:blur(7px)}
+#authScreen .auth-card{width:auto;padding:34px 32px 30px;clip-path:polygon(0 18px,18px 0,calc(100% - 18px) 0,100% 18px,100% calc(100% - 18px),calc(100% - 18px) 100%,18px 100%,0 calc(100% - 18px))}
+#authScreen .auth-card::before,#authScreen .auth-card::after,#authScreen .hud-side::before,#authScreen .hud-side::after{content:"";position:absolute;width:26px;height:26px;border-color:#00eaff;pointer-events:none}
+#authScreen .auth-card::before,#authScreen .hud-side::before{top:0;left:0;border-top:2px solid;border-left:2px solid}
+#authScreen .auth-card::after,#authScreen .hud-side::after{right:0;bottom:0;border-right:2px solid;border-bottom:2px solid}
+#authScreen .logo{text-align:left;font-family:"Press Start 2P",monospace;font-size:clamp(15px,2vw,22px);line-height:1.6;letter-spacing:1px;color:#00e5ff;text-shadow:0 0 12px rgba(0,220,255,.4);margin:0 0 5px}
+#authScreen .logo-icon{display:none}
+#authScreen .logo::before{content:"QUANTUM-OS // HUD_V1";display:block}
+#authScreen .logo{font-size:0}
+#authScreen .logo::after{content:"SECURED NEURAL GATEWAY // PIXEL-FRIEND";display:block;margin-top:8px;color:#137f9a;font:12px/1.4 "VT323",monospace;letter-spacing:2px}
+#authScreen .tagline{margin:20px 0 18px;text-align:left;color:#00bcd4;font-size:18px;letter-spacing:.7px;line-height:1.25}
+#authScreen .tabs{display:flex;gap:0;margin:0 0 25px;border:1px solid rgba(0,205,235,.42);background:rgba(0,30,42,.35)}
+#authScreen .tabs button{flex:1;min-height:38px;border:0!important;border-right:1px solid rgba(0,205,235,.3)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:#147d96!important;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+#authScreen .tabs button:last-child{border-right:0!important}
+#authScreen .tabs button::after{display:block}
+#authScreen #loginTab{font-size:0}
+#authScreen #loginTab::after{content:"// ACCESS LOGIN";font-size:16px}
+#authScreen #regTab{font-size:0}
+#authScreen #regTab::after{content:"// SYS REGISTER";font-size:16px}
+#authScreen .tabs .active{background:rgba(0,205,235,.12)!important;color:#00efff!important;outline:1px solid #00dff5;outline-offset:-2px;text-shadow:0 0 8px rgba(0,220,255,.45)}
+#authScreen input,#authScreen select,#authScreen textarea{width:100%;margin:0 0 16px;padding:13px 16px;border:1px solid rgba(0,170,205,.48);border-radius:0;background:rgba(1,10,17,.78);color:#b9f8ff;outline:none;box-shadow:inset 0 0 18px rgba(0,90,120,.05);font-size:18px;letter-spacing:.7px}
+#authScreen input::placeholder{color:#63818d;opacity:1}
+#authScreen input:focus,#authScreen select:focus,#authScreen textarea:focus{border-color:#00eaff;box-shadow:0 0 0 1px rgba(0,234,255,.25),0 0 16px rgba(0,210,240,.1);background:rgba(0,24,34,.9)}
+#authScreen #loginPane::before{content:"NEURAL LINK / ID";display:block;color:#00d8ef;font-size:16px;letter-spacing:1px;margin-bottom:7px}
+#authScreen #loginPane #loginPass{margin-top:13px}
+#authScreen #loginPane #loginPass::placeholder{color:#63818d}
+#authScreen .primary{width:100%;min-height:43px;margin-top:4px;padding:12px 16px;border:1px solid #00eaff!important;border-radius:0!important;background:linear-gradient(90deg,rgba(0,155,180,.24),rgba(0,232,255,.08))!important;color:#00eaff!important;box-shadow:0 0 14px rgba(0,210,240,.08),inset 0 0 12px rgba(0,210,240,.06)!important;font-size:16px;letter-spacing:1px;text-transform:uppercase}
+#authScreen .primary:hover{background:rgba(0,220,240,.16)!important;box-shadow:0 0 20px rgba(0,220,240,.18)!important}
+#authScreen .secondary,#authScreen .auth-guest{width:100%;margin-top:10px;padding:10px;border:1px solid rgba(0,125,155,.45);border-radius:0;background:transparent;color:#4b9aad;font-size:15px;box-shadow:none}
+#authScreen .guest-note{color:#376f7e;font-size:13px;line-height:1.3;margin-top:12px}
+#authScreen .status{min-height:22px;margin-top:15px;color:#42f4a5;font-size:16px}
+#authScreen .hud-side{padding:29px 22px;clip-path:polygon(0 18px,18px 0,calc(100% - 18px) 0,100% 18px,100% calc(100% - 18px),calc(100% - 18px) 100%,18px 100%,0 calc(100% - 18px));overflow:hidden}
+#authScreen .hud-side-title{font-size:17px;color:#00d8ef;letter-spacing:1px;margin-bottom:8px}
+#authScreen .hud-side-sub{font-size:14px;color:#42f4a5;line-height:1.45;margin-bottom:23px}
+#authScreen .telemetry-orb{width:82px;height:82px;border:1px solid rgba(0,215,240,.42);border-radius:50%;margin:0 auto 25px;display:grid;place-items:center;color:#087d91;background:radial-gradient(circle,rgba(0,190,220,.12),transparent 65%);box-shadow:0 0 0 12px rgba(0,190,220,.025),inset 0 0 20px rgba(0,220,240,.12)}
+#authScreen .telemetry-orb::before{content:"◎";font-size:44px;opacity:.55}
+#authScreen .terminal{border-top:1px solid #00dff0;margin:0 -22px;padding:16px 22px 0;min-height:200px;background:linear-gradient(180deg,rgba(0,80,105,.06),transparent)}
+#authScreen .terminal-title{display:flex;justify-content:space-between;color:#00eaff;font-size:16px;letter-spacing:1px;margin-bottom:15px}
+#authScreen .terminal-lines{font-size:13px;line-height:1.7;color:#00cce5}
+#authScreen .terminal-lines span{display:block}
+#authScreen .hud-footer{position:relative;z-index:1;display:flex;justify-content:space-between;gap:20px;padding:14px 3.2vw 18px;color:#147f9a;font-size:12px;letter-spacing:1px;border-top:1px solid rgba(0,200,235,.18)}
+#authScreen .hud-footer span:last-child{text-align:right}
+@media(max-width:800px){
+  #authScreen .hud-header{min-height:76px;padding:15px 18px}.hud-brand-title{font-size:10px!important}.hud-brand-sub{font-size:10px!important}.hud-header-meta{gap:6px;font-size:10px!important}.hud-clock{display:none}
+  #authScreen .hud-main{width:min(560px,calc(100% - 28px));grid-template-columns:1fr;gap:14px;padding:20px 0}
+  #authScreen .auth-card{padding:26px 20px 24px}.hud-side{min-height:270px!important;padding:22px 18px!important}.telemetry-orb{display:none!important}.terminal{min-height:130px!important;margin:0 -18px!important;padding:14px 18px 0!important}
+  #authScreen .hud-footer{font-size:10px;padding:12px 14px 16px}.hud-footer span:last-child{display:none}
+}
+@media(max-width:430px){#authScreen .hud-brand-mark{width:32px;height:32px;font-size:17px}#authScreen .hud-brand-title{font-size:9px!important}#authScreen .hud-brand-sub{font-size:9px!important}#authScreen .logo::before{font-size:15px}#authScreen .tagline{font-size:16px}#authScreen .tabs button::after{font-size:13px!important}}
+</style>
+
+
+<style id="sci_fi_hud_live_animation">
+/* ===== LIVE HUD MOTION LAYER — visual only ===== */
+#authScreen .hud-header,
+#authScreen .auth-card,
+#authScreen .hud-side,
+#authScreen .hud-footer{animation:hudFadeIn .8s ease both}
+#authScreen .auth-card{animation:hudFadeIn .8s ease both, hudCardBreath 5s ease-in-out 1s infinite}
+#authScreen .hud-side{animation:hudFadeIn .95s .12s ease both, hudSideBreath 6s ease-in-out 1.2s infinite}
+#authScreen .hud-header{animation-delay:.05s}
+#authScreen .hud-footer{animation-delay:.2s}
+#authScreen .hud-brand-mark{animation:hudMarkPulse 2.6s ease-in-out infinite}
+#authScreen .hud-brand-mark::before{content:"";position:absolute;inset:-7px;border:1px solid rgba(0,234,255,.18);animation:hudRingPulse 2.6s ease-out infinite}
+#authScreen .hud-status{animation:hudStatusPulse 2s ease-in-out infinite}
+#authScreen .hud-status::before{animation:hudDotBlink 1.15s steps(2,end) infinite}
+#authScreen .hud-clock{font-variant-numeric:tabular-nums;text-shadow:0 0 7px rgba(0,220,255,.35)}
+#authScreen .auth-card::after,#authScreen .hud-side::after{animation:hudCornerGlow 2.2s ease-in-out infinite alternate}
+#authScreen .tabs button{position:relative;overflow:hidden;transition:color .2s,background .2s,transform .2s}
+#authScreen .tabs button::before{content:"";position:absolute;left:-100%;top:0;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,238,255,.22),transparent);transform:skewX(-20deg);animation:hudTabSweep 4.5s ease-in-out infinite;pointer-events:none}
+#authScreen .tabs button:hover{color:#00efff!important;transform:translateY(-1px)}
+#authScreen input,#authScreen select{transition:border-color .2s,box-shadow .2s,background .2s,transform .2s}
+#authScreen input:focus,#authScreen select:focus{transform:translateX(2px)}
+#authScreen .primary{position:relative;overflow:hidden;isolation:isolate;transition:transform .2s,box-shadow .2s,background .2s}
+#authScreen .primary::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:-35%;width:28%;background:linear-gradient(90deg,transparent,rgba(180,255,255,.7),transparent);transform:skewX(-20deg);animation:hudButtonSweep 3.2s ease-in-out infinite}
+#authScreen .primary::after{content:"";position:absolute;inset:3px;border:1px solid rgba(0,238,255,.18);pointer-events:none;animation:hudButtonBorder 1.8s ease-in-out infinite alternate}
+#authScreen .primary:hover{transform:translateY(-2px) scale(1.005)}
+#authScreen .primary:active{transform:translateY(0) scale(.99)}
+#authScreen .telemetry-orb{position:relative;animation:hudOrbFloat 4s ease-in-out infinite,hudOrbGlow 2.4s ease-in-out infinite alternate}
+#authScreen .telemetry-orb::after{content:"";position:absolute;inset:-9px;border:1px dashed rgba(0,220,240,.35);border-radius:50%;animation:hudOrbSpin 9s linear infinite}
+#authScreen .telemetry-orb::before{animation:hudOrbCore 2.8s ease-in-out infinite}
+#authScreen .terminal{position:relative}
+#authScreen .terminal::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:#00eaff;box-shadow:0 0 12px #00eaff;transform:translateX(-100%);animation:hudTerminalSweep 4s linear infinite}
+#authScreen .terminal-title span:first-child{animation:hudTextFlicker 3s ease-in-out infinite}
+#authScreen .terminal-lines span{opacity:.82;animation:hudLineIn .7s ease both}
+#authScreen .terminal-lines span:nth-child(1){animation-delay:.25s}
+#authScreen .terminal-lines span:nth-child(2){animation-delay:.65s}
+#authScreen .terminal-lines span:nth-child(3){animation-delay:1.05s}
+#authScreen .hud-footer span:first-child::before{content:"◈ ";color:#00eaff;animation:hudDotBlink 1.4s steps(2,end) infinite}
+#authScreen .hud-footer span:last-child{font-variant-numeric:tabular-nums}
+@keyframes hudFadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes hudCardBreath{0%,100%{box-shadow:0 0 0 1px rgba(0,150,190,.08),0 0 30px rgba(0,150,190,.08),inset 0 0 35px rgba(0,150,190,.035)}50%{box-shadow:0 0 0 1px rgba(0,210,240,.16),0 0 42px rgba(0,180,220,.16),inset 0 0 42px rgba(0,180,220,.06)}}
+@keyframes hudSideBreath{0%,100%{box-shadow:0 0 0 1px rgba(0,150,190,.08),0 0 30px rgba(0,150,190,.08),inset 0 0 35px rgba(0,150,190,.035)}50%{box-shadow:0 0 0 1px rgba(0,210,240,.13),0 0 38px rgba(0,180,220,.13),inset 0 0 42px rgba(0,180,220,.05)}}
+@keyframes hudMarkPulse{0%,100%{box-shadow:0 0 12px rgba(0,220,255,.12)}50%{box-shadow:0 0 25px rgba(0,220,255,.45)}}
+@keyframes hudRingPulse{0%{opacity:.65;transform:scale(.9)}80%,100%{opacity:0;transform:scale(1.25)}}
+@keyframes hudStatusPulse{0%,100%{box-shadow:0 0 0 rgba(0,220,255,0)}50%{box-shadow:0 0 16px rgba(0,220,255,.16)}}
+@keyframes hudDotBlink{0%,45%{opacity:1}46%,100%{opacity:.28}}
+@keyframes hudCornerGlow{from{filter:drop-shadow(0 0 0 rgba(0,234,255,0))}to{filter:drop-shadow(0 0 5px rgba(0,234,255,.75))}}
+@keyframes hudTabSweep{0%,35%{left:-100%}65%,100%{left:150%}}
+@keyframes hudButtonSweep{0%,25%{left:-35%}70%,100%{left:135%}}
+@keyframes hudButtonBorder{from{opacity:.2}to{opacity:.8}}
+@keyframes hudOrbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes hudOrbGlow{from{box-shadow:0 0 0 12px rgba(0,190,220,.025),inset 0 0 20px rgba(0,220,240,.08)}to{box-shadow:0 0 0 12px rgba(0,190,220,.05),0 0 25px rgba(0,220,240,.2),inset 0 0 28px rgba(0,220,240,.2)}}
+@keyframes hudOrbSpin{to{transform:rotate(360deg)}}
+@keyframes hudOrbCore{0%,100%{opacity:.45;transform:scale(.92)}50%{opacity:.9;transform:scale(1.08)}}
+@keyframes hudTerminalSweep{0%{transform:translateX(-100%);opacity:0}10%{opacity:1}70%,100%{transform:translateX(100%);opacity:0}}
+@keyframes hudTextFlicker{0%,92%,100%{opacity:1}94%{opacity:.55}96%{opacity:1}}
+@keyframes hudLineIn{from{opacity:0;transform:translateX(-8px)}to{opacity:.82;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){#authScreen *,#authScreen *::before,#authScreen *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+<script>
+(function(){
+  function initLiveHud(){
+    const root=document.getElementById('authScreen');
+    if(!root) return;
+    const clock=root.querySelector('.hud-clock');
+    const status=root.querySelector('.hud-status');
+    const relay=root.querySelector('.hud-side-sub');
+    const terminal=root.querySelector('.terminal-lines');
+    if(clock){
+      const updateClock=()=>{
+        const now=new Date();
+        const t=now.toISOString().slice(11,19)+' UTC';
+        clock.textContent='UTC // '+t;
+      };
+      updateClock(); setInterval(updateClock,1000);
+    }
+    if(status){
+      const states=['STATUS: SYNCHRONIZED','STATUS: LINK STABLE','STATUS: LIVE CHANNEL'];
+      let i=0;
+      setInterval(()=>{i=(i+1)%states.length;status.textContent=states[i];},4200);
+    }
+    if(relay){
+      let relays=1024;
+      let ping=14;
+      setInterval(()=>{
+        relays=1020+Math.floor(Math.random()*17);
+        ping=11+Math.floor(Math.random()*9);
+        relay.innerHTML='ACTIVE RELAYS: '+relays.toLocaleString()+'<br>PING: '+ping+'MS // SECURE';
+      },2600);
+    }
+    if(terminal){
+      const logs=[
+        'QUANTUM_BOOT: Kernel initialized successfully.',
+        'SECURE_SOCKET: AES-256-GCM tunnel active.',
+        'BIOMETRIC_SENSOR: Awaiting operator scan...',
+        'NEURAL_LINK: Listening for secure credentials...',
+        'RELAY_GRID: Live synchronization confirmed.',
+        'AUTH_GATE: Ready for operator input.'
+      ];
+      let n=3;
+      setInterval(()=>{
+        const now=new Date();
+        const stamp='['+now.toTimeString().slice(0,8)+'] ';
+        const line=document.createElement('span');
+        line.textContent=stamp+logs[n%logs.length];
+        terminal.appendChild(line);
+        while(terminal.children.length>5) terminal.removeChild(terminal.firstElementChild);
+        n++;
+      },3400);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initLiveHud); else initLiveHud();
+})();
+</script>
+
+<style id="pf-sliding-left-menu-css">
+/* =========================================================
+   PIXEL-FRIEND SLIDING LEFT NAVIGATION
+   Visual/navigation enhancement only; app logic is preserved.
+   ========================================================= */
+.side-menu-toggle{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-width:46px;height:42px;padding:7px 10px;margin-right:10px;
+  color:#9ff7ff;background:rgba(5,18,32,.88);
+  border:1px solid rgba(67,231,255,.62);border-radius:4px;
+  box-shadow:0 0 14px rgba(67,231,255,.12),inset 0 0 12px rgba(67,231,255,.06);
+  font-family:"Press Start 2P",Consolas,monospace;font-size:10px;
+  letter-spacing:.5px;transition:all .22s ease;position:relative;z-index:55;
+}
+.side-menu-toggle:hover{color:#fff;border-color:#8ff8ff;box-shadow:0 0 20px rgba(67,231,255,.35),inset 0 0 16px rgba(67,231,255,.12);transform:translateY(-1px)}
+.side-menu-toggle:active{transform:translateY(1px)}
+.side-menu-toggle span{font-size:8px;line-height:1}
+.side-menu-overlay{display:none}
+
+@media(max-width:850px){
+  .topbar{padding:8px 12px;gap:8px}
+  .brand{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side-menu-toggle{display:inline-flex;flex:0 0 auto}
+  .layout{display:block;min-height:calc(100vh - 62px)}
+  .side#pixelSideMenu{
+    display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;
+    width:min(310px,86vw);height:100vh;z-index:1001;overflow-y:auto;
+    padding:76px 16px 22px;
+    background:
+      linear-gradient(180deg,rgba(8,25,43,.98),rgba(4,12,24,.99)),
+      repeating-linear-gradient(0deg,transparent 0 5px,rgba(67,231,255,.025) 6px);
+    border-right:1px solid rgba(67,231,255,.72);
+    box-shadow:18px 0 50px rgba(0,0,0,.48),8px 0 28px rgba(0,224,255,.12);
+    transform:translateX(-105%);visibility:hidden;pointer-events:none;
+    transition:transform .34s cubic-bezier(.22,.8,.24,1),visibility 0s linear .34s;
+  }
+  .side#pixelSideMenu:before{
+    content:"NAVIGATION // SYSTEM CONTROL";position:absolute;top:20px;left:18px;right:18px;
+    padding-bottom:12px;border-bottom:1px solid rgba(67,231,255,.25);
+    color:#55eaff;font-family:"Press Start 2P",monospace;font-size:8px;letter-spacing:.5px;
+  }
+  .side#pixelSideMenu:after{
+    content:"";position:absolute;top:20px;right:16px;width:5px;height:5px;border-radius:50%;
+    background:#55f39a;box-shadow:0 0 10px #55f39a;animation:pfSidePulse 1.4s infinite;
+  }
+  body.pf-side-menu-open .side#pixelSideMenu{
+    transform:translateX(0);visibility:visible;pointer-events:auto;
+    transition:transform .34s cubic-bezier(.22,.8,.24,1),visibility 0s;
+  }
+  .side#pixelSideMenu .mini{padding-top:4px}
+  .side#pixelSideMenu .menu{margin-top:24px;gap:8px}
+  .side#pixelSideMenu .menu button{
+    min-height:46px;padding:12px 13px;border:1px solid rgba(67,231,255,.15);
+    background:rgba(10,30,50,.48);color:#c7eaff;border-left:3px solid transparent;
+    box-shadow:inset 0 0 0 rgba(67,231,255,0);transition:all .2s ease;
+  }
+  .side#pixelSideMenu .menu button:hover{background:rgba(20,70,94,.58);border-color:rgba(67,231,255,.5);color:#fff;transform:translateX(4px)}
+  .side#pixelSideMenu .menu button.active{background:linear-gradient(90deg,rgba(0,205,255,.2),rgba(0,205,255,.04));border-left-color:#43e7ff;color:#fff;box-shadow:inset 0 0 18px rgba(67,231,255,.08),0 0 12px rgba(67,231,255,.08)}
+  .side#pixelSideMenu .menu button.danger{border-left-color:rgba(255,79,145,.45);background:rgba(70,15,40,.35)}
+  .side-menu-overlay{
+    display:block;position:fixed;inset:0;z-index:1000;background:rgba(0,5,14,.68);
+    opacity:0;visibility:hidden;pointer-events:none;backdrop-filter:blur(3px);
+    transition:opacity .28s ease,visibility 0s linear .28s;
+  }
+  body.pf-side-menu-open .side-menu-overlay{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .28s ease,visibility 0s}
+  body.pf-side-menu-open{overflow:hidden}
+  main{padding:16px 12px}
+}
+@media(min-width:851px){
+  .side-menu-toggle{display:none}
+}
+@keyframes pfSidePulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+@media(prefers-reduced-motion:reduce){.side#pixelSideMenu,.side-menu-overlay,.side-menu-toggle{transition:none!important}.side#pixelSideMenu:after{animation:none}}
+</style>
+<style id="pf-home-left-menu-slide-css">
+/* HOME LEFT MENU - FULL SLIDE MODE (desktop + tablet + mobile) */
+@media (min-width: 851px){
+  .side-menu-toggle{
+    display:inline-flex !important;
+    flex:0 0 auto;
+  }
+}
+.layout{
+  display:block !important;
+  min-height:calc(100vh - 62px);
+}
+main{
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+}
+#pixelSideMenu{
+  position:fixed !important;
+  left:0 !important;
+  top:62px !important;
+  bottom:0 !important;
+  width:min(300px,88vw) !important;
+  height:calc(100vh - 62px) !important;
+  z-index:1001 !important;
+  overflow-y:auto !important;
+  padding:22px 16px 24px !important;
+  background:
+    linear-gradient(180deg,rgba(8,25,43,.985),rgba(4,12,24,.995)),
+    repeating-linear-gradient(0deg,transparent 0 5px,rgba(67,231,255,.025) 6px) !important;
+  border-right:1px solid rgba(67,231,255,.72) !important;
+  box-shadow:18px 0 50px rgba(0,0,0,.48),8px 0 28px rgba(0,224,255,.12) !important;
+  transform:translateX(-110%) !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  transition:transform .38s cubic-bezier(.22,.8,.24,1),visibility 0s linear .38s !important;
+}
+#pixelSideMenu:before{
+  content:"NAVIGATION // SYSTEM CONTROL" !important;
+  position:absolute !important;
+  top:20px !important;
+  left:18px !important;
+  right:18px !important;
+  padding-bottom:12px !important;
+  border-bottom:1px solid rgba(67,231,255,.25) !important;
+  color:#55eaff !important;
+  font-family:"Press Start 2P",Consolas,monospace !important;
+  font-size:8px !important;
+  letter-spacing:.5px !important;
+}
+#pixelSideMenu:after{
+  content:"" !important;
+  position:absolute !important;
+  top:20px !important;
+  right:16px !important;
+  width:5px !important;
+  height:5px !important;
+  border-radius:50% !important;
+  background:#55f39a !important;
+  box-shadow:0 0 10px #55f39a !important;
+  animation:pfHomeMenuPulse 1.4s infinite !important;
+}
+body.pf-side-menu-open #pixelSideMenu{
+  transform:translateX(0) !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  transition:transform .38s cubic-bezier(.22,.8,.24,1),visibility 0s !important;
+}
+.side-menu-overlay{
+  display:block !important;
+  position:fixed !important;
+  inset:62px 0 0 0 !important;
+  z-index:1000 !important;
+  background:rgba(0,5,14,.70) !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  backdrop-filter:blur(3px) !important;
+  transition:opacity .28s ease,visibility 0s linear .28s !important;
+}
+body.pf-side-menu-open .side-menu-overlay{
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  transition:opacity .28s ease,visibility 0s !important;
+}
+#pixelSideMenu .mini{padding-top:48px !important}
+#pixelSideMenu .menu{margin-top:24px !important;gap:8px !important}
+#pixelSideMenu .menu button{
+  min-height:48px !important;
+  padding:12px 13px !important;
+  border:1px solid rgba(67,231,255,.15) !important;
+  background:rgba(10,30,50,.48) !important;
+  color:#c7eaff !important;
+  border-left:3px solid transparent !important;
+  box-shadow:inset 0 0 0 rgba(67,231,255,0) !important;
+  transition:all .2s ease !important;
+}
+#pixelSideMenu .menu button:hover{
+  background:rgba(20,70,94,.58) !important;
+  border-color:rgba(67,231,255,.5) !important;
+  color:#fff !important;
+  transform:translateX(4px) !important;
+}
+#pixelSideMenu .menu button.active{
+  background:linear-gradient(90deg,rgba(0,205,255,.2),rgba(0,205,255,.04)) !important;
+  border-left-color:#43e7ff !important;
+  color:#fff !important;
+  box-shadow:inset 0 0 18px rgba(67,231,255,.08),0 0 12px rgba(67,231,255,.08) !important;
+}
+@keyframes pfHomeMenuPulse{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+@media(max-width:850px){
+  #pixelSideMenu{top:0 !important;height:100vh !important;padding-top:22px !important}
+  .side-menu-overlay{inset:0 !important}
+  #pixelSideMenu .mini{padding-top:48px !important}
+}
+@media(prefers-reduced-motion:reduce){
+  #pixelSideMenu,.side-menu-overlay,.side-menu-toggle{transition:none !important}
+  #pixelSideMenu:after{animation:none !important}
+}
+</style>
+
+<style id="electric_border_effect">
+/* ELECTRIC BORDER EFFECT — visual-only enhancement */
+:root{
+  --electric-cyan:#00eaff;
+  --electric-blue:#238bff;
+  --electric-violet:#8b5cff;
+}
+
+/* Main HUD containers */
+.auth-card,
+.sidebar,
+.left-sidebar,
+.side-menu,
+.nav-panel,
+.panel,
+.card,
+.stat-card,
+.dashboard-card,
+.content-card,
+.modal-content,
+.profile-card,
+.message-panel,
+.chat-panel,
+.settings-panel{
+  position:relative;
+  border-color:rgba(0,234,255,.62) !important;
+  box-shadow:
+    0 0 0 1px rgba(0,234,255,.12),
+    0 0 14px rgba(0,180,255,.12),
+    inset 0 0 18px rgba(0,180,255,.035);
+  animation:electricBorderPulse 4.8s ease-in-out infinite;
+}
+
+/* A moving energy highlight around supported HUD panels */
+.auth-card::after,
+.sidebar::after,
+.left-sidebar::after,
+.side-menu::after,
+.nav-panel::after,
+.panel::after,
+.card::after,
+.stat-card::after,
+.dashboard-card::after,
+.content-card::after,
+.modal-content::after,
+.profile-card::after,
+.message-panel::after,
+.chat-panel::after,
+.settings-panel::after{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border:1px solid transparent;
+  border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(115deg,transparent 0%,transparent 38%,rgba(0,234,255,0) 44%,rgba(0,234,255,.95) 50%,rgba(139,92,255,.7) 54%,transparent 62%,transparent 100%) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  background-size:260% 100%;
+  animation:electricBorderSweep 5.5s linear infinite;
+  z-index:2;
+}
+
+/* Stronger effect for the sliding navigation */
+.sidebar,
+.left-sidebar,
+.side-menu,
+.nav-panel{
+  box-shadow:
+    0 0 0 1px rgba(0,234,255,.22),
+    0 0 20px rgba(0,180,255,.18),
+    8px 0 30px rgba(0,0,0,.25),
+    inset 0 0 24px rgba(0,180,255,.045);
+}
+
+/* Electric hover response */
+button:hover,
+.nav-item:hover,
+.menu-item:hover,
+a:hover{
+  text-shadow:0 0 8px rgba(0,234,255,.75);
+}
+
+@keyframes electricBorderPulse{
+  0%,100%{box-shadow:0 0 0 1px rgba(0,234,255,.10),0 0 12px rgba(0,180,255,.10),inset 0 0 18px rgba(0,180,255,.025)}
+  50%{box-shadow:0 0 0 1px rgba(0,234,255,.34),0 0 24px rgba(0,180,255,.24),0 0 42px rgba(35,139,255,.08),inset 0 0 22px rgba(0,180,255,.055)}
+}
+@keyframes electricBorderSweep{
+  0%{background-position:180% 0}
+  100%{background-position:-80% 0}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .auth-card,.sidebar,.left-sidebar,.side-menu,.nav-panel,.panel,.card,.stat-card,.dashboard-card,.content-card,.modal-content,.profile-card,.message-panel,.chat-panel,.settings-panel,
+  .auth-card::after,.sidebar::after,.left-sidebar::after,.side-menu::after,.nav-panel::after,.panel::after,.card::after,.stat-card::after,.dashboard-card::after,.content-card::after,.modal-content::after,.profile-card::after,.message-panel::after,.chat-panel::after,.settings-panel::after{animation:none !important}
+}
+</style>
+
+<style id="electric_multicolor_border_effect">
+/* MULTI-COLOR ELECTRIC ENERGY BORDER — visual layer only */
+:root{--electric-a:#00f6ff;--electric-b:#7b2cff;--electric-c:#ff2bd6;--electric-d:#00ff9d;}
+@keyframes electricHueFlow{0%{background-position:0% 50%;filter:hue-rotate(0deg)}50%{background-position:100% 50%;filter:hue-rotate(35deg)}100%{background-position:0% 50%;filter:hue-rotate(0deg)}}
+@keyframes electricPulse{0%,100%{opacity:.65;transform:scale(1);filter:blur(5px)}50%{opacity:1;transform:scale(1.012);filter:blur(9px)}}
+@keyframes electricDash{to{stroke-dashoffset:-1000}}
+/* Apply only to common interface panels; no JS or app behavior changes */
+#authScreen .auth-card,
+.app-container .card,.app-container .panel,
+.dashboard-card,.content-card,.chat-panel,.sidebar,
+.left-menu,.nav-panel,.profile-card,.modal-content,
+main .card,section .card{
+  position:relative;
+  isolation:isolate;
+  border:1px solid transparent !important;
+  background-clip:padding-box !important;
+}
+#authScreen .auth-card::before,
+.app-container .card::before,.app-container .panel::before,
+.dashboard-card::before,.content-card::before,.chat-panel::before,
+.sidebar::before,.left-menu::before,.nav-panel::before,
+.profile-card::before,.modal-content::before,main .card::before,section .card::before{
+  content:"";position:absolute;inset:-2px;border-radius:inherit;padding:2px;
+  background:linear-gradient(115deg,var(--electric-a),var(--electric-b),var(--electric-c),var(--electric-d),var(--electric-a));
+  background-size:350% 350%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;
+  pointer-events:none;z-index:20;
+  animation:electricHueFlow 5s ease-in-out infinite,electricPulse 2.8s ease-in-out infinite;
+}
+#authScreen .auth-card::after,
+.app-container .card::after,.app-container .panel::after,
+.dashboard-card::after,.content-card::after,.chat-panel::after,
+.sidebar::after,.left-menu::after,.nav-panel::after,
+.profile-card::after,.modal-content::after,main .card::after,section .card::after{
+  content:"";position:absolute;inset:-7px;border-radius:inherit;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,var(--electric-a),var(--electric-c),var(--electric-b),var(--electric-d),var(--electric-a));
+  background-size:300% 100%;animation:electricHueFlow 4s linear infinite;
+  opacity:.35;filter:blur(10px);
+}
+/* Moving energy streak on interactive controls */
+button,.primary,.btn,.menu-item,.nav-item,.tab{
+  position:relative;overflow:hidden;
+}
+button::after,.primary::after,.btn::after,.menu-item::after,.nav-item::after,.tab::after{
+  content:"";position:absolute;top:0;bottom:0;left:-45%;width:22%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent);
+  transform:skewX(-20deg);animation:energySweep 3.6s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes energySweep{0%,55%{left:-45%;opacity:0}65%{opacity:1}100%{left:135%;opacity:0}}
+@media(prefers-reduced-motion:reduce){
+ #authScreen .auth-card::before,.app-container .card::before,.app-container .panel::before,
+ .dashboard-card::before,.content-card::before,.chat-panel::before,.sidebar::before,
+ .left-menu::before,.nav-panel::before,.profile-card::before,.modal-content::before,
+ main .card::before,section .card::before,.auth-card::after,.app-container .card::after,
+ .app-container .panel::after,button::after,.primary::after,.btn::after,.menu-item::after,
+ .nav-item::after,.tab::after{animation:none!important}
+}
+</style>
+
+<style id="pf-theme-switcher">
+/* ===== PIXEL-FRIEND THEME SWITCHER ===== */
+:root{--theme-accent:#43e7ff;--theme-accent2:#9b6cff;--theme-bg:#070b14;--theme-panel:#0d1422;--theme-panel2:#111b2d;--theme-text:#f3f7ff;--theme-muted:#8292b3}
+body{transition:background .45s ease,color .35s ease}
+#themeToggle{position:relative;min-width:46px;height:44px;padding:0 10px!important;display:inline-flex!important;align-items:center;justify-content:center;gap:5px;background:linear-gradient(135deg,rgba(10,25,45,.96),rgba(20,12,45,.96))!important;border:1px solid var(--theme-accent)!important;color:var(--theme-accent)!important;box-shadow:0 0 10px color-mix(in srgb,var(--theme-accent) 35%,transparent),inset 0 0 12px rgba(255,255,255,.04)!important;overflow:hidden;transition:.25s ease}
+#themeToggle:hover{transform:translateY(-2px);box-shadow:0 0 22px color-mix(in srgb,var(--theme-accent) 65%,transparent),inset 0 0 15px color-mix(in srgb,var(--theme-accent) 15%,transparent)!important}
+#themeToggle:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.45),transparent 70%);transform:translateX(-120%);animation:themeButtonSweep 3.5s linear infinite}
+#themeToggle .theme-icon,#themeToggle .theme-label{position:relative;z-index:1}.theme-label{font-size:11px;letter-spacing:.5px}
+body[data-theme="violet"]{--theme-accent:#c084ff;--theme-accent2:#ff62d4;--theme-bg:#10091d;--theme-panel:#1a102b;--theme-panel2:#25153d;--theme-text:#fff3ff;--theme-muted:#bca4d4}
+body[data-theme="matrix"]{--theme-accent:#64ff9b;--theme-accent2:#d8ff65;--theme-bg:#06130d;--theme-panel:#0a2117;--theme-panel2:#103522;--theme-text:#eaffef;--theme-muted:#80b995}
+body[data-theme="sunset"]{--theme-accent:#ffb35c;--theme-accent2:#ff5f9e;--theme-bg:#1a0b12;--theme-panel:#29121d;--theme-panel2:#3b1928;--theme-text:#fff4ec;--theme-muted:#d0a0a6}
+body[data-theme="light"]{--theme-accent:#087fba;--theme-accent2:#7048c8;--theme-bg:#eaf4fb;--theme-panel:#ffffff;--theme-panel2:#e4eef8;--theme-text:#102338;--theme-muted:#526b82}
+body[data-theme="light"]{background:linear-gradient(135deg,#eaf4fb,#dbe9f6)!important;color:var(--theme-text)}
+body[data-theme="light"] .topbar,body[data-theme="light"] .side{background:#f4f9fd!important;color:var(--theme-text)}
+body[data-theme="light"] .card,body[data-theme="light"] .post-card,body[data-theme="light"] .user-card,body[data-theme="light"] .hero,body[data-theme="light"] .notification-panel{background:linear-gradient(135deg,#fff,#eaf3fb)!important;color:var(--theme-text)}
+body[data-theme="light"] input,body[data-theme="light"] textarea,body[data-theme="light"] select{background:#f7fbff!important;color:#102338!important;border-color:#9bbbd3!important}
+body[data-theme="light"] .tiny,body[data-theme="light"] .tagline{color:var(--theme-muted)!important}
+body[data-theme="violet"] .topbar,body[data-theme="violet"] .side{background:#120a20!important}
+body[data-theme="matrix"] .topbar,body[data-theme="matrix"] .side{background:#061a10!important}
+body[data-theme="sunset"] .topbar,body[data-theme="sunset"] .side{background:#1f0b15!important}
+/* unify key accents per theme */
+body[data-theme="violet"],body[data-theme="matrix"],body[data-theme="sunset"],body[data-theme="light"]{--cyan:var(--theme-accent);--blue:var(--theme-accent2);--green:var(--theme-accent);--pink:var(--theme-accent2);--purple:var(--theme-accent2);--bg:var(--theme-bg);--panel:var(--theme-panel);--panel2:var(--theme-panel2);--text:var(--theme-text);--muted:var(--theme-muted)}
+@keyframes themeButtonSweep{to{transform:translateX(120%)}}
+@media(max-width:600px){#themeToggle{min-width:42px}.theme-label{display:none}}
+@media(prefers-reduced-motion:reduce){#themeToggle:before{animation:none}}
+</style>
+
+<style id="pf-extra-themes">
+/* ===== EXTRA CYBER / SCI-FI THEMES ===== */
+body[data-theme="cyber"]{--theme-accent:#00f6ff;--theme-accent2:#ff00d4;--theme-bg:#03040b;--theme-panel:#080b18;--theme-panel2:#10152b;--theme-text:#e9fcff;--theme-muted:#6fa9c7}
+body[data-theme="scifi"]{--theme-accent:#7df9ff;--theme-accent2:#3b82f6;--theme-bg:#050b18;--theme-panel:#0a1628;--theme-panel2:#102642;--theme-text:#effbff;--theme-muted:#86a9c9}
+body[data-theme="hologram"]{--theme-accent:#70ffea;--theme-accent2:#b56cff;--theme-bg:#080615;--theme-panel:#11102a;--theme-panel2:#211947;--theme-text:#f4efff;--theme-muted:#a89ed1}
+body[data-theme="stealth"]{--theme-accent:#b7c5d8;--theme-accent2:#64748b;--theme-bg:#080b10;--theme-panel:#11161d;--theme-panel2:#1b2430;--theme-text:#edf2f7;--theme-muted:#8493a6}
+body[data-theme="cyber"] .topbar,body[data-theme="cyber"] .side{background:#050711!important}
+body[data-theme="scifi"] .topbar,body[data-theme="scifi"] .side{background:#071225!important}
+body[data-theme="hologram"] .topbar,body[data-theme="hologram"] .side{background:#0c0920!important}
+body[data-theme="stealth"] .topbar,body[data-theme="stealth"] .side{background:#0d1219!important}
+body[data-theme="cyber"],body[data-theme="scifi"],body[data-theme="hologram"],body[data-theme="stealth"]{--cyan:var(--theme-accent);--blue:var(--theme-accent2);--green:var(--theme-accent);--pink:var(--theme-accent2);--purple:var(--theme-accent2);--bg:var(--theme-bg);--panel:var(--theme-panel);--panel2:var(--theme-panel2);--text:var(--theme-text);--muted:var(--theme-muted)}
+body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="scifi"] .card,body[data-theme="scifi"] .panel,body[data-theme="hologram"] .card,body[data-theme="hologram"] .panel{box-shadow:0 0 18px color-mix(in srgb,var(--theme-accent) 20%,transparent),inset 0 0 18px color-mix(in srgb,var(--theme-accent2) 8%,transparent)!important}
+</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -1277,8 +1879,48 @@ h3{font-size:17px;line-height:1.4}
     <button id="pfMessageAlarmDismiss" type="button">DISMISS &amp; STOP SOUND</button>
   </div>
 </div>
-<div id="authScreen" class="auth-screen">  <div class="auth-card">    <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>    <p class="tagline">Connect in real-time, exchange tips and make new friends.</p>    <div class="tabs">      <button id="loginTab" class="active" onclick="authTab('login')">Login</button>      <button id="regTab" onclick="authTab('register')">Register</button>    </div>    <div id="loginPane">      <input id="loginEmail" type="email" placeholder="Email">      <input id="loginPass" type="password" placeholder="PASSWORD" onkeydown="if(event.key==='Enter')login()">      <button class="primary" style="width:100%" onclick="login()">🛡️ Login as Members</button><button class="secondary auth-guest" onclick="guestLogin()">👤 Continue as Guest</button><div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.📌</div>    </div>    <div id="registerPane" class="hidden">      <input id="regName" maxlength="20" placeholder="PIXEL USERNAME">      <input id="regEmail" type="email" placeholder="EMAIL">      <input id="regPass" type="password" placeholder="PASSWORD">      <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>      <button class="primary" style="width:100%" onclick="register()">CREATE ACCOUNT</button>    </div>    <div id="authStatus" class="status"></div>  </div></div>
-<div id="app" class="app"><header class="topbar">    <div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <div id="pfLiveUpdate" class="pf-live-update" aria-live="polite">
+<div id="authScreen" class="auth-screen">
+  <header class="hud-header">
+    <div class="hud-brand">
+      <div class="hud-brand-mark">V7</div>
+      <div><div class="hud-brand-title">QUANTUM-OS // HUD_V1</div><div class="hud-brand-sub">SECURED NEURAL GATEWAY // PIXEL-FRIEND</div></div>
+    </div>
+    <div class="hud-header-meta"><div class="hud-status">STATUS: SYNCHRONIZED</div><div class="hud-clock">UTC // ONLINE</div></div>
+  </header>
+  <div class="hud-main">
+    <div class="auth-card">
+      <div class="logo"><div class="logo-icon">🌏</div>Pixel-Friend</div>
+      <p class="tagline">Initialize secure social uplink and connect in real time.</p>
+      <div class="tabs"><button id="loginTab" class="active" onclick="authTab('login')">Login</button><button id="regTab" onclick="authTab('register')">Register</button></div>
+      <div id="loginPane">
+        <input id="loginEmail" type="email" placeholder="operator@v7-grid.net">
+        <input id="loginPass" type="password" placeholder="ENCRYPTION PASSCODE" onkeydown="if(event.key==='Enter')login()">
+        <button class="primary" style="width:100%" onclick="login()">⚡ INITIALIZE SYSTEM UPLINK</button>
+        <button class="secondary auth-guest" onclick="guestLogin()">CONTINUE AS GUEST</button>
+        <div class="guest-note">Guest accounts are automatically active and clearly marked to everyone.</div>
+      </div>
+      <div id="registerPane" class="hidden">
+        <input id="regName" maxlength="20" placeholder="NEURAL LINK / USERNAME">
+        <input id="regEmail" type="email" placeholder="NETWORK EMAIL">
+        <input id="regPass" type="password" placeholder="ENCRYPTION PASSCODE">
+        <select id="regAvatar"><option>👾</option><option>🤖</option><option>🦊</option><option>🐸</option><option>🐱</option><option>🐼</option><option>🧙</option></select>
+        <button class="primary" style="width:100%" onclick="register()">CREATE SYSTEM ACCOUNT</button>
+      </div>
+      <div id="authStatus" class="status"></div>
+    </div>
+    <aside class="hud-side">
+      <div class="hud-side-title">NODE R4H7 TELEMETRY</div>
+      <div class="hud-side-sub">ACTIVE RELAYS: 1,024<br>PING: 14MS // SECURE</div>
+      <div class="telemetry-orb"></div>
+      <div class="terminal">
+        <div class="terminal-title"><span>● LIVE SYSTEM TERMINAL</span><span>[CLEAR LOG]</span></div>
+        <div class="terminal-lines"><span>[00:00:01] QUANTUM_BOOT: Kernel initialized successfully.</span><span>[00:00:02] SECURE_SOCKET: AES-256-GCM tunnel active.</span><span>[00:00:03] BIOMETRIC_SENSOR: Awaiting operator scan...</span></div>
+      </div>
+    </aside>
+  </div>
+  <footer class="hud-footer"><span>SECURITY PROTOCOL: V7-CYBERNETIC-DEFENSE</span><span>LAT: 35.6762° N &nbsp; LON: 139.6503° E &nbsp; ACCESS_LEVEL: ALPHA</span></footer>
+</div></div>
+<div id="app" class="app"><header class="topbar">    <button id="sideMenuToggle" class="side-menu-toggle" type="button" onclick="toggleSideMenu()" aria-label="Open navigation menu" aria-controls="pixelSideMenu" aria-expanded="false">☰<span>MENU</span></button><div class="brand" onclick="page('home')"><span class="brand-icon">👤</span> Pixel-Friend</div>    <div class="actions">        <button id="themeToggle" type="button" title="Change theme" aria-label="Change theme"><span class="theme-icon">◐</span><span class="theme-label">THEME</span></button>        <div id="pfLiveUpdate" class="pf-live-update" aria-live="polite">
   <span class="pf-live-badge"><span class="pf-live-dot"></span> LIVE UPDATE</span>
   <span class="pf-live-message">Welcome to Pixel-Friend • New activity • Messages • Stories • Posts • Reactions</span>
   <span id="pfLiveDateTime" class="pf-live-time">--</span>
@@ -1290,7 +1932,7 @@ h3{font-size:17px;line-height:1.4}
         <div id="notificationList" class="notification-list"><div class="notification-empty">NO NEW NOTIFICATIONS</div></div>
       </div>
     </div>    <button id="headAvatar" class="icon" onclick="page('profile')">👤</button>    </div></header>
-<div class="layout"><aside class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 Home</button>        <button id="navFriends" onclick="page('friends',this)">👥 Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('audioPlaylist',this)">🎵 Audio Playlist</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
+<div id="sideMenuOverlay" class="side-menu-overlay" onclick="closeSideMenu()" aria-hidden="true"></div><div class="layout"><aside id="pixelSideMenu" class="side">    <div class="mini">        <div id="sideAvatar" class="avatar">👤<span class="online"></span></div>        <h3 id="sideName">PLAYER</h3><div id="sideAccountType"></div>        <p id="sideBio" class="tiny" style="margin:4px 0 8px 0;word-break:break-word;">PIXEL EXPLORER</p>    <div>LEVEL <span id="sideLevel">1</span></div>        <div class="xp"><div id="xpBar"></div></div>        <p id="xpText" class="tiny">0 / 100 XP</p>    </div>    <nav class="menu">        <button class="active" onclick="page('home',this)">🏠 Home</button>        <button id="navFriends" onclick="page('friends',this)">👥 Friends</button>        <button onclick="page('messages',this)"> 🗨️ Messages</button>        <button onclick="page('audioPlaylist',this)">🎵 Audio Playlist</button>        <button onclick="page('profile',this)">👤 Profile</button>        <button id="navAdmin" class="hidden" onclick="page('adminPanel',this)">🛡️ Admin panel</button>        <button onclick="openInviteModal()">🔗 Invite Friends</button>    <button class="danger" onclick="logout()">🚪 Logout</button>    </nav></aside>
 <main><section id="home" class="page active">
 <div class="home-dashboard">
   <div class="home-welcome">
@@ -6123,6 +6765,70 @@ window.addEventListener('beforeunload', ()=>{
 });
 </script>
 
+
+<script id="pf-sliding-left-menu-js">
+(function(){
+  function menu(){return document.getElementById('pixelSideMenu');}
+  window.toggleSideMenu=function(){
+    var open=document.body.classList.toggle('pf-side-menu-open');
+    var btn=document.getElementById('sideMenuToggle');
+    if(btn){btn.setAttribute('aria-expanded',open?'true':'false');btn.setAttribute('aria-label',open?'Close navigation menu':'Open navigation menu');btn.firstChild.textContent=open?'✕':'☰';}
+    var overlay=document.getElementById('sideMenuOverlay');
+    if(overlay) overlay.setAttribute('aria-hidden',open?'false':'true');
+  };
+  window.closeSideMenu=function(){
+    document.body.classList.remove('pf-side-menu-open');
+    var btn=document.getElementById('sideMenuToggle');
+    if(btn){btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-label','Open navigation menu');btn.firstChild.textContent='☰';}
+    var overlay=document.getElementById('sideMenuOverlay');
+    if(overlay) overlay.setAttribute('aria-hidden','true');
+  };
+  document.addEventListener('click',function(e){
+    var m=menu();
+    if(m && m.contains(e.target) && e.target.closest('.menu button') && window.matchMedia('(max-width: 850px)').matches){
+      setTimeout(window.closeSideMenu,120);
+    }
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')window.closeSideMenu();});
+  window.addEventListener('resize',function(){if(window.innerWidth>850)window.closeSideMenu();});
+})();
+</script>
+
+<script id="pf-home-left-menu-slide-js">
+(function(){
+  function closeAfterNavigation(){
+    setTimeout(function(){
+      if(typeof window.closeSideMenu==='function') window.closeSideMenu();
+    },140);
+  }
+  document.addEventListener('click',function(e){
+    var item=e.target.closest && e.target.closest('#pixelSideMenu .menu button');
+    if(item) closeAfterNavigation();
+  });
+})();
+</script>
+
+<script id="pf-theme-switcher-js">
+(function(){
+  const themes=['default','cyber','scifi','hologram','matrix','violet','sunset','stealth','light'];
+  const labels={default:'CYAN',cyber:'CYBER',scifi:'SCI-FI',hologram:'HOLO',matrix:'MATRIX',violet:'VIOLET',sunset:'SUNSET',stealth:'STEALTH',light:'LIGHT'};
+  const icons={default:'◐',cyber:'⌬',scifi:'⟁',hologram:'◈',matrix:'⌁',violet:'✦',sunset:'☀',stealth:'⬡',light:'☼'};
+  const btn=document.getElementById('themeToggle');
+  function applyTheme(theme){
+    if(theme==='default') document.body.removeAttribute('data-theme');
+    else document.body.setAttribute('data-theme',theme);
+    if(btn){btn.querySelector('.theme-icon').textContent=icons[theme]||'◐';btn.querySelector('.theme-label').textContent=labels[theme]||'THEME';btn.title='Theme: '+(labels[theme]||'CYAN')+' — click to change';}
+    try{localStorage.setItem('pixelFriendTheme',theme)}catch(e){}
+  }
+  let saved='default';try{saved=localStorage.getItem('pixelFriendTheme')||'default'}catch(e){}
+  if(!themes.includes(saved)) saved='default';
+  applyTheme(saved);
+  if(btn) btn.addEventListener('click',function(){
+    const current=document.body.getAttribute('data-theme')||'default';
+    applyTheme(themes[(themes.indexOf(current)+1)%themes.length]);
+  });
+})();
+</script>
 </body></html>
 
 <script>
