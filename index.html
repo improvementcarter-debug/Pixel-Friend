@@ -1859,6 +1859,45 @@ body[data-theme="stealth"] .topbar,body[data-theme="stealth"] .side{background:#
 body[data-theme="cyber"],body[data-theme="scifi"],body[data-theme="hologram"],body[data-theme="stealth"]{--cyan:var(--theme-accent);--blue:var(--theme-accent2);--green:var(--theme-accent);--pink:var(--theme-accent2);--purple:var(--theme-accent2);--bg:var(--theme-bg);--panel:var(--theme-panel);--panel2:var(--theme-panel2);--text:var(--theme-text);--muted:var(--theme-muted)}
 body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="scifi"] .card,body[data-theme="scifi"] .panel,body[data-theme="hologram"] .card,body[data-theme="hologram"] .panel{box-shadow:0 0 18px color-mix(in srgb,var(--theme-accent) 20%,transparent),inset 0 0 18px color-mix(in srgb,var(--theme-accent2) 8%,transparent)!important}
 </style>
+
+<style id="standard-call-responsive-all-devices">
+/* Standard responsive voice/video call layout for desktop, tablet and mobile */
+.pf-call-modal{padding:clamp(6px,2vw,18px);}
+.pf-call-window{width:min(920px,100%);height:min(760px,calc(100dvh - 24px));max-height:calc(100dvh - 12px);border-radius:clamp(10px,2vw,18px);}
+.pf-call-stage{min-height:0;aspect-ratio:16/9;}
+.pf-call-top{gap:10px;flex-wrap:wrap;}
+.pf-call-top>div{min-width:0;}
+.pf-call-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px;}
+.pf-call-controls button,.pf-call-action{min-height:42px;touch-action:manipulation;}
+.pf-call-controls button{flex:0 1 auto;}
+.pf-call-status,.pf-call-type,.pf-call-timer{overflow-wrap:anywhere;}
+@media (max-width:700px){
+  .pf-call-window{width:100%;height:100%;max-height:none;border-radius:10px;}
+  .pf-call-top{padding:12px;align-items:flex-start;}
+  .pf-call-stage{aspect-ratio:auto;flex:1;min-height:240px;}
+  #pfRemoteVideo{object-fit:contain;max-height:100%;}
+  #pfLocalVideo{right:9px;bottom:9px;width:min(120px,30vw);border-radius:8px;}
+  .pf-call-avatar{width:clamp(82px,24vw,130px);height:clamp(82px,24vw,130px);font-size:clamp(42px,12vw,70px);}
+  .pf-call-controls{padding:9px;gap:6px;}
+  .pf-call-controls button,.pf-call-action{padding:10px 11px;font-size:14px;}
+}
+@media (max-width:420px){
+  .pf-call-modal{padding:0;}
+  .pf-call-window{border-radius:0;border-left:0;border-right:0;}
+  .pf-call-top{font-size:14px;}
+  .pf-call-controls button,.pf-call-action{flex:1 1 calc(50% - 6px);min-width:0;}
+  .pf-call-controls .danger,.pf-call-controls button:last-child{flex-basis:100%;}
+}
+@media (orientation:landscape) and (max-height:520px){
+  .pf-call-window{height:100dvh;}
+  .pf-call-stage{min-height:0;}
+  .pf-call-controls{padding:6px;}
+  .pf-call-controls button,.pf-call-action{min-height:36px;padding:7px 10px;}
+}
+@media (prefers-reduced-motion:reduce){
+  .pf-call-window,.pf-call-modal *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important;}
+}
+</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
