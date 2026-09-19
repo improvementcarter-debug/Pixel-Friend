@@ -3282,7 +3282,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-feature-hero"><div><div class="pf-feature-kicker">PIXEL-FRIEND CONTROL</div><h1>⚙️ Settings</h1><p>Control alerts, notifications, theme and account preferences.</p></div></div>
     <div class="pf-settings-grid">
       <div class="card pf-setting-card"><h2>🔔 Notification Alarm</h2><p class="tiny">New realtime messages and feed notifications can ring until you dismiss the alarm.</p><button class="primary" onclick="pfEnableAlertsFromSettings()">ENABLE ALERTS</button><button class="secondary" onclick="pfTestAlertFromSettings()">TEST ALARM</button><div id="pfSettingsAlertStatus" class="status"></div></div>
-      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is not the active tab.</p><button class="secondary" onclick="requestNotificationPermission()">ALLOW DESKTOP NOTIFICATIONS</button><div id="pfSettingsNotifStatus" class="status"></div></div>
+      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is not the active tab.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><div id="pfSettingsNotifStatus" class="status"></div></div>
       <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Pixel-Friend themes are available in the app theme settings.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
       <div class="card pf-setting-card"><h2>🔊 Alarm Behavior</h2><p class="tiny">The alarm remains active until you press <b>DISMISS &amp; STOP SOUND</b> or mark notifications as read.</p><div class="pf-setting-state">● Persistent alarm: <strong>ON</strong></div></div>
     </div>
@@ -3445,6 +3445,29 @@ async function pfRegisterBackgroundPush(){
     return false;
   }
 }
+
+async function pfShowSystemNotification(title, options={}){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return false;
+  try{
+    let reg = pfPushRegistration;
+    if(!reg && 'serviceWorker' in navigator) reg = await navigator.serviceWorker.getRegistration('./');
+    if(reg?.showNotification){
+      await reg.showNotification(title, {
+        body:String(options.body||''), icon:options.icon || '/favicon.ico', badge:options.badge || '/favicon.ico',
+        tag:String(options.tag||'pixel-friend'), renotify:true, requireInteraction:false, data:options.data||{}
+      });
+      return true;
+    }
+  }catch(e){ console.warn('[PF NOTIFY] Service-worker notification failed:',e); }
+  try{
+    if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+      new Notification(title, {body:String(options.body||''),tag:String(options.tag||'pixel-friend'),renotify:true});
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+window.pfShowSystemNotification = pfShowSystemNotification;
 
 async function pfEnableBackgroundPush(options={requestPermission:true}){
   if(!currentUser) return {ok:false,reason:'not-logged-in'};
@@ -4417,13 +4440,11 @@ function notifyIncomingMessage(message){
   showTelegramNotification(message, senderName, senderAvatar);
 
   if('Notification' in window && Notification.permission === 'granted'){
-    try{
-      new Notification(`💬 ${senderName}`, {
-        body: notificationDetail(message),
-        tag:'pixel-friend-'+id,
-        renotify:true
-      });
-    }catch(e){}
+    pfShowSystemNotification(`💬 ${senderName}`, {
+      body: notificationDetail(message),
+      tag:'pixel-friend-'+id,
+      data:{url:`/?pfNotification=${encodeURIComponent(id)}`,notificationId:id,messageId:id}
+    });
   }
 
   // Profile lookup happens AFTER the alert is already visible/audible.
@@ -4513,8 +4534,22 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
 }
 
 
-function requestNotificationPermission(){
-  if('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(()=>{});
+async function requestNotificationPermission(){
+  try{
+    if(!('Notification' in window)) return false;
+    if(Notification.permission === 'default'){
+      const permission = await Notification.requestPermission();
+      if(permission !== 'granted') return false;
+    }
+    if(currentUser && typeof window.pfEnableBackgroundPush === 'function'){
+      const result = await window.pfEnableBackgroundPush({requestPermission:false});
+      return !!result?.ok;
+    }
+    return Notification.permission === 'granted';
+  }catch(e){
+    console.warn('[PF NOTIFY] Permission/setup failed:',e);
+    return false;
+  }
 }
 window.requestNotificationPermission = requestNotificationPermission;
 
@@ -6485,12 +6520,9 @@ function stopIncomingAlertFallback(){
 (function(){
   let lastVisibleAt=0;
   function pfMobileNotify(title, body, tag){
-    try{
-      if('Notification' in window && Notification.permission === 'granted'){
-        const n=new Notification(title,{body:String(body||'New notification'),tag:String(tag||'pixel-friend'),renotify:true});
-        setTimeout(()=>{try{n.close()}catch(_){}},10000);
-      }
-    }catch(_){ }
+    if('Notification' in window && Notification.permission === 'granted' && typeof window.pfShowSystemNotification==='function'){
+      window.pfShowSystemNotification(title,{body:String(body||'New notification'),tag:String(tag||'pixel-friend')});
+    }
   }
   window.pfMobileNotify=pfMobileNotify;
   async function reconcileOnWake(){
