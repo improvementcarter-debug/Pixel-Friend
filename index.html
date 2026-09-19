@@ -2829,6 +2829,52 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+
+<style id="pf-performance-mode-css">
+#pfPerformanceModeBox{
+  margin:12px 0;
+  padding:12px 14px;
+  border:1px solid rgba(120,220,255,.28);
+  border-radius:12px;
+  background:rgba(8,16,28,.72);
+}
+#pfPerformanceModeBox .pfpm-title{font-weight:800;letter-spacing:.08em;font-size:12px}
+#pfPerformanceModeBox .pfpm-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#pfPerformanceModeBox button{
+  border:1px solid rgba(120,220,255,.35);
+  border-radius:9px;
+  padding:8px 12px;
+  cursor:pointer;
+  background:rgba(20,35,52,.85);
+  color:inherit;
+}
+#pfPerformanceModeBox button.active{
+  box-shadow:0 0 0 1px rgba(120,220,255,.35) inset;
+  transform:none;
+}
+#pfPerformanceModeBox .pfpm-status{font-size:11px;opacity:.78}
+
+html.pf-performance-normal body.pf-lite-effects .summary-card::before,
+html.pf-performance-normal body.pf-lite-effects .summary-card::after{
+  animation-duration:6s !important;
+}
+html.pf-performance-normal body.pf-lite-effects .summary-card,
+html.pf-performance-normal body.pf-lite-effects .card,
+html.pf-performance-normal body.pf-lite-effects .user-card{
+  box-shadow:0 4px 16px rgba(0,0,0,.22) !important;
+}
+</style>
+
+
+<style id="pf-realtime-diagnostic-css">
+#pfRealtimeStatusBox{
+  margin:10px 0;padding:10px 12px;border:1px solid rgba(120,220,255,.25);
+  border-radius:10px;background:rgba(7,14,24,.68);font-size:11px;line-height:1.5;
+}
+#pfRealtimeStatusBox .pf-rs-row{display:flex;justify-content:space-between;gap:12px}
+#pfRealtimeStatusBox .pf-rs-ok{font-weight:800}
+</style>
+
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -6165,37 +6211,65 @@ function scheduleRealtimeReconnect(reason){
 // Safety fallback: if Supabase Realtime is delayed or unavailable, check only
 // unread incoming messages frequently and trigger the same alarm handler.
 // Realtime remains primary; this prevents missed alerts during reconnects.
+let pfLastAlertPollAt = 0;
+let pfAlertPollBusy = false;
+
 async function pfPollIncomingAlerts(){
-  if(!currentUser || document.visibilityState !== 'visible') return;
+  if(pfAlertPollBusy || !currentUser || document.visibilityState !== 'visible') return;
+  pfAlertPollBusy = true;
   try{
+    const uid = String(currentUser.id);
+    // Always reconcile while the page is visible. This is intentionally
+    // independent of the Realtime SUBSCRIBED flag: a channel can report
+    // SUBSCRIBED while Postgres Changes are not actually being delivered.
     const {data,error} = await sb.from('messages')
       .select('id,sender_id,receiver_id,content,sticker,image_url,video_url,audio_url,created_at,is_read')
-      .eq('receiver_id', currentUser.id)
+      .eq('receiver_id', uid)
       .eq('is_read', false)
       .order('created_at', {ascending:false})
-      .limit(30);
-    if(error || !Array.isArray(data)) return;
-    for(const msg of data.reverse()){
+      .limit(20);
+
+    if(error) throw error;
+
+    const rows = Array.isArray(data) ? data.reverse() : [];
+    for(const msg of rows){
       if(window.pfIsCallSignal && window.pfIsCallSignal(msg)) continue;
-      const id=String(msg.id);
-      if(!knownUnreadMessageIds.has(id)) notifyIncomingMessage(msg);
+      const id = String(msg.id || '');
+      if(!id || knownUnreadMessageIds.has(id)) continue;
+
+      // Mark it known BEFORE rendering the alarm, preventing duplicate
+      // alarms when Realtime and polling receive the same message.
+      knownUnreadMessageIds.add(id);
+      notifyIncomingMessage(msg);
     }
-  }catch(err){ console.warn('[PF Alert fallback] poll failed:', err); }
+    pfLastAlertPollAt = Date.now();
+  }catch(err){
+    console.warn('[PF Fast Alert Poll]', err?.message || err);
+  }finally{
+    pfAlertPollBusy = false;
+  }
 }
 
 function startIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
-  pfIncomingAlertPollTimer=setInterval(()=>{
-    // Only poll when the message Realtime channel is not healthy.
-    // When Realtime is healthy there is no database polling overhead.
-    if(typeof pfCallRealtimeStatus === 'undefined' || pfCallRealtimeStatus !== 'SUBSCRIBED') pfPollIncomingAlerts();
-  }, 4000);
+
+  // Foreground reconciliation every 1.5 seconds. Realtime remains enabled
+  // in parallel, so whichever path receives the message first wins.
+  pfIncomingAlertPollTimer = setInterval(() => {
+    if(document.visibilityState === 'visible' && currentUser){
+      pfPollIncomingAlerts();
+    }
+  }, 1500);
+
   pfPollIncomingAlerts();
 }
 function stopIncomingAlertFallback(){
-  if(pfIncomingAlertPollTimer){ clearInterval(pfIncomingAlertPollTimer); pfIncomingAlertPollTimer=null; }
+  if(pfIncomingAlertPollTimer){
+    clearInterval(pfIncomingAlertPollTimer);
+    pfIncomingAlertPollTimer = null;
+  }
 }
-window.pfPollIncomingAlerts=pfPollIncomingAlerts;
+
 
 /* ===== MOBILE REALTIME + NOTIFICATION HARDENING =====
    Foreground: instant visual/browser notification path.
@@ -8909,4 +8983,128 @@ img{content-visibility:auto;}
   }catch(e){}
 })();
 </script>
+
+<script id="pf-performance-mode-js">
+(function(){
+  const KEY = 'pixel_friend_performance_mode';
+
+  function applyMode(mode){
+    mode = mode === 'normal' ? 'normal' : 'lite';
+    const root = document.documentElement;
+    root.classList.toggle('pf-performance-normal', mode === 'normal');
+    root.classList.toggle('pf-performance-lite', mode === 'lite');
+
+    try { localStorage.setItem(KEY, mode); } catch(e){}
+    const lite = document.getElementById('pfPerfLiteBtn');
+    const normal = document.getElementById('pfPerfNormalBtn');
+    if(lite) lite.classList.toggle('active', mode === 'lite');
+    if(normal) normal.classList.toggle('active', mode === 'normal');
+
+    const status = document.getElementById('pfPerfModeStatus');
+    if(status) status.textContent = mode === 'lite'
+      ? 'LITE: reduced GPU effects for smoother PC/mobile realtime use'
+      : 'NORMAL: more visual effects enabled';
+  }
+
+  function init(){
+    let mode = 'lite';
+    try { mode = localStorage.getItem(KEY) || 'lite'; } catch(e){}
+    applyMode(mode);
+
+    // Try to insert into an existing Settings page.
+    if(document.getElementById('pfPerformanceModeBox')) return;
+    const candidates = Array.from(document.querySelectorAll('button,section,div'))
+      .filter(el => /settings/i.test((el.id||'')+' '+(el.className||'')+' '+(el.textContent||'')));
+    let host = candidates.find(el => /settings/i.test(el.id||'')) || null;
+
+    const box = document.createElement('div');
+    box.id = 'pfPerformanceModeBox';
+    box.innerHTML =
+      '<div class="pfpm-title">⚡ PERFORMANCE MODE</div>'+
+      '<div class="pfpm-row">'+
+        '<button type="button" id="pfPerfLiteBtn">LITE MODE</button>'+
+        '<button type="button" id="pfPerfNormalBtn">NORMAL MODE</button>'+
+      '</div>'+
+      '<div class="pfpm-status" id="pfPerfModeStatus"></div>';
+
+    // Put the control near the Settings content when possible; otherwise it remains
+    // available as a small floating control.
+    if(host && host.parentElement){
+      host.parentElement.insertBefore(box, host.nextSibling);
+    } else {
+      box.style.position='fixed';
+      box.style.right='12px';
+      box.style.bottom='12px';
+      box.style.zIndex='99999';
+      box.style.maxWidth='300px';
+      document.body.appendChild(box);
+    }
+
+    document.getElementById('pfPerfLiteBtn').addEventListener('click',()=>applyMode('lite'));
+    document.getElementById('pfPerfNormalBtn').addEventListener('click',()=>applyMode('normal'));
+    applyMode(mode);
+  }
+
+  // Apply Lite immediately to avoid an initial expensive animation burst.
+  try {
+    const saved = localStorage.getItem(KEY);
+    document.documentElement.classList.add(saved === 'normal' ? 'pf-performance-normal' : 'pf-performance-lite');
+  } catch(e) {
+    document.documentElement.classList.add('pf-performance-lite');
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  window.pfSetPerformanceMode = applyMode;
+})();
+</script>
+
+
+<script id="pf-realtime-diagnostic-js">
+(function(){
+  function render(){
+    const box=document.getElementById('pfRealtimeStatusBox');
+    if(!box) return;
+    const feed=typeof feedRealtimeStatus==='undefined'?'—':feedRealtimeStatus;
+    const msg=typeof pfCallRealtimeStatus==='undefined'?'—':pfCallRealtimeStatus;
+    const perm=('Notification' in window)?Notification.permission:'unsupported';
+    const online=navigator.onLine?'ONLINE':'OFFLINE';
+    const visible=document.visibilityState.toUpperCase();
+    box.innerHTML=
+      '<div class="pf-rs-row"><span>Realtime Feed</span><b>'+String(feed)+'</b></div>'+
+      '<div class="pf-rs-row"><span>Realtime Messages</span><b>'+String(msg)+'</b></div>'+
+      '<div class="pf-rs-row"><span>Browser</span><b>'+online+' / '+visible+'</b></div>'+
+      '<div class="pf-rs-row"><span>Notifications</span><b>'+String(perm)+'</b></div>'+
+      '<div style="opacity:.7;margin-top:5px">Fast foreground message check: 1.5s</div>';
+  }
+  window.pfRefreshRealtimeDiagnostic=render;
+  setInterval(render,2000);
+  document.addEventListener('DOMContentLoaded',render);
+})();
+</script>
+
+
+<script id="pf-realtime-status-inject">
+(function(){
+  function add(){
+    if(document.getElementById('pfRealtimeStatusBox')) return;
+    const box=document.createElement('div');
+    box.id='pfRealtimeStatusBox';
+    box.innerHTML='<div class="pf-rs-row"><span>Realtime Feed</span><b>CHECKING…</b></div>'+
+      '<div class="pf-rs-row"><span>Realtime Messages</span><b>CHECKING…</b></div>';
+    const perf=document.getElementById('pfPerformanceModeBox');
+    if(perf && perf.parentElement) perf.parentElement.insertBefore(box,perf);
+    else {
+      box.style.position='fixed';box.style.left='12px';box.style.bottom='12px';
+      box.style.zIndex='99998';box.style.maxWidth='290px';
+      document.body.appendChild(box);
+    }
+    if(window.pfRefreshRealtimeDiagnostic) window.pfRefreshRealtimeDiagnostic();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',add);
+  else add();
+})();
+</script>
+
 </body></html>
