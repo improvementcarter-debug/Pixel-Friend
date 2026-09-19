@@ -2663,6 +2663,36 @@ body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="
 }
 </style>
 
+<style id="pf-mobile-performance-ultimate">
+/* Lightweight rendering for phones/tablets without changing the Pixel-Friend design. */
+@media (max-width: 900px){
+  *{scrollbar-width:auto;}
+  .pf-heavy-glow,.pf-heavy-shadow{filter:none!important;box-shadow:none!important;}
+  .modal,.dialog,.drawer{will-change:auto!important;}
+}
+@media (max-width: 700px){
+  html{scroll-behavior:auto!important;}
+  body{overscroll-behavior-y:auto;-webkit-tap-highlight-color:transparent;}
+  .page,.card,.panel,.modal{contain:content;}
+  img{content-visibility:auto;}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}
+}
+</style>
+<script id="pf-performance-adaptive">
+(function(){
+  const mobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const saveData=!!(navigator.connection&&navigator.connection.saveData);
+  if(mobile||saveData){
+    document.documentElement.classList.add('pf-mobile-performance');
+    // Keep background work paused while a phone tab is hidden.
+    document.addEventListener('visibilitychange',function(){
+      document.documentElement.classList.toggle('pf-page-hidden',document.visibilityState!=='visible');
+    },{passive:true});
+  }
+})();
+</script>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -6117,6 +6147,7 @@ async function setupRealtime(force=false){
       }
     })
     .subscribe(status => {
+      pfCallRealtimeStatus = status;
       console.log('Pixel-Friend MESSAGE Realtime:', status);
       if(status === 'SUBSCRIBED') console.log('✅ Pixel-Friend notifications are LIVE');
       if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(status)){
@@ -6136,7 +6167,12 @@ async function setupRealtime(force=false){
 window.addEventListener('online', () => scheduleRealtimeReconnect('browser online'));
 document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'visible' && currentUser){
-    scheduleRealtimeReconnect('tab visible');
+    // Do not tear down healthy Supabase channels every time a phone wakes.
+    // Mobile browsers suspend timers/network briefly; the Realtime client
+    // already handles recovery. Reconnect only when the channel is unhealthy.
+    if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(feedRealtimeStatus) || ['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(pfCallRealtimeStatus)){
+      scheduleRealtimeReconnect('tab visible - unhealthy realtime');
+    }
   }
 });
 
@@ -7775,9 +7811,12 @@ try{
   let pfSignalPollUser = '';
   const pfSeenSignalIds = new Set();
   let pfSignalPollBusy = false;
+  let pfCallRealtimeStatus = 'CLOSED';
 
   async function pfPollSignals(){
     if(pfSignalPollBusy || !currentUser || !sb) return;
+    if(document.visibilityState !== 'visible') return;
+    if(pfCallRealtimeStatus === 'SUBSCRIBED') return;
     pfSignalPollBusy=true;
     try{
       const uid=String(currentUser.id);
@@ -7823,7 +7862,7 @@ try{
 
   function pfStartSignalPolling(){
     if(pfSignalPollTimer) clearInterval(pfSignalPollTimer);
-    pfSignalPollTimer=setInterval(pfPollSignals,3000);
+    pfSignalPollTimer=setInterval(pfPollSignals,10000);
     setTimeout(pfPollSignals,250);
   }
   pfStartSignalPolling();
@@ -8062,7 +8101,8 @@ window.addEventListener('beforeunload', ()=>{
     const feed=document.getElementById('feed');
     if(feed){new MutationObserver(()=>setTimeout(renderActivity,30)).observe(feed,{childList:true,subtree:true});}
     setTimeout(refreshHomePanels,500);
-    setInterval(refreshHomePanels,15000);
+    // Home panels are refreshed by Realtime/app navigation instead of a 15s polling loop.
+    window.addEventListener('online', refreshHomePanels, {passive:true});
   });
 })();
 </script>
