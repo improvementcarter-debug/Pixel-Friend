@@ -3603,6 +3603,15 @@ window.addEventListener('visibilitychange',()=>{
   if(document.visibilityState === 'visible') pfUnlockAlertAudio().catch(()=>{});
 });
 
+window.pfGetRealtimeStatus = function(){
+  return {
+    feed: typeof feedRealtimeStatus !== 'undefined' ? feedRealtimeStatus : '—',
+    messages: typeof messageRealtimeStatus !== 'undefined' ? messageRealtimeStatus : '—',
+    visibility: document.visibilityState,
+    online: navigator.onLine
+  };
+};
+
 window.pfStartNotificationSound = pfStartNotificationSound;
 window.pfStopNotificationSound = pfStopNotificationSound;
 window.pfStopAllNotificationSounds = pfStopAllNotificationSounds;
@@ -3714,8 +3723,12 @@ async function startApp(user){
     $("navAdmin").classList.remove("hidden");
   }
 
-  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
+  // Establish the notification/message Realtime channel BEFORE the heavier
+  // dashboard queries finish. This removes login/load latency from chat alerts.
+  // setupRealtime() subscribes synchronously and starts its fallback immediately.
   setupRealtime();
+
+  await Promise.all([loadFriends(), loadMessageUsers(), loadFeed(), loadStories(), loadLeaderboard(), updateNotificationBadge()]);
   await setupPresence();
   startUserSummaryDashboard();
   page("home");
@@ -6181,6 +6194,9 @@ let realtimeMessageChannel = null;
 let realtimeReconnectTimer = null;
 let pfIncomingAlertPollTimer = null;
 let realtimeStarted = false;
+// Keep chat/message Realtime health separate from call signaling.
+// This prevents call fallback state from accidentally controlling chat notifications.
+let messageRealtimeStatus = "DISCONNECTED";
 
 async function teardownRealtime(){
   stopIncomingAlertFallback();
@@ -6195,6 +6211,8 @@ async function teardownRealtime(){
   }
   realtimeFeedChannel = null;
   realtimeMessageChannel = null;
+  feedRealtimeStatus = "DISCONNECTED";
+  messageRealtimeStatus = "DISCONNECTED";
 }
 
 function scheduleRealtimeReconnect(reason){
@@ -6253,13 +6271,15 @@ async function pfPollIncomingAlerts(){
 function startIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
 
-  // Foreground reconciliation every 1.5 seconds. Realtime remains enabled
-  // in parallel, so whichever path receives the message first wins.
+  // Fast foreground reconciliation. Realtime remains the primary path;
+  // this only catches an event if the browser/Supabase connection briefly
+  // fails to deliver it. 700ms keeps the cross-device fallback responsive
+  // without hammering the database continuously.
   pfIncomingAlertPollTimer = setInterval(() => {
     if(document.visibilityState === 'visible' && currentUser){
       pfPollIncomingAlerts();
     }
-  }, 1500);
+  }, 700);
 
   pfPollIncomingAlerts();
 }
@@ -6294,8 +6314,8 @@ function stopIncomingAlertFallback(){
     lastVisibleAt=now;
     try{
       // Reconnect only if the channel actually became unhealthy.
-      if(typeof pfCallRealtimeStatus!=='undefined' && ['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(pfCallRealtimeStatus)){
-        scheduleRealtimeReconnect('mobile wake');
+      if(['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(messageRealtimeStatus)){
+        scheduleRealtimeReconnect('mobile wake - message realtime unhealthy');
       }
       // This also catches messages delivered while the mobile browser was suspended.
       await pfPollIncomingAlerts();
@@ -6361,7 +6381,12 @@ async function setupRealtime(force=false){
       filter:'receiver_id=eq.' + uid
     }, async payload => {
       const msg=payload.new;
-      console.info('[PF Realtime EVENT] messages INSERT received:', msg);
+      console.info('[PF Realtime EVENT] messages INSERT received:', {
+         id: msg?.id,
+         created_at: msg?.created_at,
+         received_at: new Date().toISOString(),
+         latency_ms: msg?.created_at ? Math.max(0, Date.now() - new Date(msg.created_at).getTime()) : null
+       });
       if(!msg || String(msg.sender_id) === uid) return;
 
       // This is the real-time notification path. No polling/query is needed.
