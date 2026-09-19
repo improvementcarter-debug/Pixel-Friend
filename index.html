@@ -2706,6 +2706,129 @@ img{content-visibility:auto;}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
+
+<style id="pf-performance-lite">
+/* =========================================================
+   PIXEL-FRIEND PERFORMANCE LITE
+   Keeps the sci-fi look but removes/reduces GPU-heavy effects.
+========================================================= */
+
+/* Disable expensive blur/backdrop processing */
+body.pf-lite-effects *,
+body.pf-lite-effects *::before,
+body.pf-lite-effects *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Reduce expensive glow/shadow rendering */
+body.pf-lite-effects .topbar,
+body.pf-lite-effects .side,
+body.pf-lite-effects .mini,
+body.pf-lite-effects .card,
+body.pf-lite-effects .user-card,
+body.pf-lite-effects .post-card,
+body.pf-lite-effects .rail-card,
+body.pf-lite-effects .game-card,
+body.pf-lite-effects .invite-card,
+body.pf-lite-effects .summary-card,
+body.pf-lite-effects .notification-panel,
+body.pf-lite-effects .message,
+body.pf-lite-effects .summary-icon {
+  box-shadow: 0 4px 12px rgba(0,0,0,.18) !important;
+}
+
+/* Keep the important notification/alarm visible, but remove its blur */
+body.pf-lite-effects #pfMessageAlarmOverlay,
+body.pf-lite-effects #pfNotificationSoundLoop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Slow/disable decorative continuous animations */
+body.pf-lite-effects .summary-card::before,
+body.pf-lite-effects .summary-card::after,
+body.pf-lite-effects .summary-live i,
+body.pf-lite-effects .electric-border,
+body.pf-lite-effects .energy-sweep,
+body.pf-lite-effects .theme-sweep,
+body.pf-lite-effects .level-orb,
+body.pf-lite-effects .bonus-chest {
+  animation-duration: 14s !important;
+}
+
+/* The rotating Home summary rings are much lighter */
+body.pf-lite-effects .user-summary-dashboard .summary-card::before {
+  animation-duration: 12s !important;
+  filter: none !important;
+}
+body.pf-lite-effects .user-summary-dashboard .summary-card::after {
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove decorative image/icon glow filters */
+body.pf-lite-effects .summary-icon svg,
+body.pf-lite-effects .brand,
+body.pf-lite-effects .level-orb,
+body.pf-lite-effects .bonus-chest {
+  filter: none !important;
+}
+
+/* Reduce hover movement/repainting */
+body.pf-lite-effects .summary-card:hover,
+body.pf-lite-effects .card:hover,
+body.pf-lite-effects .user-card:hover {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Disable only decorative HUD animations; functional recording/alarm UI remains */
+body.pf-lite-effects .hud-orb,
+body.pf-lite-effects .hud-ring,
+body.pf-lite-effects .hud-sweep,
+body.pf-lite-effects .hud-terminal-sweep,
+body.pf-lite-effects .hud-mark,
+body.pf-lite-effects .hud-status,
+body.pf-lite-effects .hud-corner {
+  animation: none !important;
+}
+
+/* Less costly transitions throughout the app */
+body.pf-lite-effects button,
+body.pf-lite-effects input,
+body.pf-lite-effects textarea,
+body.pf-lite-effects .page,
+body.pf-lite-effects .notification-panel {
+  transition-duration: .08s !important;
+}
+
+/* Respect battery/performance on small screens even more */
+@media (max-width: 850px) {
+  body.pf-lite-effects *,
+  body.pf-lite-effects *::before,
+  body.pf-lite-effects *::after {
+    scroll-behavior: auto !important;
+  }
+
+  body.pf-lite-effects .user-summary-dashboard .summary-card::before {
+    animation-duration: 18s !important;
+    filter: none !important;
+  }
+
+  body.pf-lite-effects .user-summary-dashboard .summary-card {
+    box-shadow: 0 3px 8px rgba(0,0,0,.16) !important;
+  }
+}
+</style>
+<script>
+/* Enable lightweight visual mode without changing realtime/notification logic. */
+document.documentElement.classList.add('pf-lite-effects');
+document.addEventListener('DOMContentLoaded', function () {
+  document.body.classList.add('pf-lite-effects');
+});
+</script>
+
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
