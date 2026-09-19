@@ -2605,6 +2605,64 @@ body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="
 @media(max-width:850px){.home-columns{display:block!important}.home-center,.home-right,.home-left{display:grid!important;grid-column:auto!important;position:static!important}.home-left{margin-top:16px}.home-dashboard-panels{grid-template-columns:1fr!important}.user-summary-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important}.user-summary-dashboard>.summary-card{height:176px!important;min-height:176px!important}}
 @media(max-width:560px){.user-summary-dashboard{grid-template-columns:1fr!important}.user-summary-dashboard>.summary-card{height:160px!important;min-height:160px!important}.home-activity-item{grid-template-columns:40px 30px minmax(0,1fr)}.home-activity-time{display:none}.home-panel-head h2{font-size:17px}}
 </style>
+<style id="pf-same-profile-avatar-fix">
+.home-online-avatar{
+  width:44px!important;height:44px!important;min-width:44px!important;
+  border-radius:50%!important;overflow:hidden!important;
+  display:grid!important;place-items:center!important;
+  background:#17263f!important;border:2px solid #314667!important;
+}
+.home-online-avatar img{
+  width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;
+}
+#messages .chat-user .user-avatar{
+  border-radius:50%!important;overflow:hidden!important;
+  background:#17263f!important;border:2px solid #314667!important;
+}
+#messages .chat-user .user-avatar img{
+  width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;
+}
+</style>
+
+<style id="pf-avatar-realtime-responsive-final">
+/* One consistent profile-avatar treatment everywhere */
+#friendsList .user-avatar,
+#friendsList .profile-avatar,
+#friendsList .avatar,
+#homeOnlineFriends .home-online-avatar,
+#messages .user-avatar{
+  border-radius:50%!important;
+  overflow:hidden!important;
+  flex:0 0 auto!important;
+}
+#friendsList .user-avatar img,
+#friendsList .profile-avatar img,
+#friendsList .avatar img,
+#homeOnlineFriends .home-online-avatar img,
+#messages .user-avatar img{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  display:block!important;
+}
+/* Prevent cards/chat rows from overflowing on small screens */
+#friendsList > *,
+#homeOnlineFriends > *,
+#messageUsers > *,
+#recentMessageUsers > *,
+#pinnedMessageUsers > *{
+  min-width:0;
+}
+@media (max-width:700px){
+  #friendsList{grid-template-columns:repeat(1,minmax(0,1fr))!important}
+  .messages-layout{grid-template-columns:1fr!important}
+}
+@media (min-width:701px) and (max-width:1100px){
+  #friendsList{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+</style>
+
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -2897,10 +2955,15 @@ body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="
   <div class="message-user-section"><div class="message-section-title">🕘 Recent Users</div><div id="recentMessageUsers" class="message-user-list"><div class="tiny">Loading recent users...</div></div></div>
   <div class="message-user-section"><div class="message-section-title">👥 All Users</div><div id="messageUsers" class="message-user-list"></div></div>
 </div>            <div class="chat-main">                <div class="chat-header">
-  <div>
-    <h2 id="chatTitle" style="margin:0">SELECT A FRIEND</h2>
+  <div class="pf-chat-title-wrap" style="display:flex;align-items:center;gap:10px;min-width:0">
+    <div id="pfActiveChatAvatar" class="pf-chat-avatar-header">👤</div>
+    <div style="min-width:0">
+      <h2 id="chatTitle" style="margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">SELECT A FRIEND</h2>
+      <div id="pfActiveChatProfileLink" class="tiny" style="cursor:pointer" onclick="pfOpenActiveChatProfile()">VIEW PROFILE</div>
+    </div>
   </div>
   <div class="pf-chat-header-actions">
+    <button id="pfChatPinCurrent" class="pf-chat-pin-current" type="button" onclick="pfToggleCurrentChatPin()" title="Pin this chat">📍</button>
     <div id="reachIndicator" class="tiny hidden">📡 STATUS: <strong style="color:var(--green)">Online</strong></div>
     <button id="pfVoiceCallBtn" class="pf-call-btn pf-call-audio" type="button" onclick="pfStartCall('audio')" disabled title="Voice call">📞</button>
     <button id="pfVideoCallBtn" class="pf-call-btn pf-call-video" type="button" onclick="pfStartCall('video')" disabled title="Video call">🎥</button>
@@ -5196,7 +5259,7 @@ function renderUserCard(u, options = {}){
                    following ? '<div class="tiny" style="margin-top:4px">⭐ YOU FOLLOW THIS USER</div>' : '';
   return `
     <div class="user-card">
-      <div class="user-avatar profile-clickable" style="margin-bottom:8px" onclick="openPublicProfile('${esc(u.id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(profileAvatarValue(u))}</div>
+      <div class="user-avatar profile-clickable" style="margin-bottom:8px" onclick="openPublicProfile('${esc(u.id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}" alt="">`:esc(profileAvatarValue(u))}</div>
       <strong class="profile-clickable" onclick="openPublicProfile('${esc(u.id)}')">${esc(u.username || 'PIXEL USER')}${accountBadge(u, true)}</strong>
       ${options.presence ? `<div data-presence-user-id="${esc(u.id)}" style="margin-top:5px">${presenceMarkup(u.id)}</div>` : ''}
       ${relation}
@@ -5277,7 +5340,7 @@ async function loadMessageUsers() {
     const {data:msgs,error:me}=await sb.from('messages').select('sender_id,receiver_id,created_at').or(`sender_id.eq.${currentUser.id},receiver_id.eq.${currentUser.id}`).order('created_at',{ascending:false}).limit(100);
     if(!me){const seen=new Set();for(const m of(msgs||[])){const other=String(m.sender_id)===String(currentUser.id)?String(m.receiver_id):String(m.sender_id);if(other&&other!==String(currentUser.id)&&userMap.has(other)&&!seen.has(other)){seen.add(other);recentIds.push(other);}}}
   }catch(e){console.warn('Recent users:',e);}
-  const makeUser=(u,recent=false)=>{const id=String(u.id),ip=pinned.has(id);return `<div class="chat-user ${selectedUser===u.id?'active':''}"><div class="chat-user-row"><div class="user-avatar profile-clickable" title="View profile" style="width:36px;height:36px;flex:0 0 36px" onclick="event.stopPropagation();openPublicProfile('${esc(id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(profileAvatarValue(u))}</div><div class="chat-user-main" onclick="openChat('${esc(id)}','${esc(u.username||'PIXEL USER')}')"><strong class="profile-clickable" onclick="event.stopPropagation();openPublicProfile('${esc(id)}')" title="View profile">${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}</strong><div data-presence-user-id="${esc(id)}">${presenceMarkup(id)}</div></div>${recent?'<span class="chat-recent-time">Recent</span>':''}<button type="button" class="chat-pin-btn ${ip?'pinned':''}" title="${ip?'Unpin chat':'Pin chat'}" onclick="event.stopPropagation();togglePinnedChat('${esc(id)}')">${ip?'📌':'📍'}</button></div></div>`};
+  const makeUser=(u,recent=false)=>{const id=String(u.id),ip=pinned.has(id);return `<div class="chat-user ${selectedUser===u.id?'active':''}" data-user-id="${esc(id)}"><div class="chat-user-row"><div class="user-avatar profile-clickable" title="View profile" style="width:36px;height:36px;flex:0 0 36px" onclick="event.stopPropagation();openPublicProfile('${esc(id)}')">${u.avatar_url?`<img src="${esc(u.avatar_url)}">`:esc(profileAvatarValue(u))}</div><div class="chat-user-main" onclick="openChat('${esc(id)}','${esc(u.username||'PIXEL USER')}')"><strong class="profile-clickable" onclick="event.stopPropagation();openPublicProfile('${esc(id)}')" title="View profile">${esc(u.username||'PIXEL USER')}${accountBadge(u,true)}</strong><div data-presence-user-id="${esc(id)}">${presenceMarkup(id)}</div></div>${recent?'<span class="chat-recent-time">Recent</span>':''}<button type="button" class="chat-pin-btn ${ip?'pinned':''}" title="${ip?'Unpin chat':'Pin chat'}" onclick="event.stopPropagation();togglePinnedChat('${esc(id)}')">${ip?'📌':'📍'}</button></div></div>`};
   const pu=users.filter(u=>pinned.has(String(u.id))),ru=recentIds.map(id=>userMap.get(id)).filter(Boolean).filter(u=>!pinned.has(String(u.id))).slice(0,12);
   $('pinnedMessageUsers').innerHTML=pu.length?pu.map(u=>makeUser(u)).join(''):'<div class="message-empty-section">No pinned chats</div>';
   $('pinnedChatCount').textContent=String(pu.length);
@@ -7987,12 +8050,9 @@ window.addEventListener('beforeunload', ()=>{
       list.innerHTML=users.map(u=>{
         const uid=JSON.stringify(String(u.id||''));
         const uname=JSON.stringify(String(u.username||'PIXEL USER'));
-        return `<div class="home-online-item pf-online-clickable" role="button" tabindex="0"
-          onclick="openPublicProfile(${uid})"
-          onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPublicProfile(${uid})}">
+        return `<div class="home-online-item pf-online-clickable" role="button" tabindex="0" data-user-id="${escHome(String(u.id||''))}" onclick="pfClickOnlineFriend(event,this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();pfClickOnlineFriend(event,this)}">
           <div class="home-online-avatar">${avatarHome(u)}</div>
-          <div class="home-online-main"><strong>${escHome(u.username||'PLAYER')}</strong><span>● Online · now</span><small>Click to view profile</small></div>
-          <button class="home-online-chat" title="Chat with ${escHome(u.username||'friend')}" onclick="event.stopPropagation();openChat(${uid},${uname})">💬</button>
+          <div class="home-online-main"><strong>${escHome(u.username||'PLAYER')}</strong><span>● Online · now</span></div>
         </div>`;
       }).join('');
     }catch(e){console.warn('Home online friends:',e);list.innerHTML='<div class="tiny home-panel-empty">Online friends could not be loaded.</div>';}
@@ -8488,109 +8548,104 @@ window.addEventListener('beforeunload', ()=>{
 }
 </style>
 
-</body></html>
 
-<script>
 
-/* ===== INSTANT TYPING INDICATOR (SUPABASE BROADCAST) =====
-   Uses a realtime broadcast channel instead of inserting typing rows into
-   `messages`, so typing is instant and does not pollute chat history.
-*/
-(() => {
-  let pfTypingChannel = null;
-  let pfTypingTimer = null;
-  let pfTypingHideTimer = null;
-  let pfTypingChannelKey = '';
-  let pfTypingSubscribed = false;
 
-  const escFn = window.esc || (s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])));
-
-  function pfTypingKey(a,b){
-    return [String(a||''),String(b||'')].sort().join('_');
+<script id="pf-click-only-fix">
+(function(){
+  'use strict';
+  function openProfile(id){
+    id=String(id||'');
+    if(id && typeof window.openPublicProfile==='function') return window.openPublicProfile(id);
   }
-
-  async function pfCloseTypingChannel(){
-    if(pfTypingTimer){clearTimeout(pfTypingTimer);pfTypingTimer=null;}
-    if(pfTypingHideTimer){clearTimeout(pfTypingHideTimer);pfTypingHideTimer=null;}
-    if(pfTypingChannel){
-      try{ await sb.removeChannel(pfTypingChannel); }catch(_){}
+  function openMessage(id,name){
+    id=String(id||'');
+    if(id && typeof window.openChat==='function') return window.openChat(id,String(name||'PIXEL USER'));
+  }
+  window.pfClickOnlineFriend=function(e,row){
+    if(!row)return;
+    if(e && e.target && e.target.closest && e.target.closest('button,a,input,textarea,select')) return;
+    var id=row.getAttribute('data-user-id');
+    openProfile(id);
+  };
+  // Event delegation keeps clicks working even when Home/Messages lists are re-rendered.
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(!t || !t.closest) return;
+    // Home Online Friends: clicking the row opens the user's profile.
+    var home=t.closest('#homeOnlineFriends .home-online-item');
+    if(home && !t.closest('button,a,input,textarea,select')){
+      e.preventDefault(); e.stopPropagation();
+      openProfile(home.getAttribute('data-user-id'));
+      return;
     }
-    pfTypingChannel=null;
-    pfTypingChannelKey='';
-    pfTypingSubscribed=false;
-    const el=document.getElementById('typingIndicator');
-    if(el) el.classList.add('hidden');
-  }
-
-  async function pfOpenTypingChannel(){
-    if(!window.currentUser || !window.selectedUser || !window.sb) return;
-    const key=pfTypingKey(currentUser.id, selectedUser);
-    if(pfTypingChannel && pfTypingChannelKey===key) return;
-    await pfCloseTypingChannel();
-    pfTypingChannelKey=key;
-
-    pfTypingChannel=sb.channel('pixel-friend-typing-'+key,{
-      config:{broadcast:{self:false}}
-    }).on('broadcast',{event:'typing'}, payload=>{
-      const d=payload?.payload||{};
-      if(String(d.sender_id)===String(currentUser.id)) return;
-      if(String(d.receiver_id)!==String(currentUser.id)) return;
-      if(String(d.chat_key)!==key) return;
-      const el=document.getElementById('typingIndicator');
-      if(!el) return;
-      el.textContent='💬 '+(d.sender_name||'Friend')+' is typing…';
-      el.classList.remove('hidden');
-      clearTimeout(pfTypingHideTimer);
-      pfTypingHideTimer=setTimeout(()=>el.classList.add('hidden'),1800);
-    }).subscribe(status=>{
-      pfTypingSubscribed=status==='SUBSCRIBED';
-    });
-  }
-
-  async function pfBroadcastTyping(){
-    if(!selectedUser || !currentUser) return;
-    await pfOpenTypingChannel();
-    if(!pfTypingChannel || !pfTypingSubscribed) return;
-    clearTimeout(pfTypingTimer);
-    try{
-      await pfTypingChannel.send({
-        type:'broadcast',
-        event:'typing',
-        payload:{
-          sender_id:String(currentUser.id),
-          receiver_id:String(selectedUser),
-          sender_name:currentProfile?.username||'Friend',
-          chat_key:pfTypingChannelKey,
-          at:Date.now()
-        }
-      });
-    }catch(e){ console.warn('Pixel-Friend typing broadcast:',e); }
-    pfTypingTimer=setTimeout(async()=>{
-      if(pfTypingChannel && pfTypingSubscribed){
-        try{
-          await pfTypingChannel.send({
-            type:'broadcast',event:'typing',
-            payload:{sender_id:String(currentUser.id),receiver_id:String(selectedUser),sender_name:currentProfile?.username||'Friend',chat_key:pfTypingChannelKey,at:Date.now(),stopped:true}
-          });
-        }catch(_){}
-      }
-    },1200);
-  }
-
-  window.pfOpenTypingChannel=pfOpenTypingChannel;
-  window.pfCloseTypingChannel=pfCloseTypingChannel;
-  window.pfBroadcastTyping=pfBroadcastTyping;
-
-  document.addEventListener('input',e=>{
-    if(e.target?.id==='messageInput' && !e.target.disabled && e.target.value.trim()){
-      pfBroadcastTyping();
+    // Messages: clicking the user row opens the chat. Pin button/avatar/profile remain available.
+    var chat=t.closest('#messages .chat-user');
+    if(chat && !t.closest('.chat-pin-btn')){
+      var id=chat.getAttribute('data-user-id');
+      var strong=chat.querySelector('.chat-user-main strong');
+      var name=strong ? strong.textContent.trim() : 'PIXEL USER';
+      if(id){ e.preventDefault(); e.stopPropagation(); openMessage(id,name); }
     }
-  });
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    const input=document.getElementById('messageInput');
-    if(input) input.addEventListener('focus',()=>pfOpenTypingChannel());
-  });
+  },true);
 })();
-
 </script>
+
+<script id="pf-chat-pin-realtime-final">
+(function(){
+  'use strict';
+
+  function pinKey(){
+    try{
+      var u = (typeof currentUser !== 'undefined' && currentUser) || window.currentUser;
+      return 'pf_pinned_chats_' + String(u && u.id || 'guest');
+    }catch(e){ return 'pf_pinned_chats_guest'; }
+  }
+
+  function readPins(){
+    try{
+      var a = JSON.parse(localStorage.getItem(pinKey()) || '[]');
+      return new Set((Array.isArray(a)?a:[]).map(String));
+    }catch(e){ return new Set(); }
+  }
+
+  function writePins(set){
+    try{ localStorage.setItem(pinKey(), JSON.stringify(Array.from(set))); }catch(e){}
+  }
+
+  window.pfPinChat = function(id){
+    id = String(id || '');
+    if(!id) return;
+    var set = readPins();
+    if(set.has(id)) set.delete(id); else set.add(id);
+    writePins(set);
+    if(typeof loadMessageUsers === 'function') loadMessageUsers();
+  };
+
+  // Keep pin state visible after realtime/user-list refreshes.
+  function syncPinButtons(){
+    var set = readPins();
+    document.querySelectorAll('#messageUsers .chat-pin-btn,#recentMessageUsers .chat-pin-btn,#pinnedMessageUsers .chat-pin-btn')
+      .forEach(function(btn){
+        var row = btn.closest('.chat-user');
+        var id = row && row.getAttribute('data-user-id');
+        if(!id) return;
+        var yes = set.has(String(id));
+        btn.textContent = yes ? '📌' : '📍';
+        btn.classList.toggle('pinned', yes);
+        btn.title = yes ? 'Unpin chat' : 'Pin chat';
+      });
+  }
+
+  function boot(){
+    syncPinButtons();
+    setTimeout(syncPinButtons,500);
+    setTimeout(syncPinButtons,1500);
+  }
+
+  document.addEventListener('DOMContentLoaded', boot);
+  setInterval(syncPinButtons, 2000);
+})();
+</script>
+
+</body></html>
