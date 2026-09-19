@@ -3282,7 +3282,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-feature-hero"><div><div class="pf-feature-kicker">PIXEL-FRIEND CONTROL</div><h1>⚙️ Settings</h1><p>Control alerts, notifications, theme and account preferences.</p></div></div>
     <div class="pf-settings-grid">
       <div class="card pf-setting-card"><h2>🔔 Notification Alarm</h2><p class="tiny">New realtime messages and feed notifications can ring until you dismiss the alarm.</p><button class="primary" onclick="pfEnableAlertsFromSettings()">ENABLE ALERTS</button><button class="secondary" onclick="pfTestAlertFromSettings()">TEST ALARM</button><div id="pfSettingsAlertStatus" class="status"></div></div>
-      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is not the active tab.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><div id="pfSettingsNotifStatus" class="status"></div></div>
+      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is not the active tab.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><button class="secondary" onclick="pfTestSystemAlert()">🧪 TEST SYSTEM ALERT</button><div id="pfSettingsNotifStatus" class="status"></div></div>
       <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Pixel-Friend themes are available in the app theme settings.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
       <div class="card pf-setting-card"><h2>🔊 Alarm Behavior</h2><p class="tiny">The alarm remains active until you press <b>DISMISS &amp; STOP SOUND</b> or mark notifications as read.</p><div class="pf-setting-state">● Persistent alarm: <strong>ON</strong></div></div>
     </div>
@@ -3449,22 +3449,39 @@ async function pfRegisterBackgroundPush(){
 async function pfShowSystemNotification(title, options={}){
   if(!('Notification' in window) || Notification.permission !== 'granted') return false;
   try{
+    // Always use the persistent service-worker notification first. This is the
+    // path that survives tab switching/minimizing and is the portable path for
+    // mobile browsers. It also avoids relying on the page's Window lifetime.
     let reg = pfPushRegistration;
-    if(!reg && 'serviceWorker' in navigator) reg = await navigator.serviceWorker.getRegistration('./');
+    if(!reg && 'serviceWorker' in navigator){
+      reg = await navigator.serviceWorker.ready;
+      pfPushRegistration = reg;
+    }
     if(reg?.showNotification){
       await reg.showNotification(title, {
-        body:String(options.body||''), icon:options.icon || '/favicon.ico', badge:options.badge || '/favicon.ico',
-        tag:String(options.tag||'pixel-friend'), renotify:true, requireInteraction:false, data:options.data||{}
+        body:String(options.body||''),
+        icon:options.icon || '/favicon.ico',
+        badge:options.badge || '/favicon.ico',
+        tag:String(options.tag||'pixel-friend'),
+        renotify:true,
+        requireInteraction:true,
+        silent:false,
+        timestamp:Date.now(),
+        data:options.data||{}
       });
+      console.info('[PF NOTIFY] OS notification shown:', title);
       return true;
     }
   }catch(e){ console.warn('[PF NOTIFY] Service-worker notification failed:',e); }
+  // Desktop-only fallback for browsers that expose Notification() but cannot
+  // use a service-worker registration. Never use this path on mobile.
   try{
     if(!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
       new Notification(title, {body:String(options.body||''),tag:String(options.tag||'pixel-friend'),renotify:true});
+      console.info('[PF NOTIFY] Window notification fallback shown:', title);
       return true;
     }
-  }catch(e){}
+  }catch(e){ console.warn('[PF NOTIFY] Window notification fallback failed:',e); }
   return false;
 }
 window.pfShowSystemNotification = pfShowSystemNotification;
@@ -4533,6 +4550,28 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
   overlay.onclick = e => { if(e.target === overlay) stopAndClose(); };
 }
 
+
+async function pfTestSystemAlert(){
+  try{
+    if(!('Notification' in window)) throw new Error('This browser does not support web notifications.');
+    if(Notification.permission !== 'granted'){
+      const permission = await Notification.requestPermission();
+      if(permission !== 'granted') throw new Error('Notification permission is not granted.');
+    }
+    const ok = await pfShowSystemNotification('🔔 Pixel-Friend TEST ALERT', {
+      body:'If you see this while Pixel-Friend is minimized, PC system alerts are working.',
+      tag:'pixel-friend-test-'+Date.now(),
+      data:{url:location.href}
+    });
+    const box=document.getElementById('pfSettingsNotifStatus');
+    if(box) box.textContent = ok ? '✓ Test alert sent to the browser/OS.' : '✕ Browser could not display the system alert.';
+  }catch(e){
+    const box=document.getElementById('pfSettingsNotifStatus');
+    if(box) box.textContent='✕ '+(e?.message||e);
+    console.warn('[PF TEST ALERT]',e);
+  }
+}
+window.pfTestSystemAlert=pfTestSystemAlert;
 
 async function requestNotificationPermission(){
   try{
@@ -6456,7 +6495,7 @@ let pfLastAlertPollAt = 0;
 let pfAlertPollBusy = false;
 
 async function pfPollIncomingAlerts(){
-  if(pfAlertPollBusy || !currentUser || document.visibilityState !== 'visible') return;
+  if(pfAlertPollBusy || !currentUser) return;
   pfAlertPollBusy = true;
   try{
     const uid = String(currentUser.id);
@@ -6494,13 +6533,13 @@ async function pfPollIncomingAlerts(){
 function startIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
 
-  // Foreground reconciliation every 1.5 seconds. Realtime remains enabled
-  // in parallel, so whichever path receives the message first wins.
+  // Fast reconciliation runs in BOTH visible and minimized states.
+  // Browsers may throttle background timers, so Web Push remains the closed-window
+  // path, but this watchdog makes a minimized desktop window recover even when
+  // Supabase Realtime briefly stops delivering events.
   pfIncomingAlertPollTimer = setInterval(() => {
-    if(document.visibilityState === 'visible' && currentUser){
-      pfPollIncomingAlerts();
-    }
-  }, 1500);
+    if(currentUser) pfPollIncomingAlerts();
+  }, 2000);
 
   pfPollIncomingAlerts();
 }
