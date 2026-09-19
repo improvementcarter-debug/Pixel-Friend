@@ -3057,11 +3057,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
   </div>
 
   <div class="actions pf-reference-actions">
-    <button id="themeToggle" type="button" title="Change theme" aria-label="Change theme">
-      <span class="theme-icon">◐</span><span class="theme-label">THEME</span><span class="pf-theme-chevron">⌄</span>
-    </button>
-
-    <div class="notification-wrap">
+<div class="notification-wrap">
       <button class="notification-button pf-bell-button" onclick="toggleNotifications(event)" title="Notifications" aria-label="Notifications">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/>
@@ -8414,29 +8410,6 @@ window.addEventListener('beforeunload', ()=>{
   });
 })();
 </script>
-
-<script id="pf-theme-switcher-js">
-(function(){
-  const themes=['default','cyber','scifi','hologram','matrix','violet','sunset','stealth','light'];
-  const labels={default:'CYAN',cyber:'CYBER',scifi:'SCI-FI',hologram:'HOLO',matrix:'MATRIX',violet:'VIOLET',sunset:'SUNSET',stealth:'STEALTH',light:'LIGHT'};
-  const icons={default:'◐',cyber:'⌬',scifi:'⟁',hologram:'◈',matrix:'⌁',violet:'✦',sunset:'☀',stealth:'⬡',light:'☼'};
-  const btn=document.getElementById('themeToggle');
-  function applyTheme(theme){
-    if(theme==='default') document.body.removeAttribute('data-theme');
-    else document.body.setAttribute('data-theme',theme);
-    if(btn){btn.querySelector('.theme-icon').textContent=icons[theme]||'◐';btn.querySelector('.theme-label').textContent=labels[theme]||'THEME';btn.title='Theme: '+(labels[theme]||'CYAN')+' — click to change';}
-    try{localStorage.setItem('pixelFriendTheme',theme)}catch(e){}
-  }
-  let saved='default';try{saved=localStorage.getItem('pixelFriendTheme')||'default'}catch(e){}
-  if(!themes.includes(saved)) saved='default';
-  applyTheme(saved);
-  if(btn) btn.addEventListener('click',function(){
-    const current=document.body.getAttribute('data-theme')||'default';
-    applyTheme(themes[(themes.indexOf(current)+1)%themes.length]);
-  });
-})();
-</script>
-
 <script id="pf-home-dashboard-activity-online">
 (function(){
   function escHome(v){ try{return typeof esc==='function'?esc(v):String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}catch(e){return String(v??'');} }
@@ -8519,7 +8492,6 @@ window.addEventListener('beforeunload', ()=>{
 .pf-header-online{font-family:Inter,ui-sans-serif,sans-serif;font-size:12px;color:#55f39a;white-space:nowrap}
 .pf-header-online span{display:inline-block;width:9px;height:9px;border-radius:50%;background:#00ff9d;box-shadow:0 0 10px #00ff9d;margin-right:7px}
 .pf-reference-actions{justify-self:end;gap:10px!important}
-.pf-reference-actions #themeToggle{min-width:148px!important;height:46px!important;border-radius:12px!important}
 .pf-theme-chevron{font-size:18px;line-height:1;margin-left:2px}
 .pf-bell-button{
   width:48px!important;height:48px!important;border:0!important;background:transparent!important;box-shadow:none!important;
@@ -8613,8 +8585,6 @@ window.addEventListener('beforeunload', ()=>{
   .pf-reference-topbar{grid-template-columns:auto 1fr!important}
   .pf-brand-text small{display:none}
   .pf-reference-actions{justify-self:end}
-  .pf-reference-actions #themeToggle{min-width:48px!important}
-  .pf-reference-actions .theme-label,.pf-theme-chevron{display:none}
   .pf-head-profile{min-width:52px!important;width:52px!important;padding:4px!important;justify-content:center}
   .pf-head-profile-info,.pf-profile-chevron{display:none}
   .pf-activity-online-row{grid-template-columns:1fr!important}
@@ -8627,7 +8597,6 @@ window.addEventListener('beforeunload', ()=>{
   .pf-brand-text strong{font-size:17px}
   .pf-header-status{display:none}
   .pf-reference-actions{gap:3px!important}
-  .pf-reference-actions #themeToggle{width:42px!important;height:42px!important;min-width:42px!important}
   .pf-bell-button{width:42px!important;height:42px!important}
   .pf-bell-button svg{width:24px;height:24px}
   .pf-head-profile{width:42px!important;min-width:42px!important;height:42px!important}
@@ -8831,17 +8800,12 @@ window.addEventListener('beforeunload', ()=>{
 }
 #sideMenuToggle .pf-menu-label{display:inline!important;font-size:9px!important;margin-left:4px!important;letter-spacing:.5px}
 
-/* Put Theme + Bell + Profile right beside Menu in the action cluster. */
+/* Keep Bell + Profile beside the Menu in the action cluster. */
 .pf-reference-actions{
   display:flex!important;
   align-items:center!important;
   gap:7px!important;
   flex-wrap:nowrap!important;
-}
-.pf-reference-actions #themeToggle{
-  width:118px!important;
-  min-width:118px!important;
-  height:46px!important;
 }
 .pf-reference-actions .notification-wrap{margin:0!important}
 .pf-head-profile{
@@ -8893,22 +8857,18 @@ window.addEventListener('beforeunload', ()=>{
   }
 }
 
-/* Tablet: retain Menu + Theme + Bell + Profile without crushing the ticker. */
+/* Tablet: retain Menu + Bell + Profile without crushing the ticker. */
 @media(max-width:1180px){
   .pf-reference-topbar{
     grid-template-columns:auto minmax(250px,1fr) auto!important;
   }
   .pf-reference-topbar .pf-brand-reference{min-width:185px!important}
-  .pf-reference-actions #themeToggle{
-    width:48px!important;min-width:48px!important;
-  }
-  .pf-reference-actions .theme-label,.pf-theme-chevron{display:none!important}
   .pf-head-profile{min-width:55px!important;width:55px!important;padding:4px!important}
   .pf-head-profile-info,.pf-profile-chevron{display:none!important}
   .pf-header-live-update{height:42px!important}
 }
 
-/* Mobile: Menu remains comfortable to tap; Theme/Profile stay immediately next to it. */
+/* Mobile: Menu remains comfortable to tap; Profile stays immediately next to it. */
 @media(max-width:900px){
   .pf-reference-topbar{
     grid-template-columns:auto 1fr!important;
@@ -8947,9 +8907,6 @@ window.addEventListener('beforeunload', ()=>{
   .pf-brand-mark svg{width:39px!important;height:37px!important}
   .pf-brand-text strong{font-size:16px!important}
   .pf-reference-actions{gap:3px!important}
-  .pf-reference-actions #themeToggle{
-    width:42px!important;min-width:42px!important;height:42px!important;
-  }
   .pf-bell-button{width:42px!important;height:42px!important}
   .pf-head-profile{
     width:42px!important;min-width:42px!important;height:42px!important;
