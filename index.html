@@ -6019,7 +6019,7 @@ async function pfPollIncomingAlerts(){
 
 function startIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
-  pfIncomingAlertPollTimer=setInterval(pfPollIncomingAlerts, 2500);
+  pfIncomingAlertPollTimer=setInterval(pfPollIncomingAlerts, 12000);
   pfPollIncomingAlerts();
 }
 function stopIncomingAlertFallback(){
@@ -6042,14 +6042,28 @@ async function setupRealtime(force=false){
   const uid = String(currentUser.id);
 
   // LIVE FEED CHANNEL
+  let pfFeedBurstTimer=null, pfStoryBurstTimer=null, pfMessageReactionTimer=null;
+  const pfQueueFeedRefresh=()=>{
+    clearTimeout(pfFeedBurstTimer);
+    pfFeedBurstTimer=setTimeout(()=>{pfFeedBurstTimer=null; if(document.visibilityState==='visible') loadFeed(true);},180);
+  };
+  const pfQueueStoryRefresh=()=>{
+    clearTimeout(pfStoryBurstTimer);
+    pfStoryBurstTimer=setTimeout(()=>{pfStoryBurstTimer=null; if(document.visibilityState==='visible') loadStories();},180);
+  };
+  const pfQueueMessageRefresh=()=>{
+    clearTimeout(pfMessageReactionTimer);
+    pfMessageReactionTimer=setTimeout(()=>{pfMessageReactionTimer=null; if(document.visibilityState==='visible' && selectedUser) loadMessages();},120);
+  };
+
   realtimeFeedChannel = sb.channel('pixel-friend-live-feed-' + uid + '-' + Date.now())
-    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => { loadFeed(true); notifyIncomingPost(payload.new); })
-    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, () => loadFeed(true))
-    .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, () => loadStories())
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:'posts'}, payload => { pfQueueFeedRefresh(); notifyIncomingPost(payload.new); })
+    .on('postgres_changes', {event:'*', schema:'public', table:'reactions'}, pfQueueFeedRefresh)
+    .on('postgres_changes', {event:'*', schema:'public', table:'comments'}, pfQueueFeedRefresh)
+    .on('postgres_changes', {event:'*', schema:'public', table:'stories'}, pfQueueStoryRefresh)
     .on('postgres_changes', {event:'*', schema:'public', table:'message_reactions'}, payload => {
       const r=payload.new || payload.old;
-      if(r && selectedUser) loadMessages();
+      if(r && selectedUser) pfQueueMessageRefresh();
     })
     .subscribe(status => {
       feedRealtimeStatus = status;
@@ -6111,26 +6125,11 @@ async function setupRealtime(force=false){
     });
 
   realtimeStarted=true;
+  // Realtime is primary. Use a low-frequency reconciliation only when visible.
   startIncomingAlertFallback();
-
-  // Fallback only. Realtime remains the primary path.
-  feedRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible') {
-      loadFeed(false);
-      loadStories();
-    }
-  }, 3000);
-
-  messageRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible' && selectedUser) loadMessages();
-  }, 3000);
-
-  // Slow reconciliation only; this does NOT control live notifications.
   notificationRefreshTimer=setInterval(() => {
-    if(document.visibilityState==='visible' && currentUser){
-      updateNotificationBadge({notify:false});
-    }
-  }, 15000);
+    if(document.visibilityState==='visible' && currentUser) updateNotificationBadge({notify:false});
+  }, 45000);
 }
 
 // Reconnect immediately when the browser returns online or the tab becomes visible.
@@ -7824,7 +7823,7 @@ try{
 
   function pfStartSignalPolling(){
     if(pfSignalPollTimer) clearInterval(pfSignalPollTimer);
-    pfSignalPollTimer=setInterval(pfPollSignals,1000);
+    pfSignalPollTimer=setInterval(pfPollSignals,3000);
     setTimeout(pfPollSignals,250);
   }
   pfStartSignalPolling();
@@ -8644,8 +8643,54 @@ window.addEventListener('beforeunload', ()=>{
   }
 
   document.addEventListener('DOMContentLoaded', boot);
-  setInterval(syncPinButtons, 2000);
+  window.addEventListener('storage', function(e){ if(e && String(e.key||'').indexOf('pf_pinned_chats_')===0) syncPinButtons(); });
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') syncPinButtons(); });
 })();
 </script>
 
+<style id="pf-performance-optimization">
+/* Pixel-Friend performance layer: preserves the visual design while reducing
+   unnecessary paint/layout work on desktop, tablet and mobile browsers. */
+html{scroll-behavior:auto;}
+img,video{max-width:100%;}
+img{content-visibility:auto;}
+.user-card,.chat-user,.home-online-item,.post-card,.story-card,.notification-item{contain:layout paint;}
+#messagesList,#feed,#friendsList,#messageUsers,#recentMessageUsers,#pinnedMessageUsers{overscroll-behavior:contain;}
+@media (max-width:1100px){
+  /* Mobile/tablet: avoid costly decorative compositing where supported. */
+  .modal,.modal-card,.panel,.card,.hud-panel,.glass,.glass-card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+  *{text-rendering:auto;}
+}
+@media (max-width:700px){
+  body{overflow-x:hidden;}
+  .page{contain:layout style;}
+  .post-card,.user-card,.chat-user,.home-online-item{box-shadow:none!important;}
+  /* Keep essential transitions, but prevent decorative infinite animations from
+     consuming the phone GPU/CPU while the user is scrolling. */
+  .page *{animation-duration:0.001ms!important;animation-iteration-count:1!important;}
+  .page *{transition-duration:0.12s!important;}
+  .chat-user,.home-online-item,.user-card,button,a{touch-action:manipulation;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.001ms!important;animation-iteration-count:1!important;transition-duration:0.001ms!important;scroll-behavior:auto!important;}
+}
+</style>
+<script id="pf-performance-runtime">
+(function(){
+  'use strict';
+  // Avoid doing visibility/reflow work while the tab is hidden.
+  document.addEventListener('visibilitychange',function(){
+    if(document.visibilityState==='hidden'){
+      try{ window.dispatchEvent(new CustomEvent('pixelfriend:pause-background')); }catch(e){}
+    }else{
+      try{ window.dispatchEvent(new CustomEvent('pixelfriend:resume-background')); }catch(e){}
+    }
+  });
+  // Native lazy-loading for any media added dynamically without the attribute.
+  try{
+    const apply=()=>document.querySelectorAll('img:not([loading])').forEach(x=>x.setAttribute('loading','lazy'));
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true}); else apply();
+  }catch(e){}
+})();
+</script>
 </body></html>
