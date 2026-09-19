@@ -1840,11 +1840,7 @@ button::after,.primary::after,.btn::after,.menu-item::after,.nav-item::after,.ta
 <style id="pf-theme-switcher">
 /* ===== PIXEL-FRIEND THEME SWITCHER ===== */
 :root{--theme-accent:#43e7ff;--theme-accent2:#9b6cff;--theme-bg:#070b14;--theme-panel:#0d1422;--theme-panel2:#111b2d;--theme-text:#f3f7ff;--theme-muted:#8292b3}
-body{transition:background .45s ease,color .35s ease}
-#themeToggle{position:relative;min-width:46px;height:44px;padding:0 10px!important;display:inline-flex!important;align-items:center;justify-content:center;gap:5px;background:linear-gradient(135deg,rgba(10,25,45,.96),rgba(20,12,45,.96))!important;border:1px solid var(--theme-accent)!important;color:var(--theme-accent)!important;box-shadow:0 0 10px color-mix(in srgb,var(--theme-accent) 35%,transparent),inset 0 0 12px rgba(255,255,255,.04)!important;overflow:hidden;transition:.25s ease}
-#themeToggle:hover{transform:translateY(-2px);box-shadow:0 0 22px color-mix(in srgb,var(--theme-accent) 65%,transparent),inset 0 0 15px color-mix(in srgb,var(--theme-accent) 15%,transparent)!important}
-#themeToggle:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,rgba(255,255,255,.45),transparent 70%);transform:translateX(-120%);animation:themeButtonSweep 3.5s linear infinite}
-#themeToggle .theme-icon,#themeToggle .theme-label{position:relative;z-index:1}.theme-label{font-size:11px;letter-spacing:.5px}
+body{transition:background .45s ease,color .35s ease}.theme-label{font-size:11px;letter-spacing:.5px}
 body[data-theme="violet"]{--theme-accent:#c084ff;--theme-accent2:#ff62d4;--theme-bg:#10091d;--theme-panel:#1a102b;--theme-panel2:#25153d;--theme-text:#fff3ff;--theme-muted:#bca4d4}
 body[data-theme="matrix"]{--theme-accent:#64ff9b;--theme-accent2:#d8ff65;--theme-bg:#06130d;--theme-panel:#0a2117;--theme-panel2:#103522;--theme-text:#eaffef;--theme-muted:#80b995}
 body[data-theme="sunset"]{--theme-accent:#ffb35c;--theme-accent2:#ff5f9e;--theme-bg:#1a0b12;--theme-panel:#29121d;--theme-panel2:#3b1928;--theme-text:#fff4ec;--theme-muted:#d0a0a6}
@@ -1860,8 +1856,6 @@ body[data-theme="sunset"] .topbar,body[data-theme="sunset"] .side{background:#1f
 /* unify key accents per theme */
 body[data-theme="violet"],body[data-theme="matrix"],body[data-theme="sunset"],body[data-theme="light"]{--cyan:var(--theme-accent);--blue:var(--theme-accent2);--green:var(--theme-accent);--pink:var(--theme-accent2);--purple:var(--theme-accent2);--bg:var(--theme-bg);--panel:var(--theme-panel);--panel2:var(--theme-panel2);--text:var(--theme-text);--muted:var(--theme-muted)}
 @keyframes themeButtonSweep{to{transform:translateX(120%)}}
-@media(max-width:600px){#themeToggle{min-width:42px}.theme-label{display:none}}
-@media(prefers-reduced-motion:reduce){#themeToggle:before{animation:none}}
 </style>
 
 <style id="pf-extra-themes">
@@ -2887,8 +2881,6 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
 #app #pfSpaceCanvas,
 #app #pfSpaceGlow,
 #app #pfLiveNotificationStack,
-#app .pf-live-update,
-#app .pf-header-live-update,
 #app .pf-breaking-footer {
   display: none !important;
   visibility: hidden !important;
@@ -2986,7 +2978,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-alarm-title">⏰ ALARM: New Message</div>
     <div id="pfMessageAlarmText" class="pf-alarm-message">A new message has arrived.</div>
     <div class="pf-alarm-sub">The alert stays visible until you mark this notification as read.</div>
-    <button id="pfMessageAlarmDismiss" type="button">MARK READ &amp; STOP ALERT</button>
+    <button id="pfMessageAlarmDismiss" type="button">Stop Alert</button>
   </div>
 </div>
 <div id="authScreen" class="auth-screen">
@@ -3291,7 +3283,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-settings-grid">
       <div class="card pf-setting-card"><h2>🔔 Notification Alarm</h2><p class="tiny">New realtime messages and feed notifications can ring until you dismiss the alarm.</p><button class="primary" onclick="pfEnableAlertsFromSettings()">ENABLE ALERTS</button><button class="secondary" onclick="pfTestAlertFromSettings()">TEST ALARM</button><div id="pfSettingsAlertStatus" class="status"></div></div>
       <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is not the active tab.</p><button class="secondary" onclick="requestNotificationPermission()">ALLOW DESKTOP NOTIFICATIONS</button><div id="pfSettingsNotifStatus" class="status"></div></div>
-      <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Use the header theme button to cycle through the available Pixel-Friend themes.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
+      <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Pixel-Friend themes are available in the app theme settings.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
       <div class="card pf-setting-card"><h2>🔊 Alarm Behavior</h2><p class="tiny">The alarm remains active until you press <b>DISMISS &amp; STOP SOUND</b> or mark notifications as read.</p><div class="pf-setting-state">● Persistent alarm: <strong>ON</strong></div></div>
     </div>
   </div>
@@ -4223,10 +4215,14 @@ function renderNotificationList(){
 
 function addNotificationItem(message, senderName, unread=true){
   if(!message?.id) return;
+  const key=String(message.id);
+  const alreadyKnown=notificationItems.has(key);
   const item={...message, senderName: senderName || 'PIXEL USER', unread};
-  notificationItems.set(String(message.id), item);
+  notificationItems.set(key, item);
   renderNotificationList();
-  if(unread && !message.__pfSilentAlarm){
+  // Only a genuinely new unread item starts the alarm. Reconciliation must
+  // keep the unread count visible without restarting a stopped alert.
+  if(unread && !message.__pfSilentAlarm && !alreadyKnown){
     showTelegramNotification(item, item.senderName, item.senderAvatar || '👾');
   }
 }
@@ -4403,26 +4399,10 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
     const current = pfActiveMessageAlarm;
     pfActiveMessageAlarm = null;
 
-    const alarmItem=current?.message||{};
-    if(alarmItem?.kind === 'post' || alarmItem?.notification_kind === 'post'){
-      notificationItems.delete(String(alarmItem.id||id));
-      savePersistentPostNotifications();
-    }else if(alarmItem?.kind === 'interaction'){
-      const arr=typeof readInteractions==='function' && currentUser ? readInteractions(currentUser.id) : [];
-      if(currentUser && typeof saveInteractions==='function'){
-        saveInteractions(currentUser.id, arr.filter(n=>String(n.id)!==String(alarmItem.id||id)));
-      }
-      notificationItems.delete(String(alarmItem.id||id));
-    }else if(alarmItem?.receiver_id && currentUser?.id){
-      try{
-        await sb.from('messages').update({is_read:true, read_at:new Date().toISOString()})
-          .eq('id', String(alarmItem.id||id)).eq('receiver_id', currentUser.id);
-      }catch(err){ console.warn('Alarm dismiss read update failed:', err); }
-      knownUnreadMessageIds.delete(String(alarmItem.id||id));
-      notificationItems.delete(String(alarmItem.id||id));
-    }else{
-      notificationItems.delete(String(alarmItem.id||id));
-    }
+    // STOP ALERT only silences/closes the alarm.
+    // It deliberately does NOT mark the notification as read and does NOT
+    // remove it from the unread collection. The bell count must remain until
+    // the user uses MARK READ / opens the notification.
     renderNotificationList();
     if(typeof updateNotificationBadge === 'function') updateNotificationBadge({details:true});
   };
@@ -8597,7 +8577,7 @@ window.addEventListener('beforeunload', ()=>{
   .pf-brand-text strong{font-size:17px}
   .pf-header-status{display:none}
   .pf-reference-actions{gap:3px!important}
-  .pf-bell-button{width:42px!important;height:42px!important}
+.pf-bell-button{width:42px!important;height:42px!important}
   .pf-bell-button svg{width:24px;height:24px}
   .pf-head-profile{width:42px!important;min-width:42px!important;height:42px!important}
   .pf-head-avatar-photo{width:34px!important;height:34px!important;flex-basis:34px!important}
@@ -8799,8 +8779,7 @@ window.addEventListener('beforeunload', ()=>{
   border-radius:11px!important;
 }
 #sideMenuToggle .pf-menu-label{display:inline!important;font-size:9px!important;margin-left:4px!important;letter-spacing:.5px}
-
-/* Keep Bell + Profile beside the Menu in the action cluster. */
+/* Put Bell + Profile right beside Menu in the action cluster. */
 .pf-reference-actions{
   display:flex!important;
   align-items:center!important;
@@ -8863,12 +8842,11 @@ window.addEventListener('beforeunload', ()=>{
     grid-template-columns:auto minmax(250px,1fr) auto!important;
   }
   .pf-reference-topbar .pf-brand-reference{min-width:185px!important}
-  .pf-head-profile{min-width:55px!important;width:55px!important;padding:4px!important}
+.pf-head-profile{min-width:55px!important;width:55px!important;padding:4px!important}
   .pf-head-profile-info,.pf-profile-chevron{display:none!important}
   .pf-header-live-update{height:42px!important}
 }
-
-/* Mobile: Menu remains comfortable to tap; Profile stays immediately next to it. */
+/* Mobile: Menu remains comfortable to tap; Bell/Profile stay immediately next to it. */
 @media(max-width:900px){
   .pf-reference-topbar{
     grid-template-columns:auto 1fr!important;
