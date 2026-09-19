@@ -2693,6 +2693,19 @@ body[data-theme="cyber"] .card,body[data-theme="cyber"] .panel,body[data-theme="
   }
 })();
 </script>
+<style id="pf-mobile-final-performance">
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:auto;}
+img{content-visibility:auto;}
+@media (max-width:700px){
+  *{scrollbar-width:none;}
+  *::-webkit-scrollbar{width:0;height:0;}
+  .card,.panel,.notification-panel,.pf-live-notification{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
+  .pf-live-notification{box-shadow:0 6px 18px rgba(0,0,0,.28)!important;}
+  input,textarea,select,button{touch-action:manipulation;}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+</style>
 </head><body>
 <div id="pfNotificationSoundLoop" aria-hidden="true">
 <div class="pf-notif-card" role="alertdialog" aria-modal="true" aria-labelledby="pfNotifLoopTitle">
@@ -4128,7 +4141,7 @@ function requestNotificationPermission(){
   if('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(()=>{});
 }
 window.requestNotificationPermission = requestNotificationPermission;
-document.addEventListener('click', () => requestNotificationPermission(), {once:true});
+
 
 async function updateNotificationBadge(options = {}){
   if(!currentUser || notificationCheckInFlight) return;
@@ -6049,13 +6062,53 @@ async function pfPollIncomingAlerts(){
 
 function startIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer) clearInterval(pfIncomingAlertPollTimer);
-  pfIncomingAlertPollTimer=setInterval(pfPollIncomingAlerts, 12000);
+  pfIncomingAlertPollTimer=setInterval(()=>{
+    // Only poll when the message Realtime channel is not healthy.
+    // When Realtime is healthy there is no database polling overhead.
+    if(typeof pfCallRealtimeStatus === 'undefined' || pfCallRealtimeStatus !== 'SUBSCRIBED') pfPollIncomingAlerts();
+  }, 4000);
   pfPollIncomingAlerts();
 }
 function stopIncomingAlertFallback(){
   if(pfIncomingAlertPollTimer){ clearInterval(pfIncomingAlertPollTimer); pfIncomingAlertPollTimer=null; }
 }
 window.pfPollIncomingAlerts=pfPollIncomingAlerts;
+
+/* ===== MOBILE REALTIME + NOTIFICATION HARDENING =====
+   Foreground: instant visual/browser notification path.
+   Mobile wake: immediately reconcile unread messages.
+   Background/closed: native Web Push requires a service worker + push provider;
+   a single HTML file cannot keep JavaScript running after iOS/Android suspends it. */
+(function(){
+  let lastVisibleAt=0;
+  function pfMobileNotify(title, body, tag){
+    try{
+      if('Notification' in window && Notification.permission === 'granted'){
+        const n=new Notification(title,{body:String(body||'New notification'),tag:String(tag||'pixel-friend'),renotify:true});
+        setTimeout(()=>{try{n.close()}catch(_){}},10000);
+      }
+    }catch(_){ }
+  }
+  window.pfMobileNotify=pfMobileNotify;
+  async function reconcileOnWake(){
+    if(!currentUser || document.visibilityState!=='visible') return;
+    const now=Date.now();
+    if(now-lastVisibleAt<800) return;
+    lastVisibleAt=now;
+    try{
+      // Reconnect only if the channel actually became unhealthy.
+      if(typeof pfCallRealtimeStatus!=='undefined' && ['CHANNEL_ERROR','TIMED_OUT','CLOSED'].includes(pfCallRealtimeStatus)){
+        scheduleRealtimeReconnect('mobile wake');
+      }
+      // This also catches messages delivered while the mobile browser was suspended.
+      await pfPollIncomingAlerts();
+      if(typeof updateNotificationBadge==='function') updateNotificationBadge({notify:false});
+    }catch(_){ }
+  }
+  document.addEventListener('visibilitychange',reconcileOnWake,{passive:true});
+  window.addEventListener('pageshow',reconcileOnWake,{passive:true});
+  window.addEventListener('online',reconcileOnWake,{passive:true});
+})();
 
 async function setupRealtime(force=false){
   if(!currentUser) return;
