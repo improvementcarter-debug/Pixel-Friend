@@ -3442,8 +3442,9 @@ async function pfRegisterBackgroundPush(){
     return false;
   }
   try{
-    const swUrl = new URL('./pixel-friend-sw.js', location.href).href;
-    pfPushRegistration = await navigator.serviceWorker.register(swUrl, {scope:'./', updateViaCache:'none'});
+    const swUrl = new URL('/pixel-friend-sw.js', location.origin).href;
+    const swScope = new URL('/', location.origin).href;
+    pfPushRegistration = await navigator.serviceWorker.register(swUrl, {scope:swScope, updateViaCache:'none'});
     await pfPushRegistration.update().catch(()=>{});
     await navigator.serviceWorker.ready;
     return true;
@@ -3511,7 +3512,7 @@ async function pfGetPushDiagnostics(){
   const out={
     secure:!!window.isSecureContext,
     protocol:location.protocol,
-    serviceWorkerURL:(location.protocol==='file:' ? 'BLOCKED on file:// — use localhost/HTTPS' : new URL('./pixel-friend-sw.js', location.href).href),
+    serviceWorkerURL:(location.protocol==='file:' ? 'BLOCKED on file:// — use localhost/HTTPS' : new URL('/pixel-friend-sw.js', location.origin).href),
     host:location.host||'(local file)',
     notification:('Notification' in window)?Notification.permission:'unsupported',
     serviceWorker:'serviceWorker' in navigator,
@@ -3525,7 +3526,7 @@ async function pfGetPushDiagnostics(){
   };
   try{
     if('serviceWorker' in navigator){
-      const reg=await navigator.serviceWorker.getRegistration('./');
+      const reg=await navigator.serviceWorker.getRegistration(new URL('/', location.origin).href);
       out.registration=!!reg;
       out.controlled=!!navigator.serviceWorker.controller;
       if(reg && reg.pushManager){
@@ -3535,6 +3536,15 @@ async function pfGetPushDiagnostics(){
       }
     }
   }catch(e){ out.error=String(e?.message||e); }
+  try{
+    if(location.protocol !== 'file:'){
+      const swUrl=new URL('/pixel-friend-sw.js', location.origin).href;
+      const r=await fetch(swUrl,{cache:'no-store'});
+      out.serviceWorkerHTTP=r.status;
+      out.serviceWorkerContentType=r.headers.get('content-type')||'';
+      out.serviceWorkerReachable=r.ok;
+    }
+  }catch(e){ out.serviceWorkerFetchError=String(e?.message||e); }
   return out;
 }
 window.pfGetPushDiagnostics=pfGetPushDiagnostics;
