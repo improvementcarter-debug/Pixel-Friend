@@ -3431,7 +3431,7 @@ function pfBase64UrlToUint8Array(base64String){
 }
 
 async function pfRegisterBackgroundPush(){
-  if(!currentUser || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  if(!currentUser || !("serviceWorker" in navigator) || !("PushManager" in window)) return false;
   if(location.protocol==='file:'){
     pfShowLocalPushHelp();
     console.warn('[PF PUSH] file:// pages cannot register a service worker. Use localhost or HTTPS.');
@@ -3442,14 +3442,40 @@ async function pfRegisterBackgroundPush(){
     return false;
   }
   try{
-    const swUrl = new URL('/pixel-friend-sw.js', location.origin).href;
-    const swScope = new URL('/', location.origin).href;
-    pfPushRegistration = await navigator.serviceWorker.register(swUrl, {scope:swScope, updateViaCache:'none'});
-    await pfPushRegistration.update().catch(()=>{});
-    await navigator.serviceWorker.ready;
-    return true;
+    // IMPORTANT: use the current published directory first. This supports both
+    // GitHub Pages root sites and project/sub-path sites.
+    const candidates=[];
+    const relativeUrl=new URL('pixel-friend-sw.js', document.baseURI).href;
+    candidates.push(relativeUrl);
+    const rootUrl=new URL('/pixel-friend-sw.js', location.origin).href;
+    if(!candidates.includes(rootUrl)) candidates.push(rootUrl);
+
+    let lastError=null;
+    for(const swUrl of candidates){
+      try{
+        const check=await fetch(swUrl,{cache:'no-store',credentials:'same-origin'});
+        const type=(check.headers.get('content-type')||'').toLowerCase();
+        if(!check.ok) throw new Error(`worker HTTP ${check.status}`);
+        if(type && !type.includes('javascript') && !type.includes('ecmascript')){
+          throw new Error(`worker MIME type is ${type}`);
+        }
+        // Do not force scope wider than the worker's own directory. GitHub Pages
+        // project sites commonly live below /, and the worker must match that path.
+        pfPushRegistration=await navigator.serviceWorker.register(swUrl,{updateViaCache:'none'});
+        await pfPushRegistration.update().catch(()=>{});
+        await navigator.serviceWorker.ready;
+        console.info('[PF PUSH] Service worker registered:',swUrl,pfPushRegistration.scope);
+        return true;
+      }catch(err){
+        lastError=err;
+        console.warn('[PF PUSH] registration candidate failed:',swUrl,err);
+      }
+    }
+    throw lastError || new Error('No service-worker registration candidate succeeded');
   }catch(err){
     console.warn('[PF PUSH] Service worker registration failed:', err);
+    const el=document.getElementById('pfSettingsNotifStatus');
+    if(el) el.innerHTML='❌ Background push worker failed: '+String(err?.message||err);
     return false;
   }
 }
@@ -3509,10 +3535,14 @@ async function pfShowSystemNotification(title, options={}){
 }
 
 async function pfGetPushDiagnostics(){
+  const relativeWorker=new URL('pixel-friend-sw.js', document.baseURI).href;
+  const rootWorker=new URL('/pixel-friend-sw.js', location.origin).href;
   const out={
     secure:!!window.isSecureContext,
     protocol:location.protocol,
-    serviceWorkerURL:(location.protocol==='file:' ? 'BLOCKED on file:// — use localhost/HTTPS' : new URL('/pixel-friend-sw.js', location.origin).href),
+    pageURL:location.href,
+    serviceWorkerURL:relativeWorker,
+    rootServiceWorkerURL:rootWorker,
     host:location.host||'(local file)',
     notification:('Notification' in window)?Notification.permission:'unsupported',
     serviceWorker:'serviceWorker' in navigator,
@@ -3520,33 +3550,38 @@ async function pfGetPushDiagnostics(){
     online:navigator.onLine,
     visibility:document.visibilityState,
     registration:false,
-    controlled:false,
+    controlled:!!navigator.serviceWorker?.controller,
     subscription:false,
     subscriptionEndpoint:false
   };
   try{
     if('serviceWorker' in navigator){
-      const reg=await navigator.serviceWorker.getRegistration(new URL('/', location.origin).href);
+      const regs=await navigator.serviceWorker.getRegistrations();
+      out.registrations=regs.map(r=>({scope:r.scope,script:r.active?.scriptURL||r.waiting?.scriptURL||r.installing?.scriptURL||''}));
+      const reg=regs.find(r=>r.scope===location.origin+'/' || location.href.startsWith(r.scope)) || regs[0];
       out.registration=!!reg;
-      out.controlled=!!navigator.serviceWorker.controller;
+      if(reg) out.registrationScope=reg.scope;
+      if(reg?.active) out.workerScriptURL=reg.active.scriptURL;
       if(reg && reg.pushManager){
         const sub=await reg.pushManager.getSubscription();
         out.subscription=!!sub;
         out.subscriptionEndpoint=!!sub?.endpoint;
       }
     }
-  }catch(e){ out.error=String(e?.message||e); }
-  try{
-    if(location.protocol !== 'file:'){
-      const swUrl=new URL('/pixel-friend-sw.js', location.origin).href;
-      const r=await fetch(swUrl,{cache:'no-store'});
-      out.serviceWorkerHTTP=r.status;
-      out.serviceWorkerContentType=r.headers.get('content-type')||'';
-      out.serviceWorkerReachable=r.ok;
-    }
-  }catch(e){ out.serviceWorkerFetchError=String(e?.message||e); }
+  }catch(e){ out.registrationError=String(e?.message||e); }
+  for(const [label,url] of [['relative',relativeWorker],['root',rootWorker]]){
+    try{
+      if(location.protocol !== 'file:'){
+        const r=await fetch(url,{cache:'no-store',credentials:'same-origin'});
+        out[label+'WorkerHTTP']=r.status;
+        out[label+'WorkerContentType']=r.headers.get('content-type')||'';
+        out[label+'WorkerReachable']=r.ok;
+      }
+    }catch(e){ out[label+'WorkerFetchError']=String(e?.message||e); }
+  }
   return out;
 }
+
 window.pfGetPushDiagnostics=pfGetPushDiagnostics;
 
 function pfShowLocalPushHelp(){
@@ -4651,7 +4686,10 @@ async function pfShowPushDiagnostics(){
     const d=await pfGetPushDiagnostics();
     box.textContent=[
       'Secure context: '+d.secure+' ('+d.protocol+')',
+      'Page URL: '+d.pageURL,
       'Host: '+d.host,
+      'Worker URL (page path): '+d.serviceWorkerURL,
+      'Worker URL (site root): '+d.rootServiceWorkerURL,
       'Notification permission: '+d.notification,
       'Service worker API: '+d.serviceWorker,
       'Push API: '+d.push,
@@ -4661,6 +4699,11 @@ async function pfShowPushDiagnostics(){
       'Push endpoint present: '+d.subscriptionEndpoint,
       'Online: '+d.online,
       'Visibility: '+d.visibility,
+      d.registrationScope ? 'Registration scope: '+d.registrationScope : '',
+      d.workerScriptURL ? 'Active worker: '+d.workerScriptURL : '',
+      d.relativeWorkerHTTP ? 'Page-path worker HTTP: '+d.relativeWorkerHTTP+' | '+d.relativeWorkerContentType : '',
+      d.rootWorkerHTTP ? 'Root worker HTTP: '+d.rootWorkerHTTP+' | '+d.rootWorkerContentType : '',
+      d.registrationError ? 'Registration error: '+d.registrationError : '',
       d.error ? 'Error: '+d.error : ''
     ].filter(Boolean).join('\n');
   }catch(e){ box.textContent='Diagnostics error: '+(e?.message||e); }
