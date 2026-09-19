@@ -3419,6 +3419,104 @@ const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
 
+// ===== PIXEL-FRIEND REAL BACKGROUND WEB PUSH =====
+const PF_VAPID_PUBLIC_KEY = "BCA203BDn2Gd61i8QK9FOscbI7gbJqg2WPBFKlDsTCfhUYrdJcUjACnXa-7mychnNEydHPbgdMC4cyBSHWC8Tp0";
+let pfPushRegistration = null;
+
+function pfBase64UrlToUint8Array(base64String){
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  return Uint8Array.from([...raw].map(ch => ch.charCodeAt(0)));
+}
+
+async function pfRegisterBackgroundPush(){
+  if(!currentUser || !('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+  if(!window.isSecureContext){
+    console.warn('[PF PUSH] HTTPS is required for background Web Push.');
+    return false;
+  }
+  try{
+    pfPushRegistration = await navigator.serviceWorker.register('./pixel-friend-sw.js', {scope:'./'});
+    await navigator.serviceWorker.ready;
+    return true;
+  }catch(err){
+    console.warn('[PF PUSH] Service worker registration failed:', err);
+    return false;
+  }
+}
+
+async function pfEnableBackgroundPush(options={requestPermission:true}){
+  if(!currentUser) return {ok:false,reason:'not-logged-in'};
+  const registered = await pfRegisterBackgroundPush();
+  if(!registered) return {ok:false,reason:'unsupported-or-insecure'};
+
+  if('Notification' in window && options.requestPermission && Notification.permission === 'default'){
+    const permission = await Notification.requestPermission();
+    if(permission !== 'granted') return {ok:false,reason:'permission-denied'};
+  }
+  if('Notification' in window && Notification.permission !== 'granted') return {ok:false,reason:'permission-denied'};
+
+  const registration = pfPushRegistration || await navigator.serviceWorker.ready;
+  let subscription = await registration.pushManager.getSubscription();
+  if(!subscription){
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly:true,
+      applicationServerKey:pfBase64UrlToUint8Array(PF_VAPID_PUBLIC_KEY)
+    });
+  }
+
+  const json = subscription.toJSON();
+  const endpoint = json?.endpoint;
+  const p256dh = json?.keys?.p256dh;
+  const auth = json?.keys?.auth;
+  if(!endpoint || !p256dh || !auth) throw new Error('Browser returned an incomplete push subscription.');
+
+  const {error} = await sb.from('web_push_subscriptions').upsert({
+    user_id:currentUser.id,
+    endpoint,
+    p256dh,
+    auth,
+    user_agent:navigator.userAgent,
+    updated_at:new Date().toISOString()
+  },{onConflict:'endpoint'});
+  if(error) throw error;
+
+  console.info('[PF PUSH] Background push enabled.');
+  return {ok:true,subscription};
+}
+window.pfEnableBackgroundPush = pfEnableBackgroundPush;
+
+async function pfAutoRegisterBackgroundPush(){
+  try{
+    // Do not prompt automatically. If permission was already granted, quietly
+    // restore the subscription after login/reload.
+    if('Notification' in window && Notification.permission === 'granted'){
+      await pfEnableBackgroundPush({requestPermission:false});
+    } else {
+      await pfRegisterBackgroundPush();
+    }
+  }catch(err){
+    console.warn('[PF PUSH] Auto registration:', err?.message || err);
+  }
+}
+
+function pfOpenNotificationFromUrl(){
+  try{
+    const id = new URLSearchParams(location.search).get('pfNotification');
+    if(!id || !currentUser) return;
+    history.replaceState(null,'',location.pathname + location.hash);
+    setTimeout(async()=>{
+      try{
+        if(typeof updateNotificationBadge==='function') await updateNotificationBadge({details:true});
+        if(typeof openNotification==='function') await openNotification(id,'','');
+      }catch(err){ console.warn('[PF PUSH] Open notification:',err); }
+    },500);
+  }catch(_){}
+}
+window.pfOpenNotificationFromUrl = pfOpenNotificationFromUrl;
+
+
 let currentUser = null, currentProfile = null, selectedUser = null;
 let presenceChannel = null;
 let onlineUserIds = new Set();
@@ -3788,6 +3886,9 @@ async function startApp(user){
 
   // The profile is required for permissions and most UI, so load only this first.
   await loadProfile();
+  // Register the service worker immediately; only subscribe/request permission
+  // when the user has already granted notifications or clicks Enable Alerts.
+  pfAutoRegisterBackgroundPush();
 
   // Keep invite functionality, but do not show a post-login toast/effect.
   try{
@@ -6511,6 +6612,7 @@ async function setupRealtime(force=false){
     });
 
   realtimeStarted=true;
+  pfOpenNotificationFromUrl();
   // Realtime is primary. Use a low-frequency reconciliation only when visible.
   startIncomingAlertFallback();
   // Double-check notification state frequently so the bell/list cannot go stale.
@@ -8685,12 +8787,19 @@ window.addEventListener('beforeunload', ()=>{
   };
   window.pfEnableAlertsFromSettings=async function(){
     const ok=await (window.pfUnlockAlertAudio?window.pfUnlockAlertAudio():Promise.resolve(false));
-    let n=true;
-    if('Notification' in window && Notification.permission==='default')try{await Notification.requestPermission()}catch(e){}
-    if('Notification' in window)n=Notification.permission==='granted';
+    let n=true, push=false;
+    try{
+      const result=await window.pfEnableBackgroundPush({requestPermission:true});
+      push=!!result?.ok;
+      n=('Notification' in window && Notification.permission==='granted');
+    }catch(e){
+      console.warn('[PF PUSH] Enable from settings:',e);
+      n=('Notification' in window && Notification.permission==='granted');
+    }
     const el=document.getElementById('pfSettingsAlertStatus');
     if(el)el.textContent=ok?'✓ Alarm sound unlocked.':'⚠️ Click the page and try again to unlock browser audio.';
-    const ne=document.getElementById('pfSettingsNotifStatus');if(ne)ne.textContent=n?'✓ Desktop notifications allowed.':'⚠️ Browser notifications are blocked.';
+    const ne=document.getElementById('pfSettingsNotifStatus');
+    if(ne)ne.textContent=push?'✓ Background push enabled — works when minimized or closed.':(n?'✓ Desktop notifications allowed.':'⚠️ Browser notifications are blocked.');
   };
   window.pfTestAlertFromSettings=async function(){
     const ok=await (window.pfUnlockAlertAudio?window.pfUnlockAlertAudio():Promise.resolve(false));
