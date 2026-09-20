@@ -3028,6 +3028,8 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
   <button id="sideMenuToggle" class="side-menu-toggle" type="button"
           onclick="toggleSideMenu()" aria-label="Open navigation menu"
           aria-controls="pixelSideMenu" aria-expanded="false">☰<span class="pf-menu-label">MENU</span></button>
+  <button id="themeToggle" class="pf-theme-toggle" type="button"
+          aria-label="Change Pixel-Friend theme" title="Change theme">🎨<span>THEME</span></button>
 
   <div class="brand pf-brand-reference" onclick="page('home')" title="Pixel-Friend Home">
     <span class="brand-icon pf-brand-mark" aria-hidden="true">
@@ -3419,6 +3421,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
 const SUPABASE_URL = "https://vvfkfpsyxipnypaltixq.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_NrHhUAFqknWsQki214NW1w_yb1mLoDP";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true}});
+window.sb = sb;
 
 // ===== PIXEL-FRIEND REAL BACKGROUND WEB PUSH =====
 const PF_VAPID_PUBLIC_KEY = "BCknbO-GI5PJTIsB1SuJ9nSg2Ixov69JbH4HKl88aTeOkupYeSM2X5-i6Md8cXTQz9YldMY7qC2UuXyhXxKCBgo";
@@ -7000,6 +7003,7 @@ async function restoreSession() {
       await startApp(data.session.user);
     } else {
       currentUser = null;
+      window.currentUser = null;
       currentProfile = null;
       document.body.classList.remove("pf-logged-in");
       $("authScreen").style.display = "grid";
@@ -7024,6 +7028,7 @@ sb.auth.onAuthStateChange((event, session) => {
     teardownRealtime();
     if(presenceChannel) stopPresence();
     currentUser = null;
+    window.currentUser = null;
     currentProfile = null;
     realtimeStarted = false;
     $("authScreen").style.display = "grid";
@@ -9580,6 +9585,252 @@ img{content-visibility:auto;}
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',add);
   else add();
+})();
+</script>
+
+
+<style id="pf-final-working-fixes">
+/* ===== FINAL WORKING HEADER / THEME / LIVE UPDATE FIX ===== */
+.pf-reference-topbar{
+  display:grid!important;
+  grid-template-columns:auto auto minmax(190px,260px) minmax(220px,1fr) auto!important;
+  align-items:center!important;
+  gap:10px!important;
+  min-height:64px!important;
+  height:auto!important;
+}
+.pf-reference-topbar > #sideMenuToggle{grid-column:1;grid-row:1}
+.pf-reference-topbar > #themeToggle{grid-column:2;grid-row:1}
+.pf-reference-topbar > .pf-brand-reference{
+  grid-column:3;grid-row:1;min-width:0!important;
+  display:flex!important;align-items:center!important;
+}
+.pf-reference-topbar > .pf-header-status{
+  grid-column:4;grid-row:1;
+  display:flex!important;align-items:center!important;min-width:0!important;
+  justify-self:stretch!important;
+}
+.pf-reference-topbar > .pf-reference-actions{
+  grid-column:5;grid-row:1;
+  display:flex!important;align-items:center!important;justify-self:end!important;
+}
+.pf-theme-toggle{
+  width:auto!important;min-width:58px!important;height:46px!important;
+  padding:6px 9px!important;border:1px solid #36567d!important;
+  border-radius:11px!important;background:#0c1b31!important;color:#dff6ff!important;
+  box-shadow:3px 3px 0 #050912!important;font-size:18px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  gap:4px!important;cursor:pointer!important;
+}
+.pf-theme-toggle span{font-size:8px;font-weight:800;letter-spacing:.4px}
+.pf-theme-toggle:hover{border-color:#42e9ff!important;transform:translateY(-1px)}
+.pf-header-status{width:100%!important}
+.pf-header-status .pf-header-live-update{
+  flex:1 1 auto!important;width:100%!important;max-width:none!important;
+  min-width:0!important;height:44px!important;
+}
+.pf-header-status .pf-header-datetime{flex:0 0 auto!important}
+.pf-header-status .pf-header-online{flex:0 0 auto!important}
+.pf-live-message{min-width:0!important}
+.pf-live-ticker-track{will-change:transform}
+.pf-live-update.is-event{
+  border-color:var(--cyan,#43e7ff)!important;
+  box-shadow:0 0 14px color-mix(in srgb,var(--cyan,#43e7ff) 28%,transparent),inset 0 0 16px rgba(0,153,255,.08)!important;
+}
+.pf-live-update.is-event .pf-live-dot{animation:pfLivePulse .65s ease-in-out 2}
+@keyframes pfLivePulse{50%{transform:scale(1.7);opacity:.55}}
+/* Theme variables are applied to the whole application, not just cards. */
+body[data-theme="cyber"] #app,
+body[data-theme="scifi"] #app,
+body[data-theme="hologram"] #app,
+body[data-theme="stealth"] #app,
+body[data-theme="violet"] #app,
+body[data-theme="matrix"] #app,
+body[data-theme="sunset"] #app,
+body[data-theme="light"] #app{
+  background:var(--theme-bg)!important;color:var(--theme-text)!important;
+}
+body[data-theme="cyber"] .topbar,body[data-theme="cyber"] .side,
+body[data-theme="scifi"] .topbar,body[data-theme="scifi"] .side,
+body[data-theme="hologram"] .topbar,body[data-theme="hologram"] .side,
+body[data-theme="stealth"] .topbar,body[data-theme="stealth"] .side,
+body[data-theme="violet"] .topbar,body[data-theme="violet"] .side,
+body[data-theme="matrix"] .topbar,body[data-theme="matrix"] .side,
+body[data-theme="sunset"] .topbar,body[data-theme="sunset"] .side{
+  background:var(--theme-panel)!important;color:var(--theme-text)!important;
+}
+body[data-theme="light"] .topbar,body[data-theme="light"] .side{
+  background:#f4f9fd!important;color:#102338!important;
+}
+@media(max-width:1180px){
+  .pf-reference-topbar{grid-template-columns:auto auto minmax(160px,210px) minmax(180px,1fr) auto!important}
+  .pf-header-status .pf-header-online{display:none!important}
+  .pf-header-status .pf-header-datetime{display:none!important}
+}
+@media(max-width:900px){
+  .pf-reference-topbar{
+    grid-template-columns:auto auto minmax(0,1fr) minmax(0,1fr) auto!important;
+  }
+  .pf-brand-reference{min-width:0!important}
+  .pf-brand-text small{display:none!important}
+  .pf-header-status{display:flex!important}
+  .pf-header-live-update{height:40px!important}
+  .pf-live-message{font-size:9px!important}
+  .pf-reference-actions{gap:4px!important}
+  .pf-head-profile{min-width:52px!important}
+}
+@media(max-width:650px){
+  .pf-reference-topbar{
+    grid-template-columns:auto auto minmax(0,1fr) minmax(0,1fr) auto!important;
+    min-height:58px!important;padding:5px 7px!important;gap:4px!important;
+  }
+  #sideMenuToggle{width:43px!important;min-width:43px!important;height:42px!important;padding:5px!important}
+  #sideMenuToggle .pf-menu-label{display:none!important}
+  .pf-theme-toggle{width:43px!important;min-width:43px!important;height:42px!important;padding:4px!important}
+  .pf-theme-toggle span{display:none!important}
+  .pf-header-status{display:flex!important;min-width:0!important}
+  .pf-header-status .pf-header-live-update{height:40px!important;min-width:0!important}
+  .pf-header-status .pf-live-badge{font-size:8px!important}
+  .pf-header-status .pf-live-message{font-size:8px!important}
+  .pf-header-status .pf-header-datetime,.pf-header-status .pf-header-online{display:none!important}
+  .pf-reference-actions{min-width:0!important}
+  .pf-reference-actions .pf-head-profile-info,.pf-reference-actions .pf-profile-chevron{display:none!important}
+  .pf-head-profile{width:42px!important;min-width:42px!important;height:42px!important}
+}
+</style>
+
+<script id="pf-final-working-controller">
+(function(){
+  'use strict';
+
+  /* ---------- Theme switcher ---------- */
+  const themes = [
+    ['cyber','CYBER'],['scifi','SCI-FI'],['hologram','HOLOGRAM'],
+    ['stealth','STEALTH'],['violet','VIOLET'],['matrix','MATRIX'],
+    ['sunset','SUNSET'],['light','LIGHT']
+  ];
+  const themeKey='pixelFriendTheme';
+  function applyTheme(theme, save=true){
+    const valid=themes.some(t=>t[0]===theme) ? theme : 'cyber';
+    document.body.dataset.theme=valid;
+    document.documentElement.dataset.pfTheme=valid;
+    try{if(save)localStorage.setItem(themeKey,valid)}catch(e){}
+    const btn=document.getElementById('themeToggle');
+    if(btn){
+      const item=themes.find(t=>t[0]===valid);
+      btn.title='Theme: '+(item?.[1]||valid)+' • click to change';
+      btn.setAttribute('aria-label','Change theme. Current theme: '+(item?.[1]||valid));
+    }
+    window.dispatchEvent(new CustomEvent('pixel-friend-theme-change',{detail:{theme:valid}}));
+  }
+  function nextTheme(){
+    const cur=document.body.dataset.theme||'cyber';
+    const i=Math.max(0,themes.findIndex(t=>t[0]===cur));
+    applyTheme(themes[(i+1)%themes.length][0],true);
+    const item=themes[(i+1)%themes.length];
+    if(typeof window.toast==='function') window.toast('🎨 Theme: '+item[1]);
+  }
+  function initTheme(){
+    let saved='cyber';
+    try{saved=localStorage.getItem(themeKey)||'cyber'}catch(e){}
+    applyTheme(saved,false);
+    document.getElementById('themeToggle')?.addEventListener('click',nextTheme);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',initTheme);
+  else initTheme();
+  window.pfApplyTheme=applyTheme;
+  window.pfNextTheme=nextTheme;
+
+  /* ---------- Real LIVE UPDATE ticker ---------- */
+  const liveItems=[
+    'WELCOME TO PIXEL-FRIEND',
+    'LIVE COMMUNITY UPDATE',
+    'NEW MESSAGES',
+    'NEW STORIES',
+    'NEW POSTS',
+    'REACTIONS & COMMENTS',
+    'FRIENDS & FOLLOWING',
+    'NOTIFICATIONS'
+  ];
+  let liveIndex=0;
+  function liveBox(){return document.getElementById('pfLiveUpdate')}
+  function setLive(text,flash=true){
+    const box=liveBox(); if(!box)return;
+    const msg=box.querySelector('.pf-live-message'); if(!msg)return;
+    const track=document.createElement('span');
+    track.className='pf-live-ticker-track';
+    track.textContent='  •  '+String(text||liveItems[liveIndex])+'     •  ';
+    msg.replaceChildren(track);
+    if(flash){
+      box.classList.remove('is-event'); void box.offsetWidth; box.classList.add('is-event');
+      setTimeout(()=>box.classList.remove('is-event'),1500);
+    }
+  }
+  function rotateLive(){
+    liveIndex=(liveIndex+1)%liveItems.length;
+    setLive(liveItems[liveIndex],false);
+  }
+  window.pfLiveUpdate=setLive;
+  window.pfLiveEvent=(text)=>setLive(text,true);
+  setTimeout(()=>{setLive(liveItems[0],false);setInterval(rotateLive,5000)},250);
+
+  /* Hook the application's actual event functions without changing their logic. */
+  function hook(name,label,format){
+    const old=window[name];
+    if(typeof old!=='function') return;
+    if(old.__pfLiveHooked)return;
+    const wrapped=function(){
+      try{
+        const args=[...arguments];
+        const text=typeof format==='function'?format(...args):label;
+        setLive(text,true);
+      }catch(e){}
+      return old.apply(this,arguments);
+    };
+    wrapped.__pfLiveHooked=true;
+    window[name]=wrapped;
+  }
+  const installHooks=()=>{
+    hook('notifyIncomingMessage','NEW MESSAGE RECEIVED',m=>'NEW MESSAGE • '+(m?.content?String(m.content).slice(0,42):'CHAT UPDATE'));
+    hook('notifyIncomingPost','NEW POST PUBLISHED');
+    hook('addComment','NEW COMMENT');
+    hook('toggleReaction','REACTION UPDATED');
+    hook('toggleMessageReaction','MESSAGE REACTION UPDATED');
+  };
+  installHooks();
+  setTimeout(installHooks,1000);
+  setTimeout(installHooks,3000);
+
+  /* Direct Supabase Realtime event listener: this makes the bar reflect
+     actual database activity even if an application function changes later. */
+  function attachLiveRealtime(){
+    try{
+      if(!window.sb || !window.currentUser) return;
+      const uid=String(window.currentUser.id);
+      const ch=window.sb.channel('pixel-friend-live-ticker-'+uid)
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'receiver_id=eq.'+uid},
+          p=>setLive('NEW MESSAGE RECEIVED',true))
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'posts'},
+          p=>setLive('NEW POST PUBLISHED',true))
+        .on('postgres_changes',{event:'INSERT',schema:'public',table:'comments'},
+          p=>setLive('NEW COMMENT',true))
+        .on('postgres_changes',{event:'*',schema:'public',table:'reactions'},
+          p=>setLive('REACTION UPDATED',true))
+        .subscribe(status=>{
+          if(status==='SUBSCRIBED') setLive('LIVE • REALTIME CONNECTED',true);
+        });
+      window.__pfLiveTickerChannel=ch;
+    }catch(e){console.warn('[PF LIVE TICKER]',e)}
+  }
+  setTimeout(attachLiveRealtime,2500);
+
+  /* Never let a missing optional Supabase table break the UI. */
+  window.addEventListener('error',e=>{
+    if(String(e?.message||'').includes('relation "logs" does not exist')){
+      e.preventDefault?.();
+      console.warn('[PF] Optional logs table is absent; continuing without it.');
+    }
+  });
 })();
 </script>
 
