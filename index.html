@@ -3283,7 +3283,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-feature-hero"><div><div class="pf-feature-kicker">PIXEL-FRIEND CONTROL</div><h1>⚙️ Settings</h1><p>Control alerts, notifications, theme and account preferences.</p></div></div>
     <div class="pf-settings-grid">
       <div class="card pf-setting-card"><h2>🔔 Notification Alarm</h2><p class="tiny">New realtime messages and feed notifications can ring until you dismiss the alarm.</p><button class="primary" onclick="pfEnableAlertsFromSettings()">ENABLE ALERTS</button><button class="secondary" onclick="pfTestAlertFromSettings()">TEST ALARM</button><div id="pfSettingsAlertStatus" class="status"></div></div>
-      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Dedicated Pixel-Friend popup appears just above the Windows taskbar. It is independent of Windows Toast permission.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><button class="secondary" onclick="pfTestSystemAlert()">🧪 TEST THIS DEVICE</button><button class="secondary" onclick="pfTestAllDevicesPush()">📡 TEST ALL DEVICES</button><button class="secondary" onclick="pfOpenWebPushTest()">🌐 OPEN WEB PUSH TEST</button><button class="secondary" onclick="pfShowPushDiagnostics()">🔎 CHECK PUSH STATUS</button><div id="pfSettingsNotifStatus" class="status"></div><pre id="pfPushDiagnostics" style="white-space:pre-wrap;font-size:11px;opacity:.82;margin-top:8px"></pre><div id="pfLocalPushHelp" class="status" style="margin-top:10px;display:none;border:1px solid #d5a84b;padding:10px;border-radius:8px">⚠️ Pixel-Friend is opened as a <b>local file (file://)</b>. Browser background push/service workers cannot be registered from this URL. Run the included <b>START-PIXEL-FRIEND-LOCAL.bat</b> or upload the HTML + <b>pixel-friend-sw.js</b> to your HTTPS website.</div><div class="pf-popup-settings" style="margin-top:14px;padding:12px;border:1px solid rgba(98,216,255,.35);border-radius:10px"><h3 style="margin:0 0 8px">⚙️ Popup Settings</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Position<select id="pfPopupPosition" class="secondary" style="width:100%"><option value="taskbar-right">Near Windows taskbar • auto detect</option><option value="bottom-right">Bottom-right • above taskbar</option><option value="bottom-left">Bottom-left</option><option value="top-right">Top-right</option><option value="top-left">Top-left</option></select></label><label>Auto close<select id="pfPopupAutoClose" class="secondary" style="width:100%"><option value="0">Stay until closed</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option></select></label><label>Width<input id="pfPopupWidth" type="number" min="360" max="520" value="430" style="width:100%"></label><label>Taskbar alert<select id="pfPopupFlash" class="secondary" style="width:100%"><option value="1">Flash taskbar icon</option><option value="0">Do not flash</option></select></label></div><button class="secondary" style="margin-top:10px" onclick="pfSavePopupSettings()">💾 SAVE POPUP SETTINGS</button><span id="pfPopupSettingsStatus" class="tiny" style="margin-left:8px"></span></div></div>
+      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Dedicated Pixel-Friend popup appears just above the Windows taskbar. It is independent of Windows Toast permission.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><button class="secondary" onclick="pfTestSystemAlert()">🧪 TEST THIS DEVICE</button><button class="secondary" onclick="pfTestAllDevicesPush()">📡 TEST ALL DEVICES</button><button class="secondary" onclick="pfShowPushDiagnostics()">🔎 CHECK PUSH STATUS</button><div id="pfSettingsNotifStatus" class="status"></div><pre id="pfPushDiagnostics" style="white-space:pre-wrap;font-size:11px;opacity:.82;margin-top:8px"></pre><div id="pfLocalPushHelp" class="status" style="margin-top:10px;display:none;border:1px solid #d5a84b;padding:10px;border-radius:8px">⚠️ Pixel-Friend is opened as a <b>local file (file://)</b>. Browser background push/service workers cannot be registered from this URL. Run the included <b>START-PIXEL-FRIEND-LOCAL.bat</b> or upload the HTML + <b>pixel-friend-sw.js</b> to your HTTPS website.</div><div class="pf-popup-settings" style="margin-top:14px;padding:12px;border:1px solid rgba(98,216,255,.35);border-radius:10px"><h3 style="margin:0 0 8px">⚙️ Popup Settings</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Position<select id="pfPopupPosition" class="secondary" style="width:100%"><option value="taskbar-right">Near Windows taskbar • auto detect</option><option value="bottom-right">Bottom-right • above taskbar</option><option value="bottom-left">Bottom-left</option><option value="top-right">Top-right</option><option value="top-left">Top-left</option></select></label><label>Auto close<select id="pfPopupAutoClose" class="secondary" style="width:100%"><option value="0">Stay until closed</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option></select></label><label>Width<input id="pfPopupWidth" type="number" min="360" max="520" value="430" style="width:100%"></label><label>Taskbar alert<select id="pfPopupFlash" class="secondary" style="width:100%"><option value="1">Flash taskbar icon</option><option value="0">Do not flash</option></select></label></div><button class="secondary" style="margin-top:10px" onclick="pfSavePopupSettings()">💾 SAVE POPUP SETTINGS</button><span id="pfPopupSettingsStatus" class="tiny" style="margin-left:8px"></span></div></div>
       <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Pixel-Friend themes are available in the app theme settings.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
       <div class="card pf-setting-card"><h2>🔊 Alarm Behavior</h2><p class="tiny">The alarm remains active until you press <b>DISMISS &amp; STOP SOUND</b> or mark notifications as read.</p><div class="pf-setting-state">● Persistent alarm: <strong>ON</strong></div></div>
     </div>
@@ -3639,17 +3639,9 @@ async function pfEnableBackgroundPush(options={requestPermission:true}){
 
   if('Notification' in window && options.requestPermission && Notification.permission === 'default'){
     const permission = await Notification.requestPermission();
-    if(permission !== 'granted'){
-      const status=document.getElementById('pfSettingsNotifStatus');
-      if(status) status.innerHTML='⚠️ Web Push permission was not granted. Set <b>Notifications → Allow</b> for improvementcarter-debug.github.io in your browser site settings, then click <b>TEST ALL DEVICES</b> again.';
-      return {ok:false,reason:permission==='denied'?'permission-denied':'permission-not-granted'};
-    }
+    if(permission !== 'granted') return {ok:false,reason:'permission-denied'};
   }
-  if('Notification' in window && Notification.permission !== 'granted'){
-    const status=document.getElementById('pfSettingsNotifStatus');
-    if(status) status.innerHTML='🚫 Web Push is blocked by this browser. Open the browser site settings for <b>improvementcarter-debug.github.io</b>, set <b>Notifications → Allow</b>, reload, then test again.';
-    return {ok:false,reason:'permission-denied'};
-  }
+  if('Notification' in window && Notification.permission !== 'granted') return {ok:false,reason:'permission-denied'};
 
   const registration = pfPushRegistration || await navigator.serviceWorker.ready;
   const PF_VAPID_STORAGE_KEY = 'pf_vapid_public_key_v2';
@@ -4812,10 +4804,9 @@ async function pfTestAllDevicesPush(){
   try{
     if(!currentUser) throw new Error('Please log in first.');
     if(window.electronAPI?.isElectron){
-      // Electron uses the native Windows notification channel. Browser Web Push
-      // requires a real browser origin with Notification permission + PushManager.
+      // Electron has its own native desktop channel; Web Push is for browser/mobile devices.
       await pfTestSystemAlert();
-      if(box) box.innerHTML='✓ Windows desktop test sent: popup + sound.<br>ℹ️ Browser Web Push is not created inside the Electron shell. Click <b>🌐 OPEN WEB PUSH TEST</b> to register this account in Chrome/Edge and test pf-push.';
+      if(box) box.textContent+=' Web Push is intentionally skipped in the Windows desktop shell.';
       return;
     }
     const enabled=await pfEnableBackgroundPush({requestPermission:true});
@@ -4837,23 +4828,6 @@ async function pfTestAllDevicesPush(){
 }
 window.pfTestAllDevicesPush=pfTestAllDevicesPush;
 
-async function pfOpenWebPushTest(){
-  const url='https://improvementcarter-debug.github.io/Pixel-Friend/';
-  try{
-    if(window.electronAPI?.openExternal){
-      await window.electronAPI.openExternal(url);
-    }else{
-      window.open(url,'_blank','noopener,noreferrer');
-    }
-    const box=document.getElementById('pfSettingsNotifStatus');
-    if(box) box.innerHTML='🌐 Web Push test page opened in your browser. Log in with the same Pixel-Friend account, allow <b>Notifications</b>, then click <b>TEST ALL DEVICES</b>.';
-  }catch(e){
-    const box=document.getElementById('pfSettingsNotifStatus');
-    if(box) box.textContent='✕ Could not open the browser Web Push test: '+(e?.message||e);
-  }
-}
-window.pfOpenWebPushTest=pfOpenWebPushTest;
-
 async function pfShowPushDiagnostics(){
   const box=document.getElementById('pfPushDiagnostics');
   if(!box) return;
@@ -4872,9 +4846,6 @@ async function pfShowPushDiagnostics(){
       'Page controlled by worker: '+d.controlled,
       'Push subscription saved in browser: '+d.subscription,
       'Push endpoint present: '+d.subscriptionEndpoint,
-      d.notification==='denied' ? 'ACTION: Browser notification permission is BLOCKED. Set Notifications → Allow for improvementcarter-debug.github.io, reload, then test again.' : '',
-      d.notification==='default' ? 'ACTION: Click ENABLE ALL ALERTS or TEST ALL DEVICES to request browser notification permission.' : '',
-      d.notification==='granted' && !d.subscription ? 'ACTION: Permission is granted but no PushSubscription exists yet; click TEST ALL DEVICES to create and save it.' : '',
       'Online: '+d.online,
       'Visibility: '+d.visibility,
       d.registrationScope ? 'Registration scope: '+d.registrationScope : '',
