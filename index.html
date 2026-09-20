@@ -3283,7 +3283,7 @@ html.pf-performance-normal body.pf-lite-effects .user-card{
     <div class="pf-feature-hero"><div><div class="pf-feature-kicker">PIXEL-FRIEND CONTROL</div><h1>⚙️ Settings</h1><p>Control alerts, notifications, theme and account preferences.</p></div></div>
     <div class="pf-settings-grid">
       <div class="card pf-setting-card"><h2>🔔 Notification Alarm</h2><p class="tiny">New realtime messages and feed notifications can ring until you dismiss the alarm.</p><button class="primary" onclick="pfEnableAlertsFromSettings()">ENABLE ALERTS</button><button class="secondary" onclick="pfTestAlertFromSettings()">TEST ALARM</button><div id="pfSettingsAlertStatus" class="status"></div></div>
-      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Allow the browser to show notifications when Pixel-Friend is minimized. Closed-window push also needs the background Web Push server setup.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><button class="secondary" onclick="pfTestSystemAlert()">🧪 TEST SYSTEM ALERT</button><button class="secondary" onclick="pfShowPushDiagnostics()">🔎 CHECK PUSH STATUS</button><div id="pfSettingsNotifStatus" class="status"></div><pre id="pfPushDiagnostics" style="white-space:pre-wrap;font-size:11px;opacity:.82;margin-top:8px"></pre><div id="pfLocalPushHelp" class="status" style="margin-top:10px;display:none;border:1px solid #d5a84b;padding:10px;border-radius:8px">⚠️ Pixel-Friend is opened as a <b>local file (file://)</b>. Browser background push/service workers cannot be registered from this URL. Run the included <b>START-PIXEL-FRIEND-LOCAL.bat</b> or upload the HTML + <b>pixel-friend-sw.js</b> to your HTTPS website.</div></div>
+      <div class="card pf-setting-card"><h2>🖥️ Desktop Notifications</h2><p class="tiny">Dedicated Pixel-Friend popup appears just above the Windows taskbar. It is independent of Windows Toast permission.</p><button class="secondary" onclick="pfEnableAlertsFromSettings()">🔔 ENABLE ALL ALERTS • PC + MOBILE</button><button class="secondary" onclick="pfTestSystemAlert()">🧪 TEST SYSTEM ALERT</button><button class="secondary" onclick="pfShowPushDiagnostics()">🔎 CHECK PUSH STATUS</button><div id="pfSettingsNotifStatus" class="status"></div><pre id="pfPushDiagnostics" style="white-space:pre-wrap;font-size:11px;opacity:.82;margin-top:8px"></pre><div id="pfLocalPushHelp" class="status" style="margin-top:10px;display:none;border:1px solid #d5a84b;padding:10px;border-radius:8px">⚠️ Pixel-Friend is opened as a <b>local file (file://)</b>. Browser background push/service workers cannot be registered from this URL. Run the included <b>START-PIXEL-FRIEND-LOCAL.bat</b> or upload the HTML + <b>pixel-friend-sw.js</b> to your HTTPS website.</div><div class="pf-popup-settings" style="margin-top:14px;padding:12px;border:1px solid rgba(98,216,255,.35);border-radius:10px"><h3 style="margin:0 0 8px">⚙️ Popup Settings</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label>Position<select id="pfPopupPosition" class="secondary" style="width:100%"><option value="taskbar-right">Near Windows taskbar • auto detect</option><option value="bottom-right">Bottom-right • above taskbar</option><option value="bottom-left">Bottom-left</option><option value="top-right">Top-right</option><option value="top-left">Top-left</option></select></label><label>Auto close<select id="pfPopupAutoClose" class="secondary" style="width:100%"><option value="0">Stay until closed</option><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option></select></label><label>Width<input id="pfPopupWidth" type="number" min="360" max="520" value="430" style="width:100%"></label><label>Taskbar alert<select id="pfPopupFlash" class="secondary" style="width:100%"><option value="1">Flash taskbar icon</option><option value="0">Do not flash</option></select></label></div><button class="secondary" style="margin-top:10px" onclick="pfSavePopupSettings()">💾 SAVE POPUP SETTINGS</button><span id="pfPopupSettingsStatus" class="tiny" style="margin-left:8px"></span></div></div>
       <div class="card pf-setting-card"><h2>🎨 Theme</h2><p class="tiny">Pixel-Friend themes are available in the app theme settings.</p><button class="secondary" onclick="document.getElementById('themeToggle')?.click()">CHANGE THEME</button></div>
       <div class="card pf-setting-card"><h2>🔊 Alarm Behavior</h2><p class="tiny">The alarm remains active until you press <b>DISMISS &amp; STOP SOUND</b> or mark notifications as read.</p><div class="pf-setting-state">● Persistent alarm: <strong>ON</strong></div></div>
     </div>
@@ -3482,6 +3482,32 @@ async function pfRegisterBackgroundPush(){
 }
 
 async function pfShowSystemNotification(title, options={}){
+  // PIXEL-FRIEND WINDOWS DESKTOP PATH: always use the dedicated Electron
+  // notification popup. Do NOT gate this on browser Notification.permission.
+  // This function is also called internally by the web app using the lexical
+  // function name, so replacing window.pfShowSystemNotification from Electron
+  // is not sufficient. The bridge must be handled here directly.
+  if(window.electronAPI?.isElectron && typeof window.electronAPI.showNotification === 'function'){
+    try{
+      const result = await window.electronAPI.showNotification({
+        title: String(title || 'Pixel-Friend'),
+        body: String(options.body || ''),
+        tag: String(options.tag || 'pixel-friend'),
+        data: options.data || {},
+        sender: String(options.sender || ''),
+        from: String(options.from || options.sender || ''),
+        source: String(options.source || 'MESSAGE'),
+        sourceDetail: String(options.sourceDetail || 'Realtime notification'),
+        unreadCount: Number(options.unreadCount || 0)
+      });
+      console.info('[PF NOTIFY] Dedicated Pixel-Friend desktop popup requested:', title);
+      return result !== false;
+    }catch(e){
+      console.warn('[PF NOTIFY] Dedicated Electron popup failed:', e);
+      return false;
+    }
+  }
+
   if(!('Notification' in window) || Notification.permission !== 'granted') return false;
 
   // DESKTOP/MINIMIZED PATH: use the browser's native Window notification first.
@@ -3585,6 +3611,17 @@ async function pfGetPushDiagnostics(){
 
 window.pfGetPushDiagnostics=pfGetPushDiagnostics;
 
+function pfValidateVapidPublicKey(){
+  try{
+    const raw=pfBase64UrlToUint8Array(PF_VAPID_PUBLIC_KEY);
+    const ok=raw.length===65 && raw[0]===4;
+    if(!ok) console.warn('[PF PUSH] VAPID public key format is invalid; expected 65-byte uncompressed P-256 key.');
+    return ok;
+  }catch(e){ console.warn('[PF PUSH] VAPID public key decode failed:',e); return false; }
+}
+window.pfValidateVapidPublicKey=pfValidateVapidPublicKey;
+
+
 function pfShowLocalPushHelp(){
   const el=document.getElementById('pfLocalPushHelp');
   if(el) el.style.display=(location.protocol==='file:')?'block':'none';
@@ -3594,7 +3631,9 @@ window.addEventListener('pageshow',pfShowLocalPushHelp);
 window.pfShowSystemNotification = pfShowSystemNotification;
 
 async function pfEnableBackgroundPush(options={requestPermission:true}){
+  if(window.electronAPI?.isElectron) return {ok:false,reason:'electron-native-notifications'};
   if(!currentUser) return {ok:false,reason:'not-logged-in'};
+  if(!pfValidateVapidPublicKey()) return {ok:false,reason:'invalid-vapid-public-key'};
   const registered = await pfRegisterBackgroundPush();
   if(!registered) return {ok:false,reason:'unsupported-or-insecure'};
 
@@ -4052,7 +4091,7 @@ async function startApp(user){
   await loadProfile();
   // Register the service worker immediately; only subscribe/request permission
   // when the user has already granted notifications or clicks Enable Alerts.
-  pfAutoRegisterBackgroundPush();
+  if(!window.electronAPI?.isElectron) pfAutoRegisterBackgroundPush();
 
   // Keep invite functionality, but do not show a post-login toast/effect.
   try{
@@ -4412,9 +4451,13 @@ let notificationItems = new Map();
 function renderNotificationBadge(count){
   localUnreadCount = Math.max(0, Number(count) || 0);
   const badge = $("notifBadge");
-  if(!badge) return;
-  badge.textContent = localUnreadCount > 99 ? '99+' : String(localUnreadCount);
-  badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
+  if(badge){
+    badge.textContent = localUnreadCount > 99 ? '99+' : String(localUnreadCount);
+    badge.style.display = localUnreadCount > 0 ? 'inline-block' : 'none';
+  }
+  // Keep the Electron tray and dedicated Windows popup synchronized with the
+  // same unread count shown by the Pixel-Friend bell.
+  try{ window.electronAPI?.setUnreadCount?.(localUnreadCount); }catch(e){}
 }
 
 let activeNotificationFilter = 'all';
@@ -4437,6 +4480,19 @@ function setNotificationFilter(){
   renderNotificationList();
 }
 window.setNotificationFilter=setNotificationFilter;
+
+function notificationSourceDetail(message){
+  if(!message) return 'Realtime notification';
+  if(message.sticker) return 'Sticker attachment';
+  if(message.image_url) return 'Image attachment';
+  if(message.video_url) return 'Video attachment';
+  if(message.audio_url) return 'Voice attachment';
+  if(message.file_url || message.file_name || message.filename || message.attachment_name){
+    const n=message.file_name||message.filename||message.attachment_name||'';
+    return n ? 'File: '+n : 'File attachment';
+  }
+  return notificationType(message)==='post' ? 'Feed / post' : 'Realtime message';
+}
 
 function notificationDetail(message){
   if(notificationType(message) === 'post'){
@@ -4580,11 +4636,18 @@ function notifyIncomingMessage(message){
   addNotificationItem(message, senderName, true);
   showTelegramNotification(message, senderName, senderAvatar);
 
-  if('Notification' in window && Notification.permission === 'granted'){
+  // Electron desktop: native Windows notification does NOT depend on the
+  // browser Notification permission. Browser/mobile keeps the permission gate.
+  if(window.electronAPI?.isElectron || ('Notification' in window && Notification.permission === 'granted')){
     pfShowSystemNotification(`💬 ${senderName}`, {
       body: notificationDetail(message),
       tag:'pixel-friend-'+id,
-      data:{url:`/?pfNotification=${encodeURIComponent(id)}`,notificationId:id,messageId:id}
+      data:{url:`/?pfNotification=${encodeURIComponent(id)}`,notificationId:id,messageId:id},
+      sender:senderName || 'PIXEL USER',
+      source: notificationType(message) === 'message' && (message.image_url || message.video_url || message.audio_url) ? 'FILE / MEDIA' : 'MESSAGE',
+      sourceDetail: notificationSourceDetail(message),
+      unreadCount:localUnreadCount,
+      popupSettings: pfGetPopupSettings()
     });
   }
 
@@ -4620,6 +4683,19 @@ async function notifyIncomingPost(post){
   notificationItems.set(key,item); savePersistentPostNotifications();
   renderNotificationBadge(Array.from(notificationItems.values()).filter(n=>n.unread).length);
   renderNotificationList(); showTelegramNotification(item,senderName,senderAvatar);
+  // Desktop posts also produce a native Windows notification.
+  if(window.electronAPI?.isElectron || ('Notification' in window && Notification.permission === 'granted')){
+    pfShowSystemNotification(`📰 ${senderName}`, {
+      body: notificationDetail(item),
+      tag:'pixel-friend-post-'+String(post.id),
+      data:{url:`/?pfNotification=${encodeURIComponent(key)}`,notificationId:key},
+      sender:senderName || 'PIXEL USER',
+      source:'NEW POST',
+      sourceDetail: notificationSourceDetail(item),
+      unreadCount:Array.from(notificationItems.values()).filter(n=>n.unread).length,
+      popupSettings: pfGetPopupSettings()
+    });
+  }
   if(!notificationProfileCache.has(senderId)&&senderId){
     sb.from('profiles').select('username,avatar,avatar_url').eq('id',senderId).maybeSingle().then(({data})=>{
       const resolved=data?.username||'PIXEL USER'; notificationProfileCache.set(senderId,resolved); notificationProfileDataCache.set(senderId,data||{});
@@ -4675,22 +4751,57 @@ function showTelegramNotification(message, senderName, senderAvatar='👾'){
 }
 
 
+function pfGetPopupSettings(){
+  try{return JSON.parse(localStorage.getItem('pfDesktopPopupSettings')||'{}')}catch(e){return {}}
+}
+function pfApplyPopupSettings(){
+  const d=pfGetPopupSettings();
+  const merged={position:d.position||'taskbar-right',autoCloseSeconds:Number(d.autoCloseSeconds||0),width:Number(d.width||430),height:225,margin:10,flashTaskbar:d.flashTaskbar!==false};
+  const pos=document.getElementById('pfPopupPosition'), ac=document.getElementById('pfPopupAutoClose'), wd=document.getElementById('pfPopupWidth'), fl=document.getElementById('pfPopupFlash');
+  if(pos)pos.value=merged.position;if(ac)ac.value=String(merged.autoCloseSeconds);if(wd)wd.value=String(merged.width);if(fl)fl.value=merged.flashTaskbar?'1':'0';
+  try{window.electronAPI?.setNotificationPopupSettings?.(merged)}catch(e){}
+  return merged;
+}
+function pfSavePopupSettings(){
+  const d={position:document.getElementById('pfPopupPosition')?.value||'taskbar-right',autoCloseSeconds:Number(document.getElementById('pfPopupAutoClose')?.value||0),width:Number(document.getElementById('pfPopupWidth')?.value||430),flashTaskbar:(document.getElementById('pfPopupFlash')?.value||'1')==='1'};
+  d.width=Math.max(360,Math.min(520,d.width));
+  try{localStorage.setItem('pfDesktopPopupSettings',JSON.stringify(d))}catch(e){}
+  pfApplyPopupSettings();
+  const st=document.getElementById('pfPopupSettingsStatus');if(st){st.textContent='✓ Saved';setTimeout(()=>st.textContent='',1800)}
+}
+if(window.electronAPI?.isElectron){window.addEventListener('DOMContentLoaded',()=>setTimeout(pfApplyPopupSettings,250));}
+
 async function pfTestSystemAlert(){
+  const box=document.getElementById('pfSettingsNotifStatus');
   try{
+    if(window.electronAPI?.isElectron){
+      const d = await window.electronAPI.notificationDiagnostics?.() || {};
+      const ok = await window.electronAPI.showNotification({
+        title:'🔔 Pixel-Friend TEST ALERT',
+        body:'Windows text + sound notification test. This should create a Windows banner and a Notification Center entry.',
+        tag:'pixel-friend-test-'+Date.now(),
+        data:{url:location.href},
+        source:'SYSTEM TEST',
+        sourceDetail:'Pixel-Friend desktop popup',
+        popupSettings:pfGetPopupSettings()
+      });
+      if(box) box.innerHTML = ok
+        ? `✓ Windows desktop alert sent. Native support: ${d.electronNotificationSupported ? 'YES' : 'NO'} • Tray fallback: ${d.trayAvailable ? 'READY' : 'NO'}`
+        : '✕ Windows could not display the desktop alert.';
+      return;
+    }
     if(!('Notification' in window)) throw new Error('This browser does not support web notifications.');
     if(Notification.permission !== 'granted'){
       const permission = await Notification.requestPermission();
-      if(permission !== 'granted') throw new Error('Notification permission is not granted.');
+      if(permission !== 'granted') throw new Error('Browser notification permission is denied.');
     }
     const ok = await pfShowSystemNotification('🔔 Pixel-Friend TEST ALERT', {
-      body:'If you see this while Pixel-Friend is minimized, Chrome/Windows system alerts are working.',
+      body:'Browser/OS system alert test.',
       tag:'pixel-friend-test-'+Date.now(),
       data:{url:location.href}
     });
-    const box=document.getElementById('pfSettingsNotifStatus');
-    if(box) box.textContent = ok ? '✓ Test alert sent to the browser/OS.' : '✕ Browser could not display the system alert.';
+    if(box) box.textContent = ok ? '✓ Browser/OS test alert sent.' : '✕ Browser could not display the system alert.';
   }catch(e){
-    const box=document.getElementById('pfSettingsNotifStatus');
     if(box) box.textContent='✕ '+(e?.message||e);
     console.warn('[PF TEST ALERT]',e);
   }
@@ -6914,56 +7025,6 @@ async function logout() {
 }
 window.logout = logout;
 
-async function restoreSession() {
-  try {
-    const { data, error } = await sb.auth.getSession();
-    if (error) throw error;
-
-    if (data?.session?.user) {
-      await startApp(data.session.user);
-    } else {
-      currentUser = null;
-      currentProfile = null;
-      document.body.classList.remove("pf-logged-in");
-      $("authScreen").style.display = "grid";
-      $("app").style.display = "none";
-    }
-  } catch (err) {
-    console.error("Session restore failed:", err);
-    toast("⚠️ Unable to restore your session. Please log in again.");
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-}
-
-// Keep the logged-in session when the page is refreshed.
-sb.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_OUT" || !session) {
-    notificationInitialized = false;
-    knownUnreadMessageIds.clear();
-    notificationProfileCache.clear();
-    if(typeof notificationProfileDataCache !== 'undefined') notificationProfileDataCache.clear();
-    notificationItems.clear();
-    if(presenceChannel) stopPresence();
-    currentUser = null;
-    currentProfile = null;
-    document.body.classList.remove("pf-logged-in");
-    $("authScreen").style.display = "grid";
-    $("app").style.display = "none";
-  }
-});
-
-async function logout() {
-  notificationInitialized = false;
-  knownUnreadMessageIds.clear();
-  notificationProfileCache.clear();
-  notificationItems.clear();
-  await stopPresence();
-  await sb.auth.signOut();
-}
-window.logout = logout;
-
-
 /* ===== PIXEL-FRIEND ARCADE: FEED THE PET ===== */
 const pfPets=['👾','🦊','🐱','🤖','🐼','🐸'];
 const pfFoods=['🍪','⭐','🍎','🍰','🍕','🍬','🥕','🧁'];
@@ -7893,7 +7954,7 @@ window.PFNativePushToken = async function(token){
       user_id:session.user.id,
       token:String(token),
       platform:'android',
-      app_version:'2.0.0',
+      app_version:'2.1.0',
       updated_at:new Date().toISOString()
     },{onConflict:'token'});
   }catch(e){ console.warn('Android push token registration failed',e); }
@@ -9025,7 +9086,9 @@ window.addEventListener('beforeunload', ()=>{
     const el=document.getElementById('pfSettingsAlertStatus');
     if(el)el.textContent=ok?'✓ Alarm sound unlocked.':'⚠️ Click the page and try again to unlock browser audio.';
     const ne=document.getElementById('pfSettingsNotifStatus');
-    if(ne)ne.textContent=push?'✓ Background push enabled — works when minimized or closed.':(n?'✓ Desktop notifications allowed.':'⚠️ Browser notifications are blocked.');
+    if(ne)ne.textContent=window.electronAPI?.isElectron
+      ? '✓ Windows desktop notifications use the native Pixel-Friend desktop channel.'
+      : (push?'✓ Background push enabled — works when minimized or closed.':(n?'✓ Desktop notifications allowed.':'⚠️ Browser notifications are blocked.'));
   };
   window.pfTestAlertFromSettings=async function(){
     const ok=await (window.pfUnlockAlertAudio?window.pfUnlockAlertAudio():Promise.resolve(false));
